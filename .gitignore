@@ -1,0 +1,8 @@
+.env
+node_modules/
+
+mg_scripts/
+
+dist/chrome
+dist/firefox
+dist/*.xpi

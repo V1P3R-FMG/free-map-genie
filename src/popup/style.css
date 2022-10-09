@@ -1,0 +1,316 @@
+:root {
+	--background: #131313;
+	--tooltip: #1d1d1d;
+	--text: #c0c0c0;
+	--text-light: #808080;
+	--item: #ffffff07;
+	--checkbox: #ffffff26;
+	--checkbox-text: #e0e0e0;
+	--button: #ffffff0d;
+	--button-hover: #ffffff10;
+	--button-active: #ffffff00;
+	--red: #c73737;
+	--active: #37c743;
+	--inactive: #ff4b4b;
+}
+
+/* @media (prefers-color-scheme: light) {  
+    :root {
+        --background: #f0f0f0;
+        --tooltip: #dadada;
+        --text: #2e2e2e;
+        --text-light: #b8b8b8;
+        --item: #e4e4e4;
+        --checkbox: #f0f0f0;
+        --checkbox-text: #686868;
+        --button: #d8d8d8;
+        --button-hover: #c4c4c4;
+        --button-active: #c4c4c4;
+        --red: #c53131;
+        --active: #2daa37;
+        --inactive: #d33f3f;
+    }
+} */
+
+body {
+	font-family: Rubik, sans-serif;
+	color: var(--text);
+	margin: 0px;
+	font-size: 1em;
+	user-select: none;
+	/* border-radius: 10px; */
+}
+
+.background {
+	position: relative;
+	background-color: var(--background);
+	width: 360px;
+}
+
+.close-button,
+.reload-button,
+.mapgenie-button {
+	display: inline-block;
+	position: absolute;
+	color: var(--text-light);
+	margin: 8px;
+	background: transparent;
+	cursor: pointer;
+	border: none;
+	font-size: 1.2em;
+	z-index: 4;
+}
+
+.close-button {
+	font-size: 1.5em;
+	margin-top: 5px;
+	right: 0;
+}
+
+.mapgenie-button {
+	font-size: 1.5em;
+	margin-top: 6px;
+	left: 0;
+}
+
+.close-button:hover,
+.reload-button:hover,
+.mapgenie-button:hover {
+	color: var(--red);
+}
+
+h3 {
+	position: relative;
+	margin: 0px 10px;
+	padding: 10px 0px 5px 0px;
+	text-align: center;
+	border-bottom: var(--text) solid 1px;
+}
+
+.pro {
+	font-weight: 200;
+	color: var(--red);
+	font-size: 0.6em;
+	padding-left: 3px;
+}
+
+.footer {
+	color: var(--text-light);
+	font-weight: 100;
+	font-size: 0.75em;
+	right: 0px;
+	bottom: 0px;
+	text-align: right;
+	margin-top: 2px;
+	margin-bottom: 0px;
+	padding: 5px 10px;
+	height: 15px;
+}
+
+.footer > span.left {
+	float: left;
+}
+
+.footer > span.right {
+	float: right;
+}
+
+.option {
+	display: flex;
+	align-items: center;
+	border-radius: 5px;
+	margin: 5px;
+	background: var(--item);
+	/* grid-template-columns: 3fr 1fr; */
+}
+
+.option > span {
+	position: relative;
+	font-weight: 300;
+	width: 100%;
+	font-size: 1em;
+	text-align: left;
+	/* text-transform: uppercase; */
+}
+
+.option > .info {
+	padding: 5px;
+}
+
+.option > span.hover::after {
+	content: attr(data-tooltip);
+	position: absolute;
+	background: var(--tooltip);
+	border-radius: 5px;
+	width: calc(100% - 5px);
+	left: 0;
+	bottom: 0;
+	z-index: 20;
+	padding: 10px;
+	pointer-events: none;
+	transform: translate(0, 100%);
+}
+
+.toggle-button-cover {
+	display: flex;
+	position: relative;
+	width: 40px;
+	height: 5px;
+	margin: 15px 10px;
+	box-sizing: border-box;
+	align-items: center;
+	justify-content: center;
+}
+
+.button-cover,
+.knobs,
+.layer {
+	position: absolute;
+	bottom: 0;
+	right: 0;
+	left: 0;
+	top: 0;
+}
+
+.button {
+	position: relative;
+	width: 100%;
+	height: 18px;
+}
+
+.button.r,
+.button.r .layer {
+	border-radius: 100px;
+}
+
+.checkbox {
+	position: relative;
+	width: 100%;
+	height: 100%;
+	padding: 0;
+	margin: 0;
+	opacity: 0;
+	cursor: pointer;
+	z-index: 3;
+}
+
+.knobs {
+	z-index: 2;
+}
+
+.layer {
+	width: 100%;
+	top: 2px;
+	height: calc(100% - 4px);
+	background-color: var(--checkbox);
+	transition: 0.3s ease all;
+	z-index: 1;
+}
+
+/* Button 3 */
+.button .knobs:before {
+	content: "";
+	position: absolute;
+	top: 50%;
+	left: 0%;
+	aspect-ratio: 1;
+	height: 100%;
+	width: auto;
+	line-height: 1;
+	background-color: var(--checkbox-text);
+	border-radius: 50%;
+	transform: translateY(-50%);
+	transition: 0.3s ease all, left 0.3s cubic-bezier(0.18, 0.89, 0.35, 1.15);
+}
+
+.button .checkbox:checked + .knobs:before {
+	content: "";
+	left: calc(80%);
+	transform: translate(-50%, -50%);
+	background-color: var(--red);
+}
+
+.button .checkbox:checked ~ .layer {
+	background-color: rgba(255, 255, 255, 0.15);
+}
+
+.statuses {
+	display: flex;
+	flex-direction: row;
+	margin: 5px;
+}
+
+.status {
+	position: relative;
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	justify-content: center;
+	width: 100%;
+	padding: 0px;
+	border-radius: 4px;
+	background-color: var(--item);
+}
+
+.status > span {
+	margin: 7px 0px 6px 0px;
+}
+
+.status-dot {
+	height: 15px;
+	width: 15px;
+	border-radius: 50%;
+	font-size: 1.5em;
+	margin: 0px 5px 1px 0px;
+	background-color: var(--inactive);
+	box-shadow: 0 0 10px 1px var(--inactive);
+	transition: 0.3s ease all;
+}
+
+.status.active .status-dot {
+	background-color: var(--active);
+	box-shadow: 0 0 10px 1px var(--active);
+}
+
+.status:not(:first-child) {
+	margin-left: 5px;
+}
+
+.buttons {
+	position: relative;
+	display: flex;
+	flex-direction: row-reverse;
+}
+
+.buttons > button {
+	color: inherit;
+	background: var(--button);
+	border-radius: 5px;
+	border: none;
+	width: 20%;
+	height: 30px;
+	margin: 0px 5px;
+	cursor: pointer;
+	transition: background 0.3s ease;
+}
+
+.buttons > button:disabled {
+	filter: brightness(0.5);
+	cursor: default;
+}
+
+.buttons > button:hover:not(:disabled) {
+	background: var(--button-hover);
+}
+
+.buttons > button > i {
+	margin-right: 5px;
+}
+
+.buttons > button:not(:last-child) {
+	margin-left: 0px;
+}
+
+#author {
+	cursor: pointer;
+}

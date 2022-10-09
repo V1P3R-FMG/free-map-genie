@@ -1,0 +1,27 @@
+button.mg-mark-all-control,
+button.mg-unmark-all-control {
+    width: 40px;
+    height: 40px;
+    box-shadow: none!important;
+    background-color: #fff!important;
+}
+
+.mg-mark-all-control .mapboxgl-ctrl-icon,
+.mg-unmark-all-control .mapboxgl-ctrl-icon {
+    background: none!important;
+    font-size: 24px;
+    padding: 7px 6px;
+}
+
+.progress-select-categories {
+    position: absolute;
+    right: 100%;
+    height: 0;
+    background-color: var(--body-background);
+    overflow: hidden;
+    transition: height 300ms ease-in;
+}
+
+.progress-select-categories.open {
+    height: auto;
+}

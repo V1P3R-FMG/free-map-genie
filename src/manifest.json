@@ -1,0 +1,36 @@
+{
+	"manifest_version": 2,
+	"content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'",
+	"icons": {
+		"16": "/images/fmg-icon-16.png",
+		"32": "/images/fmg-icon-32.png",
+		"64": "/images/fmg-icon-64.png",
+		"128": "/images/fmg-icon-128.png"
+	},
+	"permissions": [
+		"storage"
+	],
+	"content_scripts": [
+		{
+			"js": [
+				"main.js"
+			],
+			"matches": [
+				"<all_urls>"
+			],
+			"run_at": "document_start"
+		}
+	],
+	"browser_action": {
+		"default_popup": "popup/index.html"
+	},
+	"background": {
+		"scripts": [
+			"background.js"
+		]
+	},
+	"web_accessible_resources": [
+		"page.js",
+		"settings.json"
+	]
+}

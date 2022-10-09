@@ -1,0 +1,8 @@
+.game-filter-options {
+    width: 75%;
+    justify-content: right;
+}
+
+#game-search-input[name="fmg:game_search"] {
+    width: 60%;
+}
