@@ -107,7 +107,7 @@ send("get_status").then((status: Status) => {
 fetch(chrome.runtime.getURL("settings.json"))
 	.then(res => res.json())
 	.then(settings => {
-		$("#version").text(`v${chrome.runtime.getManifest().version}${settings.debug ? "-debug" : ""}`);
+		$("#version").text(`v${chrome.runtime.getManifest().version_name}${settings.debug ? "-debug" : ""}`);
 		$("#author").text(`by ${chrome.runtime.getManifest().author || "me"}`).on("click", () => {
 			chrome.tabs.create({ url: "https://github.com/V1P3R-FMG/free-mapgenie-pro" });
 		});

@@ -118,10 +118,11 @@ function build(argv) {
 			
 			// info
 			{
-				name		: pjson.title,
-				version		: pjson.version,
-				description	: pjson.description,
-				author		: pjson.author,
+				name			: pjson.title,
+				version			: pjson.version.match(/\d+\.\d+\.\d+/)?.[0],
+				version_name	: pjson.version,
+				description		: pjson.description,
+				author			: pjson.author,
 			},
 
 			// debug
