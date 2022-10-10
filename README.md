@@ -47,7 +47,7 @@ Not all pro features are supported. So if you want a pro feature or have an nice
 ### Mainpage
 
 -   Added a search bar with fuzzy search
-    ![mainpage preview](../assets/previews/mg_mainpage.png?raw=true)
+    ![mainpage preview](./assets/previews/mg_mainpage.png?raw=true)
 
 ### Map
 
@@ -56,12 +56,12 @@ Not all pro features are supported. So if you want a pro feature or have an nice
 -   Presets unlocked
 -   Remember visible categories setting unlocked
 -   Added a total progress bar for tracked categories
-    ![map preview](../assets//previews/mg_map.png?raw=true)
+    ![map preview](./assets//previews/mg_map.png?raw=true)
 
 ### Guide
 
 -   Unlimited locations marking
-    ![guide preview](../assets//previews/mg_guide.png?raw=true)
+    ![guide preview](./assets//previews/mg_guide.png?raw=true)
 
 ## Installation
 
@@ -101,13 +101,13 @@ Not all pro features are supported. So if you want a pro feature or have an nice
 -   Open the project in a terminal and type `npm install` this will install some dependencies.
 -   To build a firefox extension, you first need to get some api keys from [addons.mozilla.org credentials](https://addons.mozilla.org/en-US/developers/addon/api/key/).
     -   Press "Generate new credentials"
-        ![firefox generate keys](../assets//firefox/firefox_generate_keys.png?raw=true)
+        ![firefox generate keys](./assets//firefox/firefox_generate_keys.png?raw=true)
     -   Your JWT issuer is your KEY and looks something like `user:12345:67`<br>
         And your JWT secret is your SECRET and looks something like `634f34bee43611d2f3c0fd8c06220ac780cff681a578092001183ab62c04e009`.
-        ![firefox keys](../assets//firefox/firefox_keys.png?raw=true)
+        ![firefox keys](./assets//firefox/firefox_keys.png?raw=true)
     -   After getting your keys, create a `.env` file.
         And fill in your credentials like the picture below.
-        ![firefox keys](../assets//firefox/firefox_env.png?raw=true)
+        ![firefox keys](./assets//firefox/firefox_env.png?raw=true)
 -   Build the extension with in debug mode `npm run build-dev -- -b "firefox"` or for production `npm run build-prod -- -b "firefox"`.
     <br> You can also add a watch flag to auto build the new extensions when the source file changes
 -   After this the extension will be build under the folder dist.
