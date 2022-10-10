@@ -109,7 +109,7 @@ fetch(chrome.runtime.getURL("settings.json"))
 	.then(settings => {
 		$("#version").text(`v${chrome.runtime.getManifest().version}${settings.debug ? "-debug" : ""}`);
 		$("#author").text(`by ${chrome.runtime.getManifest().author || "me"}`).on("click", () => {
-			chrome.tabs.create({ url: "https://github.com/V1P3R-FM6/free-mapgenie-pro" });
+			chrome.tabs.create({ url: "https://github.com/V1P3R-FMG/free-mapgenie-pro" });
 		});
 	});
 
