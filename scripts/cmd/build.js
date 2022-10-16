@@ -12,7 +12,7 @@ const generate = require('generate-file-webpack-plugin');
 const pjson = require("../../package.json");
 const createBuildInfo = require("../../build.config.js");
 
-const ENV = require("dotenv").config().parsed;
+const ENV = require("dotenv").config().parsed || {};
 
 function parseArgv(argv, browser) {
 	return { ...argv, browser };
@@ -232,6 +232,10 @@ async function buildDistFirefox(argv) {
     if (fs.existsSync(dest)) {
         fs.rmSync(dest, { force: true });
     }
+
+	if (!argv.debug && !(key && secret)) {
+		throw new Error("No key or secret given!");
+	}
 
     await (argv.debug ? webExt.cmd.build : webExt.cmd.sign)({
         apiKey: key,
