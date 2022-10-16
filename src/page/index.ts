@@ -6,7 +6,7 @@ import mapStyle from "./css/map.css";
 import FMG_Map from "./map/index";
 import FMG_Guide from "./guide/index";
 import FMG_List from "./list/index";
-import appendStyle from "../shared/appendStyle";
+import appendStyle from "../shared/append_style";
 import { waitForDomLoaded, waitForGlobalsLoaded } from "../shared/load_utils";
 
 interface ExtensionWindow extends Window {
