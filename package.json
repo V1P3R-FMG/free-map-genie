@@ -1,7 +1,7 @@
 {
 	"name": "free-mapgenie-pro",
 	"title": "Free Mapgenie PRO",
-	"version": "1.1.0-alpha",
+	"version": "1.1.0",
 	"description": "Chromium/Firefox extension that unlocks mapgenie pro features for free.",
 	"author": "V1P3R-FMG",
 	"license": "MIT",
