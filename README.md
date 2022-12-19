@@ -2,8 +2,6 @@
 
 Chrome extension that unlocks [Mapgenie](https://mapgenie.io/) PRO features for free. The extension is only tested on the [DL2 villedor Map](https://mapgenie.io/dying-light-2/maps/villedor) and [Elden Ring Map](https://mapgenie.io/elden-ring) and works fine so far. But I'm pretty sure it will work on other maps too. The extenions should work on both the maps and the guides(tools).
 
-_NOTE: this is my first chrome extension I made, so don't mind some minor mistakes_
-
 ## Table Of Contents
 
 -   [Ideas for the future](#ideas-for-the-future)
