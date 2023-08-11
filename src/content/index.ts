@@ -1,6 +1,7 @@
 import { timeout, waitForGlobals } from "@/shared/async";
 import { createScript, getElement } from "@shared/dom";
 import { getPageType } from "@shared/page";
+import { FMG_Map } from "./map";
 
 /*
  * Because we delayed the map script, we need to manually create the google maps object.
@@ -51,6 +52,10 @@ async function init() {
 
     const type = getPageType(window);
     switch (type) {
+        case "map":
+            // Install the map
+            FMG_Map.install(window);
+            return;
         default:
             console.warn(`[FMG] Page type ${type}, not installing map/guide!`);
             return;
