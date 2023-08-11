@@ -230,7 +230,6 @@ export default (env) => {
                 outputFilename: `fmg-${browser}-v${packageJson.version}`,
                 target: browser === "chrome" ? "chromium" : "firefox-desktop",
                 devtools: true,
-                browserConsole: true,
                 selfHosted: true,
                 firefoxProfile: process.env.FIREFOX_PROFILE,
                 chromiumProfile: process.env.CHROMIUM_PROFILE,
