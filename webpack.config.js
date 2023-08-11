@@ -104,6 +104,11 @@ export default (env) => {
         { from: "./src/popup/font", to: "font" }
     ];
 
+    // Add the blocklist for chrome
+    if (browser === "chrome") {
+        files.push({ from: "./src/rules.json", to: "rules.json" });
+    }
+
     // Configure the webpack
     return {
         mode,

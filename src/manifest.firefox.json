@@ -1,5 +1,5 @@
 {
-    "permissions": ["storage"],
+    "permissions": ["storage", "webRequest", "webRequestBlocking"],
     "background": {
         "scripts": ["background.js"]
     },
@@ -7,5 +7,14 @@
         "gecko": {
             "id": "viper-fmg@free-mapgenie.com"
         }
+    },
+    "declarative_net_request": {
+        "rule_resources": [
+            {
+                "id": "block",
+                "enabled": true,
+                "path": "rules.json"
+            }
+        ]
     }
 }

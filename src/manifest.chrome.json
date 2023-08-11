@@ -1,7 +1,16 @@
 {
-    "permissions": ["storage"],
+    "permissions": ["storage", "declarativeNetRequest"],
     "host_permissions": ["*://cdn.mapgenie.io/*"],
     "background": {
         "service_worker": "background.js"
+    },
+    "declarative_net_request": {
+        "rule_resources": [
+            {
+                "id": "block",
+                "enabled": true,
+                "path": "rules.json"
+            }
+        ]
     }
 }
