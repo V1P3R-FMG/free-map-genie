@@ -9,7 +9,7 @@ function injectScript(name: string): HTMLScriptElement {
     const script = createScript({
         src: chrome.runtime.getURL(name)
     });
-    script.onload = () => shared.attached = true;
+    script.onload = () => (shared.attached = true);
     document.body.appendChild(script);
     return script;
 }
@@ -17,4 +17,4 @@ function injectScript(name: string): HTMLScriptElement {
 injectScript("content.js");
 initHandlers(shared);
 
-console.log("[FMG] extension script loaded");
+logger.log("extension script loaded");

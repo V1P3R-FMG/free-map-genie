@@ -10,7 +10,7 @@ send("hello")
         }
         return Promise.reject(err);
     })
-    .then(() => console.log("extension script loaded"))
-    .catch((err) => console.error(err));
+    .then(() => logger.log("extension script loaded"))
+    .catch((err) => logger.error(err));
 
 createApp(App).mount("#app");

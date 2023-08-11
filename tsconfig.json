@@ -4,10 +4,9 @@
         "forceConsistentCasingInFileNames": true,
         "resolveJsonModule": true,
         "allowSyntheticDefaultImports": true,
-        "moduleResolution": "Node",
         "strict": true,
-        "target": "ESNext",
-        "module": "ESNext",
+        "target": "ES6",
+        "module": "CommonJS",
         "baseUrl": "./src",
         "paths": {
             "@content/*": ["content/*"],

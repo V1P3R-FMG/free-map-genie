@@ -16,7 +16,7 @@ import { SwcMinifyWebpackPlugin } from "swc-minify-webpack-plugin";
 import { VueLoaderPlugin } from "vue-loader";
 
 import webpack from "webpack";
-const { DefinePlugin } = webpack;
+const { DefinePlugin, ProvidePlugin } = webpack;
 
 const packageJson = JSON.parse(
     fs.readFileSync("./package.json", { encoding: "utf-8" }).toString()
@@ -127,7 +127,8 @@ export default (env) => {
             alias: {
                 vue$: isDev
                     ? "vue/dist/vue.runtime.esm-browser.js"
-                    : "vue/dist/vue.runtime.esm-browser.prod.js"
+                    : "vue/dist/vue.runtime.esm-browser.prod.js",
+                logger: path.resolve("./src/fmg/logger.ts")
             },
             plugins: [new TsconfigPathsPlugin()]
         },
@@ -144,7 +145,8 @@ export default (env) => {
                                 jsc: {
                                     parser: {
                                         syntax: "typescript"
-                                    }
+                                    },
+                                    target:"esnext"
                                 }
                             }
                         },
@@ -200,6 +202,11 @@ export default (env) => {
                 chunks: ["popup/index"],
                 filename: "popup/index.html",
                 template: "./src/popup/index.html"
+            }),
+
+            // Provide global modules
+            new ProvidePlugin({
+                logger: "logger"
             }),
 
             // Provide the global variables

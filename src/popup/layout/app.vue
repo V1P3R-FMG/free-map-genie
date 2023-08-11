@@ -35,7 +35,7 @@ const info = ref({});
 async function save() {
     if (!dataLoaded) return;
     // #if DEBUG
-    console.log("Saving data", {
+    logger.log("Saving data", {
         bookmarks: bookmarksRaw,
         settings: settingsRaw
     });
@@ -54,7 +54,7 @@ async function load() {
     bookmarks.value = bookmarksRaw;
     settings.value = settingsRaw;
     // #if DEBUG
-    console.log("Loaded data", {
+    logger.log("Loaded data", {
         bookmarks: bookmarksRaw,
         settings: settingsRaw
     });
@@ -78,7 +78,7 @@ async function addBookmark() {
     try {
         const bookmark = await send("add-bookmark", null);
         if (!bookmark.url || !bookmark.favicon || !bookmark.title) {
-            console.warn("Invalid bookmark", bookmark);
+            logger.warn("Invalid bookmark", bookmark);
             return;
         }
 
@@ -86,7 +86,7 @@ async function addBookmark() {
             (bm) => bm.url === bookmark.url
         );
         if (sameBookmark !== undefined) {
-            console.warn("Bookmark already exists", {
+            logger.warn("Bookmark already exists", {
                 bookmark,
                 sameBookmark
             });
@@ -95,7 +95,7 @@ async function addBookmark() {
         bookmarks.value.push(bookmark);
         await save();
     } catch (err) {
-        console.error("addBookmark faild", err);
+        logger.error("addBookmark faild", err);
     }
 }
 
@@ -113,7 +113,7 @@ async function getInfo() {
             retry: true
         });
     } catch (err) {
-        console.error("getInfo failed,", err);
+        logger.error("getInfo failed,", err);
     }
 }
 

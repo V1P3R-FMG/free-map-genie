@@ -19,7 +19,7 @@ export default function addBookmark(
     ) as HTMLMetaElement;
 
     if (!$url || !$icon || !$title) {
-        console.warn("failed to add bookmark", {
+        logger.warn("failed to add bookmark", {
             url: $url,
             icon: $icon,
             title: $title

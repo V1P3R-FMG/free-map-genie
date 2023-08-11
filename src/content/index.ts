@@ -57,15 +57,15 @@ async function init() {
             FMG_Map.install(window);
             return;
         default:
-            console.warn(`[FMG] Page type ${type}, not installing map/guide!`);
+            logger.warn(`Page type ${type}, not installing map/guide!`);
             return;
     }
 }
 
 init()
     .then(() => {
-        console.log("[FMG] content script init done");
+        logger.log("content script init done");
     })
     .catch((err) => {
-        console.error("[FMG] Failed to get script", err);
+        logger.error("Failed to get script", err);
     });

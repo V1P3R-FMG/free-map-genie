@@ -9,7 +9,7 @@ defineProps<{
 }>();
 
 function tooltipHover(mouseover: boolean) {
-    console.log($div.value);
+    logger.log($div.value);
     if (mouseover) {
         $div.value?.classList.add("hover");
     } else {

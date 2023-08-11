@@ -13,7 +13,7 @@ function onBeforeRequestMapScript(
 ) {
     if (allowRequests[details.requestId]) {
         // #if DEBUG
-        console.log("[FMG] allow request", {
+        logger.log("allow request", {
             requestId: details.requestId,
             url: details.url
         });
@@ -22,7 +22,7 @@ function onBeforeRequestMapScript(
         return;
     }
     // #if DEBUG
-    console.log("[FMG] block request", {
+    logger.log("block request", {
         requestId: details.requestId,
         url: details.url
     });
@@ -34,7 +34,7 @@ function onBeforeRequestMapScriptReady(
     details: chrome.webRequest.WebRequestDetails
 ) {
     // #if DEBUG
-    console.log("[FMG] redirect request", {
+    logger.log("redirect request", {
         requestId: details.requestId,
         url: details.url
     });
