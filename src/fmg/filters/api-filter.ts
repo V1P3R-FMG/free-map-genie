@@ -1,19 +1,18 @@
-import { promisify } from "@shared/async";
+import {
+    promisify,
+    blockable,
+    Blocked,
+    type BlockableCallback
+} from "@shared/async";
 
 export interface BlockCallback {
     (): void;
 }
 
-export interface ApiFilteredCallback<T = any> {
-    (
-        method: AxiosMethod,
-        key: string,
-        id: string,
-        data: T,
-        url: string,
-        block: BlockCallback
-    ): Promise<any> | any | void;
-}
+export type ApiFilteredCallback<T = any, R = any> = BlockableCallback<
+    undefined | void | R,
+    [string, string, string, T, string]
+>;
 
 export const AxiosMethods = ["get", "put", "post", "delete"] as const;
 
@@ -75,29 +74,27 @@ export class FMG_ApiFilter {
      */
     private createProxyMethod(method: AxiosMethod): Lib.Axios[AxiosMethod] {
         const axiosMethod = this.axios[method];
-        this.axios[method] = (async (...args: any[]) => {
+        this.axios[method] = ((...args: any[]) => {
             const [url, data] = args;
             const group = this.getFilterGroup(method, url);
             const { key, id } = group?.regex.exec(url)?.groups ?? {};
 
-            let blocked = false;
-
-            const result = await promisify(
+            return blockable<any, [string, string, string, any, string]>(
                 group?.callback || (() => {}),
                 method,
                 key,
                 id,
                 data,
-                url,
-                () => {
-                    blocked = true;
-                }
-            );
-
-            if (blocked) {
-                return result;
-            }
-            return axiosMethod.apply(this.axios, args as any);
+                url
+            )
+                .then((newData) =>
+                    axiosMethod.apply(this.axios, [
+                        url,
+                        newData ?? data,
+                        ...args.slice(2)
+                    ] as any)
+                )
+                .catch(blockable.catcher);
         }) as any;
         return this.axios[method];
     }
@@ -157,10 +154,10 @@ export class FMG_ApiFilter {
      *   }
      * ); // Will log the data, and not block the original request
      */
-    public registerFilter<T = any>(
+    public registerFilter<T = any, R = any>(
         method: AxiosMethod,
         key: string,
-        callback: ApiFilteredCallback<T>
+        callback: ApiFilteredCallback<T, R>
     ) {
         // Check if the filter already exists
         if (this.filters[method][key]) {

@@ -85,3 +85,49 @@ export function promisify<C extends (...args: any[]) => any>(
         }
     });
 }
+
+export interface BlockCallback {
+    (): void;
+}
+
+export interface BlockableCallback<T, A extends any[]> {
+    (...args: [...A, BlockCallback]): T | Promise<T>;
+}
+
+export class Blocked<T = any> extends Error {
+    public result: T;
+
+    constructor(result: T) {
+        super("Blocked");
+        this.result = result;
+    }
+}
+
+function catcher(err: any) {
+    if (err instanceof Blocked) {
+        return err.result;
+    }
+    throw err;
+}
+
+/**
+ * Blocable function.
+ */
+export async function blockable<T, A extends any[]>(
+    callback: BlockableCallback<T, A>,
+    ...args: A
+): Promise<T> {
+    let blocked = false;
+
+    const result = await promisify(callback, ...args, () => {
+        blocked = true;
+    });
+
+    if (blocked) {
+        throw new Blocked(result);
+    }
+
+    return result;
+}
+
+blockable.catcher = catcher;
