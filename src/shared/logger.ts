@@ -7,7 +7,7 @@ export class Logger {
 
     public static format(msg: string, data: Record<string, any>) {
         return msg.replace(
-            /\{\w+\}/,
+            /\{\w+\}/g,
             (match) => data[match.slice(1, -1)]?.toString() ?? match
         );
     }
