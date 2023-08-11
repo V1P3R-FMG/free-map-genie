@@ -95,7 +95,7 @@ async function addBookmark() {
         bookmarks.value.push(bookmark);
         await save();
     } catch (err) {
-        logger.error("addBookmark faild", err);
+        logger.error("addBookmark faild", err as any);
     }
 }
 
@@ -113,7 +113,7 @@ async function getInfo() {
             retry: true
         });
     } catch (err) {
-        logger.error("getInfo failed,", err);
+        logger.error("getInfo failed,", err as any);
     }
 }
 
@@ -200,15 +200,19 @@ body {
     border-radius: 5px;
 }
 
+.titlebar h3 {
+    margin: 0;
+}
+
 .titlebar,
 .footer {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin: 0 5px;
-    height: 40px;
     -webkit-user-select: none;
     user-select: none;
+    padding: 5px;
 }
 
 .titlebar {
@@ -218,5 +222,6 @@ body {
 .footer {
     color: var(--color-light);
     border-top: solid 1px var(--border);
+    font-size: 0.9em;
 }
 </style>
