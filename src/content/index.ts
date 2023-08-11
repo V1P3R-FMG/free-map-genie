@@ -13,7 +13,7 @@ function fixGoogleMaps(): void {
     if (window.config?.altMapSdk) {
         window.google = window.google || {};
         window.google.maps = {
-            Size() {}
+            Size: function () {}
         };
     }
 }
@@ -36,6 +36,20 @@ async function loadMapScript(): Promise<void> {
     return timeout(waitForGlobals(["axios", "store"], window), 10 * 1000);
 }
 
+/**
+ * Init fmg map script
+ */
+async function initMapScript(): Promise<void> {
+    // Fix google maps
+    fixGoogleMaps();
+
+    // Load the mapgenie map script, that was previously blocked by the background script.
+    await loadMapScript();
+
+    // Install the map
+    FMG_Map.install(window);
+}
+
 async function init() {
     // If window.store is defined, the page has allready been loaded.
     // This can happen if the extension is reloaded.
@@ -44,18 +58,10 @@ async function init() {
         throw new Error("Store allready defined, reloading page");
     }
 
-    // Fix google maps
-    fixGoogleMaps();
-
-    // Load the mapgenie map script, that was previously blocked by the background script.
-    await loadMapScript();
-
     const type = getPageType(window);
     switch (type) {
         case "map":
-            // Install the map
-            FMG_Map.install(window);
-            return;
+            return initMapScript();
         default:
             logger.warn(`Page type ${type}, not installing map/guide!`);
             return;
