@@ -1,8 +1,0 @@
-{
-    "debug": true,
-    "watch": false,
-    "wss": {
-        "hostname": "localhost",
-        "port": 5500
-    }
-}
