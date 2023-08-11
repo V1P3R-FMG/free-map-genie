@@ -50,6 +50,9 @@ async function initMapScript(): Promise<void> {
     FMG_Map.install(window);
 }
 
+/**
+ * Itialize the content script
+ */
 async function init() {
     // If window.store is defined, the page has allready been loaded.
     // This can happen if the extension is reloaded.
@@ -58,6 +61,7 @@ async function init() {
         throw new Error("Store allready defined, reloading page");
     }
 
+    // Check if the page is a map or guide
     const type = getPageType(window);
     switch (type) {
         case "map":
@@ -73,5 +77,5 @@ init()
         logger.log("content script init done");
     })
     .catch((err) => {
-        logger.error("Failed to get script", err);
+        logger.error(err);
     });
