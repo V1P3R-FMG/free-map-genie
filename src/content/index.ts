@@ -40,6 +40,13 @@ async function loadMapScript(): Promise<void> {
  * Init fmg map script
  */
 async function initMapScript(): Promise<void> {
+    // If window.store is defined, the page has allready been loaded.
+    // This can happen if the extension is reloaded.
+    if (window.store) {
+        location.reload();
+        throw new Error("Store allready defined, reloading page");
+    }
+
     // Fix google maps
     fixGoogleMaps();
 
@@ -54,13 +61,6 @@ async function initMapScript(): Promise<void> {
  * Itialize the content script
  */
 async function init() {
-    // If window.store is defined, the page has allready been loaded.
-    // This can happen if the extension is reloaded.
-    if (window.store) {
-        location.reload();
-        throw new Error("Store allready defined, reloading page");
-    }
-
     // Check if the page is a map or guide
     const type = getPageType(window);
     switch (type) {
