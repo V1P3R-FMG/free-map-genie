@@ -1,4 +1,4 @@
-import { FMG_ApiFilter } from "@fmg/filters/api-filter";
+import type { FMG_ApiFilter } from "@fmg/filters/api-filter";
 import locations from "./locations";
 import categories from "./categories";
 import presets from "./presets";
