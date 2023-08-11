@@ -321,4 +321,42 @@ describe("FMG_ApiFilter", () => {
             }
         }
     });
+
+    it("should if no filter has been found search in any for a filter", async () => {
+        // Initialize Data
+        const windowMock = createWindowMock();
+        const filter = FMG_ApiFilter.install(windowMock);
+
+        // Setup
+        filter.registerFilter("any", "test", (_1, _2, _3, _4, _5, block) => {
+            block();
+            return "any works!";
+        });
+
+        // Expectations
+        expect(await windowMock.axios.get("/api/v1/user/test")).toBe(
+            "any works!"
+        );
+    });
+
+    it("should not use any filter if a filter with correct method has been found", async () => {
+        // Initialize Data
+        const windowMock = createWindowMock();
+        const filter = FMG_ApiFilter.install(windowMock);
+
+        // Setup
+        filter.registerFilter("get", "test", (_1, _2, _3, _4, _5, block) => {
+            block();
+            return "get works!";
+        });
+        filter.registerFilter("any", "test", (_1, _2, _3, _4, _5, block) => {
+            block();
+            return "any works!";
+        });
+
+        // Expectations
+        expect(await windowMock.axios.get("/api/v1/user/test")).toBe(
+            "get works!"
+        );
+    });
 });

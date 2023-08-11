@@ -1,13 +1,4 @@
-import {
-    promisify,
-    blockable,
-    Blocked,
-    type BlockableCallback
-} from "@shared/async";
-
-export interface BlockCallback {
-    (): void;
-}
+import { blockable, type BlockableCallback } from "@shared/async";
 
 export type ApiFilteredCallback<T = any, R = any> = BlockableCallback<
     undefined | void | R,
@@ -17,6 +8,8 @@ export type ApiFilteredCallback<T = any, R = any> = BlockableCallback<
 export const AxiosMethods = ["get", "put", "post", "delete"] as const;
 
 export type AxiosMethod = (typeof AxiosMethods)[number];
+
+export type AxiosMethodAndAny = AxiosMethod | "any";
 
 export interface ApiMethodFilterGroup {
     regex: RegExp;
@@ -38,16 +31,17 @@ export interface AxiosExtended extends Lib.Axios {
  */
 export class FMG_ApiFilter {
     private axios: AxiosExtended;
-    private filters: Record<AxiosMethod, ApiMethodFilter>;
+    private filters: Record<AxiosMethodAndAny, ApiMethodFilter>;
 
     protected constructor(axios: AxiosExtended) {
         this.axios = axios;
-        this.filters = {} as Record<AxiosMethod, ApiMethodFilter>;
+        this.filters = {} as Record<AxiosMethodAndAny, ApiMethodFilter>;
 
         AxiosMethods.forEach((method) => {
             this.filters[method] = {};
             this.createProxyMethod(method);
         });
+        this.filters.any = {};
     }
 
     /**
@@ -63,6 +57,11 @@ export class FMG_ApiFilter {
         for (const group in this.filters[method]) {
             if (this.filters[method][group].regex.test(url)) {
                 return this.filters[method][group];
+            }
+        }
+        for (const group in this.filters.any) {
+            if (this.filters.any[group].regex.test(url)) {
+                return this.filters.any[group];
             }
         }
     }
@@ -155,7 +154,7 @@ export class FMG_ApiFilter {
      * ); // Will log the data, and not block the original request
      */
     public registerFilter<T = any, R = any>(
-        method: AxiosMethod,
+        method: AxiosMethodAndAny,
         key: string,
         callback: ApiFilteredCallback<T, R>
     ) {
