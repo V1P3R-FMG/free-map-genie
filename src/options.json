@@ -1,0 +1,23 @@
+[
+    {
+        "type": "checkbox",
+        "value": true,
+        "name": "extension_enabled",
+        "label": "Extension enabled",
+        "tooltip": "Enable/Disable the extension."
+    },
+    {
+        "type": "checkbox",
+        "value": false,
+        "name": "presets_allways_enabled",
+        "label": "Allways enable presets",
+        "tooltip": "This option enables presets on all maps. Will not allways work when the extension is to slow to load."
+    },
+    {
+        "type": "checkbox",
+        "value": false,
+        "name": "total_progress_bar_legacy_mode",
+        "label": "Legacy total progress bar",
+        "tooltip": "This option sets the total progress bar back to legacy mode so all categories are counted."
+    }
+]

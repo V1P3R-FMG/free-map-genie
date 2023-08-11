@@ -1,0 +1,19 @@
+.theme-provider[theme="light"] {
+    --color: #363636;
+    --color-light: #414141;
+
+    --background: #ffffff;
+    --tab-background: #2b2b2b;
+    --border: #b6b6b6;
+
+    --active: #c42f2f;
+    --item: #e7e7e7;
+
+    --checkbox: #c5c5c5;
+    --checkbox-text: #363636;
+
+    --tooltip: #1e1e1e;
+
+    --red: #cc4040;
+    --green: #40ca40;
+}

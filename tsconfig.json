@@ -1,0 +1,25 @@
+{
+    "compilerOptions": {
+        "noImplicitAny": true,
+        "forceConsistentCasingInFileNames": true,
+        "resolveJsonModule": true,
+        "allowSyntheticDefaultImports": true,
+        "moduleResolution": "Node",
+        "strict": true,
+        "target": "ESNext",
+        "module": "ESNext",
+        "baseUrl": "./src",
+        "paths": {
+            "@content/*": ["content/*"],
+            "@extension/*": ["extension/*"],
+            "@popup/*": ["popup/*"],
+            "@background/*": ["background/*"],
+            "@shared/*": ["shared/*"],
+            "@fmg/*": ["fmg/*"],
+            "@/*": ["*"]
+        },
+        "typeRoots": ["./node_modules/@types", "./src/@types"]
+    },
+    "include": ["src/**/*", "tests/**/*"],
+    "exclude": ["node_modules", "dist"]
+}

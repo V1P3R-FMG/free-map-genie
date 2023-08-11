@@ -1,0 +1,11 @@
+{
+    "permissions": ["storage"],
+    "background": {
+        "scripts": ["background.js"]
+    },
+    "browser_specific_settings": {
+        "gecko": {
+            "id": "viper-fmg@free-mapgenie.com"
+        }
+    }
+}

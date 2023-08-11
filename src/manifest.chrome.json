@@ -1,0 +1,7 @@
+{
+    "permissions": ["storage"],
+    "host_permissions": ["*://cdn.mapgenie.io/*"],
+    "background": {
+        "service_worker": "background.js"
+    }
+}
