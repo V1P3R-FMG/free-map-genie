@@ -148,10 +148,10 @@ describe("FMG_ApiFilter", () => {
                 const fn = () => {};
                 filter.registerFilter(method, key, fn);
 
-                const matchA = filter["getFilterGroup"](method, url);
-                const matchB = filter["getFilterGroup"](method, url + "/1");
-                const matchC = filter["getFilterGroup"](method, url + "/a");
-                const matchD = filter["getFilterGroup"](method, url + "/a/1");
+                const matchA = filter["getFilter"](method, url);
+                const matchB = filter["getFilter"](method, url + "/1");
+                const matchC = filter["getFilter"](method, url + "/a");
+                const matchD = filter["getFilter"](method, url + "/a/1");
 
                 // Expectations
                 expect(matchA).toBeDefined();

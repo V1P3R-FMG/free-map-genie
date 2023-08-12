@@ -11,13 +11,13 @@ export type AxiosMethod = (typeof AxiosMethods)[number];
 
 export type AxiosMethodAndAny = AxiosMethod | "any";
 
-export interface ApiMethodFilterGroup {
+export interface ApiMethodFilter {
     regex: RegExp;
     callback: ApiFilteredCallback;
 }
 
-export interface ApiMethodFilter {
-    [key: string]: ApiMethodFilterGroup;
+export interface ApiMethodFilterGroup {
+    [key: string]: ApiMethodFilter;
 }
 
 export const ApiFiltered = Symbol("ApiFiltered");
@@ -31,11 +31,11 @@ export interface AxiosExtended extends Lib.Axios {
  */
 export class FMG_ApiFilter {
     private axios: AxiosExtended;
-    private filters: Record<AxiosMethodAndAny, ApiMethodFilter>;
+    private filters: Record<AxiosMethodAndAny, ApiMethodFilterGroup>;
 
     protected constructor(axios: AxiosExtended) {
         this.axios = axios;
-        this.filters = {} as Record<AxiosMethodAndAny, ApiMethodFilter>;
+        this.filters = {} as Record<AxiosMethodAndAny, ApiMethodFilterGroup>;
 
         AxiosMethods.forEach((method) => {
             this.filters[method] = {};
@@ -45,20 +45,36 @@ export class FMG_ApiFilter {
     }
 
     /**
+     * Install the api filter on the given window object
+     * @param window the window object containing the axios object
+     * @returns the installed api filter
+     */
+    public static install(window: Window): FMG_ApiFilter {
+        if (!window.axios) throw new Error("axios not defined");
+        // If the axios object has already been filtered, use that one instead
+        if (!window.axios[ApiFiltered]) {
+            window.axios[ApiFiltered] = new FMG_ApiFilter(window.axios);
+        }
+        return window.axios[ApiFiltered];
+    }
+
+    /**
      * Get the filter group for the given method and url
      * @param method the axios method
      * @param url the url to check
      * @returns the filter group, or undefined if no filter group was found
      */
-    private getFilterGroup(
+    private getFilter(
         method: AxiosMethod,
         url: string
-    ): ApiMethodFilterGroup | undefined {
+    ): ApiMethodFilter | undefined {
+        // First check if there is a filter for the given method and key
         for (const group in this.filters[method]) {
             if (this.filters[method][group].regex.test(url)) {
                 return this.filters[method][group];
             }
         }
+        // Then check if there is a filter for the any method and key
         for (const group in this.filters.any) {
             if (this.filters.any[group].regex.test(url)) {
                 return this.filters.any[group];
@@ -71,11 +87,11 @@ export class FMG_ApiFilter {
      * @param method the axios method
      * @returns the proxy method
      */
-    private createProxyMethod(method: AxiosMethod): Lib.Axios[AxiosMethod] {
+    private createProxyMethod(method: AxiosMethod): void {
         const axiosMethod = this.axios[method];
         this.axios[method] = ((...args: any[]) => {
             const [url, data] = args;
-            const group = this.getFilterGroup(method, url);
+            const group = this.getFilter(method, url);
             const { key, id } = group?.regex.exec(url)?.groups ?? {};
 
             return blockable<any, [string, string, string, any, string]>(
@@ -95,21 +111,6 @@ export class FMG_ApiFilter {
                 )
                 .catch(blockable.catcher);
         }) as any;
-        return this.axios[method];
-    }
-
-    /**
-     * Install the api filter on the given window object
-     * @param window the window object containing the axios object
-     * @returns the installed api filter
-     */
-    public static install(window: Window): FMG_ApiFilter {
-        if (!window.axios) throw new Error("axios not defined");
-        // If the axios object has already been filtered, use that one instead
-        if (!window.axios[ApiFiltered]) {
-            window.axios[ApiFiltered] = new FMG_ApiFilter(window.axios);
-        }
-        return window.axios[ApiFiltered];
     }
 
     /**
