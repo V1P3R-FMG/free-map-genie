@@ -42,6 +42,8 @@ export class FMG_ApiFilter {
             this.createProxyMethod(method);
         });
         this.filters.any = {};
+
+        logger.log("Api Filter Installed");
     }
 
     /**
