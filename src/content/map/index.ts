@@ -1,5 +1,7 @@
 import { FMG_ApiFilter } from "@fmg/filters/api-filter";
+import { FMG_StorageFilter } from "@fmg/filters/storage-filter";
 import setupMapApiFilter from "./filters/api-filter";
+import setupMapStorageFilter from "./filters/storage-filter";
 
 export const FmgMapInstalled = Symbol("FmgMapInstalled");
 
@@ -12,12 +14,16 @@ export type FmgMapWindow = Window & { [FmgMapInstalled]?: FMG_Map };
 export class FMG_Map {
     private window: Window;
     private apiFilter: FMG_ApiFilter;
+    private storageFilter: FMG_StorageFilter;
 
     protected constructor(window: Window) {
         this.window = window;
 
         this.apiFilter = FMG_ApiFilter.install(window);
         setupMapApiFilter(this.apiFilter);
+
+        this.storageFilter = FMG_StorageFilter.install(window);
+        setupMapStorageFilter(this.storageFilter);
 
         this.setProFeaturesEnabled();
     }

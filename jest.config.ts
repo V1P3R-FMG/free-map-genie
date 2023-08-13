@@ -18,7 +18,6 @@ if (paths && !baseUrl) throw new Error("baseUrl not defined");
 /** @type {import("@jest/types").Config.InitialOptions} */
 export default {
     verbose: true,
-    silent: false,
     transform: {
         "\\.ts$": "ts-jest"
     },
