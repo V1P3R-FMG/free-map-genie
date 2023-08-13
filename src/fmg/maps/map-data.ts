@@ -59,4 +59,12 @@ export class MapData {
         if (!this.mapData) throw new Error("Map data is not loaded");
         return this.mapData;
     }
+
+    public filterLocations(locations: Id[]): Id[] {
+        if (!this.loaded) throw new Error("Map is not loaded");
+        if (!this.mapData) throw new Error("Map data is not loaded");
+        return locations.filter((id) => {
+            return !!this.mapData?.locations.some((loc) => loc.id == id);
+        });
+    }
 }
