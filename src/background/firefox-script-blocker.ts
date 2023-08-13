@@ -8,53 +8,45 @@
 
 const allowRequests: Record<string, boolean> = {};
 
-function onBeforeRequestMapScript(
-    details: chrome.webRequest.WebRequestDetails
-) {
-    if (allowRequests[details.requestId]) {
-        // #if DEBUG
-        logger.log("allow request", {
-            requestId: details.requestId,
-            url: details.url
-        });
-        // #endif
-        delete allowRequests[details.requestId];
-        return;
-    }
-    // #if DEBUG
-    logger.log("block request", {
-        requestId: details.requestId,
-        url: details.url
-    });
-    // #endif
-    return { cancel: true };
-}
-
-function onBeforeRequestMapScriptReady(
-    details: chrome.webRequest.WebRequestDetails
-) {
-    // #if DEBUG
-    logger.log("redirect request", {
-        requestId: details.requestId,
-        url: details.url
-    });
-    // #endif
-    allowRequests[details.requestId] = true;
-    return {
-        redirectUrl: details.url.replace("ready&id=", "id=")
-    };
-}
-
 export function initFirefoxScriptBlocker() {
     if (__BROWSER__ !== "firefox") return;
     chrome.webRequest.onBeforeRequest.addListener(
-        onBeforeRequestMapScript,
+        (details) => {
+            if (allowRequests[details.requestId]) {
+                // #if DEBUG
+                logger.log("allow request", {
+                    requestId: details.requestId,
+                    url: details.url
+                });
+                // #endif
+                delete allowRequests[details.requestId];
+                return;
+            }
+            // #if DEBUG
+            logger.log("block request", {
+                requestId: details.requestId,
+                url: details.url
+            });
+            // #endif
+            return { cancel: true };
+        },
         { urls: ["https://cdn.mapgenie.io/js/map.js?id=*"] },
         ["blocking"]
     );
 
     chrome.webRequest.onBeforeRequest.addListener(
-        onBeforeRequestMapScriptReady,
+        (details) => {
+            // #if DEBUG
+            logger.log("redirect request", {
+                requestId: details.requestId,
+                url: details.url
+            });
+            // #endif
+            allowRequests[details.requestId] = true;
+            return {
+                redirectUrl: details.url.replace("ready&id=", "id=")
+            };
+        },
         { urls: ["https://cdn.mapgenie.io/js/map.js?ready&id=*"] },
         ["blocking"]
     );
