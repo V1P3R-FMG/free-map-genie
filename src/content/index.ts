@@ -1,45 +1,10 @@
-import { timeout, waitForGlobals } from "@/shared/async";
-import { createScript, getElement } from "@shared/dom";
 import { getPageType } from "@shared/page";
 import { FMG_Map } from "./map";
 
-/*
- * Because we delayed the map script, we need to manually create the google maps object.
- * If altMapSdk is enabled.
- * Because google.maps will allready be defined by another script,
- * and there for the map script will never define a maps mock object.
- **/
-function fixGoogleMaps(): void {
-    if (window.config?.altMapSdk) {
-        window.google = window.google || {};
-        window.google.maps = {
-            Size: function () {}
-        };
-    }
-}
-
-/*
- * Load the map script, and wait for the globals to be defined.
- **/
-async function loadMapScript(): Promise<void> {
-    const script = await getElement<HTMLScriptElement>(
-        "script[src^='https://cdn.mapgenie.io/js/map.js?id=']"
-    );
-
-    if (!script) throw new Error("Map script not found");
-
-    createScript({
-        src: script.src.replace("id=", "ready&id="),
-        appendTo: document.body
-    });
-
-    return timeout(waitForGlobals(["axios", "store"], window), 10 * 1000);
-}
-
 /**
- * Init fmg map script
+ * Itialize the content script
  */
-async function initMapScript(): Promise<void> {
+async function init() {
     // If window.store is defined, the page has allready been loaded.
     // This can happen if the extension is reloaded.
     if (window.store) {
@@ -47,25 +12,11 @@ async function initMapScript(): Promise<void> {
         throw new Error("Store allready defined, reloading page");
     }
 
-    // Fix google maps
-    fixGoogleMaps();
-
-    // Load the mapgenie map script, that was previously blocked by the background script.
-    await loadMapScript();
-
-    // Install the map
-    FMG_Map.install(window);
-}
-
-/**
- * Itialize the content script
- */
-async function init() {
     // Check if the page is a map or guide
     const type = getPageType(window);
     switch (type) {
         case "map":
-            return initMapScript();
+            return FMG_Map.setup(window);
         default:
             logger.warn(`Page type ${type}, not installing map/guide!`);
             return;
@@ -73,9 +24,5 @@ async function init() {
 }
 
 init()
-    .then(() => {
-        logger.log("content script init done");
-    })
-    .catch((err) => {
-        logger.error(err);
-    });
+    .then(() => logger.log("content script init done"))
+    .catch((err) => logger.error(err));
