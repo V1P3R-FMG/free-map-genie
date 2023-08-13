@@ -2,6 +2,8 @@ import { createScript, getElement } from "@shared/dom";
 import { timeout, waitForGlobals } from "@shared/async";
 import { FMG_ApiFilter } from "@fmg/filters/api-filter";
 import { FMG_StorageFilter } from "@fmg/filters/storage-filter";
+import { FMG_Storage } from "@fmg/storage";
+import { FMG_Store } from "@fmg/store";
 import setupMapApiFilter from "./filters/api-filter";
 import setupMapStorageFilter from "./filters/storage-filter";
 
@@ -15,17 +17,23 @@ export type FmgMapWindow = Window & { [FmgMapInstalled]?: FMG_Map };
  */
 export class FMG_Map {
     private window: Window;
+    private storage: FMG_Storage;
     private apiFilter: FMG_ApiFilter;
     private storageFilter: FMG_StorageFilter;
+    private store: FMG_Store;
 
     protected constructor(window: Window) {
         this.window = window;
+
+        this.storage = new FMG_Storage(window);
 
         this.apiFilter = FMG_ApiFilter.install(window);
         setupMapApiFilter(this.apiFilter);
 
         this.storageFilter = FMG_StorageFilter.install(window);
         setupMapStorageFilter(this.storageFilter);
+
+        this.store = FMG_Store.install(window, this.storage);
 
         this.setProFeaturesEnabled();
     }
@@ -91,6 +99,10 @@ export class FMG_Map {
 
         await FMG_Map.loadMapScript();
 
-        FMG_Map.install(window);
+        const map = FMG_Map.install(window);
+
+        // #if DEBUG
+        window.fmgMap = map;
+        // #endif
     }
 }
