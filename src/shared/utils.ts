@@ -43,7 +43,7 @@ export function checkDefined<T = any>(object: T, name: string): NonNullable<T> {
  * @param o the value to check.
  * @returns boolean that indicates if the value is empty or not.
  */
-export function isEmpty<T>(o: T): o is T {
+export function isEmpty<T>(o: T | null | undefined): o is null | undefined {
     if (typeof o === "object" || typeof o === "string") {
         for (const _ in o as Iterable<T[keyof T]>) {
             return false;
