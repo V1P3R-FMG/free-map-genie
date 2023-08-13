@@ -135,8 +135,8 @@ export class FMG_StorageFilter {
         }
         // Then check if there is a filter for the any action and key
         for (const filter in this.filters.any) {
-            if (this.filters[action][filter].regex.test(key)) {
-                return this.filters[action][filter];
+            if (this.filters.any[filter].regex.test(key)) {
+                return this.filters.any[filter];
             }
         }
     }
@@ -180,7 +180,7 @@ export class FMG_StorageFilter {
      * @param callback
      */
     public registerFilter<G extends MatchGroups = any>(
-        action: StorageAction,
+        action: StorageActionAndAny,
         regex: string | RegExp | undefined,
         callback: StorageFilterCallback<G>
     ): void {
@@ -204,7 +204,7 @@ export class FMG_StorageFilter {
      * Unregister a filter for the given action and key.
      */
     public unregisterFilter(
-        action: StorageAction,
+        action: StorageActionAndAny,
         regex?: string | RegExp | undefined
     ): void {
         // Convert the regex to a RegExp object
