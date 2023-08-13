@@ -2,6 +2,7 @@ import { checkDefined } from "@shared/utils";
 import { Data } from "./data";
 import { Settings } from "./settings";
 import { EventEmitter, type EventCallback } from "@shared/event-emitter";
+import { LocalStorageDriver } from "./drivers";
 import type {
     MarkEventData,
     TrackEventData,
@@ -14,6 +15,8 @@ export class FMG_Storage extends EventEmitter {
     private readonly gameId: number;
     private readonly userId: number;
 
+    private driver: FMG.Storage.Driver;
+
     public data: Data;
     public settings: Settings;
 
@@ -24,6 +27,8 @@ export class FMG_Storage extends EventEmitter {
 
         this.gameId = checkDefined(window.game?.id, "window.game.id");
         this.userId = checkDefined(window.user?.id, "window.user.id");
+
+        this.driver = new LocalStorageDriver(window);
 
         this.data = new Data({});
         this.settings = new Settings({});
