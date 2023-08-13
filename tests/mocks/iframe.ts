@@ -34,6 +34,7 @@ export class IFrameMock {
     }
 
     public remove() {
+        this.contentWindow?.close();
         this.contentWindow = undefined;
     }
 }
