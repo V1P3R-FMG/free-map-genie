@@ -1,8 +1,10 @@
 export class Logger {
     public readonly name: string;
+    private muted = false;
 
     public constructor(name: string) {
         this.name = name;
+        this.muted = false;
     }
 
     public static format(msg: string, data: Record<string, any>) {
@@ -17,6 +19,7 @@ export class Logger {
      * @param args the arguments to log
      */
     public log(msg: any, data?: Record<string, any>) {
+        if (this.muted) return;
         console.log(
             `%c[${this.name}]%c %c` + Logger.format(msg.toString(), data ?? {}),
             "background: green; color: white;",
@@ -30,6 +33,7 @@ export class Logger {
      * @param args the arguments to log
      */
     public warn(msg: any, data?: Record<string, any>) {
+        if (this.muted) return;
         console.warn(
             `%c[${this.name}]%c %c` + Logger.format(msg.toString(), data ?? {}),
             "background: green; color: white;",
@@ -43,11 +47,26 @@ export class Logger {
      * @param args the arguments to log
      */
     public error(msg: any, data?: Record<string, any>) {
+        if (this.muted) return;
         console.error(
             `%c[${this.name}]%c %c` + Logger.format(msg.toString(), data ?? {}),
             "background: green; color: white;",
             "",
             "color: #FF4A4A;"
         );
+    }
+
+    /**
+     * Mute log.
+     */
+    public mute() {
+        this.muted = true;
+    }
+
+    /**
+     * Unmute log.
+     */
+    public unmute() {
+        this.muted = false;
     }
 }

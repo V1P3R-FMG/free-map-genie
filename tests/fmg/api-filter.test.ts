@@ -38,6 +38,14 @@ describe("FMG_ApiFilter", () => {
         return FnResult;
     });
 
+    beforeAll(() => {
+        logger.mute();
+    });
+
+    afterAll(() => {
+        logger.unmute();
+    });
+
     beforeEach(() => {
         fnBlock.mockClear();
         fnNonBlock.mockClear();

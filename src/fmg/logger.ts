@@ -17,3 +17,11 @@ export function warn(msg: any, data?: Record<string, any>): void {
 export function error(msg: any, data?: Record<string, any>): void {
     fmgLogger.error(msg, data);
 }
+
+export function mute(): void {
+    fmgLogger.mute();
+}
+
+export function unmute(): void {
+    fmgLogger.unmute();
+}
