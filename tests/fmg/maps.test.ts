@@ -27,13 +27,7 @@ function createWindow(): any {
 
     const window = dom.window;
 
-    attachWindow(window, {
-        markdownit() {
-            return {
-                renderer: {}
-            };
-        }
-    });
+    attachWindow(window);
 
     window.mapData = {} as any;
     window.mapData!.maps = maps;
