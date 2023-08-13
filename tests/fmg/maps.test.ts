@@ -50,6 +50,11 @@ describe("maps", () => {
         window = createWindow();
     });
 
+    afterAll(() => {
+        window.close();
+        window = undefined as any;
+    });
+
     it("should be able to create parse url correctly", () => {
         for (const [index, map] of Object.entries(maps)) {
             const url = MapData["getMapUrl"](window, map);
@@ -68,7 +73,7 @@ describe("maps", () => {
         expect(maps.isLoading).toBe(false);
 
         expect(maps.all.length).toBeGreaterThan(0);
-    }, 10000);
+    });
 
     it("should filter locations", async () => {
         const maps = new Maps(window);
