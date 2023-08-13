@@ -1,6 +1,8 @@
 export class MapData {
     public readonly mapId: number;
     public readonly url: string;
+    private readonly window: Window;
+
     private mapData: MG.Info.MapData | null = null;
     private loaded: boolean = false;
     private loading: boolean = false;
@@ -11,12 +13,13 @@ export class MapData {
         const map = window.mapData?.maps.find((map) => map.id === mapId);
         if (!map) throw new Error(`Map with id ${mapId} not found`);
 
+        this.window = window;
         this.url = MapData.getMapUrl(window, map);
     }
 
     private static getMapUrl(window: Window, map: MG.Info.Map) {
         if (!window.game) throw new Error("window.game is not defined");
-        return `${location.origin}/${window.game.slug}/maps/${map.slug}`;
+        return `${window.location.origin}/${window.game.slug}/maps/${map.slug}`;
     }
 
     public async load() {
@@ -25,10 +28,11 @@ export class MapData {
         return new Promise<void>((resolve, reject) => {
             this.loading = true;
 
-            const frame = document.createElement("iframe");
-            document.body.append(frame);
+            const frame = this.window.document.createElement("iframe");
+            this.window.document.body.append(frame);
 
             frame.src = this.url;
+            frame.loading = "eager";
             frame.style.display = "none";
 
             frame.addEventListener("load", () => {
