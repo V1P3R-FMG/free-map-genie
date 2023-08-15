@@ -4,7 +4,7 @@ export class FMG_MapInfo {
     public mapId: number;
     public mapName: string;
 
-    constructor(window: Window) {
+    private constructor(window: Window) {
         this.mapId = 0;
         this.mapName = "";
 

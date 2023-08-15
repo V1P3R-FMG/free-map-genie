@@ -6,7 +6,7 @@ export class FMG_MapData {
 
     private data: any;
 
-    constructor(data: any) {
+    private constructor(data: any) {
         this.data = data;
     }
 
