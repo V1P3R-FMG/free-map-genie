@@ -41,6 +41,9 @@
 	</tr>
 </table>
 
+> [!NOTE]
+> If a feature is not listed you can make a feature request in [issues](https://github.com/V1P3R-FMG/free-map-genie/issues).
+
 <hr/>
 <h1>Quick Links</h1>
 <ul>
