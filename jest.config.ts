@@ -13,7 +13,6 @@ const { compilerOptions } = getTsConfig();
 const { paths, baseUrl } = compilerOptions ?? {};
 
 if (!compilerOptions) throw new Error("compilerOptions not defined");
-if (paths && !baseUrl) throw new Error("baseUrl not defined");
 
 /** @type {import("@jest/types").Config.InitialOptions} */
 export default {

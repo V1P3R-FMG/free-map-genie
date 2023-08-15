@@ -15,7 +15,9 @@
             "@background/*": ["background/*"],
             "@shared/*": ["shared/*"],
             "@fmg/*": ["fmg/*"],
-            "@/*": ["*"]
+            "@/*": ["*"],
+            "@tests/data/*": ["../tests/data/*"],
+            "@tests/mocks/*": ["../tests/mocks/*"]
         },
         "typeRoots": ["./node_modules/@types", "./src/@types"]
     },
