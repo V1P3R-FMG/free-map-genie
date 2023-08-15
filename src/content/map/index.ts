@@ -4,6 +4,8 @@ import { FMG_ApiFilter } from "@fmg/filters/api-filter";
 import { FMG_StorageFilter } from "@fmg/filters/storage-filter";
 import { FMG_Storage } from "@fmg/storage";
 import { FMG_Store } from "@fmg/store";
+import { FMG_MetaData } from "@fmg/meta-data";
+import { FMG_MapData } from "@fmg/map-data";
 import setupMapApiFilter from "./filters/api-filter";
 import setupMapStorageFilter from "./filters/storage-filter";
 
@@ -34,8 +36,6 @@ export class FMG_Map {
         setupMapStorageFilter(this.storageFilter);
 
         this.store = FMG_Store.install(window, this.storage);
-
-        this.setProFeaturesEnabled();
     }
 
     /**
@@ -48,14 +48,6 @@ export class FMG_Map {
             window[FmgMapInstalled] = new FMG_Map(window);
         }
         return window[FmgMapInstalled];
-    }
-
-    /**
-     * Enable pro features
-     */
-    private setProFeaturesEnabled() {
-        if (this.window.user) this.window.user.hasPro = true;
-        if (this.window.config) this.window.config.presetsEnabled = true;
     }
 
     /*
@@ -71,6 +63,99 @@ export class FMG_Map {
                 Size: function () {}
             };
         }
+    }
+
+    /**
+     * Enable pro features
+     */
+    private static async setProFeaturesEnabled(window: Window) {
+        // Create a user
+        // TODO: only set the required properties
+        // TODO: make this configurable
+        window.user = {
+            id: 12346,
+            role: "admin",
+            locations: [],
+            gameLocationsCount: 0,
+            hasPro: false,
+            trackedCategoryIds: [],
+            suggestions: [],
+            presets: []
+        } as any;
+
+        // Get the map id from the meta data
+        // If this is set we will imitate another map
+        // Only works with maps from the same game.
+        const { mapId } = FMG_MetaData.get();
+        if (mapId) {
+            if (window.mapData) {
+                const mapData = await FMG_MapData.get(mapId);
+                window.mapData.mapConfig = mapData.mapConfig;
+                window.mapData.groups = mapData.groups;
+                window.mapData.categories = mapData.categories;
+                window.mapData.locations = mapData.locations;
+            }
+        }
+
+        // Usual pro features
+        if (window.user) window.user.hasPro = true;
+        if (window.config) window.config.presetsEnabled = true;
+    }
+
+    /**
+     * Find the first free map url in the map switcher panel.
+     * @param window the window to search in
+     * @returns the first free map url
+     */
+    private static getFreeMapUrl(window: Window): string {
+        for (const link of window.document.querySelectorAll<HTMLLinkElement>(
+            ".map-switcher-panel .map-link"
+        )) {
+            if (!link.href.endsWith("/upgrade")) {
+                return link.href;
+            }
+        }
+        throw new Error("Free map url not found");
+    }
+
+    /**
+     * Get the map name for a given link element.
+     */
+    private static getMapName(link: HTMLLinkElement): string {
+        return link.innerText.replace(/\s?\[\w+\]/i, "").toLowerCase();
+    }
+
+    /**
+     * Unlock maps in map switcher panel.
+     */
+    private static unlockMaps(window: Window) {
+        if (!window.document.querySelector(".map-switcher-panel")) return;
+
+        const freeMapUrl = FMG_Map.getFreeMapUrl(window);
+        window.document
+            .querySelectorAll<HTMLLinkElement>(".map-switcher-panel .map-link")
+            .forEach((link) => {
+                if (!link.href.endsWith("/upgrade")) return;
+
+                // Fix name
+                const mapName = FMG_Map.getMapName(link);
+                // link.innerText = mapName;
+
+                // Fix href
+                const url = new URL(freeMapUrl);
+                url.searchParams.set("map", mapName);
+                link.setAttribute("href", url.toString());
+
+                // Remove style
+                link.removeAttribute("style");
+
+                // Remove unnecessary attributes
+                link.removeAttribute("target");
+                link.removeAttribute("data-toggle");
+                link.removeAttribute("title");
+                link.removeAttribute("data-original-title");
+                link.removeAttribute("data-placement");
+            });
     }
 
     /*
@@ -96,10 +181,16 @@ export class FMG_Map {
      */
     public static async setup(window: Window) {
         FMG_Map.fixGoogleMaps();
+        FMG_Map.unlockMaps(window);
+        await FMG_Map.setProFeaturesEnabled(window);
 
+        // After we fixed google maps and enabled pro features,
+        // we can load the blocked map script
         await FMG_Map.loadMapScript();
 
+        // After the map script is loaded, we can install our map script
         const map = FMG_Map.install(window);
+        await map.storage.load();
 
         // #if DEBUG
         window.fmgMap = map;

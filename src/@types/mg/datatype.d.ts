@@ -76,4 +76,21 @@ declare namespace MG {
         attribution: string;
         meta: unknown | null;
     }
+
+    interface TileSet {
+        extension: string;
+        max_zoom: number;
+        min_zoom: number;
+        name: string;
+        path: string;
+    }
+
+    interface MapConfig {
+        initial_zoom: number;
+        overlay: unknown | null;
+        overzoom: boolean;
+        start_lat: number;
+        start_lng: number;
+        tile_sets: TileSet[];
+    }
 }

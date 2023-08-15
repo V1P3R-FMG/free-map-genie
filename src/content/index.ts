@@ -1,5 +1,6 @@
 import { getPageType } from "@shared/page";
 import { FMG_Map } from "./map";
+import { FMG_MapSelector } from "./map-selector";
 
 /**
  * Itialize the content script
@@ -17,6 +18,8 @@ async function init() {
     switch (type) {
         case "map":
             return FMG_Map.setup(window);
+        case "map-selector":
+            return FMG_MapSelector.setup(window);
         default:
             logger.warn(`Page type ${type}, not installing map/guide!`);
             return;

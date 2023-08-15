@@ -1,4 +1,4 @@
-export type PageType = "map" | "guide" | "home" | "unknown";
+export type PageType = "map" | "guide" | "home" | "map-selector" | "unknown";
 
 /**
  * Checks if the current page is a map page.
@@ -30,6 +30,17 @@ export function isHomePage(window: Window): boolean {
 }
 
 /**
+ * Check if the current page is a map selector page.
+ * @returns Returns true if the current page is a map selector page, false otherwise.
+ */
+export function isMapSelectorPage(window: Window): boolean {
+    return (
+        !!window.document.body.classList.contains("game-home") &&
+        !!window.document.body.querySelector(".maps-container")
+    );
+}
+
+/**
  * Gets the type of the current page.
  * @returns Returns the type of the current page.
  */
@@ -40,6 +51,8 @@ export function getPageType(window: Window): PageType {
         return "guide";
     } else if (isHomePage(window)) {
         return "home";
+    } else if (isMapSelectorPage(window)) {
+        return "map-selector";
     }
     return "unknown";
 }

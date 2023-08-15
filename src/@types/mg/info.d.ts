@@ -30,6 +30,7 @@ declare namespace MG {
             map: Map;
             maps: Map[];
             presets: Preset[];
+            mapConfig: MapConfig;
         }
     }
 }
