@@ -158,6 +158,17 @@ export class FMG_Map {
             });
     }
 
+    /**
+     * Cleanup pro updrade ads.
+     * @param window the window to cleanup
+     */
+    private static cleanupProUpgradeAds(window: Window) {
+        window.document
+            .querySelector("#button-upgrade")
+            ?.parentElement?.parentElement?.remove();
+        window.document.querySelector("#nitro-floating-wrapper")?.remove();
+    }
+
     /*
      * Load the map script, and wait for the globals to be defined.
      **/
@@ -181,7 +192,11 @@ export class FMG_Map {
      */
     public static async setup(window: Window) {
         FMG_Map.fixGoogleMaps();
+
         FMG_Map.unlockMaps(window);
+        FMG_Map.cleanupProUpgradeAds(window);
+
+        // Enable pro features
         await FMG_Map.setProFeaturesEnabled(window);
 
         // After we fixed google maps and enabled pro features,
