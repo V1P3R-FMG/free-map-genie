@@ -4,8 +4,8 @@ import { FMG_ApiFilter } from "@fmg/filters/api-filter";
 import { FMG_StorageFilter } from "@fmg/filters/storage-filter";
 import { FMG_Storage } from "@fmg/storage";
 import { FMG_Store } from "@fmg/store";
-import { FMG_MetaData } from "@fmg/meta-data";
-import { FMG_MapData } from "@fmg/map-data";
+import { FMG_Games, FMG_MapInfo } from "@fmg/info";
+import { FMG_MapData } from "@fmg/info/map-data";
 import setupMapApiFilter from "./filters/api-filter";
 import setupMapStorageFilter from "./filters/storage-filter";
 
@@ -86,7 +86,7 @@ export class FMG_Map {
         // Get the map id from the meta data
         // If this is set we will imitate another map
         // Only works with maps from the same game.
-        const { mapId } = FMG_MetaData.get();
+        const { mapId } = FMG_MapInfo.get(window);
         if (mapId) {
             if (window.mapData) {
                 const mapData = await FMG_MapData.get(mapId);

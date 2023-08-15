@@ -22,6 +22,11 @@ export class MapData {
         return `${window.location.origin}/${window.game.slug}/maps/${map.slug}`;
     }
 
+    private CheckIfReady() {
+        if (!this.loaded) throw new Error("Map is not loaded");
+        if (!this.mapData) throw new Error("Map data is not loaded");
+    }
+
     public async load() {
         if (this.loaded) return;
         if (this.loading) throw new Error("Map is already loading");
@@ -59,16 +64,35 @@ export class MapData {
     }
 
     public get data(): MG.Info.MapData {
-        if (!this.loaded) throw new Error("Map is not loaded");
-        if (!this.mapData) throw new Error("Map data is not loaded");
-        return this.mapData;
+        this.CheckIfReady();
+        return this.mapData!;
     }
 
     public filterLocations(locations: Id[]): Id[] {
-        if (!this.loaded) throw new Error("Map is not loaded");
-        if (!this.mapData) throw new Error("Map data is not loaded");
+        this.CheckIfReady();
         return locations.filter((id) => {
-            return !!this.mapData?.locations.some((loc) => loc.id == id);
+            return !!this.mapData!.locations.some((loc) => loc.id == id);
         });
+    }
+
+    public filterCategories(categories: Id[]): Id[] {
+        this.CheckIfReady();
+        return categories.filter((id) => {
+            return !!this.mapData!.categories[id];
+        });
+    }
+
+    public filterPresets(
+        presets: MG.Preset[],
+        presetOrder: MG.PresetOrder
+    ): [MG.Preset[], MG.PresetOrder] {
+        this.CheckIfReady();
+        const filteredPresets = presets.filter((preset) => {
+            return !!this.filterCategories(preset.categories).length;
+        });
+        const filteredPresetOrder = presetOrder.filter((id) => {
+            return !!filteredPresets.find((preset) => preset.id === id);
+        });
+        return [presets, filteredPresetOrder];
     }
 }

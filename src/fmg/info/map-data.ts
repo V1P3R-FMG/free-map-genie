@@ -2,6 +2,8 @@
  * Get imformation about a map from mapgenie.io.
  */
 export class FMG_MapData {
+    private static cache: DictById<FMG_MapData> = {};
+
     private data: any;
 
     constructor(data: any) {
@@ -14,9 +16,13 @@ export class FMG_MapData {
      * @returns map data for the given mapId
      */
     public static async get(mapId: number): Promise<FMG_MapData> {
-        const url = "https://mapgenie.io" + "/api/v1/maps/" + mapId + "/full";
-        const res = await fetch(url);
-        return new FMG_MapData(await res.json());
+        if (!FMG_MapData.cache[mapId]) {
+            const url =
+                "https://mapgenie.io" + "/api/v1/maps/" + mapId + "/full";
+            const res = await fetch(url);
+            FMG_MapData.cache[mapId] = new FMG_MapData(await res.json());
+        }
+        return FMG_MapData.cache[mapId];
     }
 
     public get groups(): MG.Group[] {
