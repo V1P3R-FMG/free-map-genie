@@ -55,7 +55,7 @@
         "build-firefox": "yarn run build --env mode=prod --env browser=firefox",
         "build-chrome": "yarn run build --env mode=prod --env browser=chrome",
         "test": "npx jest",
-        "test-non-silent": "npx jest --silent=false",
+        "test-loud": "npx jest --silent=false",
         "lint": "npx eslint . --ext .ts",
         "lint-fix": "yarn lint --fix",
         "prettier": "npx prettier . --write --editorconfig=true"
