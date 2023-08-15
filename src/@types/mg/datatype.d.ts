@@ -1,4 +1,21 @@
 declare namespace MG {
+    interface Game {
+        available_on_ign: boolean;
+        config: {
+            cdn_url: string;
+            tiles_base_url: string;
+            url: string;
+        };
+        domain: string;
+        id: number;
+        ign_slug: string;
+        image: string;
+        logo: string;
+        maps: Map[];
+        slug: string;
+        title: string;
+    }
+
     interface Location {
         id: number;
         map_id: number;

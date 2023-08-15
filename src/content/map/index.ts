@@ -4,7 +4,7 @@ import { FMG_ApiFilter } from "@fmg/filters/api-filter";
 import { FMG_StorageFilter } from "@fmg/filters/storage-filter";
 import { FMG_Storage } from "@fmg/storage";
 import { FMG_Store } from "@fmg/store";
-import { FMG_Games, FMG_MapInfo } from "@fmg/info";
+import { FMG_MapInfo } from "@fmg/info";
 import { FMG_MapData } from "@fmg/info/map-data";
 import setupMapApiFilter from "./filters/api-filter";
 import setupMapStorageFilter from "./filters/storage-filter";
