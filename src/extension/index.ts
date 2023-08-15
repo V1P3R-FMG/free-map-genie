@@ -1,20 +1,27 @@
 import { createScript } from "@shared/dom";
+import { getData } from "@shared/extension";
 import { initHandlers } from "./handlers";
 
 const shared = {
     attached: false
 };
 
-function injectScript(name: string): HTMLScriptElement {
-    const script = createScript({
-        src: chrome.runtime.getURL(name)
-    });
+function injectScript(src: string): HTMLScriptElement {
+    const script = createScript({ src });
     script.onload = () => (shared.attached = true);
     document.body.appendChild(script);
     return script;
 }
 
-injectScript("content.js");
-initHandlers(shared);
+async function init() {
+    window.sessionStorage.setItem(
+        "fmg:extension:data",
+        JSON.stringify(await getData())
+    );
+    injectScript(chrome.runtime.getURL("content.js"));
+    initHandlers(shared);
+}
 
-logger.log("extension script loaded");
+init()
+    .then(() => logger.log("extension script loaded"))
+    .catch(console.error);
