@@ -8,12 +8,12 @@ export class FMG_MapInfo {
         this.mapId = 0;
         this.mapName = "";
 
-        if (!this.loadMapInfoFomUrlParams()) {
+        if (!this.loadMapInfoFomUrlParams(window)) {
             this.loadMapInfoFromMapData(window);
         }
     }
 
-    private loadMapInfoFomUrlParams() {
+    private loadMapInfoFomUrlParams(window: Window) {
         const params = new URL(window.location.href).searchParams;
         const map = params.get("map");
         const mapId = map
