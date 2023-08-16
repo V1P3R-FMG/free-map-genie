@@ -6,6 +6,8 @@ interface Window {
     fmgInfo?: {
         //games: MG.Game[];
         maps: import("@fmg/info/maps").FMG_Maps;
-        mapData: import("@fmg/info/map-data").FMG_MapData;
+        mapData: {
+            get: (typeof import("@fmg/info/map-data").FMG_MapData)["get"];
+        };
     };
 }

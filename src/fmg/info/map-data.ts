@@ -26,10 +26,14 @@ export class FMG_MapData {
         return FMG_MapData.cache[mapId];
     }
 
+    public get url(): string {
+        return this.data.url;
+    }
+
     public get map(): MG.Info.Map {
         return {
             id: this.data.id,
-            title: this.data.name,
+            title: this.data.title,
             slug: this.data.slug,
             ign_slug: this.data.ign_slug
         };
@@ -59,7 +63,19 @@ export class FMG_MapData {
             .flat(1);
     }
 
+    public get regions(): MG.Region[] {
+        return this.data.regions;
+    }
+
+    public get presets(): MG.Preset[] {
+        return [];
+    }
+
     public get mapConfig(): MG.MapConfig {
         return this.data.config;
+    }
+
+    public get gameConfig(): MG.GameConfig {
+        return this.data.game.config;
     }
 }

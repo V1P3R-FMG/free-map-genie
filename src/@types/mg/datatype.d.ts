@@ -3,7 +3,7 @@ declare namespace MG {
         available_on_ign: boolean;
         config: {
             cdn_url: string;
-            tiles_base_url: string;
+            tiles_base_url?: string;
             url: string;
         };
         domain: string;
@@ -82,6 +82,8 @@ declare namespace MG {
 
     interface Suggestion {}
 
+    interface Region {}
+
     interface Media {
         id: number;
         file_name: string;
@@ -109,5 +111,14 @@ declare namespace MG {
         start_lat: number;
         start_lng: number;
         tile_sets: TileSet[];
+    }
+
+    interface GameConfig {
+        cdn_url: string;
+        compass_enabled: boolean;
+        marker_sprite_url: string;
+        presets_enabled: boolean;
+        tiles_base_url: string;
+        url: string;
     }
 }

@@ -105,7 +105,7 @@ export class FMG_Map {
 
         if (map && !mapId) {
             console.error(
-                "Map({}) not found, valid maps: ",
+                `Map(${map}) not found, valid maps: `,
                 window.mapData?.maps.map((map) => map.slug) || []
             );
             throw new Error("Map not found");
@@ -115,11 +115,28 @@ export class FMG_Map {
 
         if (window.mapData) {
             const mapData = await FMG_MapData.get(mapId);
+
+            // Urls
+            window.mapUrl = mapData.url;
+            window.baseUrl = mapData.gameConfig.url;
+            window.cdnUrl = mapData.gameConfig.cdn_url;
+            window.tilesCdnUrl = mapData.gameConfig.tiles_base_url;
+            // window.storageCdnUrl = ?; // We can assume this is always the same?
+
+            // Map Data
             window.mapData.map = mapData.map;
-            window.mapData.mapConfig = mapData.mapConfig;
             window.mapData.groups = mapData.groups;
             window.mapData.categories = mapData.categories;
             window.mapData.locations = mapData.locations;
+            window.mapData.regions = mapData.regions;
+
+            // Map Settings
+            window.mapData.mapConfig = mapData.mapConfig;
+            window.initialZoom = mapData.mapConfig.initial_zoom;
+            window.initiaPosition = {
+                lat: mapData.mapConfig.start_lat,
+                lng: mapData.mapConfig.start_lng
+            };
             return;
         }
 

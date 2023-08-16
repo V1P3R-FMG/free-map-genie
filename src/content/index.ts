@@ -1,8 +1,7 @@
 import { getPageType } from "@shared/page";
 import { FMG_Map } from "./map";
 import { FMG_MapSelector } from "./map-selector";
-import { FMG_Data } from "@fmg/data";
-import { FMG_Games, FMG_Maps, FMG_MapData } from "@fmg/info";
+import { FMG_Maps, FMG_MapData } from "@fmg/info";
 
 /**
  * Itialize the content script
@@ -12,7 +11,9 @@ async function init() {
         window.fmgInfo = {
             //games: await FMG_Games.get(),
             maps: await FMG_Maps.get(window),
-            mapData: FMG_MapData.prototype
+            mapData: {
+                get: FMG_MapData.get
+            }
         };
 
         if (window.store) {
@@ -21,11 +22,6 @@ async function init() {
             location.reload();
             throw new Error("Store allready defined, reloading page");
         }
-    }
-
-    // TODO: fix script blocking
-    if (!FMG_Data.settings.extension_enabled) {
-        return; // Extension is disabled
     }
 
     // Check if the page is a map or guide

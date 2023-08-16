@@ -13,7 +13,7 @@ declare namespace MG {
             locations: Location[];
             gameLocationsCount: number;
             presets: Preset[];
-            role: keyof ["user"];
+            role: "user" | "admin";
             suggestions: Suggestion[];
             trackedCategoryIds: number[];
         }
@@ -33,6 +33,7 @@ declare namespace MG {
             maps: Map[];
             presets: Preset[];
             mapConfig: MapConfig;
+            regions: Region[];
         }
     }
 }
