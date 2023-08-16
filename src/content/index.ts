@@ -15,7 +15,12 @@ async function init() {
                 get: FMG_MapData.get
             }
         };
+    }
 
+    // Check if the page is a map or guide
+    const type = getPageType(window);
+
+    if (type !== "unknown") {
         if (window.store) {
             // If window.store is defined, the page has allready been loaded.
             // This can happen if the extension is reloaded.
@@ -24,8 +29,6 @@ async function init() {
         }
     }
 
-    // Check if the page is a map or guide
-    const type = getPageType(window);
     switch (type) {
         case "map":
             return FMG_Map.setup(window);
