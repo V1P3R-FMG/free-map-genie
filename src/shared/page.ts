@@ -1,4 +1,11 @@
-export type PageType = "map" | "guide" | "home" | "map-selector" | "unknown";
+export type PageType =
+    | "map"
+    | "guide"
+    | "home"
+    | "map-selector"
+    | "upgrade"
+    | "login"
+    | "unknown";
 
 /**
  * Checks if the current page is a map page.
@@ -41,6 +48,32 @@ export function isMapSelectorPage(window: Window): boolean {
 }
 
 /**
+ * Check if page is a upgrade page.
+ * @returns Returns true if the current page is a upgrade page, false otherwise.
+ */
+export function isUpgradePage(window: Window): boolean {
+    return (
+        window.location.pathname.endsWith("/upgrade") &&
+        !!window.document.head.querySelector(
+            "link[href*='https://cdn.mapgenie.io/']"
+        )
+    );
+}
+
+/**
+ * Check if page is a login page.
+ * @returns Returns true if the current page is a login page, false otherwise.
+ */
+export function isLoginPage(window: Window): boolean {
+    return (
+        window.location.pathname.endsWith("/login") &&
+        !!window.document.head.querySelector(
+            "link[href*='https://cdn.mapgenie.io/']"
+        )
+    );
+}
+
+/**
  * Gets the type of the current page.
  * @returns Returns the type of the current page.
  */
@@ -53,6 +86,10 @@ export function getPageType(window: Window): PageType {
         return "home";
     } else if (isMapSelectorPage(window)) {
         return "map-selector";
+    } else if (isUpgradePage(window)) {
+        return "upgrade";
+    } else if (isLoginPage(window)) {
+        return "login";
     }
     return "unknown";
 }

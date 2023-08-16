@@ -8,12 +8,18 @@ const shared = {
 
 function injectScript(src: string): HTMLScriptElement {
     const script = createScript({ src });
-    script.onload = () => (shared.attached = true);
-    document.body.appendChild(script);
+    document.head.appendChild(script);
     return script;
 }
 
 async function init() {
+    window.addEventListener("message", (event) => {
+        switch (event.data.type) {
+            case "fmg:attached":
+                shared.attached = true;
+                break;
+        }
+    });
     window.sessionStorage.setItem(
         "fmg:extension:data",
         JSON.stringify(await getData())

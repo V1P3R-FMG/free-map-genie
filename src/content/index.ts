@@ -31,15 +31,35 @@ async function init() {
 
     switch (type) {
         case "map":
-            return FMG_Map.setup(window);
+            await FMG_Map.setup(window);
+            return true;
         case "map-selector":
-            return FMG_MapSelector.setup(window);
+            await FMG_MapSelector.setup(window);
+            return true;
+        case "login":
+        case "upgrade":
+            return false;
         default:
             logger.warn(`Page type ${type}, not installing map/guide!`);
-            return;
+            break;
     }
+
+    return false;
 }
 
 init()
-    .then(() => logger.log("content script init done"))
-    .catch((err) => logger.error(err));
+    .then((attached) => {
+        if (attached) {
+            window.postMessage({
+                type: "fmg:attached"
+            });
+            logger.log("content script init done");
+        }
+    })
+    .catch((err) => {
+        window.postMessage({
+            type: "fmg:error",
+            error: err.message
+        });
+        logger.error(err);
+    });
