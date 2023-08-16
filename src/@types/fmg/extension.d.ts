@@ -11,7 +11,6 @@ declare namespace FMG {
         type Option = CheckboxOption;
 
         interface Settings {
-            extension_enabled: boolean;
             presets_allways_enabled: boolean;
             total_progress_bar_legacy_mode: boolean;
             import_safety: boolean;

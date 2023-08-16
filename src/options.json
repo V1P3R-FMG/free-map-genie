@@ -1,13 +1,6 @@
 [
     {
         "type": "checkbox",
-        "value": true,
-        "name": "extension_enabled",
-        "label": "Extension enabled",
-        "tooltip": "Enable/Disable the extension."
-    },
-    {
-        "type": "checkbox",
         "value": false,
         "name": "presets_allways_enabled",
         "label": "Allways enable presets",
