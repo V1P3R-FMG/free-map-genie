@@ -56,7 +56,7 @@ export class FMG_Map {
      * Because google.maps will allready be defined by another script,
      * and there for the map script will never define a maps mock object.
      **/
-    private static fixGoogleMaps(): void {
+    private static fixGoogleMaps(window: Window): void {
         if (window.config?.altMapSdk) {
             window.google = window.google || {};
             window.google.maps = {
@@ -230,16 +230,17 @@ export class FMG_Map {
     /*
      * Load the map script, and wait for the globals to be defined.
      **/
-    private static async loadMapScript(): Promise<void> {
+    private static async loadMapScript(window: Window): Promise<void> {
         const script = await getElement<HTMLScriptElement>(
-            "script[src^='https://cdn.mapgenie.io/js/map.js?id=']"
+            "script[src^='https://cdn.mapgenie.io/js/map.js?id=']",
+            window
         );
 
         if (!script) throw new Error("Map script not found");
 
         createScript({
             src: script.src.replace("id=", "ready&id="),
-            appendTo: document.body
+            appendTo: window.document.body
         });
 
         return timeout(waitForGlobals(["axios", "store"], window), 10 * 1000);
@@ -249,7 +250,7 @@ export class FMG_Map {
      * Setup
      */
     public static async setup(window: Window) {
-        FMG_Map.fixGoogleMaps();
+        FMG_Map.fixGoogleMaps(window);
 
         FMG_Map.unlockMaps(window);
         FMG_Map.cleanupProUpgradeAds(window);
@@ -259,7 +260,7 @@ export class FMG_Map {
 
         // After we fixed google maps and enabled pro features,
         // we can load the blocked map script
-        await FMG_Map.loadMapScript();
+        await FMG_Map.loadMapScript(window);
 
         // After the map script is loaded, we can install our map script
         const map = FMG_Map.install(window);

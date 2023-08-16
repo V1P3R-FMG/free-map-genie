@@ -1,13 +1,15 @@
 import { sleep } from "./async";
 
 export async function getElement<T extends Element>(
-    selector: string
+    selector: string,
+    win?: Window
 ): Promise<T> {
-    let element = document.querySelector(selector);
+    win = win ?? window;
+    let element = win.document.querySelector(selector);
     if (element !== null) return element as T;
     while (element === null) {
         await sleep(100);
-        element = document.querySelector(selector);
+        element = win.document.querySelector(selector);
     }
     return element as T;
 }
