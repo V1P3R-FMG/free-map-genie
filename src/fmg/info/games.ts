@@ -1,3 +1,5 @@
+import corsProxy from "@shared/cors-proxy";
+
 export class FMG_Games {
     private static instance?: FMG_Games;
 
@@ -16,11 +18,7 @@ export class FMG_Games {
     }
 
     private async load() {
-        const url =
-            __CORS_PROXY__ +
-            "?" +
-            encodeURIComponent("https://mapgenie.io/api/v1/games");
-        const res = await fetch(url);
+        const res = await fetch(corsProxy("https://mapgenie.io/api/v1/games"));
         this.data = await res.json();
     }
 }

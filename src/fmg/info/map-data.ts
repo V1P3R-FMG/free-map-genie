@@ -1,3 +1,5 @@
+import corsProxy from "@shared/cors-proxy";
+
 /**
  * Get imformation about a map from mapgenie.io.
  */
@@ -17,19 +19,15 @@ export class FMG_MapData {
      */
     public static async get(mapId: number): Promise<FMG_MapData> {
         if (!FMG_MapData.cache[mapId]) {
-            const url =
-                __CORS_PROXY__ +
-                "?" +
-                encodeURIComponent(
-                    "https://mapgenie.io/api/v1/maps/" + mapId + "/full"
-                );
-            const res = await fetch(url, {
-                headers: {
-                    Origin: "https://mapgenie.io"
+            const res = await fetch(
+                corsProxy("https://mapgenie.io/api/v1/maps/" + mapId + "/full"),
+                {
+                    headers: {
+                        Origin: "https://mapgenie.io"
+                    }
                 }
-            });
+            );
             FMG_MapData.cache[mapId] = new FMG_MapData(await res.json());
-            console.log(FMG_MapData.cache[mapId]);
         }
         return FMG_MapData.cache[mapId];
     }
