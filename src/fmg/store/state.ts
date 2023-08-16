@@ -21,9 +21,5 @@ export interface FMG_State extends MG.State {
 }
 
 export function extendState(state: MG.State, storage: FMG_Storage): FMG_State {
-    state.user.foundLocations = [] as any;
-    state.user.trackedCategories = [] as any;
-    state.user.totalFoundLocationsCount = 0;
-    state.user.suggestions = [];
     return state as FMG_State;
 }

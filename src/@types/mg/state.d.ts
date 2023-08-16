@@ -102,6 +102,7 @@ declare namespace MG {
         interface Editor {
             showAddMarkerControls: boolean;
             selectedCategory: Category | null;
+            selectedGroup: Group | null;
         }
     }
 }

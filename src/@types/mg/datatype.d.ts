@@ -58,12 +58,12 @@ declare namespace MG {
     }
 
     interface Note {
-        id: string;
-        categroty: Category | null;
+        id: number;
+        category: Category | null;
         color: string | null;
         description: string;
-        latitude: string;
-        longitude: string;
+        latitude: string | number;
+        longitude: string | number;
         map_id: number;
         title: string;
         user_id: number;
