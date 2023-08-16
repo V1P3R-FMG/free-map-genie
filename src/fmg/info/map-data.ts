@@ -25,6 +25,18 @@ export class FMG_MapData {
         return FMG_MapData.cache[mapId];
     }
 
+    public get id(): number {
+        return this.data.id;
+    }
+
+    public get name(): string {
+        return this.data.title;
+    }
+
+    public get slug(): string {
+        return this.data.slug;
+    }
+
     public get groups(): MG.Group[] {
         return this.data.groups;
     }
