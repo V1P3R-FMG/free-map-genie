@@ -13,6 +13,7 @@ export const FmgMapInstalled = Symbol("FmgMapInstalled");
 
 export type FmgMapWindow = Window & { [FmgMapInstalled]?: FMG_Map };
 
+// TODO: fix popup link copy for pro maps
 /**
  * The fmg map script
  * Handles all map related functionality
@@ -88,7 +89,14 @@ export class FMG_Map {
             window.user.hasPro = true;
             window.user.locations = [];
             window.user.gameLocationsCount = 0;
-            window.user.presets = [];
+            window.user.presets = [
+                {
+                    id: 1,
+                    title: "test",
+                    categories: [],
+                    order: 0
+                }
+            ];
         }
     }
 

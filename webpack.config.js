@@ -96,7 +96,8 @@ export default (env) => {
         __DEBUG__: isDev,
         __VERSION__: JSON.stringify(packageJson.version),
         __AUTHOR__: JSON.stringify(packageJson.author),
-        __HOMEPAGE__: JSON.stringify(packageJson.homepage)
+        __HOMEPAGE__: JSON.stringify(packageJson.homepage),
+        __CORS_PROXY__: JSON.stringify(process.env.CORS_PROXY || "")
     };
 
     const files = [
@@ -146,7 +147,7 @@ export default (env) => {
                                     parser: {
                                         syntax: "typescript"
                                     },
-                                    target:"esnext"
+                                    target: "esnext"
                                 }
                             }
                         },

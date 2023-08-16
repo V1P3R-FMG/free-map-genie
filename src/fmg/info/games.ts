@@ -16,7 +16,11 @@ export class FMG_Games {
     }
 
     private async load() {
-        const res = await fetch("https://mapgenie.io/api/v1/games");
+        const url =
+            __CORS_PROXY__ +
+            "?" +
+            encodeURIComponent("https://mapgenie.io/api/v1/games");
+        const res = await fetch(url);
         this.data = await res.json();
     }
 }

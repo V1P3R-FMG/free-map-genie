@@ -18,8 +18,16 @@ export class FMG_MapData {
     public static async get(mapId: number): Promise<FMG_MapData> {
         if (!FMG_MapData.cache[mapId]) {
             const url =
-                "https://mapgenie.io" + "/api/v1/maps/" + mapId + "/full";
-            const res = await fetch(url);
+                __CORS_PROXY__ +
+                "?" +
+                encodeURIComponent(
+                    "https://mapgenie.io/api/v1/maps/" + mapId + "/full"
+                );
+            const res = await fetch(url, {
+                headers: {
+                    Origin: "https://mapgenie.io"
+                }
+            });
             FMG_MapData.cache[mapId] = new FMG_MapData(await res.json());
             console.log(FMG_MapData.cache[mapId]);
         }
