@@ -1,8 +1,8 @@
 import { getPageType } from "@shared/page";
 import { FMG_Map } from "./map";
 import { FMG_MapSelector } from "./map-selector";
-import { FMG_Data } from "./data";
-import { FMG_Games, FMG_Maps, FMG_MapData, FMG_MapInfo } from "@fmg/info";
+import { FMG_Data } from "@fmg/data";
+import { FMG_Games, FMG_Maps, FMG_MapData } from "@fmg/info";
 
 /**
  * Itialize the content script
@@ -12,8 +12,7 @@ async function init() {
         window.fmgInfo = {
             //games: await FMG_Games.get(),
             maps: await FMG_Maps.get(window),
-            mapData: FMG_MapData.prototype,
-            mapInfo: FMG_MapInfo.get(window)
+            mapData: FMG_MapData.prototype
         };
 
         if (window.store) {

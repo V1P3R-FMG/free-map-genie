@@ -21,20 +21,22 @@ export class FMG_MapData {
                 "https://mapgenie.io" + "/api/v1/maps/" + mapId + "/full";
             const res = await fetch(url);
             FMG_MapData.cache[mapId] = new FMG_MapData(await res.json());
+            console.log(FMG_MapData.cache[mapId]);
         }
         return FMG_MapData.cache[mapId];
     }
 
-    public get id(): number {
-        return this.data.id;
+    public get map(): MG.Info.Map {
+        return {
+            id: this.data.id,
+            title: this.data.name,
+            slug: this.data.slug,
+            ign_slug: this.data.ign_slug
+        };
     }
 
-    public get name(): string {
-        return this.data.title;
-    }
-
-    public get slug(): string {
-        return this.data.slug;
+    public get maps(): MG.Info.Map[] {
+        return this.data.maps;
     }
 
     public get groups(): MG.Group[] {

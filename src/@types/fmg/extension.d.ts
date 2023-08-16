@@ -16,6 +16,7 @@ declare namespace FMG {
             total_progress_bar_legacy_mode: boolean;
             import_safety: boolean;
             custom_search_bar: boolean;
+            mock_user: boolean;
         }
 
         interface BookmarkData {

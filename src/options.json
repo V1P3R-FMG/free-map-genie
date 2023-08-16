@@ -19,5 +19,12 @@
         "name": "total_progress_bar_legacy_mode",
         "label": "Legacy total progress bar",
         "tooltip": "This option sets the total progress bar back to legacy mode so all categories are counted."
+    },
+    {
+        "type": "checkbox",
+        "value": false,
+        "name": "mock_user",
+        "label": "Mock user",
+        "tooltip": "This option mocks a user so you don't have to be logged in to see the extension working."
     }
 ]

@@ -11,16 +11,18 @@ declare namespace MG {
             id: number;
             hasPro: boolean;
             locations: Location[];
+            gameLocationsCount: number;
             presets: Preset[];
             role: keyof ["user"];
-            suggestion: Suggestion[];
-            trackedCategoriesIds: number[];
+            suggestions: Suggestion[];
+            trackedCategoryIds: number[];
         }
 
         interface Map {
             id: number;
             title: string;
             slug: string;
+            ign_slug?: string;
         }
 
         interface MapData {

@@ -4,8 +4,8 @@ import { FMG_ApiFilter } from "@fmg/filters/api-filter";
 import { FMG_StorageFilter } from "@fmg/filters/storage-filter";
 import { FMG_Storage } from "@fmg/storage";
 import { FMG_Store } from "@fmg/store";
-import { FMG_MapInfo } from "@fmg/info";
 import { FMG_MapData } from "@fmg/info/map-data";
+import { FMG_Data } from "@fmg/data";
 import setupMapApiFilter from "./filters/api-filter";
 import setupMapStorageFilter from "./filters/storage-filter";
 
@@ -66,40 +66,81 @@ export class FMG_Map {
     }
 
     /**
+     * Load mock user if enabled.
+     * And fill in data from storage.
+     * @param window the window to load the user in
+     */
+    private static async loadUser(window: Window) {
+        // TODO: only set the required properties
+        // TODO: make this configurable
+        if (FMG_Data.settings.mock_user) {
+            window.user = {
+                id: -1,
+                role: "user"
+            } as any;
+        }
+
+        // TODO: load data from storage
+        if (window.user) {
+            window.user.trackedCategoryIds = [];
+            window.user.suggestions = [];
+            window.user.presets = [];
+            window.user.hasPro = true;
+            window.user.locations = [];
+            window.user.gameLocationsCount = 0;
+            window.user.presets = [];
+        }
+    }
+
+    /**
+     * Load map data, from url params.
+     * @param window the window to load the map data in
+     */
+    private static async loadMapData(window: Window) {
+        const params = new URL(window.location.href).searchParams;
+        const map = params.get("map");
+        const mapId = map
+            ? window.mapData?.maps.find((m) => m.slug == map)?.id ?? null
+            : null;
+
+        if (map && !mapId) {
+            console.error(
+                "Map({}) not found, valid maps: ",
+                window.mapData?.maps.map((map) => map.slug) || []
+            );
+            throw new Error("Map not found");
+        }
+
+        if (!map || !mapId) return;
+
+        if (window.mapData) {
+            const mapData = await FMG_MapData.get(mapId);
+            window.mapData.map = mapData.map;
+            window.mapData.mapConfig = mapData.mapConfig;
+            window.mapData.groups = mapData.groups;
+            window.mapData.categories = mapData.categories;
+            window.mapData.locations = mapData.locations;
+            return;
+        }
+
+        throw new Error("Map data not found");
+    }
+
+    /**
      * Enable pro features
      */
     private static async setProFeaturesEnabled(window: Window) {
-        // Create a user
-        // TODO: only set the required properties
-        // TODO: make this configurable
-        window.user = {
-            id: 12346,
-            role: "admin",
-            locations: [],
-            gameLocationsCount: 0,
-            hasPro: false,
-            trackedCategoryIds: [],
-            suggestions: [],
-            presets: []
-        } as any;
+        // Load user
+        await FMG_Map.loadUser(window);
 
-        // Get the map id from the meta data
+        // Get the map id from the meta data.
         // If this is set we will imitate another map
         // Only works with maps from the same game.
-        const { mapId } = FMG_MapInfo.get(window);
-        if (mapId) {
-            if (window.mapData) {
-                const mapData = await FMG_MapData.get(mapId);
-                window.mapData.mapConfig = mapData.mapConfig;
-                window.mapData.groups = mapData.groups;
-                window.mapData.categories = mapData.categories;
-                window.mapData.locations = mapData.locations;
-            }
-        }
+        await FMG_Map.loadMapData(window);
 
-        // Usual pro features
-        if (window.user) window.user.hasPro = true;
-        if (window.config) window.config.presetsEnabled = true;
+        // Set configurations enabled.
+        if (window.config && FMG_Data.settings.presets_allways_enabled)
+            window.config.presetsEnabled = true;
     }
 
     /**
