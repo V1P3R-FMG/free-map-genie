@@ -1,13 +1,16 @@
+const _console = window.console;
+
 class Logger {
-    private name: string;
+    private name: string | undefined;
     private muted: boolean;
 
-    constructor(name: string) {
+    constructor(name?: string) {
         this.name = name;
         this.muted = false;
     }
 
     get prefix() {
+        if (!this.name) return `%c%s%c`;
         return `%c%s%c%s%c`;
     }
 
@@ -61,46 +64,46 @@ class Logger {
 
     get log() {
         if (this.muted) return () => {};
-        return console.log.bind(
-            console,
+        return _console.log.bind(
+            _console,
             // Timestamp
             this.prefix,
             this.compileCss(this.timeCss),
             this.timestamp,
             // Log type
-            this.compileCss(this.infoCss),
-            this.name,
-            ""
+            ...(!this.name
+                ? []
+                : [this.compileCss(this.infoCss), this.name, ""])
         );
     }
 
     get warn() {
         if (this.muted) return () => {};
-        return console.warn.bind(
-            console,
+        return _console.warn.bind(
+            _console,
             // Timestamp
             this.prefix,
             this.compileCss(this.timeCss),
             this.timestamp,
             // Log type
-            this.compileCss(this.warnCss),
-            this.name,
-            ""
+            ...(!this.name
+                ? []
+                : [this.compileCss(this.warnCss), this.name, ""])
         );
     }
 
     get error() {
         if (this.muted) return () => {};
-        return console.error.bind(
-            console,
+        return _console.error.bind(
+            _console,
             // Timestamp
             this.prefix,
             this.compileCss(this.timeCss),
             this.timestamp,
             // Log type
-            this.compileCss(this.errorCss),
-            this.name,
-            ""
+            ...(!this.name
+                ? []
+                : [this.compileCss(this.errorCss), this.name, ""])
         );
     }
 
