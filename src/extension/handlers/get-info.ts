@@ -1,4 +1,4 @@
-import { getPageType } from "@shared/page";
+import { getPageType } from "@fmg/page";
 
 /**
  * Gives the requesting popup information about the current page.

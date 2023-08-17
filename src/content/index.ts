@@ -1,4 +1,4 @@
-import { getPageType } from "@shared/page";
+import { getPageType } from "@fmg/page";
 import { FMG_Map } from "./map";
 import { FMG_MapSelector } from "./map-selector";
 import { FMG_Maps, FMG_MapData } from "@fmg/info";
@@ -54,13 +54,19 @@ async function init() {
 
     switch (type) {
         case "map":
-            await FMG_Map.setup(window);
+            await FMG_Map.setup(window).catch((err) => {
+                logger.error("[MAP]", err);
+            });
             return true;
         case "map-selector":
-            await FMG_MapSelector.setup(window);
+            await FMG_MapSelector.setup(window).catch((err) => {
+                logger.error("[MAP-SELECTOR]", err);
+            });
             return true;
+        case "guide":
         case "login":
         case "upgrade":
+        case "home":
             return false;
         default:
             logger.warn(`Page type ${type}, not installing map/guide!`);
@@ -84,5 +90,5 @@ init()
             type: "fmg:error",
             error: err.message
         });
-        logger.error(err);
+        logger.error("[CONTENT]", err);
     });
