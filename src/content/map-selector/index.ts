@@ -77,7 +77,7 @@ export class FMG_MapSelector {
 
                 // Remove the unnecessary attributes
                 item.removeAttribute("target");
-                item.removeAttribute("data-togg le");
+                item.removeAttribute("data-toggle");
                 item.removeAttribute("title");
                 item.removeAttribute("data-placement");
                 item.removeAttribute("data-original-title");

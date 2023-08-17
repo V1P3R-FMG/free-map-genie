@@ -173,15 +173,24 @@ export class FMG_Map {
      * @param window the window to search in
      * @returns the first free map url
      */
-    private static getFreeMapUrl(window: Window): string {
+    private static getFreeMapUrl(window: Window): string | null {
+        let lockedMaps = 0;
         for (const link of window.document.querySelectorAll<HTMLLinkElement>(
             ".map-switcher-panel .map-link"
         )) {
-            if (!link.href.endsWith("/upgrade")) {
+            if (!link.href) continue;
+            else if (link.href.endsWith("/upgrade")) {
+                lockedMaps++;
+            } else if (!link.href.endsWith("/upgrade")) {
                 return link.href;
             }
         }
-        throw new Error("Free map url not found");
+        if (lockedMaps > 0) {
+            logger.warn(
+                "No free maps found could not unlock maps in map switcher panel"
+            );
+        }
+        return null;
     }
 
     /**
@@ -198,6 +207,7 @@ export class FMG_Map {
         if (!window.document.querySelector(".map-switcher-panel")) return;
 
         const freeMapUrl = FMG_Map.getFreeMapUrl(window);
+        if (!freeMapUrl) return;
         window.document
             .querySelectorAll<HTMLLinkElement>(".map-switcher-panel .map-link")
             .forEach((link) => {
