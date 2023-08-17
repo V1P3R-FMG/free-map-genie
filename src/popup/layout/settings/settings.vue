@@ -32,7 +32,7 @@ defineEmits<{
                 v-if="option.type === 'checkbox'"
                 :label="option.label"
                 :tooltip="option.tooltip"
-                :tooltip-top="i === options.length - 1"
+                :tooltip-top="true"
                 :name="option.name"
                 :value="
                     curSettings[option.name as keyof FMG.Extension.Settings]
