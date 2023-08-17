@@ -7,6 +7,7 @@ const props = defineProps<{
     name: string;
     label: string;
     tooltip: string;
+    tooltipTop: boolean;
     value?: boolean;
 }>();
 
@@ -36,7 +37,7 @@ const emit = defineEmits<{
 
 <template>
     <OptionBase type="checkbox">
-        <Tooltip :tooltip="tooltip">
+        <Tooltip :tooltip="tooltip" :top="tooltipTop">
             <div class="content">
                 <div class="toggle-button-cover">
                     <div class="button r">

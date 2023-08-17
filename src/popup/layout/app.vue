@@ -160,7 +160,7 @@ getInfo();
                     />
                 </Page>
                 <Page name="info" icon="doc">
-                    <Info :info="info as any" />
+                    <Info :info="<any>info" />
                 </Page>
             </Frame>
             <div class="footer">

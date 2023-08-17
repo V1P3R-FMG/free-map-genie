@@ -6,6 +6,7 @@ const $div = ref<HTMLDivElement>();
 
 defineProps<{
     tooltip: string;
+    top?: boolean;
 }>();
 
 function tooltipHover(mouseover: boolean) {
@@ -19,7 +20,11 @@ function tooltipHover(mouseover: boolean) {
 </script>
 
 <template>
-    <div class="tooltip" :data-tooltip="tooltip" ref="$div">
+    <div
+        :class="'tooltip ' + (top ? 'top' : '')"
+        :data-tooltip="tooltip"
+        ref="$div"
+    >
         <div class="tooltip-container">
             <slot></slot>
         </div>
@@ -34,6 +39,7 @@ function tooltipHover(mouseover: boolean) {
 
 <style lang="scss" scoped>
 .tooltip {
+    position: relative;
     padding: 2px;
     margin-right: 5px;
     width: 100%;
@@ -48,12 +54,21 @@ function tooltipHover(mouseover: boolean) {
     position: absolute;
     background: var(--tooltip);
     border-radius: 5px;
-    width: calc(100% - 5px);
+    width: calc(100% - 10px);
     left: 0;
-    bottom: 0;
     z-index: 20;
-    padding: 10px;
+    padding: 5px;
     pointer-events: none;
-    transform: translate(0, 100%);
+    border: 1px solid var(--border);
+}
+
+.tooltip.hover:not(.top)::after {
+    bottom: 0;
+    transform: translateY(100%);
+}
+
+.tooltip.hover.top::after {
+    top: 0;
+    transform: translateY(-100%);
 }
 </style>

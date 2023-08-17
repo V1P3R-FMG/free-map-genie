@@ -27,11 +27,12 @@ defineEmits<{
 
 <template>
     <div class="settings">
-        <Container v-for="option in options">
+        <Container v-for="(option, i) in options">
             <Checkbox
                 v-if="option.type === 'checkbox'"
                 :label="option.label"
                 :tooltip="option.tooltip"
+                :tooltip-top="i === options.length - 1"
                 :name="option.name"
                 :value="
                     curSettings[option.name as keyof FMG.Extension.Settings]
