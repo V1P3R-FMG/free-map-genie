@@ -1,23 +1,116 @@
-const loggerPrefix = "%c[FMG]%c:";
-const loggerCss = ["background:green;color:white;", ""];
-const prefix = [loggerPrefix, ...loggerCss] as const;
+class Logger {
+    private name: string;
+    private muted: boolean;
 
-logger = {} as any;
+    constructor(name: string) {
+        this.name = name;
+        this.muted = false;
+    }
 
-logger.log = console.log.bind(console, ...prefix);
-logger.warn = console.warn.bind(console, ...prefix);
-logger.error = console.error.bind(console, ...prefix);
+    get prefix() {
+        return `%c%s%c%s%c`;
+    }
 
-logger.mute = () => {
-    logger.log = () => {};
-    logger.warn = () => {};
-    logger.error = () => {};
-};
+    get timestamp() {
+        //return new Date().toISOString().replace(/T/, " ").replace(/\..+/, "");
 
-logger.unmute = () => {
-    logger.log = console.log.bind(console, ...prefix);
-    logger.warn = console.warn.bind(console, ...prefix);
-    logger.error = console.error.bind(console, ...prefix);
-};
+        return new Date().toTimeString().split(" ")[0];
+    }
 
-module.exports = logger;
+    get commonCss() {
+        return {
+            "border-radius": "3px",
+            padding: "0 5px",
+            margin: "2px",
+            color: "white",
+            "font-weight": "bolder"
+        };
+    }
+
+    get timeCss() {
+        return {
+            background: "#333333"
+        };
+    }
+
+    get infoCss() {
+        return {
+            background: "#0390fc"
+        };
+    }
+
+    get warnCss() {
+        return {
+            background: "#fcba03"
+        };
+    }
+
+    get errorCss() {
+        return {
+            background: "#ff3333"
+        };
+    }
+
+    private compileCss(css: Record<string, string>): string {
+        return (
+            Object.entries(Object.assign(this.commonCss, css))
+                .map(([key, value]) => `${key}:${value}`)
+                .join(";") + ";"
+        );
+    }
+
+    get log() {
+        if (this.muted) return () => {};
+        return console.log.bind(
+            console,
+            // Timestamp
+            this.prefix,
+            this.compileCss(this.timeCss),
+            this.timestamp,
+            // Log type
+            this.compileCss(this.infoCss),
+            this.name,
+            ""
+        );
+    }
+
+    get warn() {
+        if (this.muted) return () => {};
+        return console.warn.bind(
+            console,
+            // Timestamp
+            this.prefix,
+            this.compileCss(this.timeCss),
+            this.timestamp,
+            // Log type
+            this.compileCss(this.warnCss),
+            this.name,
+            ""
+        );
+    }
+
+    get error() {
+        if (this.muted) return () => {};
+        return console.error.bind(
+            console,
+            // Timestamp
+            this.prefix,
+            this.compileCss(this.timeCss),
+            this.timestamp,
+            // Log type
+            this.compileCss(this.errorCss),
+            this.name,
+            ""
+        );
+    }
+
+    mute() {
+        this.muted = true;
+    }
+
+    unmute() {
+        this.muted = false;
+    }
+}
+
+module.exports = new Logger("FMG");
