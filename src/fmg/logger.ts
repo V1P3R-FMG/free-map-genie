@@ -1,27 +1,23 @@
-import { Logger } from "@shared/logger";
+const loggerPrefix = "%c[FMG]%c:";
+const loggerCss = ["background:green;color:white;", ""];
+const prefix = [loggerPrefix, ...loggerCss] as const;
 
-declare global {
-    const logger: Logger & { name: "FMG" };
-}
+logger = {} as any;
 
-const fmgLogger = new Logger("FMG");
+logger.log = console.log.bind(console, ...prefix);
+logger.warn = console.warn.bind(console, ...prefix);
+logger.error = console.error.bind(console, ...prefix);
 
-export function log(msg: any, data?: Record<string, any>): void {
-    fmgLogger.log(msg, data);
-}
+logger.mute = () => {
+    logger.log = () => {};
+    logger.warn = () => {};
+    logger.error = () => {};
+};
 
-export function warn(msg: any, data?: Record<string, any>): void {
-    fmgLogger.warn(msg, data);
-}
+logger.unmute = () => {
+    logger.log = console.log.bind(console, ...prefix);
+    logger.warn = console.warn.bind(console, ...prefix);
+    logger.error = console.error.bind(console, ...prefix);
+};
 
-export function error(msg: any, data?: Record<string, any>): void {
-    fmgLogger.error(msg, data);
-}
-
-export function mute(): void {
-    fmgLogger.mute();
-}
-
-export function unmute(): void {
-    fmgLogger.unmute();
-}
+module.exports = logger;

@@ -9,6 +9,11 @@ declare global {
     const __AUTHOR__: string;
     const __HOMEPAGE__: string;
     const __CORS_PROXY__: string;
+
+    let logger: typeof console & {
+        mute: () => void;
+        unmute: () => void;
+    };
 }
 
 export {};
