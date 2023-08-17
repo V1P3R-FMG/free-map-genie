@@ -6,7 +6,7 @@ class Logger {
 
     constructor(name?: string) {
         this.name = name;
-        this.muted = false;
+        this.muted = !__DEBUG__; // automatically mute in production;
     }
 
     get prefix() {
