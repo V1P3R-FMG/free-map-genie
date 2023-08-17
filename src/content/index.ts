@@ -21,11 +21,34 @@ async function init() {
     const type = getPageType(window);
 
     if (type !== "unknown") {
+        let doReload = false;
         if (window.store) {
             // If window.store is defined, the page has allready been loaded.
             // This can happen if the extension is reloaded.
-            location.reload();
-            throw new Error("Store allready defined, reloading page");
+            let i = JSON.parse(
+                window.sessionStorage.getItem("fmg:reload:count") ?? "0"
+            );
+            if (i > 3) {
+                logger.error(
+                    "reloaded 3 times, not reloading again to prevent reload loop!"
+                );
+                doReload = false;
+            } else {
+                window.sessionStorage.setItem(
+                    "fmg:reload:count",
+                    (++i).toString()
+                );
+                logger.error(
+                    "reloaded 3 times, not reloading again to prevent reload loop!"
+                );
+                doReload = true;
+            }
+        }
+
+        if (!doReload) {
+            window.sessionStorage.removeItem("fmg:reload:count");
+        } else {
+            window.location.reload();
         }
     }
 
