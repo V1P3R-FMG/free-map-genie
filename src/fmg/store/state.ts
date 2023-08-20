@@ -1,4 +1,4 @@
-import { FMG_Storage } from "@fmg/storage/index";
+import { FMG_Storage } from "@fmg/storage";
 
 export interface Map extends MG.State.Map {
     // categoriesByTitle: Record<string, MG.Category>
