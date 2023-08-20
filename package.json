@@ -34,6 +34,7 @@
         "raw-loader": "^4.0.2",
         "sass": "^1.64.2",
         "sass-loader": "^13.3.2",
+        "string-replace-loader": "^3.1.0",
         "style-loader": "^3.3.3",
         "swc-loader": "^0.2.3",
         "swc-minify-webpack-plugin": "^2.1.1",

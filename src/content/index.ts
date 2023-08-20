@@ -3,6 +3,10 @@ import { FMG_Map } from "./map";
 import { FMG_MapSelector } from "./map-selector";
 import { FMG_Maps, FMG_MapData } from "@fmg/info";
 
+/// #if DEBUG
+logger.enableHistory();
+/// #endif
+
 /**
  * Itialize the content script
  */

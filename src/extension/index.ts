@@ -2,6 +2,10 @@ import { createScript } from "@shared/dom";
 import { getData } from "@shared/extension";
 import { initHandlers } from "./handlers";
 
+/// #if DEBUG
+logger.enableHistory();
+/// #endif
+
 const shared = {
     attached: false
 };
@@ -30,4 +34,4 @@ async function init() {
 
 init()
     .then(() => logger.log("extension script loaded"))
-    .catch(console.error);
+    .catch(logger.error);

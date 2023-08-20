@@ -13,6 +13,9 @@ declare global {
     let logger: typeof console & {
         mute: () => void;
         unmute: () => void;
+        enableHistory: () => void;
+        disableHistory: () => void;
+        save: () => void;
     };
 }
 
