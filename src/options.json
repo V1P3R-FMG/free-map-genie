@@ -1,30 +1,23 @@
 [
-	{
-		"type": "checkbox",
-		"default": true,
-		"name": "extension_enabled",
-		"label": "Extension enabled",
-		"tooltip": "Enable/Disable the extension."
-	},
-	{
-		"type": "checkbox",
-		"default": false,
-		"name": "presets_allways_enabled",
-		"label": "Allways enable presets",
-		"tooltip": "This option enables presets on all maps. Will not allways work when the extension is to slow to load."
-	},
-	{
-		"type": "checkbox",
-		"default": false,
-		"name": "total_progress_bar_legacy_mode",
-		"label": "Legacy total progress bar",
-		"tooltip": "This option sets the total progress bar back to legacy mode so all categories are counted."
-	},
-	{
-		"type": "checkbox",
-		"default": true,
-		"name": "custom_search_bar",
-		"label": "Custom Searchbar",
-		"tooltip": "This option replaces the default list search bar with a slightly larger one and uses a fuzzy search algorithm to find matches."
-	}
+    {
+        "type": "checkbox",
+        "value": false,
+        "name": "presets_allways_enabled",
+        "label": "Allways enable presets",
+        "tooltip": "This option enables presets on all maps. Will not allways work when the extension is to slow to load."
+    },
+    {
+        "type": "checkbox",
+        "value": false,
+        "name": "total_progress_bar_legacy_mode",
+        "label": "Legacy total progress bar",
+        "tooltip": "This option sets the total progress bar back to legacy mode so all categories are counted."
+    },
+    {
+        "type": "checkbox",
+        "value": false,
+        "name": "mock_user",
+        "label": "Mock user",
+        "tooltip": "This option mocks a user so you don't have to be logged in to see the extension working."
+    }
 ]

@@ -1,6 +1,6 @@
 .env
-node_modules/
-
-mg_scripts/
-
-dist/
+node_modules
+dist
+yarn-error.log
+mapgenie
+tmp
