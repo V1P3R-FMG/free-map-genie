@@ -3,6 +3,8 @@
   <h1 align="center">FMG: Free Mapgenie PRO!</h1>
 </p>
 
+## [Download](https://github.com/V1P3R-FMG/free-map-genie/releases)
+
 > [!IMPORTANT]
 > FMG restricts certain API calls and localizes data in the browser instead.
 > This means data will not transfer to different devices or browsers. You can always manually > 
@@ -33,7 +35,7 @@
 	</tr>
 	<tr>
 		<td>Early Access Maps</td>
-		<td align="center">✔️</td>
+		<td align="center">❌</td>
 	</tr>
 	<tr>
 		<td>Notes</td>
