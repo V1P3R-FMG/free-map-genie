@@ -45,6 +45,15 @@ export class FMG_MapData {
         };
     }
 
+    public get game(): MG.Info.Game {
+        return {
+            id: this.data.game.id,
+            title: this.data.game.title,
+            slug: this.data.game.slug,
+            ign_slug: this.data.game.ign_slug
+        };
+    }
+
     public get maps(): MG.Info.Map[] {
         return this.data.maps;
     }
@@ -67,6 +76,10 @@ export class FMG_MapData {
         return Object.values(this.categories)
             .map((cat) => cat.locations)
             .flat(1);
+    }
+
+    public get locationsById(): DictById<MG.Location> {
+        return Object.fromEntries(this.locations.map((loc) => [loc.id, loc]));
     }
 
     public get regions(): MG.Region[] {

@@ -14,7 +14,7 @@ async function init() {
     if (__DEBUG__) {
         window.fmgInfo = {
             //games: await FMG_Games.get(),
-            maps: FMG_Maps.get(window),
+            maps: window.game?.id ? FMG_Maps.get(window.game.id) : undefined,
             mapData: {
                 get: FMG_MapData.get
             }
