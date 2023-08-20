@@ -12,6 +12,10 @@ export class FMG_Data {
         throw new Error("`fmg:extension:data` not found in session storage!");
     }
 
+    /**
+     * Extension script will set `fmg:extension:data` in session storage,
+     * so that the content script can access it.
+     */
     public load(): void {
         const data = JSON.parse(
             sessionStorage.getItem("fmg:extension:data") || "{}"
@@ -23,6 +27,9 @@ export class FMG_Data {
         sessionStorage.removeItem("fmg:extension:data");
     }
 
+    /**
+     * Reloads the data from session storage.
+     */
     public static reload(): void {
         if (!FMG_Data.instance) {
             FMG_Data.instance = new FMG_Data();
@@ -31,6 +38,9 @@ export class FMG_Data {
         FMG_Data.instance.load();
     }
 
+    /**
+     * Get the settings from the data.
+     */
     public static get settings(): FMG.Extension.Data["settings"] {
         if (!FMG_Data.instance) {
             FMG_Data.instance = new FMG_Data();
@@ -38,6 +48,9 @@ export class FMG_Data {
         return FMG_Data.instance.data.settings;
     }
 
+    /**
+     * Get the bookmarks from the data.
+     */
     public static get bookmarks(): FMG.Extension.Data["bookmarks"] {
         if (!FMG_Data.instance) {
             FMG_Data.instance = new FMG_Data();
