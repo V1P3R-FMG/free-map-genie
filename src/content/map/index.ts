@@ -1,11 +1,17 @@
 import { createScript, getElement } from "@shared/dom";
 import { timeout, waitForGlobals } from "@shared/async";
+
 import { FMG_ApiFilter } from "@fmg/filters/api-filter";
 import { FMG_StorageFilter } from "@fmg/filters/storage-filter";
-import { FMG_Storage } from "@fmg/storage";
-import { FMG_Store } from "@fmg/store";
 import { FMG_MapData } from "@fmg/info/map-data";
 import { FMG_Data } from "@fmg/data";
+import { FMG_MapManager } from "./map-manager";
+
+import { FMG_Drivers } from "@fmg/storage/drivers";
+import { FMG_StorageDataMigrator } from "@fmg/storage/migration";
+import { FMG_Storage } from "@fmg/storage";
+import { FMG_KeyDataHelper } from "@fmg/storage/helpers/key-data";
+
 import setupMapApiFilter from "./filters/api-filter";
 import setupMapStorageFilter from "./filters/storage-filter";
 
@@ -20,23 +26,20 @@ export type FmgMapWindow = Window & { [FmgMapInstalled]?: FMG_Map };
  */
 export class FMG_Map {
     private window: Window;
-    private storage: FMG_Storage;
+    private mapManager: FMG_MapManager;
     private apiFilter: FMG_ApiFilter;
     private storageFilter: FMG_StorageFilter;
-    private store: FMG_Store;
 
     protected constructor(window: Window) {
         this.window = window;
 
-        this.storage = new FMG_Storage(window);
+        this.mapManager = new FMG_MapManager(window);
 
         this.apiFilter = FMG_ApiFilter.install(window);
         setupMapApiFilter(this.apiFilter);
 
         this.storageFilter = FMG_StorageFilter.install(window);
         setupMapStorageFilter(this.storageFilter);
-
-        this.store = FMG_Store.install(window, this.storage);
     }
 
     /**
@@ -72,8 +75,6 @@ export class FMG_Map {
      * @param window the window to load the user in
      */
     private static async loadUser(window: Window) {
-        // TODO: only set the required properties
-        // TODO: make this configurable
         if (FMG_Data.settings.mock_user) {
             window.user = {
                 id: -1,
@@ -81,14 +82,21 @@ export class FMG_Map {
             } as any;
         }
 
+        const storage = FMG_Storage.get(
+            window,
+            FMG_KeyDataHelper.fromWindow(window)
+        );
+
+        await storage.load();
+
         // TODO: load data from storage
         if (window.user) {
-            window.user.trackedCategoryIds = [];
+            window.user.trackedCategoryIds = storage.data.categoryIds;
             window.user.suggestions = [];
             window.user.presets = [];
             window.user.hasPro = true;
-            window.user.locations = [];
-            window.user.gameLocationsCount = 0;
+            window.user.locations = storage.data.locations;
+            window.user.gameLocationsCount = storage.data.locationIds.length;
             window.user.presets = [
                 {
                     id: 1,
@@ -112,7 +120,7 @@ export class FMG_Map {
             : null;
 
         if (map && !mapId) {
-            console.error(
+            logger.error(
                 `Map(${map}) not found, valid maps: `,
                 window.mapData?.maps.map((map) => map.slug) || []
             );
@@ -155,13 +163,13 @@ export class FMG_Map {
      * Enable pro features
      */
     private static async setProFeaturesEnabled(window: Window) {
-        // Load user
-        await FMG_Map.loadUser(window);
-
         // Get the map id from the meta data.
         // If this is set we will imitate another map
         // Only works with maps from the same game.
         await FMG_Map.loadMapData(window);
+
+        // Load user
+        await FMG_Map.loadUser(window);
 
         // Set configurations enabled.
         if (window.config && FMG_Data.settings.presets_allways_enabled)
@@ -273,6 +281,16 @@ export class FMG_Map {
         FMG_Map.unlockMaps(window);
         FMG_Map.cleanupProUpgradeAds(window);
 
+        // TODO: make this configurable
+        const driver = FMG_Drivers.newLocalStorageDriver(window);
+        const migrator = new FMG_StorageDataMigrator(driver);
+
+        // Remove old backups
+        migrator.clearOldBackups();
+
+        // Start the migration process, if needed
+        await migrator.migrate();
+
         // Enable pro features
         await FMG_Map.setProFeaturesEnabled(window);
 
@@ -282,7 +300,7 @@ export class FMG_Map {
 
         // After the map script is loaded, we can install our map script
         const map = FMG_Map.install(window);
-        await map.storage.load();
+        await map.mapManager.load();
 
         // #if DEBUG
         window.fmgMap = map;

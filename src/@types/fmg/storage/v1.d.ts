@@ -1,6 +1,6 @@
 declare namespace FMG {
     namespace Storage {
-        namespace V5 {
+        namespace V1 {
             interface StorageObject {
                 sharedData: SharedData;
                 mapData: DictById<Data>;

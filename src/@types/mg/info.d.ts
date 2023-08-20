@@ -4,13 +4,13 @@ declare namespace MG {
             id: number;
             title: string;
             slug: string;
-            ign_slug: string;
+            ign_slug?: string;
         }
 
         interface User {
             id: number;
             hasPro: boolean;
-            locations: Location[];
+            locations: DictById<boolean>;
             gameLocationsCount: number;
             presets: Preset[];
             role: "user" | "admin" | "editor";

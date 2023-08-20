@@ -1,47 +1,103 @@
-import { checkDefined } from "@shared/utils";
-import { Data } from "./data";
-import { Settings } from "./settings";
-import { EventEmitter, type EventCallback } from "@shared/event-emitter";
-import { LocalStorageDriver } from "./drivers";
-import type {
-    MarkEventData,
-    TrackEventData,
-    UpdateEventData
-} from "@fmg/events";
+import { isEmpty } from "@shared/utils";
+import { minimizedCopy } from "@shared/copy";
 
-export class FMG_Storage extends EventEmitter {
-    private readonly window: Window;
+import { Data } from "./groups/data";
 
-    private readonly gameId: number;
-    private readonly userId: number;
+import { FMG_Drivers } from "./drivers";
 
-    private driver: FMG.Storage.Driver;
+type StorageObject = FMG.Storage.V2.StorageObject;
+
+export class FMG_Storage {
+    private static storages: Record<string, FMG_Storage> = {};
+
+    public readonly window: Window;
+
+    public readonly keyData: FMG.Storage.KeyData;
+
+    public driver: FMG.Storage.Driver;
 
     public data: Data;
-    public settings: Settings;
 
-    public constructor(window: Window) {
-        super();
-
+    public constructor(window: Window, keyData: FMG.Storage.KeyData) {
         this.window = window;
+        this.keyData = keyData;
 
-        this.gameId = checkDefined(window.game?.id, "window.game.id");
-        this.userId = checkDefined(window.user?.id, "window.user.id");
-
-        this.driver = new LocalStorageDriver(window);
+        this.driver = FMG_Drivers.newLocalStorageDriver(window);
 
         this.data = new Data({});
-        this.settings = new Settings({});
     }
 
-    public get key() {
-        return `fmg:game_${this.gameId}:user_${this.userId}:v6`;
+    /**
+     * Checks if data exists for the given key data.
+     */
+    public static async exists(
+        window: Window,
+        keyData: FMG.Storage.KeyData
+    ): Promise<boolean> {
+        return !isEmpty(await FMG_Storage.get(window, keyData).data);
     }
 
-    public on(name: "mark", cb: EventCallback<MarkEventData>): void;
-    public on(name: "track", cb: EventCallback<TrackEventData>): void;
-    public on(name: "updated", cb: EventCallback<UpdateEventData>): void;
-    public on(name: string, cb: EventCallback<any>) {
-        super.on(name, cb);
+    /**
+     * Gets the storage for the given key data.
+     * If the storage does not exist, it will be created.
+     * Else it will be loaded from the cache.
+     * @param window th e window to create the storage for
+     * @param keyData the key data to create the storage for
+     * @returns the created or loaded storage
+     */
+    public static get(window: Window, keyData: FMG.Storage.KeyData) {
+        const key = FMG_Storage.getKey(keyData);
+        if (!FMG_Storage.storages[key]) {
+            FMG_Storage.storages[key] = new FMG_Storage(window, keyData);
+        }
+        return FMG_Storage.storages[key];
+    }
+
+    /**
+     * Removes the storage from the cache.
+     * @param keyData the key to build the key from
+     */
+    public static unload(keyData: FMG.Storage.KeyData) {
+        const key = FMG_Storage.getKey(keyData);
+        if (FMG_Storage.storages[key]) {
+            FMG_Storage.storages[key].save();
+            delete FMG_Storage.storages[key];
+        }
+    }
+
+    /**
+     * Creates a key from the given key data.
+     * @param keyData the key data to create the key from
+     * @returns the created key
+     */
+    public static getKey(keyData: FMG.Storage.KeyData): string {
+        return `fmg:game_${keyData.gameId}:map_${keyData.mapId}:user_${keyData.userId}`;
+    }
+
+    /**
+     * The key of this storage.
+     */
+    public get key(): string {
+        return FMG_Storage.getKey(this.keyData);
+    }
+
+    // TODO: check if loaded data is valid
+    /**
+     * Loads the data from the storage.
+     */
+    public async load(): Promise<void> {
+        const data = await this.driver.get<StorageObject>(this.key);
+        this.data = new Data(!isEmpty(data) ? data : {});
+    }
+
+    public async save(): Promise<void> {
+        // Minimize the data, before saving it
+        const obj = minimizedCopy(this.data) as StorageObject;
+
+        if (isEmpty(obj)) {
+            await this.driver.remove(this.key);
+        } else {
+            await this.driver.set<StorageObject>(this.key, obj);
+        }
     }
 }

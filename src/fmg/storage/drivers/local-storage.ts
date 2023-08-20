@@ -1,25 +1,33 @@
-export class LocalStorageDriver implements FMG.Storage.Driver {
+export class FMG_LocalStorageDriver implements FMG.Storage.Driver {
     private storage: Storage;
 
     constructor(window: Window) {
         this.storage = window.localStorage;
     }
 
-    init(): Promise<void> {
-        return Promise.resolve();
+    async init(): Promise<void> {}
+
+    async get<T>(key: string): Promise<T | null> {
+        return JSON.parse(this.storage.getItem(key) ?? "null");
     }
 
-    get<T>(key: string): Promise<T | null> {
-        return Promise.resolve(JSON.parse(this.storage.getItem(key) ?? "null"));
-    }
-
-    set<T>(key: string, value: T): Promise<void> {
+    async set<T>(key: string, value: T): Promise<void> {
         this.storage.setItem(key, JSON.stringify(value));
-        return Promise.resolve();
     }
 
-    remove(key: string): Promise<void> {
+    async remove(key: string): Promise<void> {
         this.storage.removeItem(key);
-        return Promise.resolve();
+    }
+
+    async clear(): Promise<void> {
+        this.storage.clear();
+    }
+
+    async backup(key: string): Promise<void> {
+        // TODO: implement
+    }
+
+    async keys(): Promise<string[]> {
+        return Object.keys(this.storage);
     }
 }

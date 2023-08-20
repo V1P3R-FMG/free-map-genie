@@ -11,7 +11,7 @@ declare namespace MG {
         ign_slug: string;
         image: string;
         logo: string;
-        maps: Map[];
+        maps: MG.Info.Map[];
         slug: string;
         title: string;
     }
