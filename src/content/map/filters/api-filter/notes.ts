@@ -5,7 +5,7 @@ export default function (filter: FMG_ApiFilter) {
         "post",
         "notes",
         (method, key, id, data, url, block) => {
-            console.log("notes", method, key, id, data, url);
+            logger.log("notes", method, key, id, data, url);
             block();
             return { data: { ...data, id: 0 } };
         }
@@ -15,7 +15,7 @@ export default function (filter: FMG_ApiFilter) {
         "put",
         "notes",
         (method, key, id, data, url, block) => {
-            console.log("notes", method, key, id, data, url);
+            logger.log("notes", method, key, id, data, url);
             block();
         }
     );
@@ -24,7 +24,7 @@ export default function (filter: FMG_ApiFilter) {
         "delete",
         "notes",
         (method, key, id, data, url, block) => {
-            console.log("notes", method, key, id, data, url);
+            logger.log("notes", method, key, id, data, url);
             block();
         }
     );

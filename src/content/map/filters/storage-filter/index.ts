@@ -17,7 +17,7 @@ function rememberCategoryHandler(
     groups: RememberCategoryGroups,
     block: BlockCallback
 ) {
-    console.log("filter", action, key, value, groups);
+    logger.log("filter", action, key, value, groups);
     switch (action) {
         case "set":
             block();

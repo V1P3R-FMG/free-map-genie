@@ -5,7 +5,7 @@ export default function (filter: FMG_ApiFilter) {
         "put",
         "locations",
         (method, key, id, data, url, block) => {
-            console.log("filter", method, key, id, data, url);
+            logger.log("filter", method, key, id, data, url);
             block();
         }
     );
@@ -14,7 +14,7 @@ export default function (filter: FMG_ApiFilter) {
         "delete",
         "locations",
         (method, key, id, data, url, block) => {
-            console.log("filter", method, key, id, data, url);
+            logger.log("filter", method, key, id, data, url);
             block();
         }
     );
