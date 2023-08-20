@@ -8,6 +8,7 @@
     "type": "module",
     "devDependencies": {
         "@swc/core": "^1.3.74",
+        "@swc/jest": "^0.2.29",
         "@types/axios": "^0.14.0",
         "@types/chrome": "^0.0.243",
         "@types/jest": "^29.5.3",
@@ -55,7 +56,7 @@
         "build": "webpack --color --progress",
         "build-firefox": "yarn run build --env mode=prod --env browser=firefox",
         "build-chrome": "yarn run build --env mode=prod --env browser=chrome",
-        "test": "npx jest",
+        "test": "npx jest --silent=true",
         "test-loud": "npx jest --silent=false",
         "lint": "npx eslint . --ext .ts",
         "lint-fix": "yarn lint --fix",

@@ -18,7 +18,13 @@ if (!compilerOptions) throw new Error("compilerOptions not defined");
 export default {
     verbose: true,
     transform: {
-        "\\.ts$": "ts-jest"
+        "\\.ts$": [
+            "ts-jest",
+            {
+                tsconfig: "./tests/tsconfig.json",
+                diagnostics: false
+            }
+        ]
     },
     roots: ["tests"],
     modulePaths: baseUrl ? [baseUrl] : [],

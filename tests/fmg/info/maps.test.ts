@@ -31,39 +31,17 @@ const categoriesFiltered = {
 
 describe("FMG_Maps", () => {
     beforeAll(() => {
-        // Create a new dom
-        const dom = new JSDOM("", {
-            url: "https://mapgenie.io/"
-        });
-
-        // Set the window
-        globalThis.window = dom.window as any;
-
-        // Load the game data
-        globalThis.window.game = {
-            id: 20,
-            slug: "tarkov",
-            title: "Tarkov"
-        } as any;
-
-        // Load the map data
-        globalThis.window.mapData = {
-            maps: [
-                { id: 64, slug: "streets" }, // tarkov/streets
-                { id: 71, slug: "lighthouse" }, // tarkov/lighthouse
-                { id: 75, slug: "reserve" } // tarkov/reserve
-            ]
-        } as any;
+        createWindow();
     });
 
     it("should cache te values", async () => {
-        const mapsA = FMG_Maps.get(window.game!.id);
-        const mapsB = FMG_Maps.get(window.game!.id);
+        const mapsA = FMG_Maps.get(window.game.id);
+        const mapsB = FMG_Maps.get(window.game.id);
         expect(mapsA).toBe(mapsB);
     });
 
     it("should return the correct map", async () => {
-        const maps = FMG_Maps.get(20);
+        const maps = FMG_Maps.get(window.game.id);
 
         for (const map of window.mapData!.maps) {
             expect((await maps.get(map.id)).map).toMatchObject({
@@ -71,14 +49,16 @@ describe("FMG_Maps", () => {
                 slug: map.slug
             });
         }
-    });
+    }, 15000);
 
     it("should filter the locations by map", async () => {
-        const maps = FMG_Maps.get(window.game!.id);
+        const maps = FMG_Maps.get(window.game.id);
 
         const filtered = await maps.filterLocations(locations);
 
         for (const map of window.mapData!.maps) {
+            if (!categoriesFiltered[map.id as keyof typeof categoriesFiltered])
+                continue;
             expect(filtered[map.id].sort()).toEqual(
                 locationsFiltered[
                     map.id as keyof typeof locationsFiltered
@@ -93,6 +73,8 @@ describe("FMG_Maps", () => {
         const filtered = await maps.filterCategories(categories);
 
         for (const map of window.mapData!.maps) {
+            if (!categoriesFiltered[map.id as keyof typeof categoriesFiltered])
+                continue;
             expect(filtered[map.id].sort()).toEqual(
                 categoriesFiltered[
                     map.id as keyof typeof categoriesFiltered

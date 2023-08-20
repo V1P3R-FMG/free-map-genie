@@ -1,29 +1,11 @@
-import { JSDOM, type DOMWindow } from "jsdom";
 import {
     FMG_StorageFilter,
     StorageFilterCallback
 } from "@fmg/filters/storage-filter";
 
-function createWindow(): DOMWindow {
-    const { window } = new JSDOM("", {
-        url: "http://localhost"
-    });
-    return window;
-}
-
 describe("FMG_StorageFilter", () => {
-    let window: DOMWindow = createWindow();
-
-    beforeAll(() => {
-        logger.mute();
-    });
-
-    afterAll(() => {
-        logger.unmute();
-    });
-
-    afterEach(() => {
-        window = createWindow();
+    beforeEach(() => {
+        createWindow();
     });
 
     it("should only install once per window instance", () => {
