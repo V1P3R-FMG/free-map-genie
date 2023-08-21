@@ -36,10 +36,10 @@ export class FMG_Map {
         this.mapManager = new FMG_MapManager(window);
 
         this.apiFilter = FMG_ApiFilter.install(window);
-        setupMapApiFilter(this.apiFilter);
+        setupMapApiFilter(this.apiFilter, this.mapManager);
 
         this.storageFilter = FMG_StorageFilter.install(window);
-        setupMapStorageFilter(this.storageFilter);
+        setupMapStorageFilter(this.storageFilter, this.mapManager);
     }
 
     /**

@@ -9,7 +9,7 @@ export class FMG_Data {
     public categoryIds: number[];
     public presets: MG.Preset[];
     public presetOrder: number[];
-    public visibleCategories: number[];
+    public visibleCategoriesIds: number[];
 
     private callback: (changes: ProxyObserve.Change[]) => void;
 
@@ -26,7 +26,7 @@ export class FMG_Data {
             categoryIds: data.categoryIds ?? [],
             presets: data.presets ?? [],
             presetOrder: data.presetOrder ?? [],
-            visibleCategories: data.visibleCategories ?? []
+            visibleCategoriesIds: data.visibleCategoriesIds ?? []
         } as FMG.Storage.V2.StorageObject;
 
         Object.defineProperty(obj, "callback", {
@@ -69,7 +69,6 @@ export class FMG_Data {
             this.locationIds.map((id) => [id, true])
         );
         return Object.observe(locations, (changes) => {
-            console.debug("Categories changed", locations);
             this.locationIds = Object.keys(locations).map((id) => parseInt(id));
             this.callback(changes);
         });
@@ -80,9 +79,20 @@ export class FMG_Data {
             this.categoryIds.map((id) => [id, true])
         );
         return Object.observe(categories, (changes) => {
-            console.debug("Categories changed", categories);
             this.categoryIds = Object.keys(categories).map((id) =>
                 parseInt(id)
+            );
+            this.callback(changes);
+        });
+    }
+
+    get visibleCategories(): DictById<boolean> {
+        const visibleCategories = Object.fromEntries(
+            this.visibleCategoriesIds.map((id) => [id, true])
+        );
+        return Object.observe(visibleCategories, (changes) => {
+            this.visibleCategoriesIds = Object.keys(visibleCategories).map(
+                (id) => parseInt(id)
             );
             this.callback(changes);
         });

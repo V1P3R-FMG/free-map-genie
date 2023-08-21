@@ -19,4 +19,8 @@ export class FMG_MapManager {
     public async load() {
         await this.storage.load();
     }
+
+    public async save() {
+        await this.storage.save();
+    }
 }

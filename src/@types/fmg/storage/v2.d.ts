@@ -6,7 +6,7 @@ declare namespace FMG {
                 categoryIds: number[];
                 presets: MG.Preset[];
                 presetOrder: MG.PresetOrder;
-                visibleCategories: number[];
+                visibleCategoriesIds: number[];
             }
         }
     }

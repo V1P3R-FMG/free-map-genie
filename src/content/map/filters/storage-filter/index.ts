@@ -2,6 +2,7 @@ import type {
     FMG_StorageFilter,
     StorageAction
 } from "@fmg/filters/storage-filter";
+import type { FMG_MapManager } from "@content/map/map-manager";
 import type { BlockCallback } from "@shared/async";
 
 type RememberCategoryGroups = {
@@ -32,7 +33,10 @@ function rememberCategoryHandler(
     }
 }
 
-export default function (filter: FMG_StorageFilter) {
+export default function (
+    filter: FMG_StorageFilter,
+    mapManager: FMG_MapManager
+) {
     filter.registerFilter(
         "any",
         /mg:settings:game_(?<gameId>\d+):visible_categories:id_(?<categoryId>\d+)/,
