@@ -275,7 +275,7 @@ export class FMG_Map {
     /**
      * Setup
      */
-    public static async setup(window: Window) {
+    public static async setup(window: Window): Promise<FMG_Map> {
         FMG_Map.fixGoogleMaps(window);
 
         FMG_Map.unlockMaps(window);
@@ -305,5 +305,14 @@ export class FMG_Map {
         // #if DEBUG
         window.fmgMap = map;
         // #endif
+
+        return map;
+    }
+
+    /**
+     * Reload the map, after tab has been refocused.
+     */
+    public async reload(): Promise<void> {
+        await this.mapManager.reload();
     }
 }

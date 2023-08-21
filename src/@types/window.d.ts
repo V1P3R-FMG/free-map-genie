@@ -10,4 +10,8 @@ interface Window {
             get: (typeof import("@fmg/info/map-data").FMG_MapData)["get"];
         };
     };
+
+    mapManager?: {
+        setLocationFound(locationId: Id, found: boolean): void;
+    };
 }

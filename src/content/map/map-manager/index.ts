@@ -23,4 +23,26 @@ export class FMG_MapManager {
     public async save() {
         await this.storage.save();
     }
+
+    public async reload() {
+        await this.storage.load();
+
+        const state = this.store.getState();
+
+        // Reload locations from storage
+        state.map.locations.forEach((location) => {
+            this.window.mapManager?.setLocationFound(
+                location.id,
+                this.storage.data.locations[location.id] ?? false
+            );
+        });
+
+        // Reload categories from storage
+        state.map.categoryIds.forEach((categoryId) => {
+            this.store.trackCategory(
+                categoryId,
+                this.storage.data.categories[categoryId] ?? false
+            );
+        });
+    }
 }

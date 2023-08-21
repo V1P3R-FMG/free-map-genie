@@ -21,5 +21,9 @@ export interface FMG_State extends MG.State {
 }
 
 export function extendState(state: MG.State, storage: FMG_Storage): FMG_State {
+    state.user.foundLocations = storage.data.locations;
+    state.user.foundLocationsCount = storage.data.locationIds.length;
+    state.user.trackedCategories = storage.data.categoryIds;
+    state.user.totalFoundLocationsCount = storage.data.locationIds.length;
     return state as FMG_State;
 }
