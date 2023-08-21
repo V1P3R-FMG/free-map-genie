@@ -3,7 +3,7 @@ import "proxy-observe";
 export class FMG_Data {
     private static autosave: boolean = true;
 
-    private static ignoreKeys: string[] = ["length"];
+    private static ignoreKeys: string[] = ["length", "autosave"];
 
     public locationIds: number[];
     public categoryIds: number[];
