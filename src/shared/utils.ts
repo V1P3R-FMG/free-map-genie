@@ -39,7 +39,7 @@ export function checkDefined<T = any>(object: T, name: string): NonNullable<T> {
 }
 
 /**
- * Checks if a value is neither empty, null or undefiend.
+ * Checks if a value is empty, null or undefiend.
  * @param o the value to check.
  * @returns boolean that indicates if the value is empty or not.
  */
@@ -53,6 +53,15 @@ export function isEmpty<T>(o: T | null | undefined): o is null | undefined {
         return true;
     }
     return !o;
+}
+
+/**
+ * Checks if a value neither empty, null or undefiend.
+ * @param o the value to check.
+ * @returns boolean that indicates if the value is not empty or not.
+ */
+export function isNotEmpty<T>(o: T | null | undefined): o is T {
+    return !isEmpty(o);
 }
 
 /**
