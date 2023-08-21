@@ -1,4 +1,4 @@
-const _console = window.console;
+const _console = console;
 
 /**
  * Logger history class.
