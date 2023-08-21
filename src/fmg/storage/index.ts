@@ -1,5 +1,5 @@
-import { isEmpty } from "@shared/utils";
-import { minimizedCopy } from "@shared/copy";
+import { isEmpty, isNotEmpty } from "@shared/utils";
+import * as deepFilter from "deep-filter";
 
 import { FMG_Data } from "./proto/data";
 import { FMG_Drivers } from "./drivers";
@@ -94,8 +94,9 @@ export class FMG_Storage {
      */
     public async save(): Promise<void> {
         logger.debug("Saving storage", this.key);
-        // Minimize the data, before saving it
-        const obj = minimizedCopy(this.data) as FMG.Storage.V2.StorageObject;
+
+        // Deep filter out empty values.
+        const obj = deepFilter(this.data, isNotEmpty);
 
         if (isEmpty(obj)) {
             await this.driver.remove(this.key);
