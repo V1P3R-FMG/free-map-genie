@@ -5,8 +5,9 @@ export default function (filter: FMG_ApiFilter, mapManager: FMG_MapManager) {
     filter.registerFilter<undefined>(
         "put",
         "locations",
-        (method, key, id, data, url, block) => {
-            logger.log("filter", method, key, id, data, url);
+        (_method, _key, id, _data, _url, block) => {
+            logger.debug("mark location", id);
+            mapManager.storage.data.locations[id] = true;
             block();
         }
     );
@@ -14,8 +15,9 @@ export default function (filter: FMG_ApiFilter, mapManager: FMG_MapManager) {
     filter.registerFilter<undefined>(
         "delete",
         "locations",
-        (method, key, id, data, url, block) => {
-            logger.log("filter", method, key, id, data, url);
+        (_method, _key, id, _data, _url, block) => {
+            logger.debug("unmark location", id);
+            delete mapManager.storage.data.locations[id];
             block();
         }
     );
