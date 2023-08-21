@@ -86,6 +86,12 @@ class Logger {
         };
     }
 
+    private get debugCss() {
+        return {
+            background: "#69e643"
+        };
+    }
+
     /**
      * Console log method.
      */
@@ -108,18 +114,33 @@ class Logger {
     }
 
     /**
+     * Console debug method.
+     */
+    get debug() {
+        /// #if DEBUG
+        return this.createLogCallback("debug", "log");
+        /// #else
+        return () => () => {};
+        /// #endif
+    }
+
+    /**
      * Creates a callback for the given console method.
      * @param name the name of the console method
+     * @param method if different from name, the method to call
      * @returns the created console callback
      */
-    private createLogCallback(name: string): (...args: any[]) => void {
+    private createLogCallback(
+        name: string,
+        method?: string
+    ): (...args: any[]) => void {
         // If we are muted, return a empty interceptor that returns a empty function
         if (this.muted) return () => () => {};
 
         // Return the wrapped log method
         return this.intercept(
             name,
-            (_console[name as keyof Console] as any).bind(
+            (_console[(method ?? name) as keyof Console] as any).bind(
                 _console,
                 // Timestamp
                 this.prefix,
@@ -156,6 +177,8 @@ class Logger {
                 return this.compileCss(this.warnCss);
             case "error":
                 return this.compileCss(this.errorCss);
+            case "debug":
+                return this.compileCss(this.debugCss);
             default:
                 return "";
         }
