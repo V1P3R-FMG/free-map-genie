@@ -4,7 +4,7 @@ import { timeout, waitForGlobals } from "@shared/async";
 import { FMG_ApiFilter } from "@fmg/filters/api-filter";
 import { FMG_StorageFilter } from "@fmg/filters/storage-filter";
 import { FMG_MapData } from "@fmg/info/map-data";
-import { FMG_Data } from "@fmg/data";
+import { FMG_ExtensionData } from "@fmg/extension-data";
 import { FMG_MapManager } from "./map-manager";
 
 import { FMG_Drivers } from "@fmg/storage/drivers";
@@ -75,7 +75,7 @@ export class FMG_Map {
      * @param window the window to load the user in
      */
     private static async loadUser(window: Window) {
-        if (FMG_Data.settings.mock_user) {
+        if (FMG_ExtensionData.settings.mock_user) {
             window.user = {
                 id: -1,
                 role: "user"
@@ -172,7 +172,7 @@ export class FMG_Map {
         await FMG_Map.loadUser(window);
 
         // Set configurations enabled.
-        if (window.config && FMG_Data.settings.presets_allways_enabled)
+        if (window.config && FMG_ExtensionData.settings.presets_allways_enabled)
             window.config.presetsEnabled = true;
     }
 

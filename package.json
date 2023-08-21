@@ -64,6 +64,7 @@
     },
     "dependencies": {
         "jquery": "^3.7.0",
+        "proxy-observe": "^0.0.21",
         "vue": "^3.3.4"
     }
 }

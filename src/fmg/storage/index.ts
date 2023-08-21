@@ -1,22 +1,19 @@
 import { isEmpty } from "@shared/utils";
 import { minimizedCopy } from "@shared/copy";
 
-import { Data } from "./groups/data";
-
+import { FMG_Data } from "./proto/data";
 import { FMG_Drivers } from "./drivers";
-
-type StorageObject = FMG.Storage.V2.StorageObject;
 
 export class FMG_Storage {
     private static storages: Record<string, FMG_Storage> = {};
 
-    public readonly window: Window;
+    public autosave: boolean = true;
 
+    public readonly window: Window;
     public readonly keyData: FMG.Storage.KeyData;
 
     public driver: FMG.Storage.Driver;
-
-    public data: Data;
+    public data: FMG_Data;
 
     public constructor(window: Window, keyData: FMG.Storage.KeyData) {
         this.window = window;
@@ -24,7 +21,7 @@ export class FMG_Storage {
 
         this.driver = FMG_Drivers.newLocalStorageDriver(window);
 
-        this.data = new Data({});
+        this.data = FMG_Data.create({}, () => this.save());
     }
 
     /**
@@ -86,18 +83,24 @@ export class FMG_Storage {
      * Loads the data from the storage.
      */
     public async load(): Promise<void> {
-        const data = await this.driver.get<StorageObject>(this.key);
-        this.data = new Data(!isEmpty(data) ? data : {});
+        const data = await this.driver.get<FMG.Storage.V2.StorageObject>(
+            this.key
+        );
+        this.data = FMG_Data.create(data ?? {}, () => this.save());
     }
 
+    /**
+     * Saves the data to the storage.
+     */
     public async save(): Promise<void> {
+        logger.debug("Saving storage", this.key);
         // Minimize the data, before saving it
-        const obj = minimizedCopy(this.data) as StorageObject;
+        const obj = minimizedCopy(this.data) as FMG.Storage.V2.StorageObject;
 
         if (isEmpty(obj)) {
             await this.driver.remove(this.key);
         } else {
-            await this.driver.set<StorageObject>(this.key, obj);
+            await this.driver.set<FMG.Storage.V2.StorageObject>(this.key, obj);
         }
     }
 }

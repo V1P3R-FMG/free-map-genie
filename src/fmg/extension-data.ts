@@ -1,5 +1,5 @@
-export class FMG_Data {
-    private static instance: FMG_Data;
+export class FMG_ExtensionData {
+    private static instance: FMG_ExtensionData;
 
     private data: FMG.Extension.Data;
 
@@ -31,30 +31,30 @@ export class FMG_Data {
      * Reloads the data from session storage.
      */
     public static reload(): void {
-        if (!FMG_Data.instance) {
-            FMG_Data.instance = new FMG_Data();
+        if (!FMG_ExtensionData.instance) {
+            FMG_ExtensionData.instance = new FMG_ExtensionData();
             return;
         }
-        FMG_Data.instance.load();
+        FMG_ExtensionData.instance.load();
     }
 
     /**
      * Get the settings from the data.
      */
     public static get settings(): FMG.Extension.Data["settings"] {
-        if (!FMG_Data.instance) {
-            FMG_Data.instance = new FMG_Data();
+        if (!FMG_ExtensionData.instance) {
+            FMG_ExtensionData.instance = new FMG_ExtensionData();
         }
-        return FMG_Data.instance.data.settings;
+        return FMG_ExtensionData.instance.data.settings;
     }
 
     /**
      * Get the bookmarks from the data.
      */
     public static get bookmarks(): FMG.Extension.Data["bookmarks"] {
-        if (!FMG_Data.instance) {
-            FMG_Data.instance = new FMG_Data();
+        if (!FMG_ExtensionData.instance) {
+            FMG_ExtensionData.instance = new FMG_ExtensionData();
         }
-        return FMG_Data.instance.data.bookmarks;
+        return FMG_ExtensionData.instance.data.bookmarks;
     }
 }
