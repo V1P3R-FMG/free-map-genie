@@ -12,8 +12,6 @@ function getTsConfig(): any {
 const { compilerOptions } = getTsConfig();
 const { paths, baseUrl } = compilerOptions ?? {};
 
-if (!compilerOptions) throw new Error("compilerOptions not defined");
-
 /** @type {import("@jest/types").Config.InitialOptions} */
 export default {
     verbose: true,

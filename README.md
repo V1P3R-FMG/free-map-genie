@@ -35,11 +35,11 @@
 	</tr>
 	<tr>
 		<td>Early Access Maps</td>
-		<td align="center">❌</td>
+		<td align="center">🚧</td>
 	</tr>
 	<tr>
 		<td>Notes</td>
-		<td align="center">❌</td>
+		<td align="center">🚧</td>
 	</tr>
 </table>
 
