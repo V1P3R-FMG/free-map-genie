@@ -1,44 +1,16 @@
 const _console = console;
 
 /**
- * Logger history class.
- */
-class LoggerHistory {
-    private history: [string, any[]][] = [];
-    private enabled: boolean = false;
-
-    public addEntry(name: string, args: any[]) {
-        if (!this.enabled) return;
-        this.history.push([name, args]);
-    }
-
-    public save() {
-        _console.log(this.history);
-        // TODO: Open file dialog and save history
-    }
-
-    public enable() {
-        this.enabled = true;
-    }
-
-    public disable() {
-        this.enabled = false;
-    }
-}
-
-/**
  * Logger class for all fmg related logging.
  * This class can keep a history of all logs made by the fmg extension, if enabled.
  */
 class Logger {
     private name: string | undefined;
     private muted: boolean;
-    private history: LoggerHistory;
 
     public constructor(name?: string) {
         this.name = name;
         this.muted = !__DEBUG__; // automatically mute in production;
-        this.history = new LoggerHistory();
     }
 
     private get prefix() {
@@ -138,30 +110,15 @@ class Logger {
         if (this.muted) return () => () => {};
 
         // Return the wrapped log method
-        return this.intercept(
-            name,
-            (_console[(method ?? name) as keyof Console] as any).bind(
-                _console,
-                // Timestamp
-                this.prefix,
-                this.compileCss(this.timeCss),
-                this.timestamp,
-                // Log type
-                ...(!this.name ? [] : [this.getLoggerCss(name), this.name, ""])
-            )
+        return (_console[(method ?? name) as keyof Console] as any).bind(
+            _console,
+            // Timestamp
+            this.prefix,
+            this.compileCss(this.timeCss),
+            this.timestamp,
+            // Log type
+            ...(!this.name ? [] : [this.getLoggerCss(name), this.name, ""])
         );
-    }
-
-    /**
-     * Wraps the callback and intercepts the arguments.
-     * @param callback the callback to wrap
-     * @returns the wrapped callback
-     */
-    private intercept(name: string, callback: (...args: any[]) => void) {
-        return (...args: any[]) => {
-            this.history.addEntry(name, args);
-            return callback.bind(_console, ...args);
-        };
     }
 
     /**
@@ -204,21 +161,6 @@ class Logger {
     /** Unmute the logger */
     public unmute() {
         this.muted = false;
-    }
-
-    /** Enable log history */
-    public enableHistory() {
-        this.history.enable();
-    }
-
-    /** Disable log history */
-    public disableHistory() {
-        this.history.disable();
-    }
-
-    /** Save log history */
-    public save() {
-        this.history.save();
     }
 }
 

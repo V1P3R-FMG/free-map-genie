@@ -141,16 +141,6 @@ export default (env) => {
                     use: [
                         "import-glob",
                         {
-                            loader: "string-replace-loader",
-                            options: {
-                                search: "logger.(\\w+)\\(([^;]+)\\);?",
-                                replace(_, p1, p2) {
-                                    return `logger.${p1}(${p2})()`;
-                                },
-                                flags: "g"
-                            }
-                        },
-                        {
                             loader: "swc-loader",
                             options: {
                                 jsc: {

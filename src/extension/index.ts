@@ -2,10 +2,6 @@ import { createScript } from "@shared/dom";
 import { getData } from "@shared/extension";
 import { initHandlers } from "./handlers";
 
-/// #if DEBUG
-logger.enableHistory();
-/// #endif
-
 const shared = {
     attached: false
 };

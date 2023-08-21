@@ -10,13 +10,7 @@ declare global {
     const __HOMEPAGE__: string;
     const __CORS_PROXY__: string;
 
-    let logger: typeof console & {
-        mute: () => void;
-        unmute: () => void;
-        enableHistory: () => void;
-        disableHistory: () => void;
-        save: () => void;
-    };
+    let logger: Logger;
 }
 
 export {};
