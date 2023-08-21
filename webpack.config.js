@@ -143,7 +143,7 @@ export default (env) => {
                         {
                             loader: "string-replace-loader",
                             options: {
-                                search: "logger.(\\w+)\\((.+?)\\);?",
+                                search: "logger.(\\w+)\\(([^;]+)\\);?",
                                 replace(_, p1, p2) {
                                     return `logger.${p1}(${p2})()`;
                                 },
