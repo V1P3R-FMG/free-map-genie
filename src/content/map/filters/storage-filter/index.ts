@@ -1,5 +1,5 @@
 import type { FMG_StorageFilter } from "@fmg/filters/storage-filter";
-import type { FMG_MapManager } from "@content/map/map-manager";
+import type { FMG_MapManager } from "@fmg/map-manager";
 
 const rememberCategoriesRegex =
     /mg:settings:game_(?<gameId>\d+):visible_categories:id_(?<categoryId>\d+)/;

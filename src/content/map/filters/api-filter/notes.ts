@@ -1,5 +1,5 @@
 import type { FMG_ApiFilter } from "@fmg/filters/api-filter";
-import type { FMG_MapManager } from "@content/map/map-manager";
+import type { FMG_MapManager } from "@fmg/map-manager";
 import { nanoid } from "nanoid";
 
 interface UpdateNotePutData {

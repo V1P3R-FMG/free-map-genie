@@ -4,7 +4,7 @@ interface Window {
 
     isEditor?: boolean;
 
-    fmgMapManager?: import("@/content/map/map-manager").FMG_MapManager;
+    fmgMapManager?: import("@fmg/map-manager").FMG_MapManager;
 
     mapManager?: MG.MapManager;
     map?: MG.Map;
