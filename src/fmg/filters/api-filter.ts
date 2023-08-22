@@ -92,9 +92,18 @@ export class FMG_ApiFilter {
     private createProxyMethod(method: AxiosMethod): void {
         const axiosMethod = this.axios[method];
         this.axios[method] = ((...args: any[]) => {
-            const [url, data] = args;
-            const group = this.getFilter(method, url);
-            const { key, id } = group?.regex.exec(url)?.groups ?? {};
+            const [requestUrl, data] = args;
+
+            if (!requestUrl.startsWith("/api/v1"))
+                return axiosMethod.apply(this.axios, args as any);
+
+            const url = new URL(
+                (this.axios.defaults.baseURL ?? "") + requestUrl
+            );
+            const noParamsUrl = url.origin + url.pathname;
+
+            const group = this.getFilter(method, noParamsUrl);
+            const { key, id } = group?.regex.exec(noParamsUrl)?.groups ?? {};
 
             return blockable<any, [string, string, string, any, string]>(
                 group?.callback || (() => {}),
@@ -102,11 +111,11 @@ export class FMG_ApiFilter {
                 key,
                 id,
                 data,
-                url
+                requestUrl
             )
                 .then((newData) =>
                     axiosMethod.apply(this.axios, [
-                        url,
+                        requestUrl,
                         newData ?? data,
                         ...args.slice(2)
                     ] as any)
@@ -122,7 +131,10 @@ export class FMG_ApiFilter {
      */
     private static compileKeyToRegex(key: string): RegExp {
         return new RegExp(
-            "/api/v1/user/" + `(?<key>${key})` + "(?:/(?<id>\\d+))?" + "$"
+            "/api/v1/user/" +
+                `(?<key>${key})` +
+                "(?:/(?<id>[\\d\\w_-]+))?" +
+                "$"
         );
     }
 
