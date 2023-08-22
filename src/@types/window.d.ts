@@ -6,7 +6,6 @@ interface Window {
 
     fmgMapManager?: import("@/content/map/map-manager").FMG_MapManager;
 
-    mapManager?: {
-        setLocationFound(locationId: Id, found: boolean): void;
-    };
+    mapManager?: MG.MapManager;
+    map?: MG.Map;
 }

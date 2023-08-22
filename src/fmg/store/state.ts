@@ -1,8 +1,6 @@
 import { FMG_Storage } from "@fmg/storage";
 
-export interface Map extends MG.State.Map {
-    // categoriesByTitle: Record<string, MG.Category>
-}
+export interface Map extends MG.State.Map {}
 
 export interface User extends MG.State.User {}
 
@@ -34,6 +32,8 @@ export function extendState(state: MG.State, storage: FMG_Storage): FMG_State {
     } else {
         logger.warn("mapData not found, could not set presets");
     }
+
+    state.user.notes = storage.data.notes;
 
     return state as FMG_State;
 }

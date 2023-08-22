@@ -58,7 +58,7 @@ declare namespace MG {
     }
 
     interface Note {
-        id: number;
+        id: string;
         category: Category | null;
         color: string | null;
         description: string;

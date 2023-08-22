@@ -7,6 +7,7 @@ export class FMG_Data {
 
     public locationIds: number[];
     public categoryIds: number[];
+    public notes: MG.Note[];
     public presets: MG.Preset[];
     public presetOrder: number[];
     public visibleCategoriesIds: number[];
@@ -24,6 +25,12 @@ export class FMG_Data {
         const obj = {
             locationIds: data.locationIds ?? [],
             categoryIds: data.categoryIds ?? [],
+            notes:
+                data.notes?.map((note) => {
+                    note.color = note.color ?? null;
+                    note.category = note.category ?? null;
+                    return note;
+                }) ?? [],
             presets: data.presets ?? [],
             presetOrder: data.presetOrder ?? [],
             visibleCategoriesIds: data.visibleCategoriesIds ?? []

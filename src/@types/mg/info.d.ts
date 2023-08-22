@@ -34,6 +34,7 @@ declare namespace MG {
             presets: Preset[];
             mapConfig: MapConfig;
             regions: Region[];
+            notes: Note[];
         }
     }
 }

@@ -40,6 +40,14 @@ export class FMG_MapManager {
         );
     }
 
+    public addNote(note: MG.Note) {
+        this.window.mapManager?.createNote(note);
+    }
+
+    public removeNote(note: MG.Note) {
+        this.window.mapManager?.deleteNoteMarker(note);
+    }
+
     public async load() {
         await this.storage.load();
     }
@@ -48,8 +56,15 @@ export class FMG_MapManager {
         await this.storage.save();
     }
 
+    /**
+     * Resync the map data.
+     * This makes it possible to open multiple tabs of the same map at the same time.
+     * Or if you have the map op and guide at the same time.
+     */
     public async reload() {
+        const lastNotes = this.storage.data.notes;
         await this.storage.load();
+        const notes = this.storage.data.notes;
 
         const state = this.store.getState();
 
@@ -67,6 +82,18 @@ export class FMG_MapManager {
                 categoryId,
                 this.storage.data.categories[categoryId] ?? false
             );
+        });
+
+        lastNotes.forEach((note) => {
+            if (!notes.find((n) => note.id === n.id)) {
+                this.removeNote(note);
+            }
+        });
+
+        notes.forEach((note) => {
+            if (!lastNotes.find((n) => note.id === n.id)) {
+                this.addNote(note);
+            }
         });
 
         // Reload presets from storage

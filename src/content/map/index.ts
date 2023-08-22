@@ -53,6 +53,9 @@ export class FMG_Map {
                 mapManager.storage.data.locationIds.length;
             window.user.presets = mapManager.storage.data.presets;
         }
+        if (window.mapData) {
+            window.mapData.notes = mapManager.storage.data.notes;
+        }
     }
 
     /**

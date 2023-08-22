@@ -7,4 +7,10 @@ declare namespace MG {
             state: Record<string, any>
         ): void;
     }
+
+    interface MapManager {
+        setLocationFound(locationId: Id, found: boolean): void;
+        deleteNoteMarker(note: MG.Note): void;
+        createNote(note: MG.Note): void;
+    }
 }

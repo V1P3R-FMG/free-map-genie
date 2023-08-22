@@ -4,6 +4,7 @@ declare namespace FMG {
             interface StorageObject {
                 locationIds: number[];
                 categoryIds: number[];
+                notes: MG.Note[];
                 presets: MG.Preset[];
                 presetOrder: MG.PresetOrder;
                 visibleCategoriesIds: number[];
