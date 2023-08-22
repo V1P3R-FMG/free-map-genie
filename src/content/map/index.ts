@@ -56,6 +56,15 @@ export class FMG_Map {
     }
 
     /**
+     * Enable map editor.
+     * At the momment nothing usful can be done with as far as i know.
+     */
+    private static enableEditor(window: Window) {
+        window.isEditor = true;
+        if (window.user) window.user.role = "admin";
+    }
+
+    /**
      * Load map data, from url params.
      * @param window the window to load the map data in
      */
@@ -234,6 +243,8 @@ export class FMG_Map {
                 role: "user"
             } as any;
         }
+
+        // FMG_Map.enableEditor(window);
 
         // Get the map id from the meta data.
         // If this is set we will imitate another map
