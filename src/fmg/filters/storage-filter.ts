@@ -7,8 +7,6 @@ export interface WindowExtended extends Window {
     Storage?: Storage;
 }
 
-type MatchGroups = RegExpMatchArray["groups"];
-
 export const StorageTypes = ["local", "session"] as const;
 
 export type StorageType = (typeof StorageTypes)[number];
