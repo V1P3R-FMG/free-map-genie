@@ -4,6 +4,9 @@ import * as deepFilter from "deep-filter";
 import { FMG_Data } from "./proto/data";
 import { FMG_Drivers } from "./drivers";
 
+//import { FMG_Drivers } from "@fmg/storage/drivers";
+import { FMG_StorageDataMigrator } from "@fmg/storage/migration";
+
 export class FMG_Storage {
     private static storages: Record<string, FMG_Storage> = {};
 
@@ -103,5 +106,20 @@ export class FMG_Storage {
         } else {
             await this.driver.set<FMG.Storage.V2.StorageObject>(this.key, obj);
         }
+    }
+
+    /**
+     * Removes the data from the storage.
+     */
+    public static async migrateLegacyData(window: Window): Promise<void> {
+        // TODO: make this configurable
+        const driver = FMG_Drivers.newLocalStorageDriver(window);
+        const migrator = new FMG_StorageDataMigrator(driver);
+
+        // Remove old backups
+        migrator.clearOldBackups();
+
+        // Start the migration process, if needed
+        await migrator.migrate();
     }
 }

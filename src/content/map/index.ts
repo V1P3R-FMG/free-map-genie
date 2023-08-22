@@ -7,10 +7,7 @@ import { FMG_MapData } from "@fmg/info/map-data";
 import { FMG_ExtensionData } from "@fmg/extension-data";
 import { FMG_MapManager } from "./map-manager";
 
-import { FMG_Drivers } from "@fmg/storage/drivers";
-import { FMG_StorageDataMigrator } from "@fmg/storage/migration";
 import { FMG_Storage } from "@fmg/storage";
-import { FMG_KeyDataHelper } from "@fmg/storage/helpers/key-data";
 
 import setupMapApiFilter from "./filters/api-filter";
 import setupMapStorageFilter from "./filters/storage-filter";
@@ -25,35 +22,6 @@ export type FmgMapWindow = Window & { [FmgMapInstalled]?: FMG_Map };
  * Handles all map related functionality
  */
 export class FMG_Map {
-    private window: Window;
-    private mapManager: FMG_MapManager;
-    private apiFilter: FMG_ApiFilter;
-    private storageFilter: FMG_StorageFilter;
-
-    protected constructor(window: Window) {
-        this.window = window;
-
-        this.mapManager = new FMG_MapManager(window);
-
-        this.apiFilter = FMG_ApiFilter.install(window);
-        setupMapApiFilter(this.apiFilter, this.mapManager);
-
-        this.storageFilter = FMG_StorageFilter.install(window);
-        setupMapStorageFilter(this.storageFilter, this.mapManager);
-    }
-
-    /**
-     * Install the map
-     * @param window the window to install the map on
-     * @returns the installed map
-     */
-    public static install(window: FmgMapWindow) {
-        if (!window[FmgMapInstalled]) {
-            window[FmgMapInstalled] = new FMG_Map(window);
-        }
-        return window[FmgMapInstalled];
-    }
-
     /*
      * Because we delayed the map script, we need to manually create the google maps object.
      * If altMapSdk is enabled.
@@ -74,29 +42,17 @@ export class FMG_Map {
      * And fill in data from storage.
      * @param window the window to load the user in
      */
-    private static async loadUser(window: Window) {
-        if (FMG_ExtensionData.settings.mock_user) {
-            window.user = {
-                id: -1,
-                role: "user"
-            } as any;
-        }
-
-        const storage = FMG_Storage.get(
-            window,
-            FMG_KeyDataHelper.fromWindow(window)
-        );
-
-        await storage.load();
-
+    private static loadUser(mapManager: FMG_MapManager) {
         // TODO: load data from storage
         if (window.user) {
-            window.user.trackedCategoryIds = storage.data.categoryIds;
+            window.user.trackedCategoryIds =
+                mapManager.storage.data.categoryIds;
             window.user.suggestions = [];
             window.user.presets = [];
             window.user.hasPro = true;
-            window.user.locations = storage.data.locations;
-            window.user.gameLocationsCount = storage.data.locationIds.length;
+            window.user.locations = mapManager.storage.data.locations;
+            window.user.gameLocationsCount =
+                mapManager.storage.data.locationIds.length;
             window.user.presets = [
                 {
                     id: 1,
@@ -162,15 +118,7 @@ export class FMG_Map {
     /**
      * Enable pro features
      */
-    private static async setProFeaturesEnabled(window: Window) {
-        // Get the map id from the meta data.
-        // If this is set we will imitate another map
-        // Only works with maps from the same game.
-        await FMG_Map.loadMapData(window);
-
-        // Load user
-        await FMG_Map.loadUser(window);
-
+    private static async setupConfig(window: Window) {
         // Set configurations enabled.
         if (window.config && FMG_ExtensionData.settings.presets_allways_enabled)
             window.config.presetsEnabled = true;
@@ -275,44 +223,70 @@ export class FMG_Map {
     /**
      * Setup
      */
-    public static async setup(window: Window): Promise<FMG_Map> {
+    public static async setup(window: Window): Promise<FMG_MapManager> {
+        // Fix google maps global object
         FMG_Map.fixGoogleMaps(window);
 
+        // Unlock maps locked by pro upgrade
         FMG_Map.unlockMaps(window);
+
+        // Cleanup pro upgrade ads
         FMG_Map.cleanupProUpgradeAds(window);
 
-        // TODO: make this configurable
-        const driver = FMG_Drivers.newLocalStorageDriver(window);
-        const migrator = new FMG_StorageDataMigrator(driver);
+        // Migrate data from previous versions
+        FMG_Storage.migrateLegacyData(window);
 
-        // Remove old backups
-        migrator.clearOldBackups();
+        // Setup mock user if enabled
+        if (FMG_ExtensionData.settings.mock_user) {
+            window.user = {
+                id: -1,
+                role: "user"
+            } as any;
+        }
 
-        // Start the migration process, if needed
-        await migrator.migrate();
+        // Get the map id from the meta data.
+        // If this is set we will imitate another map
+        // Only works with maps from the same game.
+        await FMG_Map.loadMapData(window);
 
-        // Enable pro features
-        await FMG_Map.setProFeaturesEnabled(window);
+        // Initialize mapManager
+        const mapManager = new FMG_MapManager(window);
+        mapManager.initStorage();
+
+        logger.debug("mapManager", mapManager);
+
+        // Load map data
+        await mapManager.load();
+
+        // #if DEBUG
+        window.fmgMapManager = mapManager;
+        // #endif
+
+        // Load user
+        FMG_Map.loadUser(mapManager);
+
+        // Configure
+        FMG_Map.setupConfig(window);
+
+        // Install storage filter, before we load the blocked map script
+        const storageFilter = FMG_StorageFilter.install(mapManager.window);
+        setupMapStorageFilter(storageFilter, mapManager);
 
         // After we fixed google maps and enabled pro features,
         // we can load the blocked map script
         await FMG_Map.loadMapScript(window);
 
-        // After the map script is loaded, we can install our map script
-        const map = FMG_Map.install(window);
-        await map.mapManager.load();
+        // Install api filter, after we loaded the blocked map script
+        const apiFilter = FMG_ApiFilter.install(mapManager.window);
+        setupMapApiFilter(apiFilter, mapManager);
 
-        // #if DEBUG
-        window.fmgMap = map;
-        // #endif
+        // Finisish mapManager initialization
+        // We need to do this after the map script is loaded,
+        mapManager.initStore();
 
-        return map;
-    }
+        // After the map script is loaded, we can
+        await mapManager.load();
 
-    /**
-     * Reload the map, after tab has been refocused.
-     */
-    public async reload(): Promise<void> {
-        await this.mapManager.reload();
+        return mapManager;
     }
 }

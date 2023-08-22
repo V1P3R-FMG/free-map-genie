@@ -4,16 +4,32 @@ import { FMG_KeyDataHelper } from "@fmg/storage/helpers/key-data";
 
 export class FMG_MapManager {
     public window: Window;
-    public storage: FMG_Storage;
-    public store: FMG_Store;
+    private _storage?: FMG_Storage;
+    private _store?: FMG_Store;
 
     public constructor(window: Window) {
         this.window = window;
-        this.storage = new FMG_Storage(
+    }
+
+    public get storage(): FMG_Storage {
+        if (!this._storage) throw new Error("Storage not initialized");
+        return this._storage;
+    }
+
+    public get store(): FMG_Store {
+        if (!this._store) throw new Error("Store not initialized");
+        return this._store;
+    }
+
+    public initStorage() {
+        this._storage = new FMG_Storage(
             window,
             FMG_KeyDataHelper.fromWindow(window)
         );
-        this.store = FMG_Store.install(window, this.storage);
+    }
+
+    public initStore() {
+        this._store = FMG_Store.install(window, this.storage);
     }
 
     public async load() {
