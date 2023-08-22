@@ -101,7 +101,7 @@ export class FMG_Storage {
         // Deep filter out empty values.
         const obj = deepFilter(this.data, isNotEmpty);
 
-        if (isEmpty(obj)) {
+        if (Object.values(obj).every(isEmpty)) {
             await this.driver.remove(this.key);
         } else {
             await this.driver.set<FMG.Storage.V2.StorageObject>(this.key, obj);
