@@ -84,12 +84,14 @@ export class FMG_MapManager {
             );
         });
 
+        // Remove notes that are not in the storage anymore
         lastNotes.forEach((note) => {
             if (!notes.find((n) => note.id === n.id)) {
                 this.removeNote(note);
             }
         });
 
+        // Add notes that are not in the state yet
         notes.forEach((note) => {
             if (!lastNotes.find((n) => note.id === n.id)) {
                 this.addNote(note);
