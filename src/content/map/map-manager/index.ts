@@ -32,6 +32,14 @@ export class FMG_MapManager {
         this._store = FMG_Store.install(window, this.storage);
     }
 
+    public hasDemoPreset(): boolean {
+        return (
+            this.window.mapData?.presets?.some(
+                (preset) => preset.is_demo_preset
+            ) ?? false
+        );
+    }
+
     public async load() {
         await this.storage.load();
     }
@@ -60,5 +68,8 @@ export class FMG_MapManager {
                 this.storage.data.categories[categoryId] ?? false
             );
         });
+
+        // Reload presets from storage
+        this.store.updatePresets();
     }
 }

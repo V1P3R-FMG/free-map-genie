@@ -25,5 +25,15 @@ export function extendState(state: MG.State, storage: FMG_Storage): FMG_State {
     state.user.foundLocationsCount = storage.data.locationIds.length;
     state.user.trackedCategories = storage.data.categoryIds;
     state.user.totalFoundLocationsCount = storage.data.locationIds.length;
+
+    if (storage.window.mapData) {
+        state.user.presets = storage.data.presetOrder.map((id) => {
+            if (id > -1) return storage.data.presets.find((p) => p.id == id)!;
+            return storage.window.mapData!.presets.find((p) => p.id == id)!;
+        });
+    } else {
+        logger.warn("mapData not found, could not set presets");
+    }
+
     return state as FMG_State;
 }

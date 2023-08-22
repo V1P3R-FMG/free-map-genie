@@ -47,4 +47,13 @@ export class FMG_Store {
             }
         });
     }
+
+    public updatePresets(): void {
+        this.store.dispatch({
+            type: "HIVE:USER:REORDER_PRESETS",
+            meta: {
+                presets: this.storage.data.presetOrder
+            }
+        });
+    }
 }

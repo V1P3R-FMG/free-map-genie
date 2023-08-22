@@ -43,24 +43,15 @@ export class FMG_Map {
      * @param window the window to load the user in
      */
     private static loadUser(mapManager: FMG_MapManager) {
-        // TODO: load data from storage
         if (window.user) {
             window.user.trackedCategoryIds =
                 mapManager.storage.data.categoryIds;
             window.user.suggestions = [];
-            window.user.presets = [];
             window.user.hasPro = true;
             window.user.locations = mapManager.storage.data.locations;
             window.user.gameLocationsCount =
                 mapManager.storage.data.locationIds.length;
-            window.user.presets = [
-                {
-                    id: 1,
-                    title: "test",
-                    categories: [],
-                    order: 0
-                }
-            ];
+            window.user.presets = mapManager.storage.data.presets;
         }
     }
 
@@ -283,6 +274,9 @@ export class FMG_Map {
         // Finisish mapManager initialization
         // We need to do this after the map script is loaded,
         mapManager.initStore();
+
+        // Update presets
+        mapManager.store.updatePresets();
 
         // After the map script is loaded, we can
         await mapManager.load();
