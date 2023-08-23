@@ -16,7 +16,6 @@ export const FmgMapInstalled = Symbol("FmgMapInstalled");
 
 export type FmgMapWindow = Window & { [FmgMapInstalled]?: FMG_Map };
 
-// TODO: fix popup link copy for pro maps
 /**
  * The fmg map script
  * Handles all map related functionality
@@ -259,9 +258,6 @@ export class FMG_Map {
 
         // Initialize mapManager
         const mapManager = new FMG_MapManager(window);
-        mapManager.initStorage();
-
-        logger.debug("mapManager", mapManager);
 
         // Load map data
         await mapManager.load();
@@ -280,9 +276,19 @@ export class FMG_Map {
         const storageFilter = FMG_StorageFilter.install(mapManager.window);
         setupMapStorageFilter(storageFilter, mapManager);
 
+        // If we have loaded a pro map, remember the map name so we can restore the url later.
+        const map = new URL(window.location.href).searchParams.get("map");
+
         // After we fixed google maps and enabled pro features,
         // we can load the blocked map script
         await FMG_Map.loadMapScript(window);
+
+        // If we have loaded a pro map, restore the url.
+        if (map) {
+            const url = new URL(window.location.href);
+            url.searchParams.set("map", map);
+            window.history.replaceState({}, "", url.toString());
+        }
 
         // Install api filter, after we loaded the blocked map script
         const apiFilter = FMG_ApiFilter.install(mapManager.window);
@@ -290,13 +296,7 @@ export class FMG_Map {
 
         // Finisish mapManager initialization
         // We need to do this after the map script is loaded,
-        mapManager.initStore();
-
-        // Update presets
-        mapManager.updatePresets();
-
-        // After the map script is loaded, we can
-        await mapManager.load();
+        mapManager.init();
 
         return mapManager;
     }

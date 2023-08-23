@@ -993,6 +993,13 @@
   dependencies:
     "@types/sizzle" "*"
 
+"@types/jqueryui@^1.12.17":
+  version "1.12.17"
+  resolved "https://registry.yarnpkg.com/@types/jqueryui/-/jqueryui-1.12.17.tgz#afc9b3c12456995989a8562c67c9f631e79b60fc"
+  integrity sha512-rqiCaZO7d1rAcJVXNSV6MYwt42oB4ArTRr0QbU3f4+Siv0d6m9uRkhiKHpc6oL9NFJKDxzIIDvUeMXTtlJFFaA==
+  dependencies:
+    "@types/jquery" "*"
+
 "@types/jsdom@^21.1.1":
   version "21.1.1"
   resolved "https://registry.yarnpkg.com/@types/jsdom/-/jsdom-21.1.1.tgz#e59e26352071267b507bf04d51841a1d7d3e8617"

@@ -13,5 +13,18 @@ declare namespace MG {
         deleteNoteMarker(note: MG.Note): void;
         createNote(note: MG.Note): void;
         openInfoWindow(location: MG.Location): void;
+        autoPanPopup(): void;
+        popup?: Popup;
+    }
+
+    interface Popup {
+        _closeButton: HTMLButtonElement;
+        _container: HTMLDivElement;
+        _content: HTMLDivElement;
+        _tip: HTMLDivElement;
+        _lngLat: { lng: number; lat: number };
+        locationId: number;
+        remove(): void;
+        _update(): void;
     }
 }

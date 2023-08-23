@@ -1,7 +1,6 @@
 import { getPageType } from "@fmg/page";
 import { FMG_Map } from "./map";
 import { FMG_MapSelector } from "./map-selector";
-import { FMG_Maps, FMG_MapData } from "@fmg/info";
 
 function listenForRefocus(callback: () => void) {
     document.addEventListener("visibilitychange", () => {

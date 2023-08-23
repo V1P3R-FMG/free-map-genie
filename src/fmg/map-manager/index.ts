@@ -1,19 +1,22 @@
 import { FMG_Storage } from "@fmg/storage";
 import { FMG_Store } from "@fmg/store";
 import { FMG_KeyDataHelper } from "@fmg/storage/helpers/key-data";
+import { FMG_Popup } from "./popup";
 
 export class FMG_MapManager {
     public window: Window;
-    private _storage?: FMG_Storage;
+    public storage: FMG_Storage;
+    public popup?: FMG_Popup;
     private _store?: FMG_Store;
+    private _autoPanPopup?: MG.MapManager["autoPanPopup"];
 
     public constructor(window: Window) {
         this.window = window;
-    }
 
-    public get storage(): FMG_Storage {
-        if (!this._storage) throw new Error("Storage not initialized");
-        return this._storage;
+        this.storage = new FMG_Storage(
+            window,
+            FMG_KeyDataHelper.fromWindow(window)
+        );
     }
 
     public get store(): FMG_Store {
@@ -21,15 +24,24 @@ export class FMG_MapManager {
         return this._store;
     }
 
-    public initStorage() {
-        this._storage = new FMG_Storage(
-            window,
-            FMG_KeyDataHelper.fromWindow(window)
-        );
-    }
-
-    public initStore() {
+    public init() {
         this._store = FMG_Store.install(window, this);
+
+        if (this.window.mapManager) {
+            this._autoPanPopup = this.window.mapManager?.autoPanPopup;
+            this.window.mapManager.autoPanPopup = () => {
+                const popup = this.window.mapManager?.popup;
+                if (!popup) return;
+                this.popup = new FMG_Popup(popup, this);
+                this._autoPanPopup?.();
+            };
+        } else {
+            logger.error(
+                "window.mapManager not found, could not attach popup fix!"
+            );
+        }
+
+        this.updatePresets();
     }
 
     public hasDemoPreset(): boolean {
