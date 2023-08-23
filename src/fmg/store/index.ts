@@ -59,4 +59,11 @@ export class FMG_Store {
             }
         });
     }
+
+    public update(): void {
+        this.store.dispatch({
+            type: "HIVE:USER:MARK_LOCATION",
+            meta: { locationId: -1, found: false }
+        });
+    }
 }
