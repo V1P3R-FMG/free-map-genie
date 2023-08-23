@@ -46,6 +46,9 @@ window.createWindow = function () {
             jest.fn(() => Promise.resolve(method))
         ])
     ) as any;
+    dom.window.axios.defaults = {
+        baseURL: "https://mapgenie.io"
+    };
 
     return dom.window;
 };
@@ -76,6 +79,10 @@ declare global {
 
         axios: {
             [key in AxiosMethod]: jest.Mock<Promise<any>>;
+        } & {
+            defaults: {
+                baseURL: string;
+            };
         };
 
         game: {
