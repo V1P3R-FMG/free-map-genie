@@ -12,5 +12,6 @@ declare namespace MG {
         setLocationFound(locationId: Id, found: boolean): void;
         deleteNoteMarker(note: MG.Note): void;
         createNote(note: MG.Note): void;
+        openInfoWindow(location: MG.Location): void;
     }
 }

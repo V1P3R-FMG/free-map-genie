@@ -50,6 +50,13 @@ export class FMG_MapManager {
         this.store.reorderPresets(this.storage.data.presetOrder);
     }
 
+    public updatePopup() {
+        const location = this.store.getState().map.selectedLocation;
+        if (location) {
+            this.window.mapManager?.openInfoWindow(location);
+        }
+    }
+
     public addNote(note: MG.Note) {
         this.window.mapManager?.createNote(note);
     }
