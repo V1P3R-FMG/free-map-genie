@@ -14,7 +14,7 @@ export function initFirefoxScriptBlocker() {
         (details) => {
             if (allowRequests[details.requestId]) {
                 // #if DEBUG
-                logger.log("allow request", {
+                logger.debug("allow request", {
                     requestId: details.requestId,
                     url: details.url
                 });
@@ -23,7 +23,7 @@ export function initFirefoxScriptBlocker() {
                 return;
             }
             // #if DEBUG
-            logger.log("block request", {
+            logger.debug("block request", {
                 requestId: details.requestId,
                 url: details.url
             });
@@ -37,7 +37,7 @@ export function initFirefoxScriptBlocker() {
     chrome.webRequest.onBeforeRequest.addListener(
         (details) => {
             // #if DEBUG
-            logger.log("redirect request", {
+            logger.debug("redirect request", {
                 requestId: details.requestId,
                 url: details.url
             });
