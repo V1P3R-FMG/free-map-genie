@@ -23,6 +23,7 @@ export default function (filter: FMG_ApiFilter, mapManager: FMG_MapManager) {
                 id: nanoid(10),
                 user_id: mapManager.window.user?.id ?? -1
             };
+            logger.debug("create note", note);
             mapManager.storage.data.notes.push(note);
             block();
             return { data: note };
@@ -34,6 +35,7 @@ export default function (filter: FMG_ApiFilter, mapManager: FMG_MapManager) {
         "notes",
         true,
         (_method, _key, id, data, _url, block) => {
+            logger.debug("update note", id, data);
             mapManager.storage.data.notes = mapManager.storage.data.notes.map(
                 (note) => {
                     if (note.id == id) {
@@ -54,6 +56,7 @@ export default function (filter: FMG_ApiFilter, mapManager: FMG_MapManager) {
         "notes",
         true,
         (_method, _key, id, _data, _url, block) => {
+            logger.debug("delete note", id);
             mapManager.storage.data.notes =
                 mapManager.storage.data.notes.filter((note) => note.id != id);
             block();

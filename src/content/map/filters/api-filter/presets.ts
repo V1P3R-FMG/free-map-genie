@@ -11,6 +11,7 @@ export default function (filter: FMG_ApiFilter, mapManager: FMG_MapManager) {
         false,
         (_method, _key, _id, data, _url, block) => {
             const id = data.ordering.length - 1;
+            logger.debug("Adding preset", id, data);
 
             // To prevet multiple saves, we disable autosave
             mapManager.storage.data.autosave = false;
@@ -41,6 +42,7 @@ export default function (filter: FMG_ApiFilter, mapManager: FMG_MapManager) {
         "presets",
         true,
         (_method, _key, id, _data, _url, block) => {
+            logger.debug("Deleting preset", id);
             // To prevet multiple saves, we disable autosave
             mapManager.storage.data.autosave = false;
 
@@ -86,6 +88,7 @@ export default function (filter: FMG_ApiFilter, mapManager: FMG_MapManager) {
         "presets/reorder",
         false,
         (_method, _key, _id, data, _url, block) => {
+            logger.debug("Reordering presets", data.ordering);
             mapManager.storage.data.presetOrder = data.ordering;
             mapManager.updatePresets();
             block();
