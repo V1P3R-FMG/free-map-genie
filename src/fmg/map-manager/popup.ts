@@ -13,7 +13,8 @@ export class FMG_Popup {
     }
 
     private fixLocationPermaLink(): void {
-        const link = document.querySelector<HTMLElement>("i.ion-ios-link");
+        const link =
+            this.instance._content.querySelector<HTMLElement>("i.ion-ios-link");
         const fmgLink = link?.cloneNode(true) as HTMLElement | undefined;
         if (!link || !fmgLink) return;
         fmgLink.setAttribute("data-title", "FMG Link Copied");

@@ -31,7 +31,7 @@ export class FMG_MapManager {
             this._autoPanPopup = this.window.mapManager?.autoPanPopup;
             this.window.mapManager.autoPanPopup = () => {
                 const popup = this.window.mapManager?.popup;
-                if (!popup) return;
+                if (!popup || this.popup?.instance !== popup) return;
                 this.popup = new FMG_Popup(popup, this);
                 this._autoPanPopup?.();
             };
