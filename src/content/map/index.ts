@@ -167,15 +167,27 @@ export class FMG_Map {
     private static unlockMaps(window: Window) {
         if (!window.document.querySelector(".map-switcher-panel")) return;
 
+        const map = new URL(window.location.href).searchParams.get("map");
+
         const freeMapUrl = FMG_Map.getFreeMapUrl(window);
         if (!freeMapUrl) return;
         window.document
             .querySelectorAll<HTMLLinkElement>(".map-switcher-panel .map-link")
             .forEach((link) => {
+                const mapName = FMG_Map.getMapName(link);
+
+                // Fix selected when on a pro unlocked map
+                if (map) {
+                    if (mapName !== map) {
+                        link.classList.remove("selected");
+                    } else {
+                        link.classList.add("selected");
+                    }
+                }
+
                 if (!link.href.endsWith("/upgrade")) return;
 
                 // Fix name
-                const mapName = FMG_Map.getMapName(link);
                 // link.innerText = mapName;
 
                 // Fix href
