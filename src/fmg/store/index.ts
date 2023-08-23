@@ -22,6 +22,10 @@ export class FMG_Store {
         window.store.getState = this.getState.bind(this);
     }
 
+    public subscribe(listener: () => void): void {
+        this.store.subscribe(listener);
+    }
+
     public getState(): FMG_State {
         return extendState(this._getState(), this.mapManager);
     }

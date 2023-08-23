@@ -15,6 +15,9 @@ declare namespace MG {
         openInfoWindow(location: MG.Location): void;
         autoPanPopup(): void;
         popup?: Popup;
+        foundLocationService: {
+            onMarkLocation(locationId: number, marked: boolean): void;
+        };
     }
 
     interface Popup {

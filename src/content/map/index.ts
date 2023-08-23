@@ -6,8 +6,8 @@ import { FMG_StorageFilter } from "@fmg/filters/storage-filter";
 import { FMG_MapData } from "@fmg/info/map-data";
 import { FMG_ExtensionData } from "@fmg/extension-data";
 import { FMG_MapManager } from "../../fmg/map-manager";
-
 import { FMG_Storage } from "@fmg/storage";
+import { FMG_UI } from "./ui";
 
 import setupMapApiFilter from "./filters/api-filter";
 import setupMapStorageFilter from "./filters/storage-filter";
@@ -218,9 +218,9 @@ export class FMG_Map {
         window.document.querySelector("#nitro-floating-wrapper")?.remove();
     }
 
-    /*
+    /**
      * Load the map script, and wait for the globals to be defined.
-     **/
+     */
     private static async loadMapScript(window: Window): Promise<void> {
         const script = await getElement<HTMLScriptElement>(
             "script[src^='https://cdn.mapgenie.io/js/map.js?id=']",
@@ -235,6 +235,17 @@ export class FMG_Map {
         });
 
         return timeout(waitForGlobals(["axios", "store"], window), 10 * 1000);
+    }
+
+    /**
+     * Attach ui
+     */
+    private static attachUI(mapManager: FMG_MapManager): void {
+        const ui = new FMG_UI(mapManager);
+
+        mapManager.storage.subscribe(() => {
+            ui.update();
+        });
     }
 
     /**
@@ -309,6 +320,9 @@ export class FMG_Map {
         // Finisish mapManager initialization
         // We need to do this after the map script is loaded,
         mapManager.init();
+
+        // Attach ui
+        FMG_Map.attachUI(mapManager);
 
         return mapManager;
     }

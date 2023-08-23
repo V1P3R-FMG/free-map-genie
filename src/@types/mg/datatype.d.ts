@@ -45,6 +45,7 @@ declare namespace MG {
         visible: boolean;
         has_heatmap: boolean;
         template: unknown | null;
+        locations: Location[];
     }
 
     type PresetOrder = number[];
