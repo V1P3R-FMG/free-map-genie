@@ -123,8 +123,11 @@ export class FMG_Map {
      */
     private static async setupConfig(window: Window) {
         // Set configurations enabled.
-        if (window.config && FMG_ExtensionData.settings.presets_allways_enabled)
-            window.config.presetsEnabled = true;
+        if (window.config) {
+            if (FMG_ExtensionData.settings.presets_allways_enabled) {
+                window.config.presetsEnabled = true;
+            }
+        }
     }
 
     /**
