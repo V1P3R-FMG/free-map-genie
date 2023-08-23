@@ -8,12 +8,12 @@ const marked = ref(0);
 function recalculate(mapManager: FMG_MapManager) {
     total.value = 0;
     marked.value = 0;
-    const catById = mapManager.store.getState().map.categories;
+    const locByCat = mapManager.store.getState().map.locationsByCategory;
     const data = mapManager.storage.data;
     data.categoryIds.forEach((catId) => {
-        const cat = catById[catId];
-        total.value += cat.locations.length;
-        cat.locations.forEach((loc) => {
+        const locations = locByCat[catId] ?? [];
+        total.value += locations.length;
+        locations.forEach((loc) => {
             if (data.locations[loc.id]) marked.value++;
         });
     });

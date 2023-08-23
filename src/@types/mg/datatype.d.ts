@@ -45,7 +45,7 @@ declare namespace MG {
         visible: boolean;
         has_heatmap: boolean;
         template: unknown | null;
-        locations: Location[];
+        locations?: Location[]; // Not all maps will define this. (e.g. GTA V)
     }
 
     type PresetOrder = number[];
