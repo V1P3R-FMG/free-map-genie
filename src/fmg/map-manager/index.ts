@@ -29,7 +29,7 @@ export class FMG_MapManager {
     }
 
     public initStore() {
-        this._store = FMG_Store.install(window, this.storage);
+        this._store = FMG_Store.install(window, this);
     }
 
     public hasDemoPreset(): boolean {
@@ -38,6 +38,16 @@ export class FMG_MapManager {
                 (preset) => preset.is_demo_preset
             ) ?? false
         );
+    }
+
+    public updatePresets() {
+        if (this.storage.data.presets.length === 0) {
+            if (this.hasDemoPreset()) {
+                this.store.reorderPresets([-1]);
+            }
+            return;
+        }
+        this.store.reorderPresets(this.storage.data.presetOrder);
     }
 
     public addNote(note: MG.Note) {
@@ -99,6 +109,6 @@ export class FMG_MapManager {
         });
 
         // Reload presets from storage
-        this.store.updatePresets();
+        this.updatePresets();
     }
 }

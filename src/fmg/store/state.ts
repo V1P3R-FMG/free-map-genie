@@ -1,4 +1,4 @@
-import { FMG_Storage } from "@fmg/storage";
+import { FMG_MapManager } from "@fmg/map-manager";
 
 export interface Map extends MG.State.Map {}
 
@@ -18,14 +18,22 @@ export interface FMG_State extends MG.State {
     editor: Editor;
 }
 
-export function extendState(state: MG.State, storage: FMG_Storage): FMG_State {
+export function extendState(
+    state: MG.State,
+    mapManager: FMG_MapManager
+): FMG_State {
+    const storage = mapManager.storage;
     state.user.foundLocations = storage.data.locations;
     state.user.foundLocationsCount = storage.data.locationIds.length;
     state.user.trackedCategories = storage.data.categoryIds;
     state.user.totalFoundLocationsCount = storage.data.locationIds.length;
 
     if (storage.window.mapData) {
-        state.user.presets = storage.data.presetOrder.map((id) => {
+        const presetOrder =
+            storage.data.presetOrder.length === 0 && mapManager.hasDemoPreset()
+                ? [-1]
+                : storage.data.presetOrder;
+        state.user.presets = presetOrder.map((id) => {
             if (id > -1) return storage.data.presets.find((p) => p.id == id)!;
             return storage.window.mapData!.presets.find((p) => p.id == id)!;
         });

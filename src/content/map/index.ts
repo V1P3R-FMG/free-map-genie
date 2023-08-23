@@ -60,7 +60,7 @@ export class FMG_Map {
 
     /**
      * Enable map editor.
-     * At the momment nothing usful can be done with as far as i know.
+     * At the momment nothing usfull can be done with as far as i know.
      */
     private static enableEditor(window: Window) {
         window.isEditor = true;
@@ -290,7 +290,7 @@ export class FMG_Map {
         mapManager.initStore();
 
         // Update presets
-        mapManager.store.updatePresets();
+        mapManager.updatePresets();
 
         // After the map script is loaded, we can
         await mapManager.load();

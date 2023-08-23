@@ -15,6 +15,7 @@ export default function (filter: FMG_ApiFilter, mapManager: FMG_MapManager) {
     filter.registerFilter<MG.Note>(
         "post",
         "notes",
+        false,
         (_method, _key, _id, data, _url, block) => {
             const note = {
                 ...data,
@@ -31,6 +32,7 @@ export default function (filter: FMG_ApiFilter, mapManager: FMG_MapManager) {
     filter.registerFilter<UpdateNotePutData>(
         "put",
         "notes",
+        true,
         (_method, _key, id, data, _url, block) => {
             mapManager.storage.data.notes = mapManager.storage.data.notes.map(
                 (note) => {
@@ -50,6 +52,7 @@ export default function (filter: FMG_ApiFilter, mapManager: FMG_MapManager) {
     filter.registerFilter<undefined>(
         "delete",
         "notes",
+        true,
         (_method, _key, id, _data, _url, block) => {
             mapManager.storage.data.notes =
                 mapManager.storage.data.notes.filter((note) => note.id != id);

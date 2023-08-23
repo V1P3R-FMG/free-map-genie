@@ -53,7 +53,7 @@ describe("FMG_ApiFilter", () => {
         for (const method of AxiosMethods) {
             for (const [key, _] of filters) {
                 // Setup
-                filter.registerFilter(method, key, () => {});
+                filter.registerFilter(method, key, false, () => {});
 
                 // Expectations
                 expect(filter["filters"][method][key]).toBeDefined();
@@ -68,11 +68,11 @@ describe("FMG_ApiFilter", () => {
         for (const method of AxiosMethods) {
             for (const [key, _] of filters) {
                 // Setup
-                filter.registerFilter(method, key, () => {});
+                filter.registerFilter(method, key, false, () => {});
 
                 // Expectations
                 expect(() => {
-                    filter.registerFilter(method, key, () => {});
+                    filter.registerFilter(method, key, false, () => {});
                 }).toThrow(`Filter already exists for ${method} ${key}`);
             }
         }
@@ -85,7 +85,7 @@ describe("FMG_ApiFilter", () => {
         for (const method of AxiosMethods) {
             for (const [key, _] of filters) {
                 // Setup
-                filter.registerFilter(method, key, () => {});
+                filter.registerFilter(method, key, false, () => {});
                 filter.unregisterFilter(method, key);
 
                 // Expectations
@@ -94,7 +94,7 @@ describe("FMG_ApiFilter", () => {
                     filter.unregisterFilter(method, key);
                 }).toThrow(`Filter does not exist for ${method} ${key}`);
                 expect(() => {
-                    filter.registerFilter(method, key, () => {});
+                    filter.registerFilter(method, key, false, () => {});
                 }).not.toThrow(`Filter already exists for ${method} ${key}`);
             }
         }
@@ -104,11 +104,13 @@ describe("FMG_ApiFilter", () => {
         for (const [key, url] of filters) {
             for (const id of ids) {
                 // Setup
-                const regex = FMG_ApiFilter["compileKeyToRegex"](key);
+                const regex = FMG_ApiFilter["compileKeyToRegex"](
+                    key,
+                    id != undefined
+                );
                 const result = regex.exec(url + (id ? "/" + id : ""));
-
                 // Expectations
-                expect(regex.test(url)).toBeTruthy();
+                expect(result).not.toBeNull();
                 expect(result?.groups?.key).toBe(key);
                 expect(result?.groups?.id).toBe(id);
             }
@@ -127,7 +129,7 @@ describe("FMG_ApiFilter", () => {
         }
     });
 
-    it("should match url correctly", async () => {
+    it("should match url correctly whit no id", async () => {
         // Initialize Data
         const filter = FMG_ApiFilter.install(createWindow());
 
@@ -135,7 +137,7 @@ describe("FMG_ApiFilter", () => {
             for (const [key, url] of filters) {
                 // Setup
                 const fn = () => {};
-                filter.registerFilter(method, key, fn);
+                filter.registerFilter(method, key, false, fn);
 
                 const matchA = filter["getFilter"](method, url);
                 const matchB = filter["getFilter"](method, url + "/1");
@@ -144,8 +146,7 @@ describe("FMG_ApiFilter", () => {
 
                 // Expectations
                 expect(matchA).toBeDefined();
-                expect(matchB).toBeDefined();
-                expect(matchA).toBe(matchB);
+                expect(matchB).toBeUndefined();
                 expect(matchA?.callback).toBe(fn);
 
                 expect(matchC).toBeUndefined();
@@ -164,7 +165,12 @@ describe("FMG_ApiFilter", () => {
             for (const [key, url] of filters) {
                 for (const id of ids) {
                     // Setup
-                    filter.registerFilter(method, key, fnBlock);
+                    filter.registerFilter(
+                        method,
+                        key,
+                        id != undefined,
+                        fnBlock
+                    );
 
                     const result = await windowMock.axios[method](
                         url + (id ? "/" + id : "")
@@ -194,7 +200,12 @@ describe("FMG_ApiFilter", () => {
             for (const [key, url] of filters) {
                 for (const id of ids) {
                     // Setup
-                    filter.registerFilter(method, key, fnNonBlock);
+                    filter.registerFilter(
+                        method,
+                        key,
+                        id != undefined,
+                        fnNonBlock
+                    );
 
                     const result = await windowMock.axios[method](
                         url + (id ? "/" + id : "")
@@ -251,7 +262,12 @@ describe("FMG_ApiFilter", () => {
             for (const [key, url] of filters) {
                 for (const id of ids) {
                     // Setup
-                    filter.registerFilter(method, key, fnBlock);
+                    filter.registerFilter(
+                        method,
+                        key,
+                        id != undefined,
+                        fnBlock
+                    );
 
                     const result = await windowMock.axios[method](
                         url + "/a" + (id ? "/" + id : "")
@@ -284,6 +300,7 @@ describe("FMG_ApiFilter", () => {
                     filter.registerFilter(
                         method,
                         key,
+                        id != undefined,
                         (method, key, id, data, url, block) => {
                             block();
                             return [method, key, id, data, url];
@@ -317,10 +334,15 @@ describe("FMG_ApiFilter", () => {
         const filter = FMG_ApiFilter.install(windowMock);
 
         // Setup
-        filter.registerFilter("any", "test", (_1, _2, _3, _4, _5, block) => {
-            block();
-            return "any works!";
-        });
+        filter.registerFilter(
+            "any",
+            "test",
+            false,
+            (_1, _2, _3, _4, _5, block) => {
+                block();
+                return "any works!";
+            }
+        );
 
         // Expectations
         expect(await windowMock.axios.get("/api/v1/user/test")).toBe(
@@ -334,14 +356,24 @@ describe("FMG_ApiFilter", () => {
         const filter = FMG_ApiFilter.install(windowMock);
 
         // Setup
-        filter.registerFilter("get", "test", (_1, _2, _3, _4, _5, block) => {
-            block();
-            return "get works!";
-        });
-        filter.registerFilter("any", "test", (_1, _2, _3, _4, _5, block) => {
-            block();
-            return "any works!";
-        });
+        filter.registerFilter(
+            "get",
+            "test",
+            false,
+            (_1, _2, _3, _4, _5, block) => {
+                block();
+                return "get works!";
+            }
+        );
+        filter.registerFilter(
+            "any",
+            "test",
+            false,
+            (_1, _2, _3, _4, _5, block) => {
+                block();
+                return "any works!";
+            }
+        );
 
         // Expectations
         expect(await windowMock.axios.get("/api/v1/user/test")).toBe(

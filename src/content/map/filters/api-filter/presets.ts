@@ -8,6 +8,7 @@ export default function (filter: FMG_ApiFilter, mapManager: FMG_MapManager) {
     filter.registerFilter<PresetPostData>(
         "post",
         "presets",
+        false,
         (_method, _key, _id, data, _url, block) => {
             const id = data.ordering.length - 1;
 
@@ -38,6 +39,7 @@ export default function (filter: FMG_ApiFilter, mapManager: FMG_MapManager) {
     filter.registerFilter<PresetPostData>(
         "delete",
         "presets",
+        true,
         (_method, _key, id, _data, _url, block) => {
             // To prevet multiple saves, we disable autosave
             mapManager.storage.data.autosave = false;
@@ -82,9 +84,10 @@ export default function (filter: FMG_ApiFilter, mapManager: FMG_MapManager) {
     filter.registerFilter<ReorderPostData>(
         "post",
         "presets/reorder",
+        false,
         (_method, _key, _id, data, _url, block) => {
             mapManager.storage.data.presetOrder = data.ordering;
-            mapManager.store.updatePresets();
+            mapManager.updatePresets();
             block();
             return;
         }
