@@ -13,6 +13,9 @@ export class FMG_Popup {
     }
 
     private fixLocationPermaLink(): void {
+        // Only fix location link if we are on a pro unlocked map.
+        if (!new URL(window.location.href).searchParams.has("map")) return;
+
         const link =
             this.instance._content.querySelector<HTMLElement>("i.ion-ios-link");
         const fmgLink = link?.cloneNode(true) as HTMLElement | undefined;
