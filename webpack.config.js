@@ -234,8 +234,15 @@ export default (env) => {
             // Generate the extension
             new WebExtPlugin({
                 sourceDir: dist,
-                artifactsDir: dist,
-                outputFilename: `fmg-${browser}-v${packageJson.version}`,
+                artifactsDir: "./dist",
+                outputFilename:
+                    `fmg-${browser}-v${packageJson.version}` +
+                    (mode === "production"
+                        ? browser === "chrome"
+                            ? ".zip"
+                            : ".xpi"
+                        : ""),
+                overwriteDest: true,
                 target: browser === "chrome" ? "chromium" : "firefox-desktop",
                 devtools: true,
                 selfHosted: true,
