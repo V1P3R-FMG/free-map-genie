@@ -7,7 +7,7 @@ import path from "path";
 import decompress from "decompress";
 
 import dotenv from "dotenv";
-const env = dotenv.parse();
+const env = dotenv.parse(fs.readFileSync(".env"));
 
 if (!env.FONTS_PATH) {
     throw new Error("FONTS_PATH not defined");
@@ -34,6 +34,9 @@ async function updateFont() {
     const latestFont = getLatestFont();
     if (!latestFont) {
         throw new Error("No font found");
+    } else {
+        // eslint-disable-next-line no-undef
+        console.log("Updating font: " + latestFont.name);
     }
 
     const inPath = latestFont.path;
@@ -63,6 +66,8 @@ async function updateFont() {
             }
         }
     }
+    // eslint-disable-next-line no-undef
+    console.log("Font updated");
 }
 
 updateFont();
