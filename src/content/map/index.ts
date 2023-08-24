@@ -251,7 +251,9 @@ export class FMG_Map {
     /**
      * Setup
      */
-    public static async setup(window: Window): Promise<FMG_MapManager> {
+    public static async setup(
+        window: Window
+    ): Promise<FMG_MapManager | undefined> {
         // Fix google maps global object
         FMG_Map.fixGoogleMaps(window);
 
@@ -270,6 +272,12 @@ export class FMG_Map {
                 id: -1,
                 role: "user"
             } as any;
+        }
+
+        if (!window.user) {
+            // If no user is logged in restore the map script and exit.
+            await FMG_Map.loadMapScript(window);
+            return;
         }
 
         // FMG_Map.enableEditor(window);

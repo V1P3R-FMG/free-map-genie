@@ -57,7 +57,9 @@ async function init() {
 
     if (type === "map") {
         const map = await FMG_Map.setup(window);
-        listenForRefocus(() => map.reload());
+        if (map) {
+            listenForRefocus(() => map.reload());
+        }
         return true;
     } else if (type === "map-selector") {
         await FMG_MapSelector.setup(window);
