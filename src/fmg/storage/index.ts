@@ -3,9 +3,7 @@ import * as deepFilter from "deep-filter";
 
 import { FMG_Data } from "./proto/data";
 import { FMG_Drivers } from "./drivers";
-
-//import { FMG_Drivers } from "@fmg/storage/drivers";
-import { FMG_StorageDataMigrator } from "@fmg/storage/migration";
+import { FMG_Keys } from "./keys";
 
 export class FMG_Storage {
     private static storages: Record<string, FMG_Storage> = {};
@@ -13,7 +11,7 @@ export class FMG_Storage {
     public autosave: boolean = true;
 
     public readonly window: Window;
-    public readonly keyData: FMG.Storage.KeyData;
+    public readonly keys: FMG_Keys;
 
     public driver: FMG.Storage.Driver;
     public data: FMG_Data;
@@ -22,7 +20,7 @@ export class FMG_Storage {
 
     public constructor(window: Window, keyData: FMG.Storage.KeyData) {
         this.window = window;
-        this.keyData = keyData;
+        this.keys = new FMG_Keys(keyData);
 
         this.driver = FMG_Drivers.newLocalStorageDriver(window);
 
@@ -48,7 +46,7 @@ export class FMG_Storage {
      * @returns the created or loaded storage
      */
     public static get(window: Window, keyData: FMG.Storage.KeyData) {
-        const key = FMG_Storage.getKey(keyData);
+        const key = FMG_Keys.getV2Key(keyData);
         if (!FMG_Storage.storages[key]) {
             FMG_Storage.storages[key] = new FMG_Storage(window, keyData);
         }
@@ -60,7 +58,7 @@ export class FMG_Storage {
      * @param keyData the key to build the key from
      */
     public static unload(keyData: FMG.Storage.KeyData) {
-        const key = FMG_Storage.getKey(keyData);
+        const key = FMG_Keys.getV2Key(keyData);
         if (FMG_Storage.storages[key]) {
             FMG_Storage.storages[key].save();
             delete FMG_Storage.storages[key];
@@ -68,19 +66,10 @@ export class FMG_Storage {
     }
 
     /**
-     * Creates a key from the given key data.
-     * @param keyData the key data to create the key from
-     * @returns the created key
-     */
-    public static getKey(keyData: FMG.Storage.KeyData): string {
-        return `fmg:game_${keyData.gameId}:map_${keyData.mapId}:user_${keyData.userId}`;
-    }
-
-    /**
      * The key of this storage.
      */
     public get key(): string {
-        return FMG_Storage.getKey(this.keyData);
+        return this.keys.v2Key;
     }
 
     // TODO: check if loaded data is valid
@@ -113,18 +102,12 @@ export class FMG_Storage {
     }
 
     /**
-     * Removes the data from the storage.
+     * Clear the data from the storage.
      */
-    public static async migrateLegacyData(window: Window): Promise<void> {
-        // TODO: make this configurable
-        const driver = FMG_Drivers.newLocalStorageDriver(window);
-        const migrator = new FMG_StorageDataMigrator(driver);
-
-        // Remove old backups
-        migrator.clearOldBackups();
-
-        // Start the migration process, if needed
-        await migrator.migrate();
+    public async clear(): Promise<void> {
+        await this.driver.remove(this.key);
+        this.data = FMG_Data.create({}, () => this.save());
+        this.listeners.forEach((listener) => listener());
     }
 
     /**

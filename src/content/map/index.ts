@@ -6,7 +6,7 @@ import { FMG_StorageFilter } from "@fmg/filters/storage-filter";
 import { FMG_MapData } from "@fmg/info/map-data";
 import { FMG_ExtensionData } from "@fmg/extension-data";
 import { FMG_MapManager } from "../../fmg/map-manager";
-import { FMG_Storage } from "@fmg/storage";
+import { FMG_StorageDataMigrator } from "@fmg/storage/migration";
 import { FMG_UI } from "./ui";
 
 import setupMapApiFilter from "./filters/api-filter";
@@ -249,6 +249,28 @@ export class FMG_Map {
     }
 
     /**
+     * Setup window listeners
+     */
+    private static setupListeners(mapManager: FMG_MapManager): void {
+        mapManager.window.addEventListener("message", async (event) => {
+            try {
+                if (event.data.type === "fmg::export-data") {
+                    await mapManager.export();
+                } else if (event.data.type === "fmg::import-data") {
+                    await mapManager.import();
+                } else if (event.data.type === "fmg::clear-data") {
+                    if (confirm("Are you sure you want to clear all data?")) {
+                        await mapManager.storage.clear();
+                        await mapManager.reload();
+                    }
+                }
+            } catch (e) {
+                logger.error("Failed to handle message", e);
+            }
+        });
+    }
+
+    /**
      * Setup
      */
     public static async setup(
@@ -264,7 +286,7 @@ export class FMG_Map {
         FMG_Map.cleanupProUpgradeAds(window);
 
         // Migrate data from previous versions
-        FMG_Storage.migrateLegacyData(window);
+        FMG_StorageDataMigrator.migrateLegacyData(window);
 
         // Setup mock user if enabled
         if (FMG_ExtensionData.settings.mock_user) {
@@ -292,6 +314,9 @@ export class FMG_Map {
 
         // Load map data
         await mapManager.load();
+
+        // Setup listeners
+        FMG_Map.setupListeners(mapManager);
 
         // #if DEBUG
         window.fmgMapManager = mapManager;

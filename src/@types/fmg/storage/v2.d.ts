@@ -9,6 +9,14 @@ declare namespace FMG {
                 presetOrder: MG.PresetOrder;
                 visibleCategoriesIds: number[];
             }
+
+            interface ExportedJson {
+                version: 2;
+                gameId: number;
+                mapId: number;
+                userId: number;
+                data: DeepPartial<StorageObject>;
+            }
         }
     }
 }

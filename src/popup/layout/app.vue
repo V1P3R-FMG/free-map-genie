@@ -8,6 +8,7 @@ import Page from "../components/frame/page.vue";
 import Bookmarks from "./bookmarks/bookmarks.vue";
 import Settings from "./settings/settings.vue";
 import Info from "./info/info.vue";
+import Data from "./data/data.vue";
 
 import { ref } from "vue";
 import { send } from "@shared/send";
@@ -74,9 +75,21 @@ function openHomepage() {
     chrome.tabs.create({ url: __HOMEPAGE__ });
 }
 
+function importData() {
+    send("import-data");
+}
+
+function exportData() {
+    send("export-data");
+}
+
+function clearData() {
+    send("clear-data");
+}
+
 async function addBookmark() {
     try {
-        const bookmark = await send("add-bookmark", null);
+        const bookmark = await send("add-bookmark");
         if (!bookmark.url || !bookmark.favicon || !bookmark.title) {
             logger.warn("Invalid bookmark", bookmark);
             return;
@@ -161,6 +174,13 @@ getInfo();
                 </Page>
                 <Page name="info" icon="doc">
                     <Info :info="<any>info" />
+                </Page>
+                <Page name="data" icon="database">
+                    <Data
+                        @import="importData"
+                        @export="exportData"
+                        @clear="clearData"
+                    />
                 </Page>
             </Frame>
             <div class="footer">

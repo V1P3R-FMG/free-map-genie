@@ -3,6 +3,9 @@ import { FMG_Store } from "@fmg/store";
 import { FMG_KeyDataHelper } from "@fmg/storage/helpers/key-data";
 import { FMG_Popup } from "./popup";
 
+import { FMG_ImportHelper } from "@fmg/storage/data/import";
+import { FMG_ExportHelper } from "@fmg/storage/data/export";
+
 export class FMG_MapManager {
     public window: Window;
     public storage: FMG_Storage;
@@ -129,5 +132,20 @@ export class FMG_MapManager {
 
         // Reload presets from storage
         this.updatePresets();
+    }
+
+    /**
+     * Import data from a file.
+     */
+    public async import() {
+        await FMG_ImportHelper.import(this.storage.driver, this.storage.keys);
+        await this.reload();
+    }
+
+    /**
+     * Export data from a file.
+     */
+    public async export() {
+        await FMG_ExportHelper.export(this.storage.driver, this.storage.keys);
     }
 }

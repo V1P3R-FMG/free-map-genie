@@ -1,14 +1,18 @@
 import hello from "./hello";
 import addBookmark from "./add-bookmark";
 import getInfo from "./get-info";
+import forward from "./forward";
 
 /**
  * The message handlers.
  */
 const handlers: Record<string, any> = {
-    "hello": hello,
+    hello: hello,
     "add-bookmark": addBookmark,
-    "get-info": getInfo
+    "get-info": getInfo,
+    "export-data": forward("export-data"),
+    "import-data": forward("import-data"),
+    "clear-data": forward("clear-data")
 };
 
 /**

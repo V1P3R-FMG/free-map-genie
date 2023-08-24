@@ -7,7 +7,8 @@ export class V1_FMG_Storage {
     private driver: FMG.Storage.Driver;
     private keys: string[] | null = null; // Cache the keys
 
-    public static regexp = /^mg:game_(?<gameId>\d+):user_(?<userId>\d+):v5$/;
+    public static regexp =
+        /^mg:game_(?<gameId>\d+):user_(?<userId>[-]?\d+):v5$/;
 
     constructor(driver: FMG.Storage.Driver) {
         this.driver = driver;
