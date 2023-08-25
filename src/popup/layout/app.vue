@@ -10,6 +10,8 @@ import Settings from "./settings/settings.vue";
 import Info from "./info/info.vue";
 import Data from "./data/data.vue";
 
+import Version from "./version.vue";
+
 import { ref } from "vue";
 import { send } from "@shared/send";
 import {
@@ -187,7 +189,8 @@ getInfo();
                 <span class="author" @click="openHomepage"
                     >by {{ author }}</span
                 >
-                <span class="version">v{{ version }}</span>
+                <!-- <span class="version">v{{ version }}</span> -->
+                <Version :version="version" />
             </div>
         </div>
     </Theme>
