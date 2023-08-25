@@ -38,7 +38,8 @@ export class FMG_Guide {
     public static async cleanupProAds(window: Window) {
         await Promise.all(
             [
-                ["//p[contains(., 'PRO')]", "xpath"],
+                //["//p[contains(., 'PRO')]", "xpath"],
+                ["blockquote", "selector"],
                 ["#button-upgrade", "selector"]
             ].map(async ([selector, type]) => {
                 const element =
@@ -65,6 +66,7 @@ export class FMG_Guide {
         if (mapManager.window.mapData) {
             window.mapData = window.mapData ?? ({} as any);
             window.mapData!.maps = mapManager.window.mapData.maps ?? [];
+            window.mapData!.map = mapManager.window.mapData.map ?? {};
             window.game = window.game ?? mapManager.window.game;
         } else {
             throw new Error("Unable to find map data");

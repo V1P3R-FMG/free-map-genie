@@ -239,7 +239,10 @@ export class FMG_Map {
             appendTo: window.document.body
         });
 
-        return timeout(waitForGlobals(["axios", "store"], window), 10000);
+        return timeout(
+            waitForGlobals(["axios", "store", "mapData", "game"], window),
+            10000
+        );
     }
 
     /**
@@ -359,8 +362,11 @@ export class FMG_Map {
         // We need to do this after the map script is loaded,
         mapManager.init();
 
-        // Attach ui
-        FMG_Map.attachUI(mapManager);
+        // Only attach ui if we are not in mini mode
+        if (!window.isMini) {
+            // Attach ui
+            FMG_Map.attachUI(mapManager);
+        }
 
         return mapManager;
     }
