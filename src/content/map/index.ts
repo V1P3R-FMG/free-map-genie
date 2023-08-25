@@ -9,8 +9,8 @@ import { FMG_MapManager } from "../../fmg/map-manager";
 import { FMG_StorageDataMigrator } from "@fmg/storage/migration";
 import { FMG_UI } from "./ui";
 
-import setupMapApiFilter from "./filters/api-filter";
-import setupMapStorageFilter from "./filters/storage-filter";
+import setupApiFilter from "@/content/filters/api-filter";
+import setupStorageFilter from "@/content/filters/storage-filter";
 
 export const FmgMapInstalled = Symbol("FmgMapInstalled");
 
@@ -42,6 +42,7 @@ export class FMG_Map {
      * @param window the window to load the user in
      */
     private static loadUser(mapManager: FMG_MapManager) {
+        const window = mapManager.window;
         if (window.user) {
             window.user.trackedCategoryIds =
                 mapManager.storage.data.categoryIds;
@@ -51,9 +52,13 @@ export class FMG_Map {
             window.user.gameLocationsCount =
                 mapManager.storage.data.locationIds.length;
             window.user.presets = mapManager.storage.data.presets;
+        } else {
+            throw new Error("User not found");
         }
         if (window.mapData) {
             window.mapData.notes = mapManager.storage.data.notes;
+        } else {
+            throw new Error("Map data not found");
         }
     }
 
@@ -234,7 +239,7 @@ export class FMG_Map {
             appendTo: window.document.body
         });
 
-        return timeout(waitForGlobals(["axios", "store"], window), 10 * 1000);
+        return timeout(waitForGlobals(["axios", "store"], window), 10000);
     }
 
     /**
@@ -330,7 +335,7 @@ export class FMG_Map {
 
         // Install storage filter, before we load the blocked map script
         const storageFilter = FMG_StorageFilter.install(mapManager.window);
-        setupMapStorageFilter(storageFilter, mapManager);
+        setupStorageFilter(storageFilter, mapManager);
 
         // If we have loaded a pro map, remember the map name so we can restore the url later.
         const map = new URL(window.location.href).searchParams.get("map");
@@ -348,7 +353,7 @@ export class FMG_Map {
 
         // Install api filter, after we loaded the blocked map script
         const apiFilter = FMG_ApiFilter.install(mapManager.window);
-        setupMapApiFilter(apiFilter, mapManager);
+        setupApiFilter(apiFilter, mapManager);
 
         // Finisish mapManager initialization
         // We need to do this after the map script is loaded,

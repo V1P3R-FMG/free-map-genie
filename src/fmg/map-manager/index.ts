@@ -28,7 +28,7 @@ export class FMG_MapManager {
     }
 
     public init() {
-        this._store = FMG_Store.install(window, this);
+        this._store = FMG_Store.install(this.window, this);
 
         if (this.window.mapManager) {
             this._autoPanPopup = this.window.mapManager?.autoPanPopup;

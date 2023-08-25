@@ -1,5 +1,6 @@
 import { getPageType } from "@fmg/page";
 import { FMG_Map } from "./map";
+import { FMG_Guide } from "./guide";
 import { FMG_MapSelector } from "./map-selector";
 
 function listenForRefocus(callback: () => void) {
@@ -60,6 +61,10 @@ async function init() {
         if (map) {
             listenForRefocus(() => map.reload());
         }
+        return true;
+    } else if (type === "guide") {
+        const guide = await FMG_Guide.setup(window);
+        listenForRefocus(() => guide.reload());
         return true;
     } else if (type === "map-selector") {
         await FMG_MapSelector.setup(window);

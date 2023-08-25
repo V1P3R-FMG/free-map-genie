@@ -1,4 +1,5 @@
 import { isEmpty } from "@shared/utils";
+import { FMG_Keys } from "@fmg/storage/keys";
 import type { LegacyResult } from ".";
 
 export type V1_FMG_StorageObject = FMG.Storage.V1.StorageObject;
@@ -7,8 +8,7 @@ export class V1_FMG_Storage {
     private driver: FMG.Storage.Driver;
     private keys: string[] | null = null; // Cache the keys
 
-    public static regexp =
-        /^mg:game_(?<gameId>\d+):user_(?<userId>[-]?\d+):v5$/;
+    public static regexp = FMG_Keys.getV1KeyMatch({});
 
     constructor(driver: FMG.Storage.Driver) {
         this.driver = driver;

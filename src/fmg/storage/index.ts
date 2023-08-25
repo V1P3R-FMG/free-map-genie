@@ -14,7 +14,7 @@ export class FMG_Storage {
     public readonly keys: FMG_Keys;
 
     public driver: FMG.Storage.Driver;
-    public data: FMG_Data;
+    public _data: Record<string, FMG_Data> = {};
 
     private listeners: (() => void)[] = [];
 
@@ -24,7 +24,15 @@ export class FMG_Storage {
 
         this.driver = FMG_Drivers.newLocalStorageDriver(window);
 
-        this.data = FMG_Data.create({}, () => this.save());
+        this._data[this.keys.v2Key] = FMG_Data.create({}, () => this.save());
+    }
+
+    public get data(): FMG_Data {
+        return this._data[this.keys.v2Key];
+    }
+
+    public get all(): Record<string, FMG_Data> {
+        return this._data;
     }
 
     /**
@@ -77,25 +85,47 @@ export class FMG_Storage {
      * Loads the data from the storage.
      */
     public async load(): Promise<void> {
-        const data = await this.driver.get<FMG.Storage.V2.StorageObject>(
-            this.key
-        );
-        this.data = FMG_Data.create(data ?? {}, () => this.save());
+        if (this.window && this.window.mapData && this.window.isMini) {
+            await Promise.all(
+                this.window.mapData.maps.map(async (map) => {
+                    const key = FMG_Keys.getV2Key({
+                        ...this.keys.keyData,
+                        mapId: map.id
+                    });
+                    const data =
+                        await this.driver.get<FMG.Storage.V2.StorageObject>(
+                            key
+                        );
+                    this._data[key] = FMG_Data.create(data ?? {}, () =>
+                        this.save()
+                    );
+                })
+            );
+        } else {
+            const data = await this.driver.get<FMG.Storage.V2.StorageObject>(
+                this.key
+            );
+            this._data[this.keys.v2Key] = FMG_Data.create(data ?? {}, () =>
+                this.save()
+            );
+        }
     }
 
     /**
      * Saves the data to the storage.
      */
     public async save(): Promise<void> {
-        logger.debug("Saving storage", this.key);
+        for (const [key, data] of Object.entries(this._data)) {
+            logger.debug("Saving storage", key);
 
-        // Deep filter out empty values.
-        const obj = deepFilter(this.data, isNotEmpty);
+            // Deep filter out empty values.
+            const obj = deepFilter(data, isNotEmpty);
 
-        if (Object.values(obj).every(isEmpty)) {
-            await this.driver.remove(this.key);
-        } else {
-            await this.driver.set<FMG.Storage.V2.StorageObject>(this.key, obj);
+            if (Object.values(obj).every(isEmpty)) {
+                await this.driver.remove(key);
+            } else {
+                await this.driver.set<FMG.Storage.V2.StorageObject>(key, obj);
+            }
         }
 
         this.listeners.forEach((listener) => listener());
@@ -106,7 +136,12 @@ export class FMG_Storage {
      */
     public async clear(): Promise<void> {
         await this.driver.remove(this.key);
-        this.data = FMG_Data.create({}, () => this.save());
+        this._data = Object.fromEntries(
+            Object.entries(this._data).map(([key]) => [
+                key,
+                FMG_Data.create({}, () => this.save())
+            ])
+        );
         this.listeners.forEach((listener) => listener());
     }
 
