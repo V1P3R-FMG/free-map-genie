@@ -39,10 +39,18 @@ export class FMG_Checkbox {
 
     public async getMapId(): Promise<Id> {
         if (this.mapId) return this.mapId;
-        const maps = FMG_Maps.get(this.mapManager.storage.keys.keyData.gameId);
-        const map = await maps.getMapForLocation(this.getLocationId());
-        this.mapId = map.map.id;
-        return this.mapId;
+        const id = this.input.getAttribute("data-map-id");
+        if (id) {
+            this.mapId = id;
+            return this.mapId;
+        } else {
+            const maps = FMG_Maps.get(
+                this.mapManager.storage.keys.keyData.gameId
+            );
+            const map = await maps.getMapForLocation(this.getLocationId());
+            this.mapId = map.map.id;
+            return this.mapId;
+        }
     }
 
     public async mark(marked: boolean) {
