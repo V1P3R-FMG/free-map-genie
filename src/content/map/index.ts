@@ -190,7 +190,7 @@ export class FMG_Map {
                     }
                 }
 
-                if (!link.href.endsWith("/upgrade")) return;
+                if (!link.href || !link.href.endsWith("/upgrade")) return;
 
                 // Fix name
                 // link.innerText = mapName;
