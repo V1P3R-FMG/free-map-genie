@@ -29,6 +29,11 @@
 > import or export map data using the browser action.
 > In case you want to switch browser or devices, or even if you want to keep a backup.
 
+> [!WARNING]
+> Data will be stored locally in your browser, This means if you clear your browser cache, Data will
+> be lost as well. You can use the [data page](/docs/popup.md#data) to export data and import it back
+> later.
+
 <h1>PRO Feature Support</h1>
 <table>
 	<tr>
@@ -48,15 +53,15 @@
 		<td align="center">✔️</td>
 	</tr>
 	<tr>
-		<td>Remember Categories Setting</td>
+		<td>Pro Settings</td>
 		<td align="center">✔️</td>
 	</tr>
 	<tr>
-		<td>Early Access Maps</td>
+		<td>Pro Maps (Tarkov)</td>
 		<td align="center">✔️</td>
 	</tr>
 	<tr>
-		<td>Notes</td>
+		<td>Unlimited Notes*</td>
 		<td align="center">✔️</td>
 	</tr>
 </table>
@@ -64,10 +69,13 @@
 > [!NOTE]
 > If a feature is not listed you can make a feature request in [issues](https://github.com/V1P3R-FMG/free-map-genie/issues).
 
+> [!NOTE]
+> \*Notes cannot be shared at the moment, they only exist in your browser storage.
+ 
 <hr/>
-<h1>Quick Links</h1>
+<h1>Documentation</h1>
 <ul>
-	<!-- TODO add tutorials and links to it -->
+	<li><a href="/docs/popup.md">Browser Action Popup</li>
 </ul>
 
 <hr/>

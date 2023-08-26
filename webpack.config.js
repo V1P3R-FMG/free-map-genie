@@ -242,6 +242,7 @@ export default (env) => {
                 target: browser === "chrome" ? "chromium" : "firefox-desktop",
                 devtools: true,
                 selfHosted: true,
+                firefox: process.env.FIREFOX_BIN,
                 firefoxProfile: process.env.FIREFOX_PROFILE,
                 chromiumProfile: process.env.CHROMIUM_PROFILE,
                 keepProfileChanges: process.env.KEEP_PROFILE_CHANGES === "true",
