@@ -54,3 +54,7 @@ export function createScript(options: CreateScriptOptions): HTMLScriptElement {
 
     return script;
 }
+
+export function documentLoaded(window: Window): Promise<void> {
+    return waitForCallback(() => window.document.readyState === "complete");
+}

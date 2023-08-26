@@ -282,7 +282,8 @@ export class FMG_Map {
      * Setup
      */
     public static async setup(
-        window: Window
+        window: Window,
+        mapManager?: FMG_MapManager
     ): Promise<FMG_MapManager | undefined> {
         // Fix google maps global object
         FMG_Map.fixGoogleMaps(window);
@@ -307,6 +308,7 @@ export class FMG_Map {
         if (!window.user) {
             // If no user is logged in restore the map script and exit.
             await FMG_Map.loadMapScript(window);
+            logger.warn("No user found!");
             return;
         }
 
@@ -318,7 +320,7 @@ export class FMG_Map {
         await FMG_Map.loadMapData(window);
 
         // Initialize mapManager
-        const mapManager = new FMG_MapManager(window);
+        mapManager = mapManager ?? new FMG_MapManager(window);
 
         // Load map data
         await mapManager.load();

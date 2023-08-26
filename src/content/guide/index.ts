@@ -1,5 +1,5 @@
-import { timeout, waitForGlobals } from "@shared/async";
-import { getElement, getElementWithXPath } from "@shared/dom";
+import { timeout, waitForCallback, waitForGlobals } from "@shared/async";
+import { getElement, getElementWithXPath, documentLoaded } from "@shared/dom";
 
 import { FMG_Map } from "@content/map";
 import { FMG_ApiFilter } from "@fmg/filters/api-filter";
@@ -16,16 +16,13 @@ export class FMG_Guide {
     /**
      * Setup the mini map
      */
-    public static async setupMiniMap(window: Window): Promise<FMG_MapManager> {
-        // Get the map iframe element
-        const mapElement = await timeout(
-            getElement<HTMLIFrameElement>("#sticky-map iframe", window),
-            10000
-        );
-
+    public static async setupMiniMap(
+        mapElement?: HTMLIFrameElement,
+        mapManager?: FMG_MapManager
+    ): Promise<FMG_MapManager> {
         // Setup the map
         if (mapElement?.contentWindow) {
-            const mapManager = await FMG_Map.setup(mapElement?.contentWindow);
+            mapManager = await FMG_Map.setup(mapElement?.contentWindow);
             if (!mapManager) {
                 throw new Error("Unable to setup map");
             }
@@ -60,13 +57,39 @@ export class FMG_Guide {
      * Setup the guide
      */
     public static async setup(window: Window): Promise<FMG_GuideSetupResult> {
+        // Get the map iframe element
+        const mapElement = await timeout(
+            getElement<HTMLIFrameElement>("#sticky-map iframe", window),
+            10000
+        );
+
+        // Wait for the window to load
+        await timeout(
+            waitForCallback(() => !!mapElement?.contentWindow),
+            10000
+        );
+
+        // Wait for the map data to load
+        await timeout(
+            waitForGlobals(["mapData"], mapElement.contentWindow!),
+            10000
+        );
+
         // Setup the mini map
-        const mapManager = await FMG_Guide.setupMiniMap(window);
+        let mapManager = await FMG_Guide.setupMiniMap(mapElement);
+
+        // Wait for the document to load
+        await timeout(documentLoaded(mapElement.contentWindow!), 10000);
+
+        // Listen for src changes
+        mapElement?.addEventListener("load", async () => {
+            mapManager = await FMG_Guide.setupMiniMap(mapElement);
+            await mapManager.reload();
+        });
 
         if (mapManager.window.mapData) {
             window.mapData = window.mapData ?? ({} as any);
             window.mapData!.maps = mapManager.window.mapData.maps ?? [];
-            window.mapData!.map = mapManager.window.mapData.map ?? {};
             window.game = window.game ?? mapManager.window.game;
         } else {
             throw new Error("Unable to find map data");
