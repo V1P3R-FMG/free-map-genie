@@ -75,7 +75,12 @@
 <hr/>
 <h1>Documentation</h1>
 <ul>
-	<li><a href="/docs/popup.md">Browser Action Popup</li>
+	<li><a href="/docs/popup.md">Browser Action Popup</a></li>
+    <li>Extension Installation</li>
+    <ul>
+        <li><a href="/docs/installation/chrome.md">Chrome installation</a></li>
+        <li><a href="/docs/installation/firefox.md">Firefox installation</a></li>
+    </ul>
 </ul>
 
 <hr/>
