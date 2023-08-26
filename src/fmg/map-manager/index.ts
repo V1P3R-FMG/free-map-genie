@@ -67,9 +67,13 @@ export class FMG_MapManager {
 
     public updatePopup() {
         const location = this.store.getState().map.selectedLocation;
-        if (location) {
+        if (location && this.isPopupOpen()) {
             this.window.mapManager?.openInfoWindow(location);
         }
+    }
+
+    public isPopupOpen(): boolean {
+        return !!this.window.document.querySelector("#marker-info");
     }
 
     public addNote(note: MG.Note) {

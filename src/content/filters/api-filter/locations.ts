@@ -9,7 +9,7 @@ export default function (filter: FMG_ApiFilter, mapManager: FMG_MapManager) {
         (_method, _key, id, _data, _url, block) => {
             logger.debug("mark location", id);
             mapManager.storage.data.locations[id] = true;
-            mapManager.updatePopup();
+            //mapManager.updatePopup();
             mapManager.store.update();
             mapManager.fire("fmg-location", {
                 id,
@@ -26,7 +26,7 @@ export default function (filter: FMG_ApiFilter, mapManager: FMG_MapManager) {
         (_method, _key, id, _data, _url, block) => {
             logger.debug("unmark location", id);
             delete mapManager.storage.data.locations[id];
-            mapManager.updatePopup();
+            //mapManager.updatePopup();
             mapManager.store.update();
             mapManager.fire("fmg-location", {
                 id,
