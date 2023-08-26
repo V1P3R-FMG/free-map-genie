@@ -40,19 +40,7 @@ export class FMG_Data {
             enumerable: false,
             configurable: false,
             writable: false,
-            value: (changes: ProxyObserve.Change[]) => {
-                const skip = changes.every((change) =>
-                    FMG_Data.ignoreKeys.includes(change.name)
-                );
-                logger.debug("Data changed", {
-                    autosave: FMG_Data.autosave,
-                    skipped: skip,
-                    changes
-                });
-                if (skip) return;
-                if (!FMG_Data.autosave) return;
-                callback();
-            }
+            value: FMG_Data.createCallback(callback)
         });
 
         const dataObj = Object.setPrototypeOf(
@@ -61,6 +49,56 @@ export class FMG_Data {
         ) as FMG_Data;
 
         return Object.deepObserve(dataObj, dataObj.callback);
+    }
+
+    /**
+     * Creates a callback that will be called when the data changes.
+     * @param callback the callback to call when the data changes.
+     * @returns the callback that will be called when the data changes.
+     */
+    private static createCallback(
+        callback: () => void
+    ): (changes: ProxyObserve.Change[]) => void {
+        let timer: number;
+        let totalChanges: ProxyObserve.Change[] = [];
+        let totalSkippedChanges: ProxyObserve.Change[] = [];
+
+        function pushChanges(changes: ProxyObserve.Change[], skipped = false) {
+            // Clear previous timer
+            window.clearTimeout(timer);
+
+            // Add changes to the total changes/skipped changes
+            if (skipped) totalSkippedChanges.push(...changes);
+            else totalChanges.push(...changes);
+
+            // Set a new timer
+            timer = window.setTimeout(() => {
+                // Log the changes
+                logger.debug("Data changed", {
+                    changes: totalChanges,
+                    skippedChanges: totalSkippedChanges
+                });
+
+                // Only call the callback if there are changes that are not ignored
+                if (totalChanges.length > 0) {
+                    callback();
+                }
+
+                // Reset the changes
+                totalChanges = [];
+                totalSkippedChanges = [];
+            }, 200);
+        }
+
+        return (changes: ProxyObserve.Change[]) => {
+            pushChanges(
+                changes,
+                !FMG_Data.autosave ||
+                    changes.every((change) =>
+                        FMG_Data.ignoreKeys.includes(change.name)
+                    )
+            );
+        };
     }
 
     get autosave(): boolean {

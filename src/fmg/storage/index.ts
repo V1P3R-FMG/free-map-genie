@@ -114,8 +114,6 @@ export class FMG_Storage {
      */
     public async save(): Promise<void> {
         for (const [key, data] of Object.entries(this._data)) {
-            logger.debug("Saving storage", key);
-
             // Deep filter out empty values.
             const obj = deepFilter(data, isNotEmpty);
 
@@ -125,6 +123,7 @@ export class FMG_Storage {
                 await this.driver.set<FMG.Storage.V2.StorageObject>(key, obj);
             }
         }
+        logger.debug("Saving storage", this._data);
     }
 
     /**
