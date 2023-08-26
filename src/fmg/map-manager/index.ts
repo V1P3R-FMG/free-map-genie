@@ -88,6 +88,10 @@ export class FMG_MapManager {
         await this.storage.save();
     }
 
+    public markLocationFound(locationId: Id, found: boolean) {
+        this.window.mapManager?.setLocationFound(locationId, found);
+    }
+
     /**
      * Resync the map data.
      * This makes it possible to open multiple tabs of the same map at the same time.
@@ -102,7 +106,7 @@ export class FMG_MapManager {
 
         // Reload locations from storage
         state.map.locations.forEach((location) => {
-            this.window.mapManager?.setLocationFound(
+            this.markLocationFound(
                 location.id,
                 this.storage.data.locations[location.id] ?? false
             );
