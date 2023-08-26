@@ -87,6 +87,7 @@ export class FMG_Guide {
             await mapManager.reload();
         });
 
+        // Load data from iframe contentWindow to main window
         if (mapManager.window.mapData) {
             window.mapData = window.mapData ?? ({} as any);
             window.mapData!.maps = mapManager.window.mapData.maps ?? [];
@@ -95,11 +96,14 @@ export class FMG_Guide {
             throw new Error("Unable to find map data");
         }
 
+        // Setup the checkbox manager
         const checkboxManager = new FMG_CheckboxManager(window, mapManager);
         checkboxManager.reload();
 
+        // Wait for axios to load
         await timeout(waitForGlobals(["axios"], window), 10000);
 
+        // Cleanup pro ads, but don't wait for it
         FMG_Guide.cleanupProAds(window).catch();
 
         // Setup the api filter
