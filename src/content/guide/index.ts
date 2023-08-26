@@ -81,12 +81,6 @@ export class FMG_Guide {
         // Wait for the document to load
         await timeout(documentLoaded(mapElement.contentWindow!), 10000);
 
-        // Listen for src changes
-        mapElement?.addEventListener("load", async () => {
-            mapManager = await FMG_Guide.setupMiniMap(mapElement);
-            await mapManager.reload();
-        });
-
         // Load data from iframe contentWindow to main window
         if (mapManager.window.mapData) {
             window.mapData = window.mapData ?? ({} as any);
@@ -99,6 +93,20 @@ export class FMG_Guide {
         // Setup the checkbox manager
         const checkboxManager = new FMG_CheckboxManager(window, mapManager);
         checkboxManager.reload();
+
+        // Listen for location marks
+        mapManager.on("fmg-location", (e) => {
+            checkboxManager.mark(e.detail.id, e.detail.marked);
+        });
+
+        // Listen for src changes
+        mapElement?.addEventListener("load", async () => {
+            mapManager = await FMG_Guide.setupMiniMap(mapElement);
+            mapManager.on("fmg-location", (e) => {
+                checkboxManager.mark(e.detail.id, e.detail.marked);
+            });
+            await mapManager.reload();
+        });
 
         // Wait for axios to load
         await timeout(waitForGlobals(["axios"], window), 10000);

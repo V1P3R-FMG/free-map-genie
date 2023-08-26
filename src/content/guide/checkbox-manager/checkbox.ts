@@ -13,11 +13,17 @@ export class FMG_Checkbox {
 
         this.mapManager = mapManager;
 
+        // We watch for changes to the checkbox
         this.input.addEventListener("change", async () => {
-            await this.mark(this.input.checked);
+            await this._mark(this.input.checked);
         });
     }
 
+    /**
+     * Replaces Mapgenie's checkbox with our own
+     * @param input the input element to replace
+     * @returns the new input element
+     */
     private replaceInput(input: HTMLInputElement): HTMLInputElement {
         const clone = input.cloneNode(true) as HTMLInputElement;
         clone.classList.add("fmg-checkbox");
@@ -26,6 +32,10 @@ export class FMG_Checkbox {
         return clone;
     }
 
+    /**
+     * Get the location id for this checkbox
+     * @returns the location id
+     */
     public getLocationId(): Id {
         if (this.locationId) return this.locationId;
         // Get location id
@@ -37,6 +47,10 @@ export class FMG_Checkbox {
         return this.locationId;
     }
 
+    /**
+     * Get the map id for this checkbox
+     * @returns the map id
+     */
     public async getMapId(): Promise<Id> {
         if (this.mapId) return this.mapId;
         const id = this.input.getAttribute("data-map-id");
@@ -53,7 +67,11 @@ export class FMG_Checkbox {
         }
     }
 
-    public async mark(marked: boolean) {
+    /**
+     * Mark the checkbox as checked or not
+     * @param marked whether the checkbox should be marked or not
+     */
+    private async _mark(marked: boolean): Promise<void> {
         const locationId = this.getLocationId();
         const mapId = await this.getMapId();
         const key = this.mapManager.storage.keys.getV2KeyForMap(mapId);
@@ -62,17 +80,25 @@ export class FMG_Checkbox {
         } else {
             delete this.mapManager.storage.all[key].locations[locationId];
         }
+        this.mapManager.markLocationFound(locationId, marked);
     }
 
-    private _mark(marked: boolean) {
+    /**
+     * Visualy mark the checkbox as checked or not
+     * @param marked whether the checkbox should be marked or not
+     */
+    public mark(marked: boolean): void {
         this.input.checked = marked;
     }
 
-    public async load() {
+    /**
+     * Load the checkbox state from storage
+     */
+    public async load(): Promise<void> {
         const locationId = this.getLocationId();
         const value = Object.values(this.mapManager.storage.all).some(
-            (data) => data.locations[locationId]
+            (data) => data.locations[locationId] ?? false
         );
-        this._mark(value);
+        this.mark(value);
     }
 }

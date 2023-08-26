@@ -97,7 +97,10 @@ export class FMG_MapManager {
      * @param event the event to listen for
      * @param callback the callback to call when the event is fired
      */
-    public on(event: keyof WindowEventMap, callback: EventListener) {
+    public on<E extends keyof WindowEventMap>(
+        event: E,
+        callback: (e: WindowEventMap[E]) => void
+    ) {
         this.window.addEventListener(event, callback);
     }
 
