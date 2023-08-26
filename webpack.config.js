@@ -7,7 +7,6 @@ dotenv.config();
 
 import HtmlWebpackPlugin from "html-webpack-plugin";
 import TsconfigPathsPlugin from "tsconfig-paths-webpack-plugin";
-import ForkTsCheckerPlugin from "fork-ts-checker-webpack-plugin";
 import WebpackExtensionManifestPlugin from "webpack-extension-manifest-plugin";
 import WebExtPlugin from "web-ext-plugin";
 import CopyPlugin from "copy-webpack-plugin";
@@ -218,9 +217,6 @@ export default (env) => {
 
             // Vue loader
             new VueLoaderPlugin(),
-
-            // Lint the typescript
-            new ForkTsCheckerPlugin(),
 
             // Generate the manifest
             new WebpackExtensionManifestPlugin({
