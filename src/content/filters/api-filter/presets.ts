@@ -32,6 +32,11 @@ export default function (filter: FMG_ApiFilter, mapManager: FMG_MapManager) {
             mapManager.storage.data.autosave = true;
             mapManager.storage.save();
 
+            mapManager.fire("fmg-preset", {
+                preset: mapManager.storage.data.presets[id],
+                action: "added"
+            });
+
             block();
             return { data };
         }
@@ -78,6 +83,10 @@ export default function (filter: FMG_ApiFilter, mapManager: FMG_MapManager) {
             mapManager.storage.data.autosave = true;
             mapManager.storage.save();
 
+            mapManager.fire("fmg-preset", {
+                action: "removed"
+            });
+
             block();
             return;
         }
@@ -91,6 +100,10 @@ export default function (filter: FMG_ApiFilter, mapManager: FMG_MapManager) {
             logger.debug("Reordering presets", data.ordering);
             mapManager.storage.data.presetOrder = data.ordering;
             mapManager.updatePresets();
+            mapManager.fire("fmg-preset", {
+                ordering: data.ordering,
+                action: "reordered"
+            });
             block();
             return;
         }

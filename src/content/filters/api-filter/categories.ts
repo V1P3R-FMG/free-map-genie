@@ -9,6 +9,10 @@ export default function (filter: FMG_ApiFilter, mapManager: FMG_MapManager) {
         (_method, _key, _id, data, _url, block) => {
             logger.debug("track category", data.category);
             mapManager.storage.data.categories[data.category] = true;
+            mapManager.fire("fmg-category", {
+                id: data.category,
+                tracked: true
+            });
             block();
         }
     );
@@ -20,6 +24,10 @@ export default function (filter: FMG_ApiFilter, mapManager: FMG_MapManager) {
         (_method, _key, id, _data, _url, block) => {
             logger.debug("untrack category", id);
             delete mapManager.storage.data.categories[id];
+            mapManager.fire("fmg-category", {
+                id,
+                tracked: false
+            });
             block();
         }
     );

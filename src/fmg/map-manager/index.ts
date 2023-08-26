@@ -93,6 +93,39 @@ export class FMG_MapManager {
     }
 
     /**
+     * Attaches an event listener to the window.
+     * @param event the event to listen for
+     * @param callback the callback to call when the event is fired
+     */
+    public on(event: keyof WindowEventMap, callback: EventListener) {
+        this.window.addEventListener(event, callback);
+    }
+
+    /**
+     * Removes an event listener from the window.
+     * @param event the event to remove the listener from
+     * @param callback the callback to remove
+     */
+    public off(event: keyof WindowEventMap, callback: EventListener) {
+        this.window.removeEventListener(event, callback);
+    }
+
+    /**
+     * Fires an event on the window.
+     * @param event the event to fire
+     */
+    public fire<T extends keyof WindowFmgEventsMap>(
+        event: T,
+        detail?: WindowEventMap[T]["detail"]
+    ) {
+        this.window.dispatchEvent(
+            new CustomEvent(event, {
+                detail
+            })
+        );
+    }
+
+    /**
      * Resync the map data.
      * This makes it possible to open multiple tabs of the same map at the same time.
      * Or if you have the map op and guide at the same time.

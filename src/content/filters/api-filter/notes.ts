@@ -17,6 +17,7 @@ export default function (filter: FMG_ApiFilter, mapManager: FMG_MapManager) {
         "notes",
         false,
         (_method, _key, _id, data, _url, block) => {
+            // Create a new note
             const note = {
                 ...data,
                 category: null,
@@ -24,7 +25,14 @@ export default function (filter: FMG_ApiFilter, mapManager: FMG_MapManager) {
                 user_id: mapManager.window.user?.id ?? -1
             };
             logger.debug("create note", note);
+
+            // Add the note to the notes array
             mapManager.storage.data.notes.push(note);
+
+            mapManager.fire("fmg-note", {
+                note,
+                action: "added"
+            });
             block();
             return { data: note };
         }
@@ -36,18 +44,22 @@ export default function (filter: FMG_ApiFilter, mapManager: FMG_MapManager) {
         true,
         (_method, _key, id, data, _url, block) => {
             logger.debug("update note", id, data);
-            mapManager.storage.data.notes = mapManager.storage.data.notes.map(
-                (note) => {
-                    if (note.id == id) {
-                        return {
-                            ...note,
-                            ...data
-                        };
-                    }
-                    return note;
-                }
+            const note = mapManager.storage.data.notes.find(
+                (note) => note.id == id
             );
+
+            // If the note doesn't exist, return
+            if (!note) return;
+
+            // Assign the new data to the note
+            Object.assign(note, data);
+
+            mapManager.fire("fmg-note", {
+                note,
+                action: "updated"
+            });
             block();
+            return { data: note };
         }
     );
 
@@ -57,8 +69,14 @@ export default function (filter: FMG_ApiFilter, mapManager: FMG_MapManager) {
         true,
         (_method, _key, id, _data, _url, block) => {
             logger.debug("delete note", id);
+
+            // Filter out the note with the given id
             mapManager.storage.data.notes =
                 mapManager.storage.data.notes.filter((note) => note.id != id);
+
+            mapManager.fire("fmg-note", {
+                action: "removed"
+            });
             block();
         }
     );

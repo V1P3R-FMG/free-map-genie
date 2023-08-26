@@ -11,6 +11,10 @@ export default function (filter: FMG_ApiFilter, mapManager: FMG_MapManager) {
             mapManager.storage.data.locations[id] = true;
             mapManager.updatePopup();
             mapManager.store.update();
+            mapManager.fire("fmg-location", {
+                id,
+                marked: true
+            });
             block();
         }
     );
@@ -24,6 +28,10 @@ export default function (filter: FMG_ApiFilter, mapManager: FMG_MapManager) {
             delete mapManager.storage.data.locations[id];
             mapManager.updatePopup();
             mapManager.store.update();
+            mapManager.fire("fmg-location", {
+                id,
+                marked: false
+            });
             block();
         }
     );

@@ -16,8 +16,6 @@ export class FMG_Storage {
     public driver: FMG.Storage.Driver;
     public _data: Record<string, FMG_Data> = {};
 
-    private listeners: (() => void)[] = [];
-
     public constructor(window: Window, keyData: FMG.Storage.KeyData) {
         this.window = window;
         this.keys = new FMG_Keys(keyData);
@@ -127,8 +125,6 @@ export class FMG_Storage {
                 await this.driver.set<FMG.Storage.V2.StorageObject>(key, obj);
             }
         }
-
-        this.listeners.forEach((listener) => listener());
     }
 
     /**
@@ -142,14 +138,5 @@ export class FMG_Storage {
                 FMG_Data.create({}, () => this.save())
             ])
         );
-        this.listeners.forEach((listener) => listener());
-    }
-
-    /**
-     * Adds a listener to the storage.
-     * @param listener the listener to add
-     */
-    public subscribe(listener: () => void): void {
-        this.listeners.push(listener);
     }
 }
