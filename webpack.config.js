@@ -141,6 +141,16 @@ export default (env) => {
                     use: [
                         "import-glob",
                         {
+                            loader: "ifdef-loader",
+                            options: {
+                                DEBUG: isDev,
+                                BROWSER: browser,
+                                VERSION: packageJson.version,
+                                CHROME: browser === "chrome",
+                                FIREFOX: browser === "firefox"
+                            }
+                        },
+                        {
                             loader: "swc-loader",
                             options: {
                                 jsc: {
@@ -149,16 +159,6 @@ export default (env) => {
                                     },
                                     target: "esnext"
                                 }
-                            }
-                        },
-                        {
-                            loader: "ifdef-loader",
-                            options: {
-                                DEBUG: isDev,
-                                BROWSER: browser,
-                                VERSION: packageJson.version,
-                                CHROME: browser === "chrome",
-                                FIREFOX: browser === "firefox"
                             }
                         }
                     ]
