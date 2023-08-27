@@ -36,7 +36,7 @@ export class FMG_Maps {
      */
     public async all(): Promise<FMG_MapData[]> {
         // Check if the current game is the game we are looking for
-        const isCurrentGame = window.game?.id === this.gameId;
+        const isCurrentGame = window.game?.id == this.gameId;
 
         // If we are looking for the current game.
         // Use the window.mapData, else use the FMG_Games
@@ -96,5 +96,17 @@ export class FMG_Maps {
                 ])
                 .filter(([_, categories]) => (categories as Id[]).length > 0)
         );
+    }
+
+    /**
+     * Get the map for a given location id.
+     * @param locationId the location id to get the map for
+     * @returns the map for the given location id
+     */
+    public async getMapForLocation(locationId: Id): Promise<FMG_MapData> {
+        const maps = await this.all();
+        const map = maps.find((map) => !!map.locationsById[locationId]);
+        if (!map) throw new Error("Could not find map for location");
+        return map;
     }
 }

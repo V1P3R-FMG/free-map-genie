@@ -16,7 +16,13 @@ const { paths, baseUrl } = compilerOptions ?? {};
 export default {
     verbose: true,
     transform: {
-        "\\.ts$": "ts-jest"
+        "\\.ts$": [
+            "ts-jest",
+            {
+                tsconfig: "./tests/tsconfig.json",
+                diagnostics: false
+            }
+        ]
     },
     roots: ["tests"],
     modulePaths: baseUrl ? [baseUrl] : [],

@@ -7,7 +7,6 @@ dotenv.config();
 
 import HtmlWebpackPlugin from "html-webpack-plugin";
 import TsconfigPathsPlugin from "tsconfig-paths-webpack-plugin";
-import ForkTsCheckerPlugin from "fork-ts-checker-webpack-plugin";
 import WebpackExtensionManifestPlugin from "webpack-extension-manifest-plugin";
 import WebExtPlugin from "web-ext-plugin";
 import CopyPlugin from "copy-webpack-plugin";
@@ -141,13 +140,13 @@ export default (env) => {
                     use: [
                         "import-glob",
                         {
-                            loader: "string-replace-loader",
+                            loader: "ifdef-loader",
                             options: {
-                                search: "logger.(\\w+)\\((.+?)\\);?",
-                                replace(_, p1, p2) {
-                                    return `logger.${p1}(${p2})()`;
-                                },
-                                flags: "g"
+                                DEBUG: isDev,
+                                BROWSER: browser,
+                                VERSION: packageJson.version,
+                                CHROME: browser === "chrome",
+                                FIREFOX: browser === "firefox"
                             }
                         },
                         {
@@ -159,16 +158,6 @@ export default (env) => {
                                     },
                                     target: "esnext"
                                 }
-                            }
-                        },
-                        {
-                            loader: "ifdef-loader",
-                            options: {
-                                DEBUG: isDev,
-                                BROWSER: browser,
-                                VERSION: packageJson.version,
-                                CHROME: browser === "chrome",
-                                FIREFOX: browser === "firefox"
                             }
                         }
                     ]
@@ -229,9 +218,6 @@ export default (env) => {
             // Vue loader
             new VueLoaderPlugin(),
 
-            // Lint the typescript
-            new ForkTsCheckerPlugin(),
-
             // Generate the manifest
             new WebpackExtensionManifestPlugin({
                 config: {
@@ -244,11 +230,19 @@ export default (env) => {
             // Generate the extension
             new WebExtPlugin({
                 sourceDir: dist,
-                artifactsDir: dist,
-                outputFilename: `fmg-${browser}-v${packageJson.version}`,
+                artifactsDir: "./dist",
+                outputFilename:
+                    `fmg-${browser}-v${packageJson.version}` +
+                    (mode === "production"
+                        ? browser === "chrome"
+                            ? ".zip"
+                            : ".xpi"
+                        : ""),
+                overwriteDest: true,
                 target: browser === "chrome" ? "chromium" : "firefox-desktop",
                 devtools: true,
                 selfHosted: true,
+                firefox: process.env.FIREFOX_BIN,
                 firefoxProfile: process.env.FIREFOX_PROFILE,
                 chromiumProfile: process.env.CHROMIUM_PROFILE,
                 keepProfileChanges: process.env.KEEP_PROFILE_CHANGES === "true",

@@ -4,56 +4,23 @@ import { timeout, waitForGlobals } from "@shared/async";
 import { FMG_ApiFilter } from "@fmg/filters/api-filter";
 import { FMG_StorageFilter } from "@fmg/filters/storage-filter";
 import { FMG_MapData } from "@fmg/info/map-data";
-import { FMG_Data } from "@fmg/data";
-import { FMG_MapManager } from "./map-manager";
-
-import { FMG_Drivers } from "@fmg/storage/drivers";
+import { FMG_ExtensionData } from "@fmg/extension-data";
+import { FMG_MapManager } from "../../fmg/map-manager";
 import { FMG_StorageDataMigrator } from "@fmg/storage/migration";
-import { FMG_Storage } from "@fmg/storage";
-import { FMG_KeyDataHelper } from "@fmg/storage/helpers/key-data";
+import { FMG_UI } from "./ui";
 
-import setupMapApiFilter from "./filters/api-filter";
-import setupMapStorageFilter from "./filters/storage-filter";
+import setupApiFilter from "@/content/filters/api-filter";
+import setupStorageFilter from "@/content/filters/storage-filter";
 
 export const FmgMapInstalled = Symbol("FmgMapInstalled");
 
 export type FmgMapWindow = Window & { [FmgMapInstalled]?: FMG_Map };
 
-// TODO: fix popup link copy for pro maps
 /**
  * The fmg map script
  * Handles all map related functionality
  */
 export class FMG_Map {
-    private window: Window;
-    private mapManager: FMG_MapManager;
-    private apiFilter: FMG_ApiFilter;
-    private storageFilter: FMG_StorageFilter;
-
-    protected constructor(window: Window) {
-        this.window = window;
-
-        this.mapManager = new FMG_MapManager(window);
-
-        this.apiFilter = FMG_ApiFilter.install(window);
-        setupMapApiFilter(this.apiFilter);
-
-        this.storageFilter = FMG_StorageFilter.install(window);
-        setupMapStorageFilter(this.storageFilter);
-    }
-
-    /**
-     * Install the map
-     * @param window the window to install the map on
-     * @returns the installed map
-     */
-    public static install(window: FmgMapWindow) {
-        if (!window[FmgMapInstalled]) {
-            window[FmgMapInstalled] = new FMG_Map(window);
-        }
-        return window[FmgMapInstalled];
-    }
-
     /*
      * Because we delayed the map script, we need to manually create the google maps object.
      * If altMapSdk is enabled.
@@ -74,38 +41,34 @@ export class FMG_Map {
      * And fill in data from storage.
      * @param window the window to load the user in
      */
-    private static async loadUser(window: Window) {
-        if (FMG_Data.settings.mock_user) {
-            window.user = {
-                id: -1,
-                role: "user"
-            } as any;
-        }
-
-        const storage = FMG_Storage.get(
-            window,
-            FMG_KeyDataHelper.fromWindow(window)
-        );
-
-        await storage.load();
-
-        // TODO: load data from storage
+    private static loadUser(mapManager: FMG_MapManager) {
+        const window = mapManager.window;
         if (window.user) {
-            window.user.trackedCategoryIds = storage.data.categoryIds;
+            window.user.trackedCategoryIds =
+                mapManager.storage.data.categoryIds;
             window.user.suggestions = [];
-            window.user.presets = [];
             window.user.hasPro = true;
-            window.user.locations = storage.data.locations;
-            window.user.gameLocationsCount = storage.data.locationIds.length;
-            window.user.presets = [
-                {
-                    id: 1,
-                    title: "test",
-                    categories: [],
-                    order: 0
-                }
-            ];
+            window.user.locations = mapManager.storage.data.locations;
+            window.user.gameLocationsCount =
+                mapManager.storage.data.locationIds.length;
+            window.user.presets = mapManager.storage.data.presets;
+        } else {
+            throw new Error("User not found");
         }
+        if (window.mapData) {
+            window.mapData.notes = mapManager.storage.data.notes;
+        } else {
+            throw new Error("Map data not found");
+        }
+    }
+
+    /**
+     * Enable map editor.
+     * At the momment nothing usfull can be done with as far as i know.
+     */
+    private static enableEditor(window: Window) {
+        window.isEditor = true;
+        if (window.user) window.user.role = "admin";
     }
 
     /**
@@ -162,18 +125,13 @@ export class FMG_Map {
     /**
      * Enable pro features
      */
-    private static async setProFeaturesEnabled(window: Window) {
-        // Get the map id from the meta data.
-        // If this is set we will imitate another map
-        // Only works with maps from the same game.
-        await FMG_Map.loadMapData(window);
-
-        // Load user
-        await FMG_Map.loadUser(window);
-
+    private static async setupConfig(window: Window) {
         // Set configurations enabled.
-        if (window.config && FMG_Data.settings.presets_allways_enabled)
-            window.config.presetsEnabled = true;
+        if (window.config) {
+            if (FMG_ExtensionData.settings.presets_allways_enabled) {
+                window.config.presetsEnabled = true;
+            }
+        }
     }
 
     /**
@@ -214,15 +172,27 @@ export class FMG_Map {
     private static unlockMaps(window: Window) {
         if (!window.document.querySelector(".map-switcher-panel")) return;
 
+        const map = new URL(window.location.href).searchParams.get("map");
+
         const freeMapUrl = FMG_Map.getFreeMapUrl(window);
         if (!freeMapUrl) return;
         window.document
             .querySelectorAll<HTMLLinkElement>(".map-switcher-panel .map-link")
             .forEach((link) => {
-                if (!link.href.endsWith("/upgrade")) return;
+                const mapName = FMG_Map.getMapName(link);
+
+                // Fix selected when on a pro unlocked map
+                if (map) {
+                    if (mapName !== map) {
+                        link.classList.remove("selected");
+                    } else {
+                        link.classList.add("selected");
+                    }
+                }
+
+                if (!link.href || !link.href.endsWith("/upgrade")) return;
 
                 // Fix name
-                const mapName = FMG_Map.getMapName(link);
                 // link.innerText = mapName;
 
                 // Fix href
@@ -253,9 +223,9 @@ export class FMG_Map {
         window.document.querySelector("#nitro-floating-wrapper")?.remove();
     }
 
-    /*
+    /**
      * Load the map script, and wait for the globals to be defined.
-     **/
+     */
     private static async loadMapScript(window: Window): Promise<void> {
         const script = await getElement<HTMLScriptElement>(
             "script[src^='https://cdn.mapgenie.io/js/map.js?id=']",
@@ -269,41 +239,135 @@ export class FMG_Map {
             appendTo: window.document.body
         });
 
-        return timeout(waitForGlobals(["axios", "store"], window), 10 * 1000);
+        return timeout(
+            waitForGlobals(["axios", "store", "mapData", "game"], window),
+            10000
+        );
+    }
+
+    /**
+     * Attach ui
+     */
+    private static attachUI(mapManager: FMG_MapManager): void {
+        const ui = new FMG_UI(mapManager);
+        window.addEventListener("fmg-location", () => ui.update());
+        window.addEventListener("fmg-category", () => ui.update());
+    }
+
+    /**
+     * Setup window listeners
+     */
+    private static setupListeners(mapManager: FMG_MapManager): void {
+        mapManager.window.addEventListener("message", async (event) => {
+            try {
+                if (event.data.type === "fmg::export-data") {
+                    await mapManager.export();
+                } else if (event.data.type === "fmg::import-data") {
+                    await mapManager.import();
+                } else if (event.data.type === "fmg::clear-data") {
+                    if (confirm("Are you sure you want to clear all data?")) {
+                        await mapManager.storage.clear();
+                        await mapManager.reload();
+                    }
+                }
+            } catch (e) {
+                logger.error("Failed to handle message", e);
+            }
+        });
     }
 
     /**
      * Setup
      */
-    public static async setup(window: Window) {
+    public static async setup(
+        window: Window,
+        mapManager?: FMG_MapManager
+    ): Promise<FMG_MapManager | undefined> {
+        // Fix google maps global object
         FMG_Map.fixGoogleMaps(window);
 
+        // Unlock maps locked by pro upgrade
         FMG_Map.unlockMaps(window);
+
+        // Cleanup pro upgrade ads
         FMG_Map.cleanupProUpgradeAds(window);
 
-        // TODO: make this configurable
-        const driver = FMG_Drivers.newLocalStorageDriver(window);
-        const migrator = new FMG_StorageDataMigrator(driver);
+        // Migrate data from previous versions
+        FMG_StorageDataMigrator.migrateLegacyData(window);
 
-        // Remove old backups
-        migrator.clearOldBackups();
+        // Setup mock user if enabled
+        if (FMG_ExtensionData.settings.mock_user) {
+            window.user = {
+                id: -1,
+                role: "user"
+            } as any;
+        }
 
-        // Start the migration process, if needed
-        await migrator.migrate();
+        if (!window.user) {
+            // If no user is logged in restore the map script and exit.
+            await FMG_Map.loadMapScript(window);
+            logger.warn("No user found!");
+            return;
+        }
 
-        // Enable pro features
-        await FMG_Map.setProFeaturesEnabled(window);
+        // FMG_Map.enableEditor(window);
+
+        // Get the map id from the meta data.
+        // If this is set we will imitate another map
+        // Only works with maps from the same game.
+        await FMG_Map.loadMapData(window);
+
+        // Initialize mapManager
+        mapManager = mapManager ?? new FMG_MapManager(window);
+
+        // Load map data
+        await mapManager.load();
+
+        // Setup listeners
+        FMG_Map.setupListeners(mapManager);
+
+        // #if DEBUG
+        window.fmgMapManager = mapManager;
+        // #endif
+
+        // Load user
+        FMG_Map.loadUser(mapManager);
+
+        // Configure
+        FMG_Map.setupConfig(window);
+
+        // Install storage filter, before we load the blocked map script
+        const storageFilter = FMG_StorageFilter.install(mapManager.window);
+        setupStorageFilter(storageFilter, mapManager);
+
+        // If we have loaded a pro map, remember the map name so we can restore the url later.
+        const map = new URL(window.location.href).searchParams.get("map");
 
         // After we fixed google maps and enabled pro features,
         // we can load the blocked map script
         await FMG_Map.loadMapScript(window);
 
-        // After the map script is loaded, we can install our map script
-        const map = FMG_Map.install(window);
-        await map.mapManager.load();
+        // If we have loaded a pro map, restore the url.
+        if (map) {
+            const url = new URL(window.location.href);
+            url.searchParams.set("map", map);
+            window.history.replaceState({}, "", url.toString());
+        }
 
-        // #if DEBUG
-        window.fmgMap = map;
-        // #endif
+        // Install api filter, after we loaded the blocked map script
+        const apiFilter = FMG_ApiFilter.install(mapManager.window);
+        setupApiFilter(apiFilter, mapManager);
+
+        // Finisish mapManager initialization
+        // We need to do this after the map script is loaded,
+        mapManager.init();
+
+        // Only attach ui if we are not in mini mode
+        if (!window.isMini) {
+            // Attach ui
+            FMG_Map.attachUI(mapManager);
+        }
+
+        return mapManager;
     }
 }

@@ -1,12 +1,8 @@
 declare namespace MG {
-    type ActionType =
-        | import("@fmg/actions").MapAction
-        | import("@fmg/actions").UserAction
-        | import("@fmg/actions").SearchAction;
-
     interface Action {
-        type: ActionType | string;
+        type: string;
         meta?: any;
+        payload?: any;
     }
 
     interface Store {

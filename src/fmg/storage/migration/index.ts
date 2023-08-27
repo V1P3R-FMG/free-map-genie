@@ -1,5 +1,6 @@
 import { FMG_Maps } from "@fmg/info/maps";
-import { FMG_Storage } from "@fmg/storage";
+import { FMG_Keys } from "@fmg/storage/keys";
+import { FMG_Drivers } from "../drivers";
 import { LegacyDataStorage, type LegacyResult } from "./legacy";
 import { isEmpty } from "@shared/utils";
 
@@ -17,6 +18,21 @@ export class FMG_StorageDataMigrator {
     constructor(driver: FMG.Storage.Driver) {
         this.driver = driver;
         this.legacy = new LegacyDataStorage(driver);
+    }
+
+    /**
+     * Removes the data from the storage.
+     */
+    public static async migrateLegacyData(window: Window): Promise<void> {
+        // TODO: make this configurable
+        const driver = FMG_Drivers.newLocalStorageDriver(window);
+        const migrator = new FMG_StorageDataMigrator(driver);
+
+        // Remove old backups
+        migrator.clearOldBackups();
+
+        // Start the migration process, if needed
+        await migrator.migrate();
     }
 
     /**
@@ -55,7 +71,7 @@ export class FMG_StorageDataMigrator {
             for (const [mapId, mapData] of Object.entries(migratedData || {})) {
                 if (!mapData) continue;
                 await this.driver.set(
-                    FMG_Storage.getKey({
+                    FMG_Keys.getLatestKey({
                         mapId,
                         gameId: gameData.gameId,
                         userId: gameData.userId

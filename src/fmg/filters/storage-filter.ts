@@ -7,8 +7,6 @@ export interface WindowExtended extends Window {
     Storage?: Storage;
 }
 
-type MatchGroups = RegExpMatchArray["groups"];
-
 export const StorageTypes = ["local", "session"] as const;
 
 export type StorageType = (typeof StorageTypes)[number];
@@ -19,17 +17,19 @@ export type StorageAction = (typeof StorageActions)[number];
 
 export type StorageActionAndAny = StorageAction | "any";
 
-export interface StorageFilterCallback<G extends MatchGroups> {
+export interface StorageFilterCallback<G extends string[]> {
     (
         storage: Storage,
         action: StorageAction,
         key: string,
         value: string | undefined,
-        groups: G,
+        groups: {
+            [key in G[number]]?: string | undefined;
+        },
         block: BlockCallback
     ): string | undefined | void;
 }
-export interface StorageFilter<G extends MatchGroups> {
+export interface StorageFilter<G extends string[]> {
     regex: RegExp;
     callback: StorageFilterCallback<G>;
 }
@@ -123,7 +123,7 @@ export class FMG_StorageFilter {
      * @param key the key to check
      * @returns the filter group, or undefined if no filter group was found
      */
-    private getFilter<G extends MatchGroups = any>(
+    private getFilter<G extends string[] = []>(
         action: StorageAction,
         key: string
     ): StorageFilter<G> | undefined {
@@ -179,7 +179,7 @@ export class FMG_StorageFilter {
      * @param regex
      * @param callback
      */
-    public registerFilter<G extends MatchGroups = any>(
+    public registerFilter<G extends string[] = []>(
         action: StorageActionAndAny,
         regex: string | RegExp | undefined,
         callback: StorageFilterCallback<G>

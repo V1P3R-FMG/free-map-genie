@@ -4,9 +4,18 @@ declare namespace FMG {
             interface StorageObject {
                 locationIds: number[];
                 categoryIds: number[];
+                notes: MG.Note[];
                 presets: MG.Preset[];
-                preset_order: MG.PresetOrder;
-                visible_categories: number[];
+                presetOrder: MG.PresetOrder;
+                visibleCategoriesIds: number[];
+            }
+
+            interface ExportedJson {
+                version: 2;
+                gameId: number;
+                mapId: number;
+                userId: number;
+                data: DeepPartial<StorageObject>;
             }
         }
     }

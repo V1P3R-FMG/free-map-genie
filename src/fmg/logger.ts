@@ -1,30 +1,4 @@
-const _console = window.console;
-
-/**
- * Logger history class.
- */
-class LoggerHistory {
-    private history: [string, any[]][] = [];
-    private enabled: boolean = false;
-
-    public addEntry(name: string, args: any[]) {
-        if (!this.enabled) return;
-        this.history.push([name, args]);
-    }
-
-    public save() {
-        _console.log(this.history);
-        // TODO: Open file dialog and save history
-    }
-
-    public enable() {
-        this.enabled = true;
-    }
-
-    public disable() {
-        this.enabled = false;
-    }
-}
+const _console = console;
 
 /**
  * Logger class for all fmg related logging.
@@ -33,12 +7,10 @@ class LoggerHistory {
 class Logger {
     private name: string | undefined;
     private muted: boolean;
-    private history: LoggerHistory;
 
     public constructor(name?: string) {
         this.name = name;
         this.muted = !__DEBUG__; // automatically mute in production;
-        this.history = new LoggerHistory();
     }
 
     private get prefix() {
@@ -86,6 +58,12 @@ class Logger {
         };
     }
 
+    private get debugCss() {
+        return {
+            background: "#69e643"
+        };
+    }
+
     /**
      * Console log method.
      */
@@ -108,39 +86,39 @@ class Logger {
     }
 
     /**
+     * Console debug method.
+     */
+    get debug() {
+        /// #if DEBUG
+        return this.createLogCallback("debug", "log");
+        /// #else
+        return () => () => {};
+        /// #endif
+    }
+
+    /**
      * Creates a callback for the given console method.
      * @param name the name of the console method
+     * @param method if different from name, the method to call
      * @returns the created console callback
      */
-    private createLogCallback(name: string): (...args: any[]) => void {
+    private createLogCallback(
+        name: string,
+        method?: string
+    ): (...args: any[]) => void {
         // If we are muted, return a empty interceptor that returns a empty function
         if (this.muted) return () => () => {};
 
         // Return the wrapped log method
-        return this.intercept(
-            name,
-            (_console[name as keyof Console] as any).bind(
-                _console,
-                // Timestamp
-                this.prefix,
-                this.compileCss(this.timeCss),
-                this.timestamp,
-                // Log type
-                ...(!this.name ? [] : [this.getLoggerCss(name), this.name, ""])
-            )
+        return (_console[(method ?? name) as keyof Console] as any).bind(
+            _console,
+            // Timestamp
+            this.prefix,
+            this.compileCss(this.timeCss),
+            this.timestamp,
+            // Log type
+            ...(!this.name ? [] : [this.getLoggerCss(name), this.name, ""])
         );
-    }
-
-    /**
-     * Wraps the callback and intercepts the arguments.
-     * @param callback the callback to wrap
-     * @returns the wrapped callback
-     */
-    private intercept(name: string, callback: (...args: any[]) => void) {
-        return (...args: any[]) => {
-            this.history.addEntry(name, args);
-            return callback.bind(_console, ...args);
-        };
     }
 
     /**
@@ -156,6 +134,8 @@ class Logger {
                 return this.compileCss(this.warnCss);
             case "error":
                 return this.compileCss(this.errorCss);
+            case "debug":
+                return this.compileCss(this.debugCss);
             default:
                 return "";
         }
@@ -181,21 +161,6 @@ class Logger {
     /** Unmute the logger */
     public unmute() {
         this.muted = false;
-    }
-
-    /** Enable log history */
-    public enableHistory() {
-        this.history.enable();
-    }
-
-    /** Disable log history */
-    public disableHistory() {
-        this.history.disable();
-    }
-
-    /** Save log history */
-    public save() {
-        this.history.save();
     }
 }
 

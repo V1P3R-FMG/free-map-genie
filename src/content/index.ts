@@ -1,82 +1,78 @@
 import { getPageType } from "@fmg/page";
 import { FMG_Map } from "./map";
+import { FMG_Guide } from "./guide";
 import { FMG_MapSelector } from "./map-selector";
-import { FMG_Maps, FMG_MapData } from "@fmg/info";
 
-/// #if DEBUG
-logger.enableHistory();
-/// #endif
+function listenForRefocus(callback: () => void) {
+    document.addEventListener("visibilitychange", () => {
+        switch (document.visibilityState) {
+            case "visible":
+                callback();
+                logger.debug("refocused");
+                break;
+        }
+    });
+}
+
+/**
+ * Reload the page, but only if it has not been reloaded consecutively 3 times.
+ */
+function reloadCheck(): boolean {
+    if (!window.store) {
+        window.sessionStorage.removeItem("fmg:reload:count");
+        return false;
+    }
+
+    let i = JSON.parse(
+        window.sessionStorage.getItem("fmg:reload:count") ?? "0"
+    );
+
+    if (i > 3) {
+        logger.error(
+            "reloaded 3 times, not reloading again to prevent reload loop!"
+        );
+        window.sessionStorage.removeItem("fmg:reload:count");
+        return false;
+    }
+
+    window.sessionStorage.setItem("fmg:reload:count", `${++i}`);
+
+    logger.log("reloading page, because the store was allready defined.");
+
+    window.location.reload();
+
+    return true;
+}
 
 /**
  * Itialize the content script
  */
 async function init() {
-    if (__DEBUG__) {
-        window.fmgInfo = {
-            //games: await FMG_Games.get(),
-            maps: window.game?.id ? FMG_Maps.get(window.game.id) : undefined,
-            mapData: {
-                get: FMG_MapData.get
-            }
-        };
-    }
-
     // Check if the page is a map or guide
     const type = getPageType(window);
 
-    if (type !== "unknown") {
-        let doReload = false;
-        if (window.store) {
-            // If window.store is defined, the page has allready been loaded.
-            // This can happen if the extension is reloaded.
-            let i = JSON.parse(
-                window.sessionStorage.getItem("fmg:reload:count") ?? "0"
-            );
-            if (i > 3) {
-                logger.error(
-                    "reloaded 3 times, not reloading again to prevent reload loop!"
-                );
-                doReload = false;
-            } else {
-                window.sessionStorage.setItem(
-                    "fmg:reload:count",
-                    (++i).toString()
-                );
-                logger.error(
-                    "reloaded 3 times, not reloading again to prevent reload loop!"
-                );
-                doReload = true;
-            }
-        }
-
-        if (!doReload) {
-            window.sessionStorage.removeItem("fmg:reload:count");
-        } else {
-            window.location.reload();
-        }
+    if (type === "map") {
+        // Check if we need to reload the page, and do so if needed.
+        if (reloadCheck()) return;
     }
 
-    switch (type) {
-        case "map":
-            await FMG_Map.setup(window).catch((err) => {
-                logger.error("[MAP]", err);
-            });
-            return true;
-        case "map-selector":
-            await FMG_MapSelector.setup(window).catch((err) => {
-                logger.error("[MAP-SELECTOR]", err);
-            });
-            return true;
-        case "guide":
-        case "login":
-        case "upgrade":
-        case "home":
-            return false;
-        default:
-            logger.warn(`Page type ${type}, not installing map/guide!`);
-            break;
+    if (type === "map") {
+        const map = await FMG_Map.setup(window);
+        if (map) {
+            listenForRefocus(() => map.reload());
+        }
+        return true;
+    } else if (type === "guide") {
+        const guide = await FMG_Guide.setup(window);
+        listenForRefocus(() => guide.reload());
+        return true;
+    } else if (type === "map-selector") {
+        await FMG_MapSelector.setup(window);
+        return true;
+    } else if (type === "unknown") {
+        logger.warn(`Page type ${type}, not attaching content script`);
+        return false;
     }
-
     return false;
 }
 

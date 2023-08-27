@@ -1,30 +1,36 @@
-import { isEmpty } from "@shared/utils";
-import { minimizedCopy } from "@shared/copy";
+import { isEmpty, isNotEmpty } from "@shared/utils";
+import * as deepFilter from "deep-filter";
 
-import { Data } from "./groups/data";
-
+import { FMG_Data } from "./proto/data";
 import { FMG_Drivers } from "./drivers";
-
-type StorageObject = FMG.Storage.V2.StorageObject;
+import { FMG_Keys } from "./keys";
 
 export class FMG_Storage {
     private static storages: Record<string, FMG_Storage> = {};
 
-    public readonly window: Window;
+    public autosave: boolean = true;
 
-    public readonly keyData: FMG.Storage.KeyData;
+    public readonly window: Window;
+    public readonly keys: FMG_Keys;
 
     public driver: FMG.Storage.Driver;
-
-    public data: Data;
+    public _data: Record<string, FMG_Data> = {};
 
     public constructor(window: Window, keyData: FMG.Storage.KeyData) {
         this.window = window;
-        this.keyData = keyData;
+        this.keys = new FMG_Keys(keyData);
 
         this.driver = FMG_Drivers.newLocalStorageDriver(window);
 
-        this.data = new Data({});
+        this._data[this.keys.v2Key] = FMG_Data.create({}, () => this.save());
+    }
+
+    public get data(): FMG_Data {
+        return this._data[this.keys.v2Key];
+    }
+
+    public get all(): Record<string, FMG_Data> {
+        return this._data;
     }
 
     /**
@@ -46,7 +52,7 @@ export class FMG_Storage {
      * @returns the created or loaded storage
      */
     public static get(window: Window, keyData: FMG.Storage.KeyData) {
-        const key = FMG_Storage.getKey(keyData);
+        const key = FMG_Keys.getV2Key(keyData);
         if (!FMG_Storage.storages[key]) {
             FMG_Storage.storages[key] = new FMG_Storage(window, keyData);
         }
@@ -58,7 +64,7 @@ export class FMG_Storage {
      * @param keyData the key to build the key from
      */
     public static unload(keyData: FMG.Storage.KeyData) {
-        const key = FMG_Storage.getKey(keyData);
+        const key = FMG_Keys.getV2Key(keyData);
         if (FMG_Storage.storages[key]) {
             FMG_Storage.storages[key].save();
             delete FMG_Storage.storages[key];
@@ -66,19 +72,10 @@ export class FMG_Storage {
     }
 
     /**
-     * Creates a key from the given key data.
-     * @param keyData the key data to create the key from
-     * @returns the created key
-     */
-    public static getKey(keyData: FMG.Storage.KeyData): string {
-        return `fmg:game_${keyData.gameId}:map_${keyData.mapId}:user_${keyData.userId}`;
-    }
-
-    /**
      * The key of this storage.
      */
     public get key(): string {
-        return FMG_Storage.getKey(this.keyData);
+        return this.keys.v2Key;
     }
 
     // TODO: check if loaded data is valid
@@ -86,18 +83,59 @@ export class FMG_Storage {
      * Loads the data from the storage.
      */
     public async load(): Promise<void> {
-        const data = await this.driver.get<StorageObject>(this.key);
-        this.data = new Data(!isEmpty(data) ? data : {});
+        if (this.window && this.window.mapData && this.window.isMini) {
+            await Promise.all(
+                this.window.mapData.maps.map(async (map) => {
+                    const key = FMG_Keys.getV2Key({
+                        ...this.keys.keyData,
+                        mapId: map.id
+                    });
+                    const data =
+                        await this.driver.get<FMG.Storage.V2.StorageObject>(
+                            key
+                        );
+                    this._data[key] = FMG_Data.create(data ?? {}, () =>
+                        this.save()
+                    );
+                })
+            );
+        } else {
+            const data = await this.driver.get<FMG.Storage.V2.StorageObject>(
+                this.key
+            );
+            this._data[this.keys.v2Key] = FMG_Data.create(data ?? {}, () =>
+                this.save()
+            );
+        }
     }
 
+    /**
+     * Saves the data to the storage.
+     */
     public async save(): Promise<void> {
-        // Minimize the data, before saving it
-        const obj = minimizedCopy(this.data) as StorageObject;
+        for (const [key, data] of Object.entries(this._data)) {
+            // Deep filter out empty values.
+            const obj = deepFilter(data, isNotEmpty);
 
-        if (isEmpty(obj)) {
-            await this.driver.remove(this.key);
-        } else {
-            await this.driver.set<StorageObject>(this.key, obj);
+            if (Object.values(obj).every(isEmpty)) {
+                await this.driver.remove(key);
+            } else {
+                await this.driver.set<FMG.Storage.V2.StorageObject>(key, obj);
+            }
         }
+        logger.debug("Saving storage", this._data);
+    }
+
+    /**
+     * Clear the data from the storage.
+     */
+    public async clear(): Promise<void> {
+        await this.driver.remove(this.key);
+        this._data = Object.fromEntries(
+            Object.entries(this._data).map(([key]) => [
+                key,
+                FMG_Data.create({}, () => this.save())
+            ])
+        );
     }
 }

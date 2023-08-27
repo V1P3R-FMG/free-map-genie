@@ -95,7 +95,8 @@ export class FMG_MapSelector {
      * Sets up the map selector.
      * @param window the window to setup the map selector in
      */
-    public static async setup(window: Window): Promise<void> {
+    public static async setup(window: Window): Promise<FMG_MapSelector> {
         this.unlockProMaps(window);
+        return this.install(window);
     }
 }

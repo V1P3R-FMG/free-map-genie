@@ -76,12 +76,15 @@ export class FMG_ApiFilter {
                 return this.filters[method][group];
             }
         }
+
         // Then check if there is a filter for the any method and key
         for (const group in this.filters.any) {
             if (this.filters.any[group].regex.test(url)) {
                 return this.filters.any[group];
             }
         }
+
+        return;
     }
 
     /**
@@ -92,9 +95,18 @@ export class FMG_ApiFilter {
     private createProxyMethod(method: AxiosMethod): void {
         const axiosMethod = this.axios[method];
         this.axios[method] = ((...args: any[]) => {
-            const [url, data] = args;
-            const group = this.getFilter(method, url);
-            const { key, id } = group?.regex.exec(url)?.groups ?? {};
+            const [requestUrl, data] = args;
+
+            if (!requestUrl.startsWith("/api/v1"))
+                return axiosMethod.apply(this.axios, args as any);
+
+            const url = new URL(
+                (this.axios.defaults.baseURL ?? "") + requestUrl
+            );
+            const noParamsUrl = url.origin + url.pathname;
+
+            const group = this.getFilter(method, noParamsUrl);
+            const { key, id } = group?.regex.exec(noParamsUrl)?.groups ?? {};
 
             return blockable<any, [string, string, string, any, string]>(
                 group?.callback || (() => {}),
@@ -102,11 +114,11 @@ export class FMG_ApiFilter {
                 key,
                 id,
                 data,
-                url
+                requestUrl
             )
                 .then((newData) =>
                     axiosMethod.apply(this.axios, [
-                        url,
+                        requestUrl,
                         newData ?? data,
                         ...args.slice(2)
                     ] as any)
@@ -120,9 +132,12 @@ export class FMG_ApiFilter {
      * @param key the key to compile
      * @returns the compiled regex
      */
-    private static compileKeyToRegex(key: string): RegExp {
+    private static compileKeyToRegex(key: string, hasId: boolean): RegExp {
         return new RegExp(
-            "/api/v1/user/" + `(?<key>${key})` + "(?:/(?<id>\\d+))?" + "$"
+            "/api/v1/user/" +
+                `(?<key>${key})` +
+                (hasId ? "/(?<id>[\\d\\w_-]+)" : "") +
+                "$"
         );
     }
 
@@ -159,6 +174,7 @@ export class FMG_ApiFilter {
     public registerFilter<T = any, R = any>(
         method: AxiosMethodAndAny,
         key: string,
+        hasId: boolean,
         callback: ApiFilteredCallback<T, R>
     ) {
         // Check if the filter already exists
@@ -168,7 +184,7 @@ export class FMG_ApiFilter {
         } else {
             // If the filter doesn't exist, create it
             this.filters[method][key] = {
-                regex: FMG_ApiFilter.compileKeyToRegex(key),
+                regex: FMG_ApiFilter.compileKeyToRegex(key, hasId),
                 callback: callback
             };
         }

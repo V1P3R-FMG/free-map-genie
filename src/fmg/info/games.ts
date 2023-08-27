@@ -21,7 +21,11 @@ export class FMG_Games {
         if (!gameId) return FMG_Games.instance.data;
 
         // Else return the game with the given id
-        return FMG_Games.instance.data.filter((game) => game.id == gameId);
+        const game = FMG_Games.instance.data.find((game) => game.id == gameId);
+
+        if (!game) throw new Error(`Game with id ${gameId} not found`);
+
+        return game;
     }
 
     private async load() {

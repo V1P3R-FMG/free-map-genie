@@ -21,6 +21,13 @@ declare namespace FMG {
             interface Settings {
                 remember_categories: boolean;
             }
+
+            interface ExportedJson {
+                version: "v5";
+                gameId: number;
+                userId: number;
+                storageObject: DeepPartial<StorageObject>;
+            }
         }
     }
 }

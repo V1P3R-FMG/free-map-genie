@@ -21,6 +21,6 @@
         },
         "typeRoots": ["./node_modules/@types", "./src/@types"]
     },
-    "include": ["src/**/*", "tests/**/*"],
+    "include": ["src/**/*"],
     "exclude": ["node_modules", "dist"]
 }
