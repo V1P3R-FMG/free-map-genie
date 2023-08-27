@@ -21,7 +21,6 @@ function update() {
     const [_total, _marked] = props.calculateTotal();
     total.value = _total;
     marked.value = _marked;
-    console.log("progress updated");
 }
 
 onMounted(() => {

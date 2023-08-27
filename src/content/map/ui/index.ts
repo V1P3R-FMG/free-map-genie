@@ -94,7 +94,6 @@ export class FMG_UI {
     }
 
     public update() {
-        console.log("Updating UI", this.totalProgress, this.trackedProgress);
         this.totalProgress.update();
         this.trackedProgress.update();
     }
