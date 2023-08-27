@@ -1,10 +1,13 @@
 <script lang="ts" setup>
-import { ref, watch } from "vue";
-import type { FMG_MapManager } from "@fmg/map-manager";
+import { ref, watch, onMounted } from "vue";
 
 const total = ref(0);
 const marked = ref(0);
 const percent = ref(100);
+
+const props = defineProps<{
+    calculateTotal: () => [number, number];
+}>();
 
 watch([total, marked], () => {
     if (total.value === 0 && marked.value === 0) {
@@ -14,23 +17,16 @@ watch([total, marked], () => {
     percent.value = (marked.value / total.value) * 100;
 });
 
-function recalculate(mapManager: FMG_MapManager) {
-    total.value = 0;
-    marked.value = 0;
-    const locByCat = mapManager.store.getState().map.locationsByCategory;
-    const data = mapManager.storage.data;
-    data.categoryIds.forEach((catId) => {
-        const locations = locByCat[catId] ?? [];
-        total.value += locations.length;
-        locations.forEach((loc) => {
-            if (data.locations[loc.id]) marked.value++;
-        });
-    });
+function update() {
+    const [_total, _marked] = props.calculateTotal();
+    total.value = _total;
+    marked.value = _marked;
+    console.log("progress updated");
 }
 
-function update(mapManager: FMG_MapManager) {
-    recalculate(mapManager);
-}
+onMounted(() => {
+    update();
+});
 
 defineExpose({
     update
