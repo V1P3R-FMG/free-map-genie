@@ -56,7 +56,8 @@
         "test-loud": "npx jest --silent=false",
         "lint": "npx eslint . --ext .ts",
         "lint-fix": "yarn lint --fix",
-        "prettier": "npx prettier . --write --editorconfig=true"
+        "prettier": "npx prettier . --write --editorconfig=true",
+        "sign": "node ./scrpts/sign.js"
     },
     "dependencies": {
         "deep-filter": "^1.0.2",
