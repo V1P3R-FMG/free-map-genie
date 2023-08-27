@@ -248,7 +248,7 @@ export default (env) => {
                 keepProfileChanges: process.env.KEEP_PROFILE_CHANGES === "true",
                 startUrl: process.env.START_URL || "https://mapgenie.io/",
                 runLint: false,
-                buildPackage: !env.package
+                buildPackage: mode === "production"
             })
         ],
         watch,
