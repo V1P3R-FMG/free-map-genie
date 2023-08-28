@@ -35,26 +35,6 @@ export interface CreateScriptOptions {
     appendTo?: HTMLElement;
 }
 
-export function createScript(options: CreateScriptOptions): HTMLScriptElement {
-    if (options.src && options.content) {
-        throw new Error("Cannot create script with both src and content");
-    }
-
-    const script = document.createElement("script");
-
-    if (options.src) {
-        script.src = options.src;
-    } else if (options.content) {
-        script.textContent = options.content;
-    }
-
-    if (options.appendTo) {
-        options.appendTo.appendChild(script);
-    }
-
-    return script;
-}
-
 export function documentLoaded(window: Window): Promise<void> {
     return waitForCallback(() => window.document.readyState === "complete");
 }

@@ -1,4 +1,4 @@
-import { createScript, getElement } from "@shared/dom";
+import { getElement } from "@shared/dom";
 import { timeout, waitForGlobals } from "@shared/async";
 
 import { FMG_ApiFilter } from "@fmg/filters/api-filter";
@@ -234,10 +234,9 @@ export class FMG_Map {
 
         if (!script) throw new Error("Map script not found");
 
-        createScript({
-            src: script.src.replace("id=", "ready&id="),
-            appendTo: window.document.body
-        });
+        const newScript = document.createElement("script");
+        newScript.src = script.src.replace("id=", "ready&id=");
+        window.document.body.appendChild(newScript);
 
         return timeout(
             waitForGlobals(["axios", "store", "mapData", "game"], window),
