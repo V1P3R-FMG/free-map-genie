@@ -1,6 +1,6 @@
 {
     "name": "fmg",
-    "version": "2.0.0",
+    "version": "2.0.1",
     "license": "MIT",
     "description": "Mapgenie PRO unlocker",
     "homepage": "https://github.com/V1P3R-FMG/free-map-genie",
@@ -57,7 +57,7 @@
         "lint": "npx eslint . --ext .ts",
         "lint-fix": "yarn lint --fix",
         "prettier": "npx prettier . --write --editorconfig=true",
-        "sign": "node ./scrpts/sign.js"
+        "sign": "node ./scripts/sign.js"
     },
     "dependencies": {
         "deep-filter": "^1.0.2",
