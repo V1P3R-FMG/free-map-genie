@@ -5,7 +5,7 @@ import { FMG_ApiFilter } from "@fmg/filters/api-filter";
 import { FMG_StorageFilter } from "@fmg/filters/storage-filter";
 import { FMG_MapData } from "@fmg/info/map-data";
 import { FMG_ExtensionData } from "@fmg/extension-data";
-import { FMG_MapManager } from "../../fmg/map-manager";
+import { FMG_MapManager } from "@fmg/map-manager";
 import { FMG_StorageDataMigrator } from "@fmg/storage/migration";
 import { FMG_UI } from "./ui";
 
