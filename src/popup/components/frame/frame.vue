@@ -67,7 +67,7 @@ function changePage(page: string) {
                 @click="changePage(tab.name)"
                 :class="curPage === tab.name ? 'active' : ''"
             >
-                <Icon v-if="!!tab.icon" :icon="tab.icon" size="0.75em"></Icon>
+                <Icon v-if="!!tab.icon" :icon="tab.icon" size="16px"></Icon>
                 <span v-else>{{ tab.name }}</span>
             </h4>
         </div>

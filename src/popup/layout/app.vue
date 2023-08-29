@@ -148,14 +148,14 @@ getInfo();
                 <IconButton
                     icon="g"
                     title="mapgenie"
-                    size="1em"
+                    size="20px"
                     @click="openMapGenie"
                 />
                 <h3 class="title">MapGenie<sup class="pro">PRO</sup></h3>
                 <IconButton
                     icon="cancel"
                     title="close"
-                    size="1.4em"
+                    size="30px"
                     @click="closePopup"
                 />
             </div>

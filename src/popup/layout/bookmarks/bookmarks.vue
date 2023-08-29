@@ -24,6 +24,7 @@ const trash = ref(false);
         <IconButton
             icon="trash"
             title="trash-bookmarks"
+            size="20px"
             :toggle="true"
             @toggle="trash = $event"
         />
