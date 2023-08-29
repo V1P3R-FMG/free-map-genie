@@ -14,9 +14,13 @@ defineProps<Props>();
 </template>
 
 <style lang="scss" scoped>
+i[class^="icon-"] {
+    font-size: 1rem;
+}
+
 i[class^="icon-"]:before,
 i[class*=" icon-"]:before {
-    font-size: 1.5em;
+    font-size: inherit;
     // color: red;
 }
 </style>
