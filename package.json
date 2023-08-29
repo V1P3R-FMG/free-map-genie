@@ -57,7 +57,8 @@
         "lint": "npx eslint . --ext .ts",
         "lint-fix": "yarn lint --fix",
         "prettier": "npx prettier . --write --editorconfig=true",
-        "sign": "node ./scripts/sign.js"
+        "sign": "node ./scripts/sign.js",
+        "update-font": "node ./scripts/update-font.js"
     },
     "dependencies": {
         "deep-filter": "^1.0.2",

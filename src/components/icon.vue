@@ -10,16 +10,16 @@ defineProps<Props>();
 </script>
 
 <template>
-    <i :class="'icon-' + icon" :style="size ? { fontSize: size } : {}"></i>
+    <i :class="'fmg-icon-' + icon" :style="size ? { fontSize: size } : {}"></i>
 </template>
 
 <style lang="scss" scoped>
-i[class^="icon-"] {
+i[class^="fmg-icon-"] {
     font-size: 1rem;
 }
 
-i[class^="icon-"]:before,
-i[class*=" icon-"]:before {
+i[class^="fmg-icon-"]:before,
+i[class*=" fmg-icon-"]:before {
     font-size: inherit;
     // color: red;
 }
