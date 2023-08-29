@@ -11,7 +11,12 @@ const markAll = (found: boolean) => {
     mapManager.storage.data.autosave = false;
     mapManager.getCurrentCategories().forEach((category) => {
         if (category.visible) {
-            category.locations?.forEach((location) => {
+            const locations =
+                category.locations ||
+                mapManager.store.getState().map.locationsByCategory[
+                    category.id
+                ];
+            locations.forEach((location) => {
                 mapManager.markLocationFound(location.id, found);
                 if (found) {
                     mapManager.storage.data.locations[location.id] = true;

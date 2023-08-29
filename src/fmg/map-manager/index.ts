@@ -75,10 +75,7 @@ export class FMG_MapManager {
     }
 
     public getCurrentCategories(): MG.Category[] {
-        return this.store
-            .getState()
-            .map.groups.map((group) => group.categories)
-            .flat();
+        return Object.values(this.store.getState().map.categories);
     }
 
     public isPopupOpen(): boolean {
