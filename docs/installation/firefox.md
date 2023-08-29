@@ -1,4 +1,4 @@
-1. Download the latest `fmg-firefox-vX.X.X.xpi`.<br>
+1. Download the [latest](https://github.com/V1P3R-FMG/free-map-genie/releases/latest) `fmg-firefox-vX.X.X.xpi`.<br>
     ![Firefox Extension](/assets/installation/firefox-extension.png)
 2. Go to `about:addons`.<br>
     ![Firefox Extensions](/assets/installation/firefox-extensions.png)
