@@ -1,4 +1,4 @@
-1. Download the latest `fmg-chrome-vX.X.X.zip` Extract the zip.<br>
+1. Download the [latest](https://github.com/V1P3R-FMG/free-map-genie/releases/latest) `fmg-chrome-vX.X.X.zip` Extract the zip.<br>
     ![Chrome Unzip](/assets/installation/chrome-unzip.png)
 2. Go to `chrome://extensions/`.<br>
     ![Chrome Extensions](/assets/installation/chrome-extensions.png)
