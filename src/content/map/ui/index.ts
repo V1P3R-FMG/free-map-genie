@@ -1,17 +1,20 @@
 import { createApp } from "vue";
 import Progress from "./progress.vue";
+import MarkControls from "./mark-controls.vue";
 import type { FMG_MapManager } from "@fmg/map-manager";
 
 export class FMG_UI {
     private mapManager: FMG_MapManager;
-    public totalProgress: typeof Progress;
-    public trackedProgress: typeof Progress;
+    public readonly totalProgress: typeof Progress;
+    public readonly trackedProgress: typeof Progress;
+    public readonly markControls: typeof MarkControls;
 
     constructor(mapManager: FMG_MapManager) {
         this.mapManager = mapManager;
 
         this.totalProgress = this.attachTotalProgressUI();
         this.trackedProgress = this.attachTrackedProgressUI();
+        this.markControls = this.attachMarkControlsUI();
 
         this.update();
     }
@@ -37,27 +40,46 @@ export class FMG_UI {
         return categoryPanel;
     }
 
+    private getBottomRightControlContainer(): HTMLElement {
+        const container =
+            this.mapManager.window.document.querySelector<HTMLElement>(
+                ".mapboxgl-ctrl-bottom-right"
+            );
+        if (!container) {
+            throw new Error("Could not find bottom right control container");
+        }
+        return container;
+    }
+
     private createHorizontalRule(): HTMLHRElement {
         return this.mapManager.window.document.createElement("hr");
     }
 
-    private mountBeforeUI(
-        element: HTMLElement,
-        component: any,
-        props?: { [key: string]: any },
-        hr: boolean = true
-    ): any {
+    private createBeforeDiv(element: HTMLElement): HTMLDivElement {
         const div = window.document.createElement("div");
         element.before(div);
-        if (hr) {
-            element.before(this.createHorizontalRule());
-        }
-        return createApp(component, props).mount(div);
+        return div;
+    }
+
+    private createDiv(element: HTMLElement): HTMLDivElement {
+        const div = window.document.createElement("div");
+        element.appendChild(div);
+        return div;
+    }
+
+    private mount(
+        element: HTMLElement,
+        component: any,
+        props?: { [key: string]: any }
+    ): any {
+        return createApp(component, props).mount(element);
     }
 
     private attachTotalProgressUI(): typeof Progress {
         const categoryPanel = this.getCategoryPanel();
-        return this.mountBeforeUI(categoryPanel, Progress, {
+        const div = this.createBeforeDiv(categoryPanel);
+        categoryPanel.before(this.createHorizontalRule());
+        return this.mount(div, Progress, {
             calculateTotal: () => {
                 return [
                     this.mapManager.store.getState().map.locations.length,
@@ -69,28 +91,29 @@ export class FMG_UI {
 
     private attachTrackedProgressUI(): typeof Progress {
         const categoryPanel = this.getCategoryPanel();
-        return this.mountBeforeUI(
-            categoryPanel,
-            Progress,
-            {
-                calculateTotal: () => {
-                    let [total, marked] = [0, 0];
-                    const locByCat =
-                        this.mapManager.store.getState().map
-                            .locationsByCategory;
-                    const data = this.mapManager.storage.data;
-                    data.categoryIds.forEach((catId) => {
-                        const locations = locByCat[catId] ?? [];
-                        total += locations.length;
-                        locations.forEach((loc) => {
-                            if (data.locations[loc.id]) marked++;
-                        });
+        return this.mount(this.createBeforeDiv(categoryPanel), Progress, {
+            calculateTotal: () => {
+                let [total, marked] = [0, 0];
+                const locByCat =
+                    this.mapManager.store.getState().map.locationsByCategory;
+                const data = this.mapManager.storage.data;
+                data.categoryIds.forEach((catId) => {
+                    const locations = locByCat[catId] ?? [];
+                    total += locations.length;
+                    locations.forEach((loc) => {
+                        if (data.locations[loc.id]) marked++;
                     });
-                    return [total, marked];
-                }
-            },
-            false
-        );
+                });
+                return [total, marked];
+            }
+        });
+    }
+
+    private attachMarkControlsUI(): typeof MarkControls {
+        const container = this.getBottomRightControlContainer();
+        return this.mount(this.createDiv(container), MarkControls, {
+            mapManager: this.mapManager
+        });
     }
 
     public update() {

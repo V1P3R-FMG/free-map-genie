@@ -30,6 +30,7 @@ interface WindowFmgEventsMap {
               action: "reordered";
           }
     >;
+    "fmg-update": CustomEvent;
 }
 
 interface WindowEventMap extends WindowFmgEventsMap {}

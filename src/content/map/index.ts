@@ -249,8 +249,9 @@ export class FMG_Map {
      */
     private static attachUI(mapManager: FMG_MapManager): void {
         const ui = new FMG_UI(mapManager);
-        window.addEventListener("fmg-location", () => ui.update());
-        window.addEventListener("fmg-category", () => ui.update());
+        mapManager.on("fmg-location", () => ui.update());
+        mapManager.on("fmg-category", () => ui.update());
+        mapManager.on("fmg-update", () => ui.update());
     }
 
     /**

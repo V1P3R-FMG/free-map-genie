@@ -60,10 +60,14 @@ export class FMG_Store {
         });
     }
 
-    public update(): void {
+    public updateLocations(): void {
         this.store.dispatch({
             type: "HIVE:USER:MARK_LOCATION",
             meta: { locationId: -1, found: false }
         });
+    }
+
+    public updateCategories(): void {
+        this.store.dispatch({ type: "HIVE:USER:UPDATE_CATEGORY_PROGRESS" });
     }
 }

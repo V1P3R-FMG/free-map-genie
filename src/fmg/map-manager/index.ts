@@ -72,6 +72,13 @@ export class FMG_MapManager {
         }
     }
 
+    public getCurrentCategories(): MG.Category[] {
+        return this.store
+            .getState()
+            .map.groups.map((group) => group.categories)
+            .flat();
+    }
+
     public isPopupOpen(): boolean {
         return !!this.window.document.querySelector("#marker-info");
     }
