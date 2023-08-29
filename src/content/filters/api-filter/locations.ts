@@ -11,6 +11,7 @@ export default function (filter: FMG_ApiFilter, mapManager: FMG_MapManager) {
             mapManager.storage.data.locations[id] = true;
             //mapManager.updatePopup();
             mapManager.store.updateLocations();
+            mapManager.store.updateCategories();
             mapManager.fire("fmg-location", {
                 id,
                 marked: true
@@ -28,6 +29,7 @@ export default function (filter: FMG_ApiFilter, mapManager: FMG_MapManager) {
             delete mapManager.storage.data.locations[id];
             //mapManager.updatePopup();
             mapManager.store.updateLocations();
+            mapManager.store.updateCategories();
             mapManager.fire("fmg-location", {
                 id,
                 marked: false
