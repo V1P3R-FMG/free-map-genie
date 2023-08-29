@@ -2,12 +2,20 @@
 import Control from "./components/control.vue";
 import ControlGroup from "./components/control-group.vue";
 import type { FMG_MapManager } from "@fmg/map-manager";
+import { FMG_ExtensionData } from "@fmg/extension-data";
 
 const { mapManager } = defineProps<{
     mapManager: FMG_MapManager;
 }>();
 
 const markAll = (found: boolean) => {
+    if (
+        !FMG_ExtensionData.settings.no_confirm_mark_unmark_all &&
+        !confirm(`${found ? "Mark" : "Unmark"} all visible locations?`)
+    ) {
+        return;
+    }
+
     mapManager.storage.data.autosave = false;
     mapManager.getCurrentCategories().forEach((category) => {
         if (category.visible) {

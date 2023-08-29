@@ -12,5 +12,12 @@
         "name": "mock_user",
         "label": "Mock user",
         "tooltip": "This option mocks a user so you don't have to be logged in to see the extension working."
+    },
+    {
+        "type": "checkbox",
+        "value": false,
+        "name": "no_confirm_mark_unmark_all",
+        "label": "No confirm mark/unmark all",
+        "tooltip": "This option removes the confirm dialog when you click the mark/unmark all button."
     }
 ]

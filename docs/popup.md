@@ -126,6 +126,13 @@
                 This will allow you to use all features without logging in.
             </td>
         </tr>
+        <tr>
+            <td>No confirm mark/unmark all</td>
+            <td>
+                This will remove the confirm dialog when clicking on the mark/unmark all
+                visible locations buttons.
+            </td>
+        </tr>
     </tbody>
 <table>
 <hr>
