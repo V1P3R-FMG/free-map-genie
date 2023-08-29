@@ -29,7 +29,7 @@ function tooltipHover(mouseover: boolean) {
         </div>
         <Icon
             icon="info-circled"
-            size="0.7em"
+            size="14px"
             @mouseover="tooltipHover(true)"
             @mouseout="tooltipHover(false)"
         ></Icon>

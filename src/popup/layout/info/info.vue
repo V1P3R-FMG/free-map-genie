@@ -21,7 +21,7 @@ defineProps<Props>();
             <h4>Attached</h4>
             <Icon
                 icon="cd"
-                size="0.75em"
+                size="14px"
                 :class="info.attached ? 'active' : 'inactive'"
             />
         </div>
