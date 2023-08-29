@@ -10,7 +10,9 @@ export default function (filter: FMG_ApiFilter, mapManager: FMG_MapManager) {
         "presets",
         false,
         (_method, _key, _id, data, _url, block) => {
-            const id = data.ordering.length - 1;
+            const id = mapManager.hasDemoPreset()
+                ? data.ordering.length - 1
+                : data.ordering.length;
             logger.debug("Adding preset", id, data);
 
             // To prevet multiple saves, we disable autosave

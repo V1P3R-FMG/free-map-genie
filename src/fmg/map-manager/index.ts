@@ -59,6 +59,8 @@ export class FMG_MapManager {
         if (this.storage.data.presets.length === 0) {
             if (this.hasDemoPreset()) {
                 this.store.reorderPresets([-1]);
+            } else {
+                this.store.reorderPresets([]);
             }
             return;
         }
