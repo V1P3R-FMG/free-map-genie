@@ -101,7 +101,7 @@ export default (env) => {
 
     const files = [
         { from: "./src/icons", to: "icons" },
-        { from: "./src/popup/font", to: "font" }
+        { from: "./src/font", to: "font" }
     ];
 
     // Add the blocklist for chrome

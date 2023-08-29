@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import Bookmark from "./bookmark.vue";
-import IconButton from "@popup/components/icon-button.vue";
+import IconButton from "@components/icon-button.vue";
 import { ref } from "vue";
 
 export interface Props {

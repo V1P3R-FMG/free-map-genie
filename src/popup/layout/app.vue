@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import Theme from "../components/theme.vue";
-import IconButton from "../components/icon-button.vue";
+import IconButton from "@components/icon-button.vue";
 
 import Frame from "../components/frame/frame.vue";
 import Page from "../components/frame/page.vue";

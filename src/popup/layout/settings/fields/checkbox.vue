@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { ref, watch } from "vue";
 import OptionBase from "./option-base.vue";
-import Tooltip from "../../../components/tooltip.vue";
+import Tooltip from "@components/tooltip.vue";
 
 const props = defineProps<{
     name: string;

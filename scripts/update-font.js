@@ -45,13 +45,22 @@ async function updateFont() {
         path.basename(inPath, ".zip")
     );
 
+    if (!fs.existsSync(path.join("src", "font"))) {
+        fs.mkdirSync(path.join("src", "font"));
+    }
+
+    if (!fs.existsSync(path.join("src", "css"))) {
+        fs.mkdirSync(path.join("src", "css"));
+    }
+
     const files = await decompress(latestFont.path, outPath);
     for (const file of files) {
         const folder = path.basename(path.dirname(file.path));
         if (folder === "font") {
             fs.writeFileSync(
-                path.join("src", "popup", "font", path.basename(file.path)),
-                file.data
+                path.join("src", "font", path.basename(file.path)),
+                file.data,
+                { flag: "w" }
             );
         } else if (folder === "css") {
             if (
@@ -60,8 +69,9 @@ async function updateFont() {
                 !file.path.includes("codes")
             ) {
                 fs.writeFileSync(
-                    path.join("src", "popup", "css", path.basename(file.path)),
-                    file.data
+                    path.join("src", "css", path.basename(file.path)),
+                    file.data,
+                    { flag: "w" }
                 );
             }
         }

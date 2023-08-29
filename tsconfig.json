@@ -15,6 +15,9 @@
             "@background/*": ["background/*"],
             "@shared/*": ["shared/*"],
             "@fmg/*": ["fmg/*"],
+            "@font/*": ["font/*"],
+            "@css/*": ["css/*"],
+            "@components/*": ["components/*"],
             "@/*": ["*"],
             "@tests/data/*": ["../tests/data/*"],
             "@tests/mocks/*": ["../tests/mocks/*"]

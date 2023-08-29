@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import Icon from "../icon.vue";
+import Icon from "@components/icon.vue";
 import { onMounted, ref, reactive, watch } from "vue";
 const $pages = ref<HTMLDivElement>();
 const $tabs = ref<HTMLDivElement>();

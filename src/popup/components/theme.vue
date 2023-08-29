@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import "../css/themes/*.css";
+import "../themes/*.css";
 import { watch, ref } from "vue";
 
 export interface Props {

@@ -1,6 +1,5 @@
 <script lang="ts" setup>
-import "../css/fmg-font.css";
-import "../css/animation.css";
+import "@css/fmg-font.css";
 
 export interface Props {
     icon: string;

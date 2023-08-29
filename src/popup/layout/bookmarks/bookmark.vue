@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import IconButton from "@popup/components/icon-button.vue";
+import IconButton from "@components/icon-button.vue";
 
 const props = defineProps<{
     isTemplate?: boolean;

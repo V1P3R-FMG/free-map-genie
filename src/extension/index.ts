@@ -33,6 +33,7 @@ async function init() {
         JSON.stringify(await getData())
     );
     injectLink(chrome.runtime.getURL("content.css"));
+    injectLink(chrome.runtime.getURL("css/fmg-font.css"));
     injectScript(chrome.runtime.getURL("content.js"));
     initHandlers(shared);
 }

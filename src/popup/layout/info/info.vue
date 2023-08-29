@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import Icon from "../../components/icon.vue";
+import Icon from "@components/icon.vue";
 
 export interface Props {
     info: {

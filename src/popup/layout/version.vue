@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { onMounted, ref } from "vue";
-import Icon from "@popup/components/icon.vue";
+import Icon from "@components/icon.vue";
 
 const props = defineProps<{
     version: string;
