@@ -78,6 +78,7 @@
 	<li><a href="/docs/popup.md">Browser Action Popup</a></li>
     <li>Extension Installation</li>
     <ul>
+        <li><a href="https://github.com/V1P3R-FMG/free-map-genie/releases/latest">Download</a></li>
         <li><a href="/docs/installation/chrome.md">Chrome installation</a></li>
         <li><a href="/docs/installation/firefox.md">Firefox installation</a></li>
     </ul>
