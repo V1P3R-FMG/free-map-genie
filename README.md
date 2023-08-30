@@ -7,6 +7,9 @@
         <img alt="Github Author" src="https://img.shields.io/badge/dynamic/json?url=https%3A%2F%2Fraw.githubusercontent.com%2FV1P3R-FMG%2Ffree-map-genie%2Fmain%2Fpackage.json&query=%24.author&label=author" />
     </a>
     <a href="https://github.com/V1P3R-FMG/free-map-genie/releases">
+        <img alt="Github Latest Release Downloads" src="https://img.shields.io/github/downloads/V1P3R-FMG/free-map-genie/total" />
+    </a>
+    <a href="https://github.com/V1P3R-FMG/free-map-genie/releases">
         <img alt="Github Latest Release Downloads" src="https://shields.io/github/downloads/V1P3R-FMG/free-map-genie/latest/total?logo=github" />
     </a>
     <a href="https://github.com/V1P3R-FMG/free-map-genie/blob/main/LICENSE">
