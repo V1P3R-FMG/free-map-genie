@@ -182,6 +182,11 @@ export class FMG_MapManager {
 
         // Reload presets from storage
         this.updatePresets();
+
+        // Reload locations and categories
+        this.store.updateLocations();
+        this.store.updateCategories();
+        this.fire("fmg-update");
     }
 
     /**
