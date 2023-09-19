@@ -26,6 +26,7 @@
     </a>
 </p>
 <img src="/assets/tarkov_preview.png"/>
+
 > [!IMPORTANT]
 > FMG restricts certain API calls and localizes data in the browser instead.
 > This means data will not transfer to different devices or browsers. You can always manually
