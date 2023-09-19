@@ -1,6 +1,6 @@
 <p align="center">
   <img src="./src/icons/fmg-icon-128.png" />
-  <h1 align="center">FMG: Free Mapgenie PRO!</h1>
+  <h1 align="center">FMG: Free <a href="https://mapgenie.io">Mapgenie</a> PRO!</h1>
 </p>
 <p align="center">
     <a href="https://github.com/V1P3R-FMG">
@@ -25,7 +25,7 @@
         <img alt="Github Author" src="https://img.shields.io/github/issues/V1P3R-FMG/free-map-genie" />
     </a>
 </p>
-
+<img src="/assets/tarkov_preview.png"/>
 > [!IMPORTANT]
 > FMG restricts certain API calls and localizes data in the browser instead.
 > This means data will not transfer to different devices or browsers. You can always manually
