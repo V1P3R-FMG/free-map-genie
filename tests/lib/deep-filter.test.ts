@@ -1,6 +1,8 @@
 import * as deepFilter from "deep-filter";
 import { isNotEmpty } from "@shared/utils";
 
+logger.log("hello world");
+
 function createObj() {
     return {
         a: 1,

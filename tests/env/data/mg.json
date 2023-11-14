@@ -1,0 +1,58 @@
+{
+    "user": {
+        "id": -1
+    },
+    "game": {
+        "id": 20,
+        "title": "Escape From Tarkov",
+        "slug": "tarkov",
+        "ign_slug": "escape-from-tarkov"
+    },
+    "maps": [
+        {
+            "id": 68,
+            "title": "Factory",
+            "slug": "factory"
+        },
+        {
+            "id": 69,
+            "title": "Woods",
+            "slug": "woods"
+        },
+        {
+            "id": 67,
+            "title": "Customs",
+            "slug": "customs"
+        },
+        {
+            "id": 66,
+            "title": "Interchange",
+            "slug": "interchange"
+        },
+        {
+            "id": 75,
+            "title": "Reserve",
+            "slug": "reserve"
+        },
+        {
+            "id": 72,
+            "title": "Shoreline",
+            "slug": "shoreline"
+        },
+        {
+            "id": 74,
+            "title": "The Lab",
+            "slug": "lab"
+        },
+        {
+            "id": 71,
+            "title": "Lighthouse",
+            "slug": "lighthouse"
+        },
+        {
+            "id": 64,
+            "title": "Streets",
+            "slug": "streets"
+        }
+    ]
+}
