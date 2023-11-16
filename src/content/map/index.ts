@@ -217,10 +217,9 @@ export class FMG_Map {
      * @param window the window to cleanup
      */
     private static cleanupProUpgradeAds(window: Window) {
-        window.document
-            .querySelector("#button-upgrade")
-            ?.parentElement?.parentElement?.remove();
-        window.document.querySelector("#nitro-floating-wrapper")?.remove();
+        $(window.document).find("#button-upgrade").parent().remove();
+        $(window.document).find("#nitro-floating-wrapper").remove();
+        $(window.document).find("#blobby-left").remove();
     }
 
     /**

@@ -1,10 +1,4 @@
 {
-    "permissions": [
-        "storage",
-        "webRequest",
-        "webRequestBlocking",
-        "<all_urls>"
-    ],
     "background": {
         "scripts": ["background.js"]
     },

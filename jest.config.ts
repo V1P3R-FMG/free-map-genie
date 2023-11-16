@@ -28,5 +28,5 @@ export default {
     modulePaths: baseUrl ? [baseUrl] : [],
     moduleDirectories: ["node_modules"],
     moduleNameMapper: paths ? pathsToModuleNameMapper(paths) : [],
-    setupFilesAfterEnv: ["./tests/env.ts"]
+    testEnvironment: "./tests/env/main.ts"
 };

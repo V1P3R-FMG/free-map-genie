@@ -21,5 +21,19 @@
             "resources": ["content.js", "content.css", "font/*", "css/*"],
             "matches": ["<all_urls>"]
         }
-    ]
+    ],
+    "permissions": [
+        "storage",
+        "declarativeNetRequest"
+    ],
+    "host_permissions": ["*://cdn.mapgenie.io/*"],
+    "declarative_net_request": {
+        "rule_resources": [
+            {
+                "id": "block",
+                "enabled": true,
+                "path": "rules.json"
+            }
+        ]
+    }
 }

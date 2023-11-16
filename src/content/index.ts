@@ -17,31 +17,8 @@ function listenForRefocus(callback: () => void) {
 /**
  * Reload the page, but only if it has not been reloaded consecutively 3 times.
  */
-function reloadCheck(): boolean {
-    if (!window.store) {
-        window.sessionStorage.removeItem("fmg:reload:count");
-        return false;
-    }
-
-    let i = JSON.parse(
-        window.sessionStorage.getItem("fmg:reload:count") ?? "0"
-    );
-
-    if (i > 3) {
-        logger.error(
-            "reloaded 3 times, not reloading again to prevent reload loop!"
-        );
-        window.sessionStorage.removeItem("fmg:reload:count");
-        return false;
-    }
-
-    window.sessionStorage.setItem("fmg:reload:count", `${++i}`);
-
-    logger.log("reloading page, because the store was allready defined.");
-
-    window.location.reload();
-
-    return true;
+function isReduxStoreDefined(): boolean {
+    return !!window.store;
 }
 
 /**
@@ -52,8 +29,11 @@ async function init() {
     const type = getPageType(window);
 
     if (type === "map") {
-        // Check if we need to reload the page, and do so if needed.
-        if (reloadCheck()) return;
+        // Check if the redux store is defined?.
+        // And if so tell the user the extension couldn't load probably.
+        if (isReduxStoreDefined()) {
+            logger.error("window.store is allready defined! The extension may not work probably if this is the case reload the page.")
+        };
     }
 
     if (type === "map") {

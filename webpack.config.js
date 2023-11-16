@@ -101,13 +101,14 @@ export default (env) => {
 
     const files = [
         { from: "./src/icons", to: "icons" },
-        { from: "./src/font", to: "font" }
+        { from: "./src/font", to: "font" },
+        { from: "./src/rules.json", to: "rules.json" }
     ];
 
     // Add the blocklist for chrome
-    if (browser === "chrome") {
-        files.push({ from: "./src/rules.json", to: "rules.json" });
-    }
+    // if (browser === "chrome") {
+    //     files.push({ from: "./src/rules.json", to: "rules.json" });
+    // }
 
     // Configure the webpack
     return {
@@ -242,6 +243,7 @@ export default (env) => {
                 target: browser === "chrome" ? "chromium" : "firefox-desktop",
                 devtools: true,
                 selfHosted: true,
+                chromiumBinary: process.env.CHROME_BIN,
                 firefox: process.env.FIREFOX_BIN,
                 firefoxProfile: process.env.FIREFOX_PROFILE,
                 chromiumProfile: process.env.CHROMIUM_PROFILE,
