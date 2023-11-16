@@ -82,7 +82,13 @@ class Logger {
      * Console error method.
      */
     get error() {
-        return this.createLogCallback("error");
+        const error = this.createLogCallback("error");
+        return function(...args: any) {
+            error(...args);
+            if (window.toastr) {
+                window.toastr.error(args.join(" "), "FMG ERROR", { timeOut: 10000 });
+            }
+        };
     }
 
     /**
