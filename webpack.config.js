@@ -101,13 +101,14 @@ export default (env) => {
 
     const files = [
         { from: "./src/icons", to: "icons" },
-        { from: "./src/font", to: "font" }
+        { from: "./src/font", to: "font" },
+        { from: "./src/rules.json", to: "rules.json" }
     ];
 
     // Add the blocklist for chrome
-    if (browser === "chrome") {
-        files.push({ from: "./src/rules.json", to: "rules.json" });
-    }
+    // if (browser === "chrome") {
+    //     files.push({ from: "./src/rules.json", to: "rules.json" });
+    // }
 
     // Configure the webpack
     return {
