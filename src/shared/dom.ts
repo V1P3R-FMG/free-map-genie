@@ -2,14 +2,14 @@ import { sleep, waitForCallback } from "./async";
 
 export async function getElement<T extends Element>(
     selector: string,
-    win?: Window
+    winOrElement?: Window | Element
 ): Promise<T> {
-    win = win ?? window;
-    let element = win.document.querySelector(selector);
+    const parent = winOrElement instanceof Element ? winOrElement : winOrElement?.document ?? window.document;
+    let element =parent.querySelector(selector);
     if (element !== null) return element as T;
     while (element === null) {
         await sleep(100);
-        element = win.document.querySelector(selector);
+        element = parent.querySelector(selector);
     }
     return element as T;
 }
