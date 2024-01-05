@@ -28,6 +28,10 @@
 <img src="/assets/tarkov_preview.png"/>
 
 > [!IMPORTANT]
+> The extension will not work when not loggedin.
+> Either login or use the [browser action](/docs/popup.md) to enable `mock user`.
+
+> [!IMPORTANT]
 > FMG restricts certain API calls and localizes data in the browser instead.
 > This means data will not transfer to different devices or browsers. You can always manually
 > import or export map data using the browser action.
