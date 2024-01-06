@@ -32,8 +32,8 @@ async function init() {
         // Check if the redux store is defined?.
         // And if so tell the user the extension couldn't load probably.
         if (isReduxStoreDefined()) {
-            logger.error("window.store is allready defined! The extension may not work probably if this is the case reload the page.")
-        };
+            logger.error("window.store is allready defined! The extension may not work probably if this is the case reload the page.");
+        }
     }
 
     if (type === "map") {
