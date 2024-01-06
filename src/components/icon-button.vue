@@ -9,26 +9,19 @@ export interface Props {
     toggle?: boolean;
 }
 
+export type ToggleEvent = (e: "toggle", value: boolean) => void;
+
+export type Events = ToggleEvent;
+
 const props = defineProps<Props>();
-const emit = defineEmits<{
-    (e: "toggle", value: boolean): void;
-}>();
+const emit = defineEmits<Events>();
 
 const toggled = ref(false);
 
 watch(
     () => props.toggle,
-    () => {
-        toggled.value = false;
-        emit("toggle", toggled.value);
-    }
+    () => emit("toggle", toggled.value = false)
 );
-
-function toggleButton() {
-    if (!props.toggle) return;
-    toggled.value = !toggled.value;
-    emit("toggle", toggled.value);
-}
 </script>
 
 <template>
@@ -39,7 +32,7 @@ function toggleButton() {
             (' ' + title)
         "
         :title="title"
-        @click="toggleButton"
+        @click="$props.toggle && (toggled = !toggled)"
     >
         <Icon :icon="icon" :size="size" />
     </button>
