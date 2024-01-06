@@ -19,5 +19,12 @@
         "name": "no_confirm_mark_unmark_all",
         "label": "No confirm mark/unmark all",
         "tooltip": "This option removes the confirm dialog when you click the mark/unmark all button."
+    },
+    {
+        "type": "checkbox",
+        "value": true,
+        "name": "use_declarative_net_request",
+        "label": "Enable DeclarativeNetRequest API",
+        "tooltip": "Block map script using DeclarativeNetRequest API which makes the extenions more reliable, but is sometimes not supported by the browser."
     }
 ]
