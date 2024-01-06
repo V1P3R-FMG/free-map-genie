@@ -6,7 +6,11 @@ export function getElement<T extends Element>(
     timeoutTime: number = -1
 ): Promise<T> {
     return timeout((async () => {
-        const parent = winOrElement instanceof Window ? winOrElement.document : winOrElement ?? window.document;
+        const parent = winOrElement !== undefined 
+            ? winOrElement instanceof Element
+                ? winOrElement
+                : winOrElement.document
+            : window.document;
         let element = parent.querySelector(selector);
         if (element !== null) return element as T;
         while (element === null) {
@@ -41,14 +45,32 @@ export interface CreateScriptOptions {
     appendTo?: HTMLElement;
 }
 
-export function documentLoaded(win?: Window): Promise<void> {
-    return waitForCallback(() => (win ?? window).document.readyState === "complete");
+/**
+ * Wait for document loaded
+ * @param win the window to check.
+ * @param timeoutTime reject promise if we are waiting longer then given timeout -1 for no rejection.
+ * @returns 
+ */
+export function documentLoaded(win?: Window, timeoutTime: number = -1): Promise<void> {
+    return waitForCallback(() => (win ?? window).document.readyState === "complete", timeoutTime);
 }
 
-export async function waitForBody(win: Window): Promise<void> {
-    await waitForCallback(() => !!(win ?? window).document.body);
+/**
+ * Wait for document loaded
+ * @param win the window to check.
+ * @param timeoutTime reject promise if we are waiting longer then given timeout -1 for no rejection.
+ * @returns 
+ */
+export async function waitForBody(win?: Window, timeoutTime: number = -1): Promise<void> {
+    await waitForCallback(() => !!(win ?? window).document.body, timeoutTime);
 }
 
-export async function waitForHead(win: Window): Promise<void> {
-    await waitForCallback(() => !!(win ?? window).document.head);
+/**
+ * Wait for document loaded
+ * @param win the window to check.
+ * @param timeoutTime reject promise if we are waiting longer then given timeout -1 for no rejection.
+ * @returns 
+ */
+export async function waitForHead(win?: Window, timeoutTime: number = -1): Promise<void> {
+    await waitForCallback(() => !!(win ?? window).document.head, timeoutTime);
 }

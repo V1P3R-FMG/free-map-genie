@@ -46,32 +46,32 @@ export function timeout<T>(promise: Promise<T>, ms: number, error?: string): Pro
 /**
  * Wait for callback to return true
  * @param callback the callback to wait for.
+ * @param timeoutTime reject promise if we are waiting longer then given timeout -1 for no rejection.
  * @returns a promise that resolves when the callback returns true.
  */
-export async function waitForCallback(callback: () => boolean) {
-    if (callback()) {
-        return;
-    }
-    while (!callback()) {
-        await sleep(100);
-    }
-    return;
+export async function waitForCallback(callback: () => boolean, timeoutTime: number = -1) {
+    if (callback()) return;
+    return timeout((async () => {
+        while (!callback()) await sleep(100);
+    })(), timeoutTime);
 }
 
 /**
  * Wait for globals to be defined
  * @param globals the globals or global to wait for.
  * @param window the window to check for the globals.
+ * @param timeoutTime reject promise if we are waiting longer then given timeout -1 for no rejection.
  * @returns a promise that resolves when the globals are defined.
  */
 export async function waitForGlobals(
     globals: keyof Window | (keyof Window)[],
-    window: Window
+    window: Window,
+    timeoutTime: number = -1
 ) {
     if (typeof globals === "string") {
         globals = [globals];
     }
-    return waitForCallback(() => hasKeys(window, globals as (keyof Window)[]));
+    return waitForCallback(() => hasKeys(window, globals as (keyof Window)[]), timeoutTime);
 }
 
 /**
