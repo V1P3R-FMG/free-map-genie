@@ -10,8 +10,12 @@ export function sleep(ms: number): Promise<void> {
 }
 
 export class PromiseTimeoutError extends Error {
-    constructor() {
-        super("Promise timed out");
+    constructor(error?: string) {
+        if (error !== undefined) {
+            super(`Promise timed out: ${error}`);
+        } else {
+            super("Promise timed out.");
+        }
     }
 }
 
@@ -22,18 +26,18 @@ export class PromiseTimeoutError extends Error {
  * @param ms the amount of time to wait before timing out.
  * @returns a promise that resolves with the result of the given promise or rejects with the error of the given promise.
  */
-export function timeout<T>(promise: Promise<T>, ms: number): Promise<T> {
+export function timeout<T>(promise: Promise<T>, ms: number, error?: string): Promise<T> {
     return new Promise((resolve, reject) => {
-        const timeout = setTimeout(() => {
-            reject(new PromiseTimeoutError());
+        const timeout = ms > 0 && setTimeout(() => {
+            reject(new PromiseTimeoutError(error));
         }, ms);
         promise
             .then((result) => {
-                clearTimeout(timeout);
+                if (timeout) clearTimeout(timeout);
                 resolve(result);
             })
             .catch((error) => {
-                clearTimeout(timeout);
+                if (timeout) clearTimeout(timeout);
                 reject(error);
             });
     });
