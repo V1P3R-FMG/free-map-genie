@@ -10,9 +10,11 @@ export default function getInfo(
     shared: any,
     sendResponse: (response: any) => void
 ) {
-    sendResponse({
-        pageType: getPageType(window),
-        attached: shared.attached
+    getPageType(window).then(pageType => {
+        sendResponse({
+            pageType,
+            attached: shared.attached
+        });
     });
     return true;
 }
