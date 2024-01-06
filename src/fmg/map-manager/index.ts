@@ -8,20 +8,19 @@ import { FMG_ExportHelper } from "@fmg/storage/data/export";
 
 export class FMG_MapManager {
     public window: Window;
-    public storage: FMG_Storage;
     public popup?: FMG_Popup;
     
+    public _storage?: FMG_Storage;
     private _store?: FMG_Store;
     private _autoPanPopup?: MG.MapManager["autoPanPopup"]; 
 
     public constructor(window: Window) {
         this.window = window;
+    }
 
-        // Create a storage manager
-        this.storage = new FMG_Storage(
-            window,
-            FMG_KeyDataHelper.fromWindow(window)
-        );
+    public get storage(): FMG_Storage {
+        if (!this._storage) throw new Error("Storage not initialized");
+        return this._storage;
     }
 
     /**
@@ -177,6 +176,12 @@ export class FMG_MapManager {
      * Loads the storage data.
      */
     public async load() {
+        if (!this._storage) {
+            this._storage = new FMG_Storage(
+                this.window,
+                FMG_KeyDataHelper.fromWindow(this.window)
+            );
+        }
         await this.storage.load();
     }
 
