@@ -48,11 +48,11 @@ export class FMG_MapSelector {
     private static getMapName(item: Element): string {
         const img = item.querySelector<HTMLImageElement>("img");
         if (img?.alt) {
-            return img.alt.toLowerCase();
+            return img.alt.replace(" ", "-").toLowerCase();
         } else if (img?.src) {
             const name = /\/maps\/([\w_-]+)\.[\w]+/.exec(img.src)?.[1];
             if (name) {
-                return name.toLowerCase();
+                return name.replace(" ", "-").toLowerCase();
             }
         }
         throw new Error("Could not find map name");

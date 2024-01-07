@@ -176,7 +176,7 @@ export class FMG_Map {
      * Get the map name for a given link element.
      */
     private getMapName(link: HTMLLinkElement): string {
-        return link.innerText.replace(/\s?\[\w+\]/i, "").toLowerCase();
+        return link.innerText.replace(/\s?\[\w+\]/i, "").replace(" ", "-").toLowerCase();
     }
 
     /**
