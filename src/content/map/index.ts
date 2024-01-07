@@ -292,14 +292,23 @@ export class FMG_Map {
     public async preSetup(): Promise<void> {
         if (!FMG_ExtensionData.settings.use_declarative_net_request) {
             logger.log("Using alternative block.");
-            const [appElement, mapElement] = await Promise.all([
-                getElement<HTMLDivElement>("#app", this.window, 5000),
-                getElement<HTMLDivElement>("#map", this.window, 5000)
-            ]);
-            this.appElement = appElement;
+             
+            const mapElement = await getElement<HTMLDivElement>("#map", this.window, 5000);
+            const appElement = mapElement.parentElement!;
+            mapElement.remove();
+            appElement.remove();
+            
+            this.appElement = appElement.cloneNode(true) as HTMLDivElement;
             this.appElement.id = "_app";
-            this.mapElement = mapElement;
+
+            this.mapElement = mapElement.cloneNode(true) as HTMLDivElement;
             this.mapElement.id = "_map";
+
+            this.appElement.insertBefore(this.mapElement, this.appElement.firstChild);
+            this.window.document.body.appendChild(this.appElement);
+
+            const control = this.appElement.querySelector(".mapboxgl-control-container");
+            control?.remove();
         } else {
             logger.log("Using declarative net requests.");
         }
@@ -333,7 +342,7 @@ export class FMG_Map {
      * Setup
      */
     public async setup(): Promise<void> {
-        this.refreshCheck();
+        //this.refreshCheck();
         await this.preSetup();
 
         // #if DEBUG
@@ -344,30 +353,28 @@ export class FMG_Map {
 
         await timeout(waitForCallback(() => !!this.window.mapData), 5000, "Mapdata took to long to load.");
         if (!FMG_ExtensionData.settings.use_declarative_net_request) {
-            //await (timeout(waitForCallback(() => !!this.window.store), 1000).catch());
-            await sleep(1000);
+            await sleep(500);
         }
 
         // Setup mock user if enabled
         if (FMG_ExtensionData.settings.mock_user) {
             this.window.user = {
                 id: -1,
-                role: "user"
+                role: "user",
             } as any;
         }
 
         await this.loadMapData();
-
-        if (!this.window.user) {
-            await this.loadMapScript();
-            throw new Error("User not loggedin");
-        }
+        this.setupConfig();
 
         await FMG_StorageDataMigrator.migrateLegacyData(this.window);
         await this.mapManager.load();
 
-        this.loadUser();
-        this.setupConfig();
+        if (this.window.user) {
+            this.loadUser();
+        } {
+            console.error("User not loggedin");
+        }
 
         // Install storage filter, before we load the blocked map script
         const storageFilter = FMG_StorageFilter.install(this.window);
@@ -399,7 +406,8 @@ export class FMG_Map {
             }
 
             // Attach ui
-            await this.attachUI();
+            await this.attachUI()
+                .catch(logger.error);
         }
     }
 }

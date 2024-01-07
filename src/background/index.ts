@@ -4,10 +4,10 @@ const RULES = [
     {
         id: 1,
         priority: 1,
-        action: { type: chrome.declarativeNetRequest.RuleActionType.BLOCK },
+        action: { type: "block" as chrome.declarativeNetRequest.RuleActionType.BLOCK },
         condition: {
             regexFilter: "^https://cdn\\.mapgenie\\.io/js/map\\.js\\?id=\\w+$",
-            resourceTypes: [chrome.declarativeNetRequest.ResourceType.SCRIPT]
+            resourceTypes: ["script" as chrome.declarativeNetRequest.ResourceType.SCRIPT]
         }
     }
 ];

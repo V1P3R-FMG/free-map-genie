@@ -34,8 +34,7 @@ export class FMG_UI {
     }
 
     private async getCategoryPanel(): Promise<HTMLElement> {
-        const panel = await this.getPanel();
-        return getElement(".category-progress", panel, 5000);
+        return getElement(".category-progress", this.mapManager.window, 5000);
     }
 
     private getBottomRightControlContainer(): Promise<HTMLElement> {
@@ -43,17 +42,17 @@ export class FMG_UI {
     }
 
     private createHorizontalRule(): HTMLHRElement {
-        return this.mapManager.window.document.createElement("hr");
+        return document.createElement("hr");
     }
 
     private createBeforeDiv(element: HTMLElement): HTMLDivElement {
-        const div = window.document.createElement("div");
+        const div = document.createElement("div");
         element.before(div);
         return div;
     }
 
     private createDiv(element: HTMLElement): HTMLDivElement {
-        const div = window.document.createElement("div");
+        const div = document.createElement("div");
         element.appendChild(div);
         return div;
     }
