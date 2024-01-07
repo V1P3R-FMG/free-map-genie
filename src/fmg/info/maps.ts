@@ -23,7 +23,7 @@ export class FMG_Maps {
      * @param gameId the game id to get the FMG_Maps instance for
      * @returns the FMG_Maps instance
      */
-    public static get(gameId: Id): FMG_Maps {
+    public static forGame(gameId: Id): FMG_Maps {
         if (!FMG_Maps.games[gameId]) {
             FMG_Maps.games[gameId] = new FMG_Maps(gameId);
         }

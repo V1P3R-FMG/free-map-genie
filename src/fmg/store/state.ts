@@ -35,7 +35,7 @@ export function extendState(
                 : storage.data.presetOrder;
         state.user.presets = presetOrder.map((id) => {
             if (id > -1) return storage.data.presets.find((p) => p.id == id)!;
-            return storage.window.mapData!.presets.find((p) => p.id == id)!;
+            return storage.window.mapData!.presets.find((p) => p.is_demo_preset)!;
         });
     } else {
         logger.warn("mapData not found, could not set presets");

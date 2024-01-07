@@ -20,8 +20,12 @@ import {
     setData,
     getData
 } from "@shared/extension";
+import { sleep } from "@shared/async";
 
-var dataLoaded = false;
+chrome.storage.onChanged.addListener(async () => {
+    await sleep(50);
+    await load();
+});
 
 const author = __AUTHOR__;
 const version = __VERSION__ + (__DEBUG__ ? "-dev" : "");
@@ -36,13 +40,10 @@ const settings = ref<FMG.Extension.Settings>(settingsRaw);
 const info = ref({});
 
 async function save() {
-    if (!dataLoaded) return;
-    // #if DEBUG
-    logger.log("Saving data", {
+    logger.debug("Saving data", {
         bookmarks: bookmarksRaw,
         settings: settingsRaw
     });
-    // #endif
     setData({
         bookmarks: bookmarksRaw,
         settings: settingsRaw
@@ -50,19 +51,19 @@ async function save() {
 }
 
 async function load() {
-    if (dataLoaded) return;
     const data = await getData();
     bookmarksRaw = data.bookmarks;
     settingsRaw = data.settings;
     bookmarks.value = bookmarksRaw;
     settings.value = settingsRaw;
-    // #if DEBUG
-    logger.log("Loaded data", {
+    logger.debug("Loaded data", {
         bookmarks: bookmarksRaw,
         settings: settingsRaw
     });
-    // #endif
-    dataLoaded = true;
+}
+
+function reload() {
+    chrome.runtime.reload();
 }
 
 function openMapGenie() {
@@ -145,12 +146,20 @@ getInfo();
     <Theme theme="auto">
         <div class="container">
             <div class="titlebar">
-                <IconButton
-                    icon="g"
-                    title="mapgenie"
-                    size="20px"
-                    @click="openMapGenie"
-                />
+                <div class="titlebar-button-group">
+                    <IconButton
+                        icon="reload"
+                        title="reload"
+                        size="20px"
+                        @click="reload"
+                    />
+                    <IconButton
+                        icon="g"
+                        title="mapgenie"
+                        size="20px"
+                        @click="openMapGenie"
+                    />
+                </div>
                 <h3 class="title">MapGenie<sup class="pro">PRO</sup></h3>
                 <IconButton
                     icon="cancel"

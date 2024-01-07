@@ -6,21 +6,26 @@ const shared = {
 };
 
 function injectScript(src: string): HTMLScriptElement {
+    const head = document.head || document.documentElement;
     const script = document.createElement("script");
     script.src = src;
-    document.head.appendChild(script);
+    head.appendChild(script);
     return script;
 }
 
 function injectLink(href: string): HTMLLinkElement {
+    const head = document.head || document.documentElement;
     const link = document.createElement("link");
     link.rel = "stylesheet";
     link.href = href;
-    document.head.appendChild(link);
+    head.appendChild(link);
     return link;
 }
 
 async function init() {
+    const data = await getData();
+    if (!data.settings.extension_enabled) return;
+
     window.addEventListener("message", (event) => {
         switch (event.data.type) {
             case "fmg:attached":
@@ -28,13 +33,11 @@ async function init() {
                 break;
         }
     });
-    window.sessionStorage.setItem(
-        "fmg:extension:data",
-        JSON.stringify(await getData())
-    );
+    window.sessionStorage.setItem("fmg:extension:data", JSON.stringify(data));
+
     injectLink(chrome.runtime.getURL("content.css"));
-    injectLink(chrome.runtime.getURL("css/fmg-font.css"));
     injectScript(chrome.runtime.getURL("content.js"));
+    
     initHandlers(shared);
 }
 

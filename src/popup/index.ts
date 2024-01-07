@@ -1,11 +1,15 @@
 import { createApp } from "vue";
 import App from "./layout/app.vue";
 import { send, reload, isConnectionError } from "../shared/send";
+import { getData } from "@shared/extension";
 
 send("hello")
-    .catch((err) => {
+    .catch(async (err) => {
         if (isConnectionError(err as Error)) {
-            reload();
+            const data = await getData();
+            if (data.settings.extension_enabled) {
+                reload();
+            }
             return Promise.resolve();
         }
         return Promise.reject(err);

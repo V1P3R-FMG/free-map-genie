@@ -1,38 +1,37 @@
+import { waitForBody } from "@shared/dom";
+
 export type PageType =
     | "map"
     | "guide"
     | "home"
     | "map-selector"
-    | "upgrade"
-    | "login"
     | "unknown";
 
 /**
  * Checks if the current page is a map page.
  * @returns Returns true if the current page is a map page, false otherwise.
  */
-export function isMapPage(window: Window): boolean {
-    return !!window.document.body.querySelector(
-        "script[src^='https://cdn.mapgenie.io/js/map.js?id=']"
-    );
+export async function isMapPage(window: Window): Promise<boolean> {
+    return true
+        && !!window.document.head.querySelector("meta[property='og:image'][content^='https://cdn.mapgenie.io/']")
+        && !!document.head.querySelector("meta[property='og:title'][content~='Map']");
 }
 
 /**
  * Checks if the current page is a guide page.
  * @returns Returns true if the current page is a guide page, false otherwise.
  */
-export function isGuidePage(window: Window): boolean {
-    return (
-        !!window.document.querySelector("body.guide.pogo") ||
-        !!window.document.body.querySelector("#stick-map")
-    );
+export async function isGuidePage(window: Window): Promise<boolean> {
+    return true
+        &&!!window.document.head.querySelector("meta[property='og:image'][content^='https://cdn.mapgenie.io/']")
+        &&!!window.document.head.querySelector("meta[property='og:url'][content*='guides']");
 }
 
 /**
  * Checks if the current page is the homepage.
  * @returns Returns true if the current page is the homepage, false otherwise.
  */
-export function isHomePage(window: Window): boolean {
+export async function isHomePage(window: Window): Promise<boolean> {
     return window.location.href === "https://mapgenie.io/";
 }
 
@@ -40,56 +39,27 @@ export function isHomePage(window: Window): boolean {
  * Check if the current page is a map selector page.
  * @returns Returns true if the current page is a map selector page, false otherwise.
  */
-export function isMapSelectorPage(window: Window): boolean {
-    return (
-        !!window.document.body.classList.contains("game-home") &&
-        !!window.document.body.querySelector(".maps-container")
-    );
-}
-
-/**
- * Check if page is a upgrade page.
- * @returns Returns true if the current page is a upgrade page, false otherwise.
- */
-export function isUpgradePage(window: Window): boolean {
-    return (
-        window.location.pathname.endsWith("/upgrade") &&
-        !!window.document.head.querySelector(
-            "link[href*='https://cdn.mapgenie.io/']"
-        )
-    );
-}
-
-/**
- * Check if page is a login page.
- * @returns Returns true if the current page is a login page, false otherwise.
- */
-export function isLoginPage(window: Window): boolean {
-    return (
-        window.location.pathname.endsWith("/login") &&
-        !!window.document.head.querySelector(
-            "link[href*='https://cdn.mapgenie.io/']"
-        )
-    );
+export async function isMapSelectorPage(window: Window): Promise<boolean> {
+    return true
+        && !!window.document.head.querySelector("meta[property='og:image'][content^='https://cdn.mapgenie.io/']")
+        && !!window.document.head.querySelector("meta[property='og:title'][content~='Map']")
+        && window.document.body.classList.contains("game-home");
 }
 
 /**
  * Gets the type of the current page.
  * @returns Returns the type of the current page.
  */
-export function getPageType(window: Window): PageType {
-    if (isMapPage(window)) {
-        return "map";
-    } else if (isGuidePage(window)) {
-        return "guide";
-    } else if (isHomePage(window)) {
+export async function getPageType(window: Window): Promise<PageType> {
+    await waitForBody(window);
+    if (await isHomePage(window)) {
         return "home";
-    } else if (isMapSelectorPage(window)) {
+    } else if (await isMapSelectorPage(window)) {
         return "map-selector";
-    } else if (isUpgradePage(window)) {
-        return "upgrade";
-    } else if (isLoginPage(window)) {
-        return "login";
+    } else if (await isMapPage(window)) {
+        return "map";
+    } else if (await isGuidePage(window)) {
+        return "guide";
     }
     return "unknown";
 }

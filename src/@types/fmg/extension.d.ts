@@ -11,9 +11,11 @@ declare namespace FMG {
         type Option = CheckboxOption;
 
         interface Settings {
+            extension_enabled: boolean;
             presets_allways_enabled: boolean;
             mock_user: boolean;
             no_confirm_mark_unmark_all: boolean;
+            use_declarative_net_request: boolean;
         }
 
         interface BookmarkData {

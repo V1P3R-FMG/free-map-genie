@@ -11,26 +11,39 @@ export class FMG_Storage {
     public autosave: boolean = true;
 
     public readonly window: Window;
-    public readonly keys: FMG_Keys;
 
     public driver: FMG.Storage.Driver;
-    public _data: Record<string, FMG_Data> = {};
+
+    private _keyData: FMG.Storage.KeyData;
+    private _data: Record<string, FMG_Data> = {};
+    private _keys?: FMG_Keys;
 
     public constructor(window: Window, keyData: FMG.Storage.KeyData) {
         this.window = window;
-        this.keys = new FMG_Keys(keyData);
-
         this.driver = FMG_Drivers.newLocalStorageDriver(window);
-
-        this._data[this.keys.v2Key] = FMG_Data.create({}, () => this.save());
+        
+        this._keyData = keyData;
+        if (window.user) {
+            this._data[this.keys.v2Key] = FMG_Data.create({}, () => this.save());
+        }
     }
 
     public get data(): FMG_Data {
-        return this._data[this.keys.v2Key];
+        if (this.window.user) {
+            return this._data[this.keys.v2Key];
+        }
+        return FMG_Data.create({}, () => {});
     }
 
     public get all(): Record<string, FMG_Data> {
         return this._data;
+    }
+
+    public get keys(): FMG_Keys {
+        if (!this._keys) {
+            this._keys = new FMG_Keys(this._keyData);
+        }
+        return this._keys;
     }
 
     /**
@@ -83,6 +96,7 @@ export class FMG_Storage {
      * Loads the data from the storage.
      */
     public async load(): Promise<void> {
+        if (!this.window.user) return;
         if (this.window && this.window.mapData && this.window.isMini) {
             await Promise.all(
                 this.window.mapData.maps.map(async (map) => {
@@ -113,6 +127,7 @@ export class FMG_Storage {
      * Saves the data to the storage.
      */
     public async save(): Promise<void> {
+        if (!this.window.user) return;
         for (const [key, data] of Object.entries(this._data)) {
             // Deep filter out empty values.
             const obj = deepFilter(data, isNotEmpty);
@@ -130,6 +145,7 @@ export class FMG_Storage {
      * Clear the data from the storage.
      */
     public async clear(): Promise<void> {
+        if (!this.window.user) return;
         await this.driver.remove(this.key);
         this._data = Object.fromEntries(
             Object.entries(this._data).map(([key]) => [

@@ -35,13 +35,13 @@ describe("FMG_Maps", () => {
     });
 
     it("should cache te values", async () => {
-        const mapsA = FMG_Maps.get(window.game.id);
-        const mapsB = FMG_Maps.get(window.game.id);
+        const mapsA = FMG_Maps.forGame(window.game.id);
+        const mapsB = FMG_Maps.forGame(window.game.id);
         expect(mapsA).toBe(mapsB);
     });
 
     it("should return the correct map", async () => {
-        const maps = FMG_Maps.get(window.game.id);
+        const maps = FMG_Maps.forGame(window.game.id);
 
         for (const map of window.mapData!.maps) {
             expect((await maps.get(map.id)).map).toMatchObject({
@@ -52,7 +52,7 @@ describe("FMG_Maps", () => {
     }, 15000);
 
     it("should filter the locations by map", async () => {
-        const maps = FMG_Maps.get(window.game.id);
+        const maps = FMG_Maps.forGame(window.game.id);
 
         const filtered = await maps.filterLocations(locations);
 
@@ -68,7 +68,7 @@ describe("FMG_Maps", () => {
     });
 
     it("should filter the categories by map", async () => {
-        const maps = FMG_Maps.get(window.game!.id);
+        const maps = FMG_Maps.forGame(window.game!.id);
 
         const filtered = await maps.filterCategories(categories);
 

@@ -13,7 +13,8 @@
     "content_scripts": [
         {
             "js": ["extension.js"],
-            "matches": ["<all_urls>"]
+            "matches": ["<all_urls>"],
+            "run_at": "document_start"
         }
     ],
     "web_accessible_resources": [
@@ -26,14 +27,5 @@
         "storage",
         "declarativeNetRequest"
     ],
-    "host_permissions": ["*://cdn.mapgenie.io/*"],
-    "declarative_net_request": {
-        "rule_resources": [
-            {
-                "id": "block",
-                "enabled": true,
-                "path": "rules.json"
-            }
-        ]
-    }
+    "host_permissions": ["*://cdn.mapgenie.io/*"]
 }

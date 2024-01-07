@@ -22,14 +22,28 @@ export class FMG_Store {
         window.store.getState = this.getState.bind(this);
     }
 
+    /**
+     * Subscribe to store/state changes.
+     * @param listener a callback to call when changes occur.
+     */
     public subscribe(listener: () => void): void {
         this.store.subscribe(listener);
     }
 
+    /**
+     * Get the current mg app state wrapped in a custom class.
+     * @returns the wrapped mg map app state.
+     */
     public getState(): FMG_State {
         return extendState(this._getState(), this.mapManager);
     }
 
+    /**
+     * Initialize this store class injector.
+     * @param window the window to attach on.
+     * @param mapManager the fmg mapmannager for the given window.
+     * @returns the injected class instance.
+     */
     public static install(
         window: WindowExtended,
         mapManager: FMG_MapManager
@@ -40,6 +54,11 @@ export class FMG_Store {
         return window[StoreInstalled];
     }
 
+    /**
+     * Track or untrack multiple categories.
+     * @param categoryId the locations to (un)track.
+     * @param track a boolean value true to track and false to untrack.
+     */
     public trackCategory(categoryId: Id, tracked: boolean): void {
         this.store.dispatch({
             type: tracked
@@ -51,6 +70,25 @@ export class FMG_Store {
         });
     }
 
+    /**
+     * Track or untrack multiple categories.
+     * @param categoryIds the locations to (un)track.
+     * @param tracked either a object with id as keys and boolean as value or a single boolean value.
+     */
+    public trackCategories(categoryIds: Id[], tracked: boolean): void;
+    public trackCategories(categoryIds: Id[], tracked: Record<Id, boolean>): void;
+    public trackCategories(categoryIds: Id[], tracked: any) {
+        if (typeof tracked === "boolean") {
+            categoryIds.forEach(id => this.trackCategory(id, tracked));
+        } else {
+            categoryIds.forEach(id => this.trackCategory(id, tracked[id] ?? false));
+        }
+    }
+
+    /**
+     * Reorder the presets.
+     * @param ordering the new ordering for the presets.
+     */
     public reorderPresets(ordering: number[]): void {
         this.store.dispatch({
             type: "HIVE:USER:REORDER_PRESETS",
@@ -60,6 +98,9 @@ export class FMG_Store {
         });
     }
 
+    /**
+     * Force a location update.
+     */
     public updateLocations(): void {
         this.store.dispatch({
             type: "HIVE:USER:MARK_LOCATION",
@@ -67,6 +108,9 @@ export class FMG_Store {
         });
     }
 
+    /**
+     * Force a category update.
+     */
     public updateCategories(): void {
         this.store.dispatch({ type: "HIVE:USER:UPDATE_CATEGORY_PROGRESS" });
     }

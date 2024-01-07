@@ -2,16 +2,17 @@ import { getPageType } from "@fmg/page";
 import { FMG_Map } from "./map";
 import { FMG_Guide } from "./guide";
 import { FMG_MapSelector } from "./map-selector";
+import debounce from "@shared/debounce";
 
 function listenForRefocus(callback: () => void) {
-    document.addEventListener("visibilitychange", () => {
+    document.addEventListener("visibilitychange", debounce(() => {
         switch (document.visibilityState) {
             case "visible":
                 callback();
                 logger.debug("refocused");
                 break;
         }
-    });
+    }, 250));
 }
 
 /**
@@ -26,24 +27,15 @@ function isReduxStoreDefined(): boolean {
  */
 async function init() {
     // Check if the page is a map or guide
-    const type = getPageType(window);
-
+    const type = await getPageType(window);
     if (type === "map") {
-        // Check if the redux store is defined?.
-        // And if so tell the user the extension couldn't load probably.
-        if (isReduxStoreDefined()) {
-            logger.error("window.store is allready defined! The extension may not work probably if this is the case reload the page.")
-        };
-    }
-
-    if (type === "map") {
-        const map = await FMG_Map.setup(window);
-        if (map) {
-            listenForRefocus(() => map.reload());
-        }
+        const map = new FMG_Map(window);
+        await map.setup();
+        listenForRefocus(() => map.reload());
         return true;
     } else if (type === "guide") {
-        const guide = await FMG_Guide.setup(window);
+        const guide = new FMG_Guide(window);
+        await guide.setup();
         listenForRefocus(() => guide.reload());
         return true;
     } else if (type === "map-selector") {

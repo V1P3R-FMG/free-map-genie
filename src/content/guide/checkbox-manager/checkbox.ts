@@ -1,22 +1,21 @@
-import type { FMG_MapManager } from "@fmg/map-manager";
-import { FMG_Maps } from "@fmg/info";
-
 export class FMG_Checkbox {
-    private input: HTMLInputElement;
-    private mapManager: FMG_MapManager;
+    public readonly input: HTMLInputElement;
 
-    private mapId?: Id;
-    private locationId?: Id;
+    public readonly locationId: Id;
+    public mapId?: Id;
 
-    constructor(input: HTMLInputElement, mapManager: FMG_MapManager) {
+    constructor(input: HTMLInputElement) {
         this.input = this.replaceInput(input);
+        this.locationId = input.getAttribute("data-location-id") ?? (() => {
+            throw new Error("Input does not hava data-location-id.");
+        })();
+    }
 
-        this.mapManager = mapManager;
-
-        // We watch for changes to the checkbox
-        this.input.addEventListener("change", async () => {
-            await this._mark(this.input.checked);
-        });
+    /**
+     * Add on change callback
+     */
+    public onChange(cb: () => void): void {
+        this.input.addEventListener("change", cb);
     }
 
     /**
@@ -33,57 +32,6 @@ export class FMG_Checkbox {
     }
 
     /**
-     * Get the location id for this checkbox
-     * @returns the location id
-     */
-    public getLocationId(): Id {
-        if (this.locationId) return this.locationId;
-        // Get location id
-        const id = this.input.getAttribute("data-location-id");
-        if (!id) {
-            throw new Error("Input element is missing data-location-id");
-        }
-        this.locationId = id;
-        return this.locationId;
-    }
-
-    /**
-     * Get the map id for this checkbox
-     * @returns the map id
-     */
-    public async getMapId(): Promise<Id> {
-        if (this.mapId) return this.mapId;
-        const id = this.input.getAttribute("data-map-id");
-        if (id) {
-            this.mapId = id;
-            return this.mapId;
-        } else {
-            const maps = FMG_Maps.get(
-                this.mapManager.storage.keys.keyData.gameId
-            );
-            const map = await maps.getMapForLocation(this.getLocationId());
-            this.mapId = map.map.id;
-            return this.mapId;
-        }
-    }
-
-    /**
-     * Mark the checkbox as checked or not
-     * @param marked whether the checkbox should be marked or not
-     */
-    private async _mark(marked: boolean): Promise<void> {
-        const locationId = this.getLocationId();
-        const mapId = await this.getMapId();
-        const key = this.mapManager.storage.keys.getV2KeyForMap(mapId);
-        if (marked) {
-            this.mapManager.storage.all[key].locations[locationId] = true;
-        } else {
-            delete this.mapManager.storage.all[key].locations[locationId];
-        }
-        this.mapManager.markLocationFound(locationId, marked);
-    }
-
-    /**
      * Visualy mark the checkbox as checked or not
      * @param marked whether the checkbox should be marked or not
      */
@@ -92,13 +40,9 @@ export class FMG_Checkbox {
     }
 
     /**
-     * Load the checkbox state from storage
-     */
-    public async load(): Promise<void> {
-        const locationId = this.getLocationId();
-        const value = Object.values(this.mapManager.storage.all).some(
-            (data) => data.locations[locationId] ?? false
-        );
-        this.mark(value);
-    }
+     * Check if the checkbox is marked
+    */
+   public get isMarked(): boolean {
+    return this.input.checked;
+   }
 }
