@@ -34,4 +34,24 @@ export class FMG_KeyDataHelper {
             userId: checkDefined(window.user?.id, "window.user.id")
         };
     }
+
+    /**
+     * Creates key data from the given window and userId.
+     * @param window the window to create the key data from
+     * @param userId the userId to use
+     * @returns the created key data
+     */
+        static fromWindowAndUser(
+            window: Window,
+            userId: number
+        ): FMG.Storage.KeyData {
+            return {
+                mapId: checkDefined(
+                    window.mapData?.map.id,
+                    "window.mapData.map.id"
+                ),
+                gameId: checkDefined(window.game?.id, "window.game.id"),
+                userId
+            };
+        }
 }

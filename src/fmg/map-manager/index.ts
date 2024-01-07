@@ -22,7 +22,9 @@ export class FMG_MapManager {
         if (!this._storage) {
             this._storage = new FMG_Storage(
                 this.window,
-                FMG_KeyDataHelper.fromWindow(this.window)
+                this.window.user
+                    ? FMG_KeyDataHelper.fromWindow(this.window)
+                    : FMG_KeyDataHelper.fromWindowAndUser(this.window, -1000)
             );
         }
         return this._storage;
