@@ -65,6 +65,10 @@ async function load() {
     dataLoaded = true;
 }
 
+function reload() {
+    chrome.runtime.reload();
+}
+
 function openMapGenie() {
     chrome.tabs.create({ url: "https://mapgenie.io/" });
 }
@@ -145,12 +149,20 @@ getInfo();
     <Theme theme="auto">
         <div class="container">
             <div class="titlebar">
-                <IconButton
-                    icon="g"
-                    title="mapgenie"
-                    size="20px"
-                    @click="openMapGenie"
-                />
+                <div class="titlebar-button-group">
+                    <IconButton
+                        icon="reload"
+                        title="reload"
+                        size="20px"
+                        @click="reload"
+                    />
+                    <IconButton
+                        icon="g"
+                        title="mapgenie"
+                        size="20px"
+                        @click="openMapGenie"
+                    />
+                </div>
                 <h3 class="title">MapGenie<sup class="pro">PRO</sup></h3>
                 <IconButton
                     icon="cancel"
