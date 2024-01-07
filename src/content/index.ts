@@ -2,17 +2,17 @@ import { getPageType } from "@fmg/page";
 import { FMG_Map } from "./map";
 import { FMG_Guide } from "./guide";
 import { FMG_MapSelector } from "./map-selector";
-import { getElement } from "@shared/dom";
+import debounce from "@shared/debounce";
 
 function listenForRefocus(callback: () => void) {
-    document.addEventListener("visibilitychange", () => {
+    document.addEventListener("visibilitychange", debounce(() => {
         switch (document.visibilityState) {
             case "visible":
                 callback();
                 logger.debug("refocused");
                 break;
         }
-    });
+    }, 250));
 }
 
 /**
