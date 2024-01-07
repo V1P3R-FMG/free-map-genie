@@ -1,4 +1,4 @@
-import { waitForBody, waitForHead } from "@shared/dom";
+import { waitForBody } from "@shared/dom";
 
 export type PageType =
     | "map"
@@ -12,7 +12,6 @@ export type PageType =
  * @returns Returns true if the current page is a map page, false otherwise.
  */
 export async function isMapPage(window: Window): Promise<boolean> {
-    waitForHead(window);
     return true
         && !!window.document.head.querySelector("meta[property='og:image'][content^='https://cdn.mapgenie.io/']")
         && !!document.head.querySelector("meta[property='og:title'][content~='Map']");
@@ -23,7 +22,6 @@ export async function isMapPage(window: Window): Promise<boolean> {
  * @returns Returns true if the current page is a guide page, false otherwise.
  */
 export async function isGuidePage(window: Window): Promise<boolean> {
-    waitForHead(window);
     return true
         &&!!window.document.head.querySelector("meta[property='og:image'][content^='https://cdn.mapgenie.io/']")
         &&!!window.document.head.querySelector("meta[property='og:url'][content*='guides']");
@@ -42,11 +40,10 @@ export async function isHomePage(window: Window): Promise<boolean> {
  * @returns Returns true if the current page is a map selector page, false otherwise.
  */
 export async function isMapSelectorPage(window: Window): Promise<boolean> {
-    waitForHead(window);
     return true
         && !!window.document.head.querySelector("meta[property='og:image'][content^='https://cdn.mapgenie.io/']")
         && !!window.document.head.querySelector("meta[property='og:title'][content~='Map']")
-        && !window.document.head.querySelector("meta[property='og:url'][content*=");
+        && window.document.body.classList.contains("game-home");
 }
 
 /**
@@ -54,14 +51,15 @@ export async function isMapSelectorPage(window: Window): Promise<boolean> {
  * @returns Returns the type of the current page.
  */
 export async function getPageType(window: Window): Promise<PageType> {
-    if (await isMapPage(window)) {
-        return "map";
-    } else if (await isGuidePage(window)) {
-        return "guide";
-    } else if (await isHomePage(window)) {
+    await waitForBody(window);
+    if (await isHomePage(window)) {
         return "home";
     } else if (await isMapSelectorPage(window)) {
         return "map-selector";
+    } else if (await isMapPage(window)) {
+        return "map";
+    } else if (await isGuidePage(window)) {
+        return "guide";
     }
     return "unknown";
 }
