@@ -23,13 +23,13 @@ export class FMG_Storage {
         this.driver = FMG_Drivers.newLocalStorageDriver(window);
         
         this._keyData = keyData;
-        if (!window.user) {
+        if (window.user) {
             this._data[this.keys.v2Key] = FMG_Data.create({}, () => this.save());
         }
     }
 
     public get data(): FMG_Data {
-        if (!this.window.user) {
+        if (this.window.user) {
             return this._data[this.keys.v2Key];
         }
         return FMG_Data.create({}, () => {});
