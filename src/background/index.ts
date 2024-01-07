@@ -14,33 +14,48 @@ const RULES = [
 
 async function isDeclarativeNetRequestsEnabled(): Promise<boolean> {
     const data = await getData();
-    return data.settings.use_declarative_net_request;
+    return data.settings.extension_enabled && data.settings.use_declarative_net_request;
 }
 
 function isDeclarativeNetRequestsChanged(changes: Record<string, chrome.storage.StorageChange>): boolean {
     if (!changes.settings) return false;
-    return changes.settings.newValue.use_declarative_net_request 
-        != changes.settings.oldValue.use_declarative_net_request;
+    return true
+        || changes.settings.newValue.use_declarative_net_request 
+            != changes.settings.oldValue.use_declarative_net_request
+        || changes.settings.newValue.extension_enabled
+            != changes.settings.oldValue.extension_enabled;
 }
 
 function enableDeclarativeNetRequestRules() {
     logger.debug("Enabled DNR Rules");
-    chrome.declarativeNetRequest.updateDynamicRules({
-        removeRuleIds: RULES.map(r => r.id),
-        addRules: RULES,
-    });
+    if (chrome.declarativeNetRequest) {
+        chrome.declarativeNetRequest.updateDynamicRules({
+            removeRuleIds: RULES.map(r => r.id),
+            addRules: RULES,
+        });
+    } else {
+        console.warn("Browser does not support.");
+        // TODO: turn off setting.
+    }
 }
 
 function disableDeclarativeNetRequestRules() {
     logger.debug("Disabled DNR rules");
-    chrome.declarativeNetRequest.updateDynamicRules({
-        removeRuleIds: RULES.map(r => r.id),
-    });
+    if (chrome.declarativeNetRequest) {
+        chrome.declarativeNetRequest.updateDynamicRules({
+            removeRuleIds: RULES.map(r => r.id),
+        });
+    } else {
+        console.warn("Browser does not support.");
+        // TODO: turn off setting.
+    }
 }
 
 async function init() {
-    if (await isDeclarativeNetRequestsEnabled() && chrome.declarativeNetRequest) {
+    if (await isDeclarativeNetRequestsEnabled()) {
         enableDeclarativeNetRequestRules();
+    } else if (chrome.declarativeNetRequest) {
+        disableDeclarativeNetRequestRules();
     }
 
     chrome.storage.onChanged.addListener(async (changes, area) => {

@@ -23,6 +23,9 @@ function injectLink(href: string): HTMLLinkElement {
 }
 
 async function init() {
+    const data = await getData();
+    if (!data.settings.extension_enabled) return;
+
     window.addEventListener("message", (event) => {
         switch (event.data.type) {
             case "fmg:attached":
@@ -30,12 +33,11 @@ async function init() {
                 break;
         }
     });
-    window.sessionStorage.setItem(
-        "fmg:extension:data",
-        JSON.stringify(await getData())
-    );
+    window.sessionStorage.setItem("fmg:extension:data", JSON.stringify(data));
+
     injectLink(chrome.runtime.getURL("content.css"));
     injectScript(chrome.runtime.getURL("content.js"));
+    
     initHandlers(shared);
 }
 
