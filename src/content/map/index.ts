@@ -372,7 +372,7 @@ export class FMG_Map {
 
         if (this.window.user) {
             this.loadUser();
-        } {
+        } else {
             console.error("User not loggedin");
         }
 
@@ -390,7 +390,7 @@ export class FMG_Map {
 
         // Finish mapManager initialization
         // We need to do this after the map script is loaded,
-        this.mapManager.init();
+        this.mapManager.init(); 
 
         // Only attach ui if we are not in mini mode
         if (!this.window.isMini) {
