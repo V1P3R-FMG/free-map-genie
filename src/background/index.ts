@@ -1,4 +1,4 @@
-import { getData } from "@shared/extension";
+import { getData, setData } from "@shared/extension";
 
 const RULES = [
     {
@@ -26,6 +26,12 @@ function isDeclarativeNetRequestsChanged(changes: Record<string, chrome.storage.
             != changes.settings.oldValue.extension_enabled;
 }
 
+async function disableDeclarativeNetRequestsOptions() {
+    const data = await getData();
+    data.settings.use_declarative_net_request = false;
+    await setData(data);
+}
+
 function enableDeclarativeNetRequestRules() {
     logger.debug("Enabled DNR Rules");
     if (chrome.declarativeNetRequest) {
@@ -35,7 +41,7 @@ function enableDeclarativeNetRequestRules() {
         });
     } else {
         console.warn("Browser does not support.");
-        // TODO: turn off setting.
+        disableDeclarativeNetRequestsOptions();
     }
 }
 
@@ -47,7 +53,7 @@ function disableDeclarativeNetRequestRules() {
         });
     } else {
         console.warn("Browser does not support.");
-        // TODO: turn off setting.
+        disableDeclarativeNetRequestsOptions();
     }
 }
 
