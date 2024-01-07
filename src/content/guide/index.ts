@@ -1,9 +1,8 @@
-import { timeout, waitForCallback, waitForGlobals } from "@shared/async";
-import { getElement, getElementWithXPath, documentLoaded } from "@shared/dom";
+import { waitForCallback, waitForGlobals } from "@shared/async";
+import { getElement, documentLoaded } from "@shared/dom";
 
 import { FMG_Map } from "@content/map";
 import { FMG_ApiFilter } from "@fmg/filters/api-filter";
-import type { FMG_MapManager } from "@fmg/map-manager";
 import { FMG_CheckboxManager } from "./checkbox-manager";
 
 import setupApiFilter from "@content/filters/api-filter";
@@ -13,120 +12,92 @@ export interface FMG_GuideSetupResult {
 }
 
 export class FMG_Guide {
-    /**
-     * Setup the mini map
-     */
-    public static async setupMiniMap(
-        mapElement?: HTMLIFrameElement,
-        mapManager?: FMG_MapManager
-    ): Promise<FMG_MapManager> {
-        // Setup the map
-        if (mapElement?.contentWindow) {
-            mapManager = await FMG_Map.setup(mapElement?.contentWindow);
-            if (!mapManager) {
-                throw new Error("Unable to setup map");
-            }
-            return mapManager;
-        }
 
-        throw new Error("Unable to find map element");
+    public readonly window: Window;
+    public readonly checkboxManager: FMG_CheckboxManager;
+
+    private _miniMap?: FMG_Map;
+    private _mapElement?: HTMLIFrameElement;
+
+    constructor(window: Window) {
+        this.window = window;
+        this.checkboxManager = new FMG_CheckboxManager(window);
     }
 
-    public static async cleanupProAds(window: Window) {
-        await Promise.all(
-            [
-                //["//p[contains(., 'PRO')]", "xpath"],
-                ["blockquote", "selector"],
-                ["#button-upgrade", "selector"]
-            ].map(async ([selector, type]) => {
-                const element =
-                    type === "selector"
-                        ? await timeout(getElement(selector, window), 10000)
-                        : type === "xpath"
-                        ? await timeout(
-                              getElementWithXPath(selector, window),
-                              10000
-                          )
-                        : null;
-                element?.remove();
-            })
-        );
+    public get miniMap(): FMG_Map {
+        if (!this._miniMap) throw new Error("Minimap not setup.");
+        return this._miniMap;
+    }
+
+    public get mapElement(): HTMLIFrameElement {
+        if (!this._mapElement) throw new Error("mapElement not setup.");
+        return this._mapElement;
+    }
+
+    public async cleanupProAds() {
+        getElement("#button-upgrade", this.window, 5000).then(elem => elem.remove());
+        getElement("blockquote", this.window, 5000).then(elem => elem.remove());
+    }
+
+    private async waitForMapElementLoaded(): Promise<HTMLIFrameElement> {
+        const mapElement = await getElement<HTMLIFrameElement>("#sticky-map iframe", this.window, 10000);
+        await waitForCallback(() => !!mapElement.contentWindow, 10000);   
+        await waitForGlobals(["mapData"], mapElement.contentWindow!, 10000);
+        await documentLoaded(mapElement.contentWindow!, 10000);
+        return mapElement;
+    }
+
+    private async setupMinimap(): Promise<void> {
+        this._miniMap = new FMG_Map(this.mapElement.contentWindow!);
+        this._miniMap!.setup();
+        this.checkboxManager.mapManager = this._miniMap!.mapManager;
+        this._miniMap!.mapManager.on("fmg-location", (e) => {
+            this.checkboxManager.mark(e.detail.id, e.detail.marked);
+        });
+    }
+
+    private loadData(): void {
+        if (this.miniMap.mapManager.window.mapData) {
+            this.window.mapData = this.miniMap.window.mapData ?? ({} as any);
+            this.window.mapData!.maps = this.miniMap.window.mapData?.maps ?? [];
+            this.window.game = this.miniMap.window.game;
+        } else {
+            throw new Error("Unable to find map data");
+        }
+    }
+
+    public async reload(): Promise<void> {
+        await this.miniMap.mapManager.reload();
+        this.checkboxManager.reload();
     }
 
     /**
      * Setup the guide
      */
-    public static async setup(window: Window): Promise<FMG_GuideSetupResult> {
-        // Get the map iframe element
-        const mapElement = await timeout(
-            getElement<HTMLIFrameElement>("#sticky-map iframe", window),
-            10000
-        );
+    public async setup(): Promise<void> {
+        this._mapElement = await this.waitForMapElementLoaded();
 
-        // Wait for the window to load
-        await timeout(
-            waitForCallback(() => !!mapElement?.contentWindow),
-            10000
-        );
-
-        // Wait for the map data to load
-        await timeout(
-            waitForGlobals(["mapData"], mapElement.contentWindow!),
-            10000
-        );
-
-        // Setup the mini map
-        let mapManager = await FMG_Guide.setupMiniMap(mapElement);
-
-        // Wait for the document to load
-        await timeout(documentLoaded(mapElement.contentWindow!), 10000);
-
-        // Load data from iframe contentWindow to main window
-        if (mapManager.window.mapData) {
-            window.mapData = window.mapData ?? ({} as any);
-            window.mapData!.maps = mapManager.window.mapData.maps ?? [];
-            window.game = window.game ?? mapManager.window.game;
-        } else {
-            throw new Error("Unable to find map data");
-        }
-
-        // Setup the checkbox manager
-        const checkboxManager = new FMG_CheckboxManager(window, mapManager);
-        checkboxManager.reload();
-
-        // Listen for location marks
-        mapManager.on("fmg-location", (e) => {
-            checkboxManager.mark(e.detail.id, e.detail.marked);
-        });
+        await this.setupMinimap();
+        this.loadData();
+        this.checkboxManager.reload();
 
         // Listen for src changes
-        mapElement?.addEventListener("load", async () => {
-            mapManager = await FMG_Guide.setupMiniMap(mapElement);
-            mapManager.on("fmg-location", (e) => {
-                checkboxManager.mark(e.detail.id, e.detail.marked);
-            });
-            await mapManager.reload();
+        this.mapElement.addEventListener("load", async () => {
+            await this.waitForMapElementLoaded();
+            await this.setupMinimap();
+            await this.miniMap.mapManager.reload();
         });
 
         // Wait for axios to load
-        await timeout(waitForGlobals(["axios"], window), 10000);
+        await waitForGlobals(["axios"], window, 10000);
 
         // Cleanup pro ads, but don't wait for it
-        FMG_Guide.cleanupProAds(window).catch();
+        this.cleanupProAds().catch();
 
         // Setup the api filter
         const apiFilter = FMG_ApiFilter.install(window);
-        setupApiFilter(apiFilter, mapManager);
-
-        /// #if DEBUG
-        window.fmgMapManager = mapManager;
-        /// #endif
+        setupApiFilter(apiFilter, this.miniMap.mapManager);
 
         logger.log("Guide setup complete");
-        return {
-            reload: async () => {
-                await mapManager.reload(), checkboxManager.reload();
-            }
-        };
     }
 }

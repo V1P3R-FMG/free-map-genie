@@ -6,17 +6,19 @@ const shared = {
 };
 
 function injectScript(src: string): HTMLScriptElement {
+    const head = document.head || document.documentElement;
     const script = document.createElement("script");
     script.src = src;
-    document.head.appendChild(script);
+    head.appendChild(script);
     return script;
 }
 
 function injectLink(href: string): HTMLLinkElement {
+    const head = document.head || document.documentElement;
     const link = document.createElement("link");
     link.rel = "stylesheet";
     link.href = href;
-    document.head.appendChild(link);
+    head.appendChild(link);
     return link;
 }
 

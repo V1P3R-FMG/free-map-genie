@@ -19,7 +19,12 @@ export class FMG_MapManager {
     }
 
     public get storage(): FMG_Storage {
-        if (!this._storage) throw new Error("Storage not initialized");
+        if (!this._storage) {
+            this._storage = new FMG_Storage(
+                this.window,
+                FMG_KeyDataHelper.fromWindow(this.window)
+            );
+        }
         return this._storage;
     }
 
@@ -176,12 +181,6 @@ export class FMG_MapManager {
      * Loads the storage data.
      */
     public async load() {
-        if (!this._storage) {
-            this._storage = new FMG_Storage(
-                this.window,
-                FMG_KeyDataHelper.fromWindow(this.window)
-            );
-        }
         await this.storage.load();
     }
 

@@ -2,53 +2,44 @@ import { createApp } from "vue";
 import Progress from "./progress.vue";
 import MarkControls from "./mark-controls.vue";
 import type { FMG_MapManager } from "@fmg/map-manager";
+import { getElement } from "@shared/dom";
 
 export class FMG_UI {
     private mapManager: FMG_MapManager;
-    public readonly totalProgress: typeof Progress;
-    public readonly trackedProgress: typeof Progress;
-    public readonly markControls: typeof MarkControls;
+    private _totalProgress?: typeof Progress;
+    private _trackedProgress?: typeof Progress;
+    private _markControls?: typeof MarkControls;
 
     constructor(mapManager: FMG_MapManager) {
         this.mapManager = mapManager;
-
-        this.totalProgress = this.attachTotalProgressUI();
-        this.trackedProgress = this.attachTrackedProgressUI();
-        this.markControls = this.attachMarkControlsUI();
-
-        this.update();
     }
 
-    private getPanel(): HTMLElement {
-        const panel =
-            this.mapManager.window.document.querySelector<HTMLElement>(
-                "#user-panel"
-            );
-        if (!panel) {
-            throw new Error("Could not find user panel");
-        }
-        return panel;
+    public get totalProgress(): typeof Progress {
+        if (!this._totalProgress) throw new Error("UI not attached.");
+        return this._totalProgress;
     }
 
-    private getCategoryPanel(): HTMLElement {
-        const panel = this.getPanel();
-        const categoryPanel =
-            panel.querySelector<HTMLElement>(".category-progress");
-        if (!categoryPanel) {
-            throw new Error("Could not find category panel");
-        }
-        return categoryPanel;
+    public get trackedProgress(): typeof Progress {
+        if (!this._trackedProgress) throw new Error("UI not attached.");
+        return this._trackedProgress;
     }
 
-    private getBottomRightControlContainer(): HTMLElement {
-        const container =
-            this.mapManager.window.document.querySelector<HTMLElement>(
-                ".mapboxgl-ctrl-bottom-right"
-            );
-        if (!container) {
-            throw new Error("Could not find bottom right control container");
-        }
-        return container;
+    public get markControls(): typeof MarkControls {
+        if (!this._markControls) throw new Error("UI not attached.");
+        return this._markControls;
+    }
+
+    private getPanel(): Promise<HTMLElement> {
+        return getElement("#user-panel", this.mapManager.window, 5000);
+    }
+
+    private async getCategoryPanel(): Promise<HTMLElement> {
+        const panel = await this.getPanel();
+        return getElement(".category-progress", panel, 5000);
+    }
+
+    private getBottomRightControlContainer(): Promise<HTMLElement> {
+        return getElement(".mapboxgl-ctrl-bottom-right", this.mapManager.window, 5000);
     }
 
     private createHorizontalRule(): HTMLHRElement {
@@ -75,8 +66,8 @@ export class FMG_UI {
         return createApp(component, props).mount(element);
     }
 
-    private attachTotalProgressUI(): typeof Progress {
-        const categoryPanel = this.getCategoryPanel();
+    private async attachTotalProgressUI(): Promise<typeof Progress> {
+        const categoryPanel = await this.getCategoryPanel();
         const div = this.createBeforeDiv(categoryPanel);
         categoryPanel.before(this.createHorizontalRule());
         return this.mount(div, Progress, {
@@ -89,8 +80,8 @@ export class FMG_UI {
         });
     }
 
-    private attachTrackedProgressUI(): typeof Progress {
-        const categoryPanel = this.getCategoryPanel();
+    private async attachTrackedProgressUI(): Promise<typeof Progress> {
+        const categoryPanel = await this.getCategoryPanel();
         return this.mount(this.createBeforeDiv(categoryPanel), Progress, {
             calculateTotal: () => {
                 let [total, marked] = [0, 0];
@@ -109,11 +100,17 @@ export class FMG_UI {
         });
     }
 
-    private attachMarkControlsUI(): typeof MarkControls {
-        const container = this.getBottomRightControlContainer();
+    private async attachMarkControlsUI(): Promise<typeof MarkControls> {
+        const container = await this.getBottomRightControlContainer();
         return this.mount(this.createDiv(container), MarkControls, {
             mapManager: this.mapManager
         });
+    }
+
+    public async attach() {
+        this._totalProgress = await this.attachTotalProgressUI();
+        this._trackedProgress = await this.attachTrackedProgressUI();
+        this._markControls = await this.attachMarkControlsUI();
     }
 
     public update() {
