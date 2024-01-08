@@ -107,8 +107,10 @@ export class FMG_UI {
     }
 
     public async attach() {
-        this._totalProgress = await this.attachTotalProgressUI();
-        this._trackedProgress = await this.attachTrackedProgressUI();
+        if (this.mapManager.window.user) {
+            this._totalProgress = await this.attachTotalProgressUI();
+            this._trackedProgress = await this.attachTrackedProgressUI();
+        }
         this._markControls = await this.attachMarkControlsUI();
     }
 
