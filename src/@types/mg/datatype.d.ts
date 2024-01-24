@@ -103,6 +103,7 @@ declare namespace MG {
         min_zoom: number;
         name: string;
         path: string;
+        pattern: string;
     }
 
     interface MapConfig {
