@@ -81,7 +81,7 @@ export class FMG_Map {
     private loadUser() {
         if (this.window.user) {
             this.window.user.trackedCategoryIds =
-            this.mapManager.storage.data.categoryIds;
+                this.mapManager.storage.data.categoryIds;
             this.window.user.suggestions = [];
             this.window.user.hasPro = true;
             this.window.user.locations = this.mapManager.storage.data.locations;
@@ -104,6 +104,24 @@ export class FMG_Map {
     }
 
     /**
+     * Fix tile_set
+     */
+    private fixTileset(tileSet: Omit<MG.TileSet, "pattern">, refTileSet: MG.TileSet): MG.TileSet {
+        console.log(tileSet, refTileSet);
+        const prefix = tileSet.path.replace("/images/tiles/", "");
+        const refPrefix = /[\w-_]+\/[\w-_]+\/[\w-_]+/.exec(refTileSet.path)?.[0];
+        const refSubfix = refPrefix
+            ? refTileSet.pattern
+                .replace(refPrefix, "")
+                .replace(/\.[\w]+/, `.${tileSet.extension ?? "png"}`)
+            : `{z}/{x}/{y}.${tileSet.extension ?? "png"}`;
+        return {
+            ...tileSet,
+            pattern: `${prefix}${refSubfix}`,
+        };
+    }
+
+    /**
      * Load map data, from url params.
      */
     private async loadMapData() {
@@ -114,10 +132,6 @@ export class FMG_Map {
 
         // Urls
         this.window.mapUrl = mapData.url;
-        this.window.baseUrl = mapData.gameConfig.url;
-        this.window.cdnUrl = mapData.gameConfig.cdn_url;
-        this.window.tilesCdnUrl = mapData.gameConfig.tiles_base_url;
-        // this.window.storageCdnUrl = ?; // We can assume this is always the same?
 
         // Map Data
         this.window.mapData.map = mapData.map;
@@ -127,7 +141,13 @@ export class FMG_Map {
         this.window.mapData.regions = mapData.regions;
 
         // Map Settings
+        const ogMapConfig = this.window.mapData.mapConfig;
+        const refTileSet = ogMapConfig.tile_sets[0];
         this.window.mapData.mapConfig = mapData.mapConfig;
+
+        this.window.mapData.mapConfig.tile_sets = 
+            this.window.mapData.mapConfig.tile_sets.map(set => this.fixTileset(set, refTileSet));
+
         this.window.initialZoom = mapData.mapConfig.initial_zoom;
         this.window.initiaPosition = {
             lat: mapData.mapConfig.start_lat,
