@@ -107,7 +107,6 @@ export class FMG_Map {
      * Fix tile_set
      */
     private fixTileset(tileSet: Omit<MG.TileSet, "pattern">, refTileSet: MG.TileSet): MG.TileSet {
-        console.log(tileSet, refTileSet);
         const prefix = tileSet.path.replace("/images/tiles/", "");
         const refPrefix = /[\w-_]+\/[\w-_]+\/[\w-_]+/.exec(refTileSet.path)?.[0];
         const refSubfix = refPrefix
