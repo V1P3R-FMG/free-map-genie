@@ -1,0 +1,15 @@
+{
+  "name": "webpack-web-ext-manifest",
+  "author": "VIPER",
+  "version": "1.0.0",
+  "license": "MIT",
+  "type": "module",
+  "main": "src/index.js",
+  "devDependencies": {
+    "@types/loader-utils": "^2.0.6",
+    "deepmerge": "^4.3.1",
+    "loader-utils": "^3.2.1",
+    "schema-utils": "^4.2.0",
+    "webpack": "^5.91.0"
+  }
+}

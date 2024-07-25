@@ -1,0 +1,18 @@
+{
+    "compilerOptions": {
+        "module": "ES2020",
+        "lib": ["DOM", "ES2020.Promise"],
+        "target": "ES2015",
+        "allowSyntheticDefaultImports": true,
+        "esModuleInterop": true,
+        "skipLibCheck": true,
+        "baseUrl": "src",
+        "noImplicitAny": true,
+        "strict": true,
+        "paths": {
+            "@globals": ["globals/index.ts"]
+        }
+    },
+    "include": ["src"],
+    "exclude": ["node_modules"]
+}

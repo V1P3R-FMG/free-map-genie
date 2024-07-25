@@ -1,0 +1,10 @@
+{
+    "manifest_version": 3,
+    "content_scripts": [
+        {
+            "matches": ["<all_urls>"],
+            "js": ["extension.js"],
+            "run_at": "document_start"
+        }
+    ]
+}
