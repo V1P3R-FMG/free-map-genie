@@ -547,16 +547,16 @@ export default class Channel<M extends BasicMessageSendAndResponseMap = any> {
             const message = Channel.getMessage(e.data);
             if (!message) return;
 
+            this.activeChannels[message.sender] = true;
+            if (!this.isMessageForMe(message)) return;
+
             if (!this.checkOrigin(e)) {
                 logger.warn(
-                    "Ignoring message because it the origin was not allowed",
+                    "Ignoring message because the origin was not allowed",
                     ...Channel.formatMessage(e.data)
                 );
                 return;
             }
-
-            this.activeChannels[message.sender] = true;
-            if (!this.isMessageForMe(message)) return;
 
             switch (message.type) {
                 case "ping":

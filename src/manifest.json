@@ -1,9 +1,17 @@
 {
     "manifest_version": 3,
+    "permissions": ["declarativeNetRequest"],
+    "host_permissions": ["https://mapgenie.io/"],
     "content_scripts": [
         {
             "matches": ["<all_urls>"],
             "js": ["extension.js"],
+            "run_at": "document_start"
+        },
+        {
+            "matches": ["https://mapgenie.io/?origin=*"],
+            "js": ["iframe.js"],
+            "all_frames": true,
             "run_at": "document_start"
         }
     ],
