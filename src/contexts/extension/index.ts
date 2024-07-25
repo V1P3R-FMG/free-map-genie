@@ -4,33 +4,9 @@ import validation from "@shared/validation";
 import runContexts from "@shared/run";
 import { injectExtensionScript } from "@shared/inject";
 import AdBlocker from "./ads";
+import initStorage, { get, set } from "./storage";
 
 const MESSAGE_SCHEME = validation.scheme({ type: "string", data: "any" });
-
-function createFrame(): HTMLIFrameElement {
-    logger.debug("Create Frame");
-    return $<HTMLIFrameElement>("<iframe/>")
-        .attr({
-            id: "mapgenie-storage",
-            src: `https://mapgenie.io/?origin=${window.location.origin}`,
-            width: 0,
-            height: 0,
-            marginwidth: 0,
-            marginheight: 0,
-            hspace: 0,
-            vspace: 0,
-            frameborder: 0,
-            scrolling: "no",
-            "aria-hidden": true,
-        })
-        .appendTo(document.body)
-        .get(0)!;
-}
-
-function getFrame(): HTMLIFrameElement {
-    const iframe = $<HTMLIFrameElement>("#mapgenie-storage");
-    return iframe.length > 0 ? iframe.get(0)! : createFrame();
-}
 
 async function main() {
     const _ = Channel.window(
@@ -48,23 +24,11 @@ async function main() {
         }
     );
 
-    const channel = Channel.extension(Channels.Extension);
-    channel.allowOrigin("https://mapgenie.io");
-
-    await document.waitForDocumentBody();
-    const _iframe = getFrame();
-
-    await channel.send(Channels.Mapgenie, {
-        type: "set",
-        data: { key: "hello", value: "world" },
-    });
+    await set("hello", "world");
 
     logger.debug(
         "Mapgenie Iframe Send data for key 'hello'",
-        await channel.send(Channels.Mapgenie, {
-            type: "get",
-            data: { key: "hello" },
-        })
+        await get("hello")
     );
 
     injectExtensionScript("content.js");
@@ -74,4 +38,4 @@ async function main() {
     AdBlocker.removePrivacyPopup();
 }
 
-runContexts("extension", main);
+runContexts("extension", initStorage, main);
