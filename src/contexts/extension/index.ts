@@ -25,10 +25,18 @@ function setLoginDestinationURL(url?: string) {
 async function main() {
     const _ = Channel.window(
         Channels.Extension,
-        (message, _sendResponse, _sendError) => {
+        (message, sendResponse, sendError) => {
             const { type } = validation.check(MESSAGE_SCHEME, message);
 
             switch (type) {
+                case "games":
+                case "game":
+                case "game::map":
+                    chrome.runtime
+                        .sendMessage(message)
+                        .then(sendResponse)
+                        .catch(sendError);
+                    return true;
                 case "start:login":
                     chrome.runtime.sendMessage(message);
                     return false;

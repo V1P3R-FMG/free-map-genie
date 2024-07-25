@@ -1,11 +1,24 @@
 import Channel, { type ChannelMessage } from "@shared/channel";
 import runContexts from "@shared/run";
+import validation from "@shared/validation";
+
 import installRules from "./rules";
+import { getGames, getGame, getGameMap } from "./games";
+
+const MESSAGE_SCHEME = validation.scheme({ type: "string", data: "any" });
+
+const GET_GAME_SCHEME = validation.scheme({ gameId: "number" });
+const GET_GAME_MAP_SCHEME = validation.scheme({
+    gameId: "number",
+    mapId: "number",
+});
+
+const START_LOGIN_SCHEME = validation.scheme("string");
 
 export function forwardMessage(
     sender: chrome.runtime.MessageSender,
     message: ChannelMessage
-) {
+): boolean {
     if (sender.tab?.id) {
         chrome.tabs.sendMessage(sender.tab.id, {
             origin: sender.origin,
@@ -24,31 +37,43 @@ export function logMessage(message: ChannelMessage) {
 
 async function main() {
     chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-        if (typeof message !== "object" || !message.type) {
-            logger.warn("Invalid message", message);
-            return false;
-        }
+        const { type, data } = validation.check(MESSAGE_SCHEME, message);
 
-        switch (message.type) {
-            case "channel":
-                if (forwardMessage(sender, message.data)) {
-                    logMessage(message.data);
+        switch (type) {
+            case "channel": {
+                if (forwardMessage(sender, data)) {
+                    logMessage(data);
                 }
                 return false;
-            case "start:login":
-                logger.debug("start:login", message.data);
-                chrome.storage.session.set({ last_mg_url: message.data });
+            }
+            case "start:login": {
+                const last_mg_url = validation.check(START_LOGIN_SCHEME, data);
+                chrome.storage.session.set({ last_mg_url });
                 return false;
-            case "login":
+            }
+            case "login": {
                 chrome.storage.session
                     .get("last_mg_url")
-                    .then(
-                        ({ last_mg_url }) => (
-                            logger.debug("login", last_mg_url),
-                            sendResponse(last_mg_url)
-                        )
-                    );
+                    .then(({ last_mg_url }) => sendResponse(last_mg_url));
                 return true;
+            }
+            case "games": {
+                getGames().then(sendResponse);
+                return true;
+            }
+            case "game": {
+                const { gameId } = validation.check(GET_GAME_SCHEME, data);
+                getGame(gameId).then(sendResponse);
+                return true;
+            }
+            case "game:map": {
+                const { gameId, mapId } = validation.check(
+                    GET_GAME_MAP_SCHEME,
+                    data
+                );
+                getGameMap(gameId, mapId).then(sendResponse);
+                return true;
+            }
             default:
                 return false;
         }
