@@ -1,11 +1,10 @@
 import Channel from "@shared/channel";
 import { Channels } from "@constants";
 import runContexts from "@shared/run";
+import initPage from "./pages/index";
 
 async function main() {
-    const channel = Channel.window(Channels.Content);
-
-    logger.debug(await channel.send(Channels.Extension, { type: "hello" }));
+    const _channel = Channel.window(Channels.Content);
 }
 
-runContexts("content", main);
+runContexts("content", initPage, main);

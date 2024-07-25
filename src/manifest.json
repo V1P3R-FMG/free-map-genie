@@ -1,7 +1,7 @@
 {
     "manifest_version": 3,
-    "permissions": ["declarativeNetRequest"],
-    "host_permissions": ["https://mapgenie.io/"],
+    "permissions": ["declarativeNetRequest", "storage"],
+    "host_permissions": ["https://mapgenie.io/", "https://cdn.mapgenie.io/"],
     "content_scripts": [
         {
             "matches": ["<all_urls>"],

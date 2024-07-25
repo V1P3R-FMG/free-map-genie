@@ -8,16 +8,35 @@ import initStorage, { get, set } from "./storage";
 
 const MESSAGE_SCHEME = validation.scheme({ type: "string", data: "any" });
 
+function setLoginDestinationURL(url?: string) {
+    if (url) return (window.location.href = url);
+
+    const location = new URL(window.location.href);
+    location.search = "";
+
+    if (location.pathname.endsWith("/login")) {
+        window.location.href = location.href.split("/").slice(0, -1).join("/");
+        return;
+    }
+
+    window.location.href = "https://mapgenie.io";
+}
+
 async function main() {
     const _ = Channel.window(
         Channels.Extension,
-        (message, sendResponse, _sendError) => {
+        (message, _sendResponse, _sendError) => {
             const { type } = validation.check(MESSAGE_SCHEME, message);
 
             switch (type) {
-                case "hello":
-                    sendResponse("Hello from extension.js");
-                    return true;
+                case "start:login":
+                    chrome.runtime.sendMessage(message);
+                    return false;
+                case "login":
+                    chrome.runtime
+                        .sendMessage(message)
+                        .then(setLoginDestinationURL);
+                    return false;
                 default:
                     return false;
             }

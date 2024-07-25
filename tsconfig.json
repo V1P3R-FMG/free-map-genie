@@ -12,7 +12,8 @@
         "paths": {
             "@globals": ["globals/index.ts"],
             "@constants": ["constants.ts"],
-            "@shared/*": ["shared/*"]
+            "@shared/*": ["shared/*"],
+            "@fmg/*": ["fmg/*"]
         }
     },
     "include": ["src"],

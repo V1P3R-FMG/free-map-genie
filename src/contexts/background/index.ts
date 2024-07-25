@@ -23,7 +23,7 @@ export function logMessage(message: ChannelMessage) {
 }
 
 async function main() {
-    chrome.runtime.onMessage.addListener((message, sender, _sendResponse) => {
+    chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         if (typeof message !== "object" || !message.type) {
             logger.warn("Invalid message", message);
             return false;
@@ -34,10 +34,24 @@ async function main() {
                 if (forwardMessage(sender, message.data)) {
                     logMessage(message.data);
                 }
-                break;
+                return false;
+            case "start:login":
+                logger.debug("start:login", message.data);
+                chrome.storage.session.set({ last_mg_url: message.data });
+                return false;
+            case "login":
+                chrome.storage.session
+                    .get("last_mg_url")
+                    .then(
+                        ({ last_mg_url }) => (
+                            logger.debug("login", last_mg_url),
+                            sendResponse(last_mg_url)
+                        )
+                    );
+                return true;
+            default:
+                return false;
         }
-
-        return false;
     });
 }
 
