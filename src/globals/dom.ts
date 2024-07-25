@@ -5,7 +5,6 @@ declare global {
     }
 }
 
-
 if (global.document) {
     Document.prototype.waitForDocumentBody = async function (
         timeout?: number
@@ -33,6 +32,5 @@ if (global.document) {
               );
     };
 }
-
 
 export {};

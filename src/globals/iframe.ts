@@ -4,7 +4,6 @@ declare global {
     }
 }
 
-
 if (global.HTMLIFrameElement) {
     HTMLIFrameElement.prototype.waitForContentWindow = function (
         this: HTMLIFrameElement,
@@ -15,6 +14,5 @@ if (global.HTMLIFrameElement) {
         ).timeout(timeout ?? 5000);
     };
 }
-
 
 export {};

@@ -236,9 +236,9 @@ export class Logger {
     /** Get current stack */
     public get stack() {
         return () => {
-            const stack = (new Error()).stack;
+            const stack = new Error().stack;
             return stack?.substring(stack.indexOf("\n"));
-        }
+        };
     }
 }
 

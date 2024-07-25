@@ -1,7 +1,6 @@
 const DEFAULT_TIMEOUT = 10000;
 const DEFAULT_INTERVAL = 1000;
 
-
 interface State {
     resolved: boolean;
 }
@@ -29,7 +28,6 @@ export class TimeoutError extends Error {
     }
 }
 
-
 function callbackWrapper<F extends (arg: any) => any>(
     cb: F,
     handle: number | undefined,
@@ -56,9 +54,10 @@ function createTimeout<T>(
     if (timeout === undefined || timeout > 0) {
         handle = window.setTimeout(
             callbackWrapper(
-                () => reject(
-                    new TimeoutError(msg ?? "Promise.waitFor took to long")
-                ),
+                () =>
+                    reject(
+                        new TimeoutError(msg ?? "Promise.waitFor took to long")
+                    ),
                 undefined,
                 state
             ),
@@ -73,7 +72,6 @@ function createTimeout<T>(
         handle,
     ];
 }
-
 
 declare global {
     interface PromiseConstructor {
@@ -114,7 +112,6 @@ declare global {
     }
 }
 
-
 Promise.waitFor = async function <T>(
     waiter: Waiter<T>,
     interval?: number,
@@ -122,8 +119,12 @@ Promise.waitFor = async function <T>(
     msg?: string
 ) {
     return new Promise<T>(async (resolve, reject) => {
-        const [resolver, rejecter, state] =
-            createTimeout(resolve, reject, timeout, msg);
+        const [resolver, rejecter, state] = createTimeout(
+            resolve,
+            reject,
+            timeout,
+            msg
+        );
 
         const handle = window.setInterval(async () => {
             if (state.resolved) return window.clearInterval(handle);
@@ -163,6 +164,5 @@ Promise.prototype.timeout = function (
 };
 
 Promise.TimeoutError = TimeoutError;
-
 
 export {};

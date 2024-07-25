@@ -16,7 +16,6 @@ declare global {
     }
 }
 
-
 Object.iterateKeys = function* <O extends object>(o: O): Generator<keyof O> {
     for (const key in o) yield key;
 };
@@ -33,10 +32,9 @@ Object.iterateEntries = function* <O extends object>(
     for (const key in o) yield [key, o[key]];
 };
 
-Object.isEmpty = function(o: object) {
+Object.isEmpty = function (o: object) {
     for (const _ in o) return false;
     return true;
 };
-
 
 export {};
