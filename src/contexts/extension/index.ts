@@ -3,6 +3,7 @@ import { Channels } from "@constants";
 import validation from "@shared/validation";
 import runContexts from "@shared/run";
 import { injectExtensionScript } from "@shared/inject";
+import AdBlocker from "./ads";
 
 const MESSAGE_SCHEME = validation.scheme({ type: "string", data: "any" });
 
@@ -67,6 +68,10 @@ async function main() {
     );
 
     injectExtensionScript("content.js");
+
+    // AdBlocker.onTick(logger.debug.bind("FMG AdBlocker stats:"));
+    AdBlocker.start();
+    AdBlocker.removePrivacyPopup();
 }
 
 runContexts("extension", main);
