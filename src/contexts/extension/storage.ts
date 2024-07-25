@@ -2,6 +2,8 @@ import Channel from "@shared/channel";
 import { Channels } from "@constants";
 import validation from "@shared/validation";
 
+const MESSAGE_SCHEME = validation.validator({ type: "string" });
+
 function createFrame(): HTMLIFrameElement {
     logger.debug("Create Frame");
     return $<HTMLIFrameElement>("<iframe/>")
@@ -55,7 +57,7 @@ export default async function initStorage() {
     const _winChannel = Channel.window(
         Channels.Extension,
         (message, sendResponse, sendError) => {
-            validation.check("object", message);
+            MESSAGE_SCHEME(message);
             switch (message.type) {
                 case "has":
                 case "get":

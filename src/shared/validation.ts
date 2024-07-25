@@ -162,7 +162,14 @@ export function scheme<S extends Scheme>(scheme: S): S {
     return scheme;
 }
 
+export function validator<S extends Scheme>(
+    scheme: S
+): (data: any) => ValidatedResult<S> {
+    return (data: any) => validate(scheme, data);
+}
+
 export default {
     check: validate,
     scheme,
+    validator,
 };

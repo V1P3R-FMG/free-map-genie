@@ -3,10 +3,11 @@ import { Channels } from "@constants";
 import validation from "@shared/validation";
 import runContexts from "@shared/run";
 import { injectExtensionScript } from "@shared/inject";
+
 import AdBlocker from "./ads";
 import initStorage, { get, set } from "./storage";
 
-const MESSAGE_SCHEME = validation.scheme({ type: "string", data: "any" });
+const MESSAGE_SCHEME = validation.validator({ type: "string", data: "any" });
 
 function setLoginDestinationURL(url?: string) {
     if (url) return (window.location.href = url);
@@ -26,7 +27,7 @@ async function main() {
     const _ = Channel.window(
         Channels.Extension,
         (message, sendResponse, sendError) => {
-            const { type } = validation.check(MESSAGE_SCHEME, message);
+            const { type } = MESSAGE_SCHEME(message);
 
             switch (type) {
                 case "games":
