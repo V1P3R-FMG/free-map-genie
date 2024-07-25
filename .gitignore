@@ -1,7 +1,7 @@
-webpack/**/*.js
-keys
-build
-data
-node_modules
-.keys
-.env
+/webpack/**/*.js
+/build
+/data
+/node_modules
+/.keys
+/.env
+/mg

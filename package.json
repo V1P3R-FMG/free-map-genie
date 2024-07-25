@@ -14,21 +14,24 @@
         "lint:fix": "npx eslint . --fix"
     },
     "devDependencies": {
-        "@types/node": "*",
         "@swc/core": "^1.4.16",
         "@swc/helpers": "^0.5.10",
         "@types/chrome": "^0.0.269",
         "@types/fs-extra": "^11.0.4",
         "@types/jquery": "^3.5.29",
         "@types/loader-utils": "^2.0.6",
+        "@types/node": "*",
         "@types/toastr": "^2.1.43",
         "@typescript-eslint/parser": "^7.17.0",
+        "acorn": "^8.12.1",
         "copy-webpack-plugin": "^12.0.2",
         "dotenv": "^16.4.5",
         "eslint": "^8.56.0",
         "eslint-config-prettier": "^9.1.0",
         "eslint-plugin-prettier": "^5.2.1",
         "eslint-plugin-vue": "^9.27.0",
+        "fmg-import-globals-loader": "./webpack/loaders/fmg-import-globals",
+        "fmg-webpack-utils": "./webpack/utils",
         "generate-file-webpack-plugin": "^1.0.1",
         "globals": "^15.8.0",
         "loader-utils": "^3.2.1",
@@ -39,15 +42,14 @@
         "swc-loader": "^0.2.6",
         "ts-node": "^10.9.2",
         "tsconfig-paths-webpack-plugin": "^4.1.0",
+        "tsx": "^4.16.2",
         "typescript": "^5.4.5",
         "typescript-eslint": "^7.17.0",
         "vue-eslint-parser": "^9.4.3",
         "web-ext-plugin": "^2.9.0",
         "webpack": "^5.91.0",
         "webpack-cli": "^5.1.4",
-        "webpack-web-ext-manifest": "./webpack/plugins/web-ext-manifest",
-        "fmg-webpack-utils": "./webpack/utils",
-        "fmg-import-globals-loader": "./webpack/loaders/fmg-import-globals"
+        "webpack-web-ext-manifest": "./webpack/plugins/web-ext-manifest"
     },
     "dependencies": {
         "jquery": "^3.7.1"

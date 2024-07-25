@@ -4,7 +4,17 @@ import pluginVue from "eslint-plugin-vue";
 import eslintPluginPrettierRecommended from "eslint-plugin-prettier/recommended";
 
 export default [
-    { ignores: ["build/", "script/", "scripts/", "webpack/**/*.js", "*.json"] },
+    {
+        ignores: [
+            "data/",
+            "mg/",
+            "build/",
+            "script/",
+            "scripts/",
+            "webpack/**/*.js",
+            "*.json",
+        ],
+    },
     { files: ["src/**/*.ts", "webpack/**/*.ts"] },
     { languageOptions: { globals: globals.browser } },
     ...tseslint.configs.recommended,
