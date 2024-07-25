@@ -26,7 +26,9 @@ export default function (env) {
 
     return {
         entry: {
-            extension: "./src/index.ts",
+            extension: "./src/extension/index.ts",
+            background: "./src/background/index.ts",
+            content: "./src/content/index.ts",
         },
         output: { path: buildInfo.out },
         resolveLoader: {
