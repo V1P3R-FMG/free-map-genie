@@ -25,6 +25,7 @@ export default [
     },
     {
         rules: {
+            "max-len": ["error", { code: 120 }],
             semi: "error",
             "prefer-const": "error",
             "no-unused-vars": "off",
