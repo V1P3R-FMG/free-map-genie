@@ -15,7 +15,6 @@ export default [
     },
     {
         rules: {
-            code: 100,
             semi: "error",
             "prefer-const": "error",
             "no-unused-vars": "off",
