@@ -11,6 +11,7 @@
         "strict": true,
         "paths": {
             "@globals": ["globals/index.ts"],
+            "@constants": ["constants.ts"],
             "@shared/*": ["shared/*"]
         }
     },
