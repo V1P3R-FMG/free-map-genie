@@ -1,5 +1,5 @@
 import { waitForPageType } from "@fmg/page";
-import mainLogin from "./login/login";
+import mainLogin from "./login/index";
 import mainMap from "./map/index";
 
 export default async function initPage() {
