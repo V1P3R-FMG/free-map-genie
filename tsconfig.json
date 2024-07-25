@@ -10,7 +10,8 @@
         "noImplicitAny": true,
         "strict": true,
         "paths": {
-            "@globals": ["globals/index.ts"]
+            "@globals": ["globals/index.ts"],
+            "@shared/*": ["shared/*"]
         }
     },
     "include": ["src"],
