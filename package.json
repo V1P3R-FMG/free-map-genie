@@ -4,6 +4,7 @@
     "homepage": "https://github.com/V1P3R-FMG/free-map-genie",
     "version": "3.0.0",
     "license": "MIT",
+    "type": "module",
     "scripts": {
         "webpack": "npx tsx webpack/build.ts",
         "build": "yarn webpack",

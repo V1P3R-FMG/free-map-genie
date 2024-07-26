@@ -7,7 +7,7 @@ export default [
     {
         ignores: ["data/", "mg/", "build/"],
     },
-    { files: ["fmg/**/*.{ts,json}", "webpack/**/*.{ts,json}", "wdio/**/*.{ts,json}"] },
+    { files: ["src/**/*.{ts,json}", "webpack/**/*.{ts,json}", "wdio/**/*.{ts,json}"] },
     { languageOptions: { globals: globals.browser } },
     ...tseslint.configs.recommended,
     ...pluginVue.configs["flat/essential"],

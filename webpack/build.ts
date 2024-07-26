@@ -6,13 +6,15 @@ import "dotenv/config";
 import getBuildInfo, { type BuildInfo } from "./buildInfo.js";
 import WebExtManifestPlugin from "./plugins/web-ext-manifest.js";
 
-import TsconfigPathsPlugin from "tsconfig-paths-webpack-plugin";
+import { TsconfigPathsPlugin } from "tsconfig-paths-webpack-plugin";
 import CopyPlugin from "copy-webpack-plugin";
 import TerserPlugin from "terser-webpack-plugin";
 
 import type { WebpackConfiguration } from "webpack-cli";
 
 const { ProvidePlugin, DefinePlugin } = webpack;
+
+const __dirname = import.meta.dirname;
 
 async function webpackPromise(options: WebpackConfiguration) {
     return new Promise((resolve, reject) => {
@@ -22,10 +24,12 @@ async function webpackPromise(options: WebpackConfiguration) {
         });
 
         compiler.hooks.afterCompile.tap("fmg::build", (compilation) => {
-            console.log(compilation.getStats().toString({
-                colors: true
-            }))
-        })
+            console.log(
+                compilation.getStats().toString({
+                    colors: true,
+                })
+            );
+        });
     });
 }
 
@@ -41,7 +45,7 @@ function swcLoader(buildInfo: BuildInfo) {
                 target: "es2020",
             },
         },
-    }
+    };
 }
 
 function defines(buildInfo: BuildInfo) {
@@ -53,7 +57,7 @@ function defines(buildInfo: BuildInfo) {
         __DEBUG__: buildInfo.isDev,
         __WATCH__: buildInfo.watch,
         console: "logger",
-    })
+    });
 }
 
 function copies(buildInfo: BuildInfo) {
@@ -74,7 +78,7 @@ function provides(_buildInfo: BuildInfo) {
         $: "jquery",
         jQuery: "jquery",
         logger: [path.resolve(__dirname, "..", "src", "logger.ts"), "default"],
-    })
+    });
 }
 
 async function webExtPlugin(buildInfo: BuildInfo) {
@@ -84,9 +88,7 @@ async function webExtPlugin(buildInfo: BuildInfo) {
         artifactsDir: buildInfo.out,
         target: buildInfo.isChrome ? "chromium" : "firefox-desktop",
         buildPackage: !buildInfo.watch && !buildInfo.isDev,
-        outputFilename: buildInfo.isDev
-            ? buildInfo.name
-            : buildInfo.name + (buildInfo.isChrome ? ".zip" : ".xpi"),
+        outputFilename: buildInfo.isDev ? buildInfo.name : buildInfo.name + (buildInfo.isChrome ? ".zip" : ".xpi"),
         runLint: false,
         selfHosted: true,
         overwriteDest: true,
@@ -94,7 +96,7 @@ async function webExtPlugin(buildInfo: BuildInfo) {
         startUrl: process.env.START_URL ?? "https://mapgenie.io",
         sourceDir: buildInfo.out,
         args: buildInfo.isChrome ? ["--auto-open-devtools-for-tabs", "--system-developer-mode"] : [],
-    })
+    });
 }
 
 function webExtManfestPlugin(buildInfo: BuildInfo) {
@@ -109,7 +111,7 @@ function webExtManfestPlugin(buildInfo: BuildInfo) {
         ],
         fields: ["version", "author", "name"],
         tabs: 2,
-    })
+    });
 }
 
 async function build() {
@@ -166,5 +168,4 @@ async function build() {
     });
 }
 
-build()
-    .catch(console.error);
+build().catch(console.error);
