@@ -18,7 +18,7 @@
     "web_accessible_resources": [
         {
             "matches": ["<all_urls>"],
-            "resources": ["content.js"]
+            "resources": ["content.js", "content/*"]
         }
     ]
 }

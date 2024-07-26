@@ -3,9 +3,6 @@ import { waitForPageType } from "@fmg/page";
 
 import Games from "@fmg/api/games";
 
-import LoginScript from "./login/index";
-import MapScript from "./map/index";
-
 import ContentChannel from "./channel";
 
 export interface PageScript {
@@ -17,10 +14,14 @@ async function initScript() {
     logger.log("PageType:", pageType);
 
     switch (pageType) {
-        case "login":
-            await LoginScript.initScript();
-        case "map":
-            await MapScript.initScript();
+        case "login": {
+            const { default: script } = await import(/* webpackChunkName: "content/login" */ "./login/index");
+            await script.initScript();
+        }
+        case "map": {
+            const { default: script } = await import(/* webpackChunkName: "content/map" */ "./map/index");
+            await script.initScript();
+        }
         default:
             return;
     }
