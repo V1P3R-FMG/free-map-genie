@@ -6,6 +6,8 @@ import Games from "@fmg/api/games";
 import LoginScript from "./login/index";
 import MapScript from "./map/index";
 
+import ContentChannel from "./channel";
+
 export interface PageScript {
     initScript(): Promise<void> | void;
 }
@@ -25,6 +27,9 @@ async function initScript() {
 }
 
 async function main() {
+    await ContentChannel.set("hello", "world");
+    const value = await ContentChannel.get("hello");
+    logger.debug("hello =", value, "@ https://mapgenie.io");
     Games.getGame(1).then(logger.debug);
 }
 

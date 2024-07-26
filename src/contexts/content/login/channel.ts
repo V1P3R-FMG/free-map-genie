@@ -1,8 +1,8 @@
 import { Channels } from "@constants";
-import ChannelClass from "@shared/channel";
+import Channel from "@shared/channel";
 
-class Channel {
-    private readonly channel = ChannelClass.window(Channels.Content);
+class LoginChannel {
+    private readonly channel = Channel.window(Channels.Content);
 
     public async sendLogin() {
         return this.channel.send(Channels.Extension, {
@@ -11,4 +11,4 @@ class Channel {
     }
 }
 
-export default new Channel();
+export default new LoginChannel();
