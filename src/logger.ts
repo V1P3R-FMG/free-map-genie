@@ -126,24 +126,39 @@ export class Logger {
         debug: { background: "#8b32ba", color: "#eee" },
     });
 
-    protected readonly infoTemplate!: ConsoleLogTemplate;
-    protected readonly warnTemplate!: ConsoleLogTemplate;
-    protected readonly errorTemplate!: ConsoleLogTemplate;
-    protected readonly debugTemplate!: ConsoleLogTemplate;
+    protected readonly infoTemplate: ConsoleLogTemplate;
+    protected readonly warnTemplate: ConsoleLogTemplate;
+    protected readonly errorTemplate: ConsoleLogTemplate;
+    protected readonly debugTemplate: ConsoleLogTemplate;
 
     public constructor(name?: string, prefix?: string, prefixCss?: CssStyleEntryValue) {
         this.muted = !__DEBUG__; // automatically mute in production;
 
-        for (const logName of ["info", "warn", "error", "debug"] as const) {
-            const template = new ConsoleLogTemplate(this.css.common, this.css.message);
+        this.infoTemplate = this.createTemplate("info", name, prefix, prefixCss);
+        this.warnTemplate = this.createTemplate("warn", name, prefix, prefixCss);
+        this.errorTemplate = this.createTemplate("error", name, prefix, prefixCss);
+        this.debugTemplate = this.createTemplate("debug", name, prefix, prefixCss);
+    }
 
-            template.addTag(Logger.getTimestamp, this.css.timestamp);
+    protected createTemplate(
+        logName: LogMethodName,
+        name?: string,
+        prefix?: string,
+        prefixCss?: CssStyleEntryValue
+    ): ConsoleLogTemplate {
+        const template = new ConsoleLogTemplate(this.css.common, this.css.message);
 
-            if (name) template.addTag(name, this.css[logName]);
-            if (prefix) template.addTag(prefix, prefixCss);
+        template.addTag(Logger.getTimestamp, this.css.timestamp);
 
-            this[`${logName}Template`] = template;
+        if (name) {
+            template.addTag(name, this.css[logName]);
+        } else {
+            template.addTag(logName, this.css[logName]);
         }
+
+        if (prefix) template.addTag(prefix, prefixCss);
+
+        return template;
     }
 
     /** Creates a timestamp of the current time. */
