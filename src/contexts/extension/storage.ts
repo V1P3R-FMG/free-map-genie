@@ -1,11 +1,12 @@
 import Channel from "@shared/channel";
 import { Channels } from "@constants";
 import validation from "@shared/validation";
+import { waitForBody } from "@utils/dom";
 
 const MESSAGE_SCHEME = validation.validator({ type: "string" });
 
 function createFrame(): HTMLIFrameElement {
-    logger.debug("Create Frame");
+    logger.debug("Create Frame", document.body);
     return $<HTMLIFrameElement>("<iframe/>")
         .attr({
             id: "mapgenie-storage",
@@ -36,7 +37,7 @@ async function forwardMessage<T>(type: string, key?: string, value?: string, tim
 }
 
 export default async function initStorage() {
-    await document.waitForDocumentBody();
+    await waitForBody(document);
 
     const _iframe = getFrame(); // Create iframe if it doesn't exist.
 

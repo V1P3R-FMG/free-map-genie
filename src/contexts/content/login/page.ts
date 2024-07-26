@@ -1,9 +1,10 @@
 import Data from "./data";
 import Channel from "./channel";
+import { $waitFor, type JQueryAsync } from "@utils/jquery";
 
 class Page {
     public async getButtonFormGroup(): JQueryAsync<HTMLElement> {
-        return $.waitFor(`form button[type="submit"]`).then((el) => el.parent());
+        return $waitFor(`form button[type="submit"]`).then((el) => el.parent());
     }
 
     public async addSpace(): JQueryAsync<HTMLDivElement> {

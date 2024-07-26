@@ -1,3 +1,5 @@
+import { waitForCondition } from "@utils/async";
+
 export type MageniePageType = "home" | "login" | "map" | "guide" | "game-home" | "unknown";
 
 export function isMapgeniePage(): boolean {
@@ -41,7 +43,7 @@ export async function waitForPageType(timeout?: number): Promise<MageniePageType
 
     if (pageType !== "unknown") return pageType;
 
-    return Promise.waitForCondition(() => (pageType = getPageType()) !== "unknown", {
+    return waitForCondition(() => (pageType = getPageType()) !== "unknown", {
         interval: 0,
         timeout,
     })

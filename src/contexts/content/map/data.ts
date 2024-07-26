@@ -1,4 +1,5 @@
 import { FmgMockedUserKey } from "@constants";
+import { waitForCondition, waitFor } from "@utils/async";
 
 class Data {
     public createMockUser(): MG.User {
@@ -35,7 +36,7 @@ class Data {
         }
 
         if (this.isMockUserActive()) {
-            await Promise.waitForCondition(() => window.user !== undefined);
+            await waitForCondition(() => window.user !== undefined);
             window.user = this.createMockUser();
             logger.debug("Loaded mocked user");
             return true;
@@ -45,7 +46,7 @@ class Data {
     }
 
     public async fixGoogleMaps() {
-        await Promise.waitForCondition(() => window.google !== undefined);
+        await waitForCondition(() => window.google !== undefined);
         if (window.config?.altMapSdk) {
             window.google!.maps = {
                 Size: function () {},
@@ -54,7 +55,7 @@ class Data {
     }
 
     public async getStore() {
-        return Promise.waitFor<MG.Store>(
+        return waitFor<MG.Store>(
             (resolve) => {
                 if (window.store) {
                     resolve(window.store);

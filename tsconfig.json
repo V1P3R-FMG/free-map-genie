@@ -10,10 +10,12 @@
         "noImplicitAny": true,
         "strict": true,
         "paths": {
-            "@globals": ["globals/index.ts"],
             "@constants": ["constants.ts"],
+            "@utils/*": ["utils/*"],
             "@shared/*": ["shared/*"],
-            "@fmg/*": ["fmg/*"]
+            "@fmg/*": ["fmg/*"],
+            "@content/*": ["contexts/content/*"],
+            "@extension/*": ["contexts/extension/*"]
         }
     },
     "include": ["src"],

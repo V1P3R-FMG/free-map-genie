@@ -49,7 +49,6 @@ export default function (env) {
                     test: /\.ts$/,
                     exclude: /(node_modules)/,
                     use: [
-                        "fmg-import-globals-loader",
                         {
                             loader: "swc-loader",
                             options: {
@@ -86,6 +85,7 @@ export default function (env) {
                 __AUTHOR__: JSON.stringify(buildInfo.author),
                 __DEBUG__: buildInfo.isDev,
                 __WATCH__: buildInfo.watch,
+                console: "logger",
             }),
             new WebExtManifestPlugin({
                 files: [

@@ -1,3 +1,5 @@
+import { waitForHead } from "@utils/dom";
+
 export function injectScript(src: string, query?: Record<string, string>) {
     const url = new URL(src);
     if (query) {
@@ -9,7 +11,8 @@ export function injectScript(src: string, query?: Record<string, string>) {
         script.onload = resolve;
         script.onerror = resolve;
 
-        await document.waitForDocumentHead().then((head) => head.appendChild(script));
+        const head = await waitForHead(document);
+        head.appendChild(script);
     });
 }
 

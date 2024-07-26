@@ -10,6 +10,10 @@ import initStorage, { get, set } from "./storage";
 const MESSAGE_SCHEME = validation.validator({ type: "string", data: "any" });
 
 async function main() {
+    // AdBlocker.onTick(logger.debug.bind("FMG AdBlocker stats:"));
+    AdBlocker.start();
+    AdBlocker.removePrivacyPopup();
+
     const _ = Channel.window(Channels.Extension, (message, sendResponse, sendError) => {
         const { type } = MESSAGE_SCHEME(message);
 
@@ -47,10 +51,6 @@ async function main() {
     await set("hello", "world");
 
     logger.debug("Mapgenie Iframe Send data for key 'hello'", await get("hello"));
-
-    // AdBlocker.onTick(logger.debug.bind("FMG AdBlocker stats:"));
-    AdBlocker.start();
-    AdBlocker.removePrivacyPopup();
 }
 
 runContexts("extension", initStorage, main);

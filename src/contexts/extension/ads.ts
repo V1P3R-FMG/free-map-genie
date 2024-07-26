@@ -1,47 +1,50 @@
+import { sumArray, createArray } from "@utils/array";
+import { waitForCondition } from "@utils/async";
+
 export interface AdBlockerStats {
     totalAdsRemovedThisTick: number;
     totalAdsRemoveLastCoupleTicks: number;
 }
 
 export interface OnTickCallback {
-    (this: AdBlocker, stats: AdBlockerStats): any;
+    (stats: AdBlockerStats): any;
 }
 
 export default class AdBlocker {
     public static REMOVE_CHECK_INTERVAL = 2000;
 
-    public static totalAdsRemoveLastCoupleTicks: (number | undefined)[] = Array.withLength(10, undefined);
+    public static totalAdsRemoveLastCoupleTicks: (number | undefined)[] = createArray(10, undefined);
 
     public static handle: number | null = null;
     public static autoStop: boolean = true;
 
     private static readonly onTickCallbacks: OnTickCallback[] = [];
 
-    private static async removeIframeAds(): Promise<number> {
+    private static removeIframeAds(): number {
         return $('iframe[name^="ifrm_"]').remove().length;
     }
 
-    private static async removeGoogleAds(): Promise<number> {
-        return [
-            $('iframe[name*="goog"]').remove().length,
-            $('div[id^="google_ads_iframe_"]').remove().length,
-            $('iframe[src*="safeframe.googlesyndication"]').remove().length,
-        ].sum();
+    private static removeGoogleAds(): number {
+        return (
+            $('iframe[name*="goog"]').remove().length +
+            $('div[id^="google_ads_iframe_"]').remove().length +
+            $('iframe[src*="safeframe.googlesyndication"]').remove().length
+        );
     }
 
-    private static async removeNitroAds(): Promise<number> {
+    private static removeNitroAds(): number {
         return $("#nitro-floating-wrapper").remove().length;
     }
 
-    private static async removeBodyAds(): Promise<number> {
+    private static removeBodyAds(): number {
         return $('html > iframe[sandbox="allow-scripts allow-same-origin"]').remove().length;
     }
 
-    private static async removeUpgradeProAd(): Promise<number> {
+    private static removeUpgradeProAd(): number {
         return $("#blobby-left").remove().length;
     }
 
-    private static async removeBlueKai(): Promise<number> {
+    private static removeBlueKai(): number {
         return $('iframe[name="__bkframe"]').remove().length;
     }
 
@@ -49,32 +52,30 @@ export default class AdBlocker {
         return $("#onetrust-consent-sdk").remove().length;
     }
 
-    private static async removeAds(): Promise<number> {
+    private static removeAds(): number {
         return (
-            await Promise.all([
-                this.removeIframeAds(),
-                this.removeGoogleAds(),
-                this.removeNitroAds(),
-                this.removeBodyAds(),
-                this.removeUpgradeProAd(),
-                this.removeBlueKai(),
-            ])
-        ).sum();
+            this.removeUpgradeProAd() +
+            this.removeIframeAds() +
+            this.removeGoogleAds() +
+            this.removeNitroAds() +
+            this.removeBodyAds() +
+            this.removeBlueKai()
+        );
     }
 
     public static stats(): AdBlockerStats {
         return Object.seal({
             totalAdsRemovedThisTick: this.totalAdsRemoveLastCoupleTicks[0] ?? 0,
-            totalAdsRemoveLastCoupleTicks: this.totalAdsRemoveLastCoupleTicks.map((x) => x ?? 0).sum(),
+            totalAdsRemoveLastCoupleTicks: sumArray(this.totalAdsRemoveLastCoupleTicks.map((x) => x ?? 0)),
         });
     }
 
-    private static async tick() {
+    private static tick() {
         this.totalAdsRemoveLastCoupleTicks.shift();
-        this.totalAdsRemoveLastCoupleTicks.push(await this.removeAds());
+        this.totalAdsRemoveLastCoupleTicks.push(this.removeAds());
 
         const stats = this.stats();
-        this.onTickCallbacks.forEach((cb) => cb.call(this, stats));
+        this.onTickCallbacks.forEach((cb) => cb(stats));
 
         if (this.autoStop && this.totalAdsRemoveLastCoupleTicks.every((x) => x !== undefined)) {
             const ms = this.REMOVE_CHECK_INTERVAL * this.totalAdsRemoveLastCoupleTicks.length;
@@ -107,8 +108,8 @@ export default class AdBlocker {
     public static async removePrivacyPopup() {
         if (!__DEBUG__) throw "This should be removed for release builds.";
 
-        await Promise.waitForCondition(() => !!this.removePrivacyPopupElement()).catch((_) =>
-            logger.warn("Privacy popup not visible.")
+        await waitForCondition(() => !!this.removePrivacyPopupElement()).catch(() =>
+            logger.debug("Privacy popup not visible.")
         );
     }
 }

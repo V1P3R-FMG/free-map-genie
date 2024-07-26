@@ -1,3 +1,5 @@
+import { waitFor } from "@utils/async";
+
 export type Id = ReturnType<typeof crypto.randomUUID>;
 
 export type ChannelType = "window" | "extension";
@@ -352,14 +354,16 @@ export default class Channel<M extends BasicMessageSendAndResponseMap = any> {
                 this.postMessage(message);
             });
         } else {
-            return Promise.waitFor(
+            return waitFor(
                 async (resolve, reject) => {
                     this.addResponseHandler(messageId, successMatch, failedMatch, resolve, reject);
                     this.postMessage(message);
                 },
-                interval,
-                timeout,
-                `Waiting for response for ${Channel.formatMessage(message).join(" ")} took to long`
+                {
+                    interval,
+                    timeout,
+                    message: `Waiting for response for ${Channel.formatMessage(message).join(" ")} took to long`,
+                }
             );
         }
     }
