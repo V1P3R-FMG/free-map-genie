@@ -29,15 +29,15 @@ class Data {
         }
     }
 
-    public login(): boolean {
-        const isMockUser = this.isMockUserActive();
-
+    public async login(): Promise<boolean> {
         if (window.user) {
             return true;
         }
 
-        if (isMockUser) {
+        if (this.isMockUserActive()) {
+            await Promise.waitForCondition(() => window.user !== undefined);
             window.user = this.createMockUser();
+            logger.debug("Loaded mocked user");
             return true;
         }
 
