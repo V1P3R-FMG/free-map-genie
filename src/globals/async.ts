@@ -17,8 +17,21 @@ export interface Waiter<T> {
     (resolve: Resolver<T>, reject: Rejecter): Promise<any> | any;
 }
 
+export interface ConditionWaiter {
+    (): Promise<boolean> | boolean;
+}
+
 export interface PossibleAsyncCallback {
     (...args: any[]): any | Promise<any>;
+}
+
+export interface TimeoutOptions {
+    timeout?: number;
+    message?: string;
+}
+
+export interface WaiterTimeoutOptions extends TimeoutOptions {
+    interval?: number;
 }
 
 export class TimeoutError extends Error {
@@ -28,11 +41,7 @@ export class TimeoutError extends Error {
     }
 }
 
-function callbackWrapper<F extends (arg: any) => any>(
-    cb: F,
-    handle: number | undefined,
-    state: State
-): F {
+function callbackWrapper<F extends (arg: any) => any>(cb: F, handle: number | undefined, state: State): F {
     return ((arg: any) => {
         if (state.resolved) return;
         // logger.debug("Resolved", arg, handle);
@@ -45,8 +54,7 @@ function callbackWrapper<F extends (arg: any) => any>(
 function createTimeout<T>(
     resolve: Resolver<T>,
     reject: Rejecter,
-    timeout?: number,
-    msg?: string
+    { timeout, message }: TimeoutOptions = {}
 ): [Resolver<T>, Rejecter, State, number | undefined] {
     const state: State = { resolved: false };
 
@@ -54,10 +62,7 @@ function createTimeout<T>(
     if (timeout === undefined || timeout > 0) {
         handle = window.setTimeout(
             callbackWrapper(
-                () =>
-                    reject(
-                        new TimeoutError(msg ?? "Promise.waitFor took to long")
-                    ),
+                () => reject(new TimeoutError(message ?? "Promise.waitFor took to long")),
                 undefined,
                 state
             ),
@@ -65,12 +70,7 @@ function createTimeout<T>(
         );
     }
 
-    return [
-        callbackWrapper(resolve, handle, state),
-        callbackWrapper(reject, handle, state),
-        state,
-        handle,
-    ];
+    return [callbackWrapper(resolve, handle, state), callbackWrapper(reject, handle, state), state, handle];
 }
 
 declare global {
@@ -81,12 +81,15 @@ declare global {
          * @param interval
          * @param timeout
          */
-        waitFor<T = void>(
-            waiter: Waiter<T>,
-            interval?: number,
-            timeout?: number,
-            msg?: string
-        ): Promise<T>;
+        waitFor<T = void>(waiter: Waiter<T>, { timeout, message, interval }?: WaiterTimeoutOptions): Promise<T>;
+
+        /**
+         * Calls the waiter every couple of miliseconds until it returns true.
+         * @param waiter
+         * @param interval
+         * @param timeout
+         */
+        waitForCondition(waiter: ConditionWaiter, { timeout, message, interval }?: WaiterTimeoutOptions): Promise<void>;
 
         /**
          * Creates a promise that resolves after the given amount of miliseconds.
@@ -112,19 +115,9 @@ declare global {
     }
 }
 
-Promise.waitFor = async function <T>(
-    waiter: Waiter<T>,
-    interval?: number,
-    timeout?: number,
-    msg?: string
-) {
+Promise.waitFor = async function <T>(waiter: Waiter<T>, { timeout, message, interval }: WaiterTimeoutOptions = {}) {
     return new Promise<T>(async (resolve, reject) => {
-        const [resolver, rejecter, state] = createTimeout(
-            resolve,
-            reject,
-            timeout,
-            msg
-        );
+        const [resolver, rejecter, state] = createTimeout(resolve, reject, { timeout, message });
 
         const handle = window.setInterval(async () => {
             if (state.resolved) return window.clearInterval(handle);
@@ -137,6 +130,16 @@ Promise.waitFor = async function <T>(
     });
 };
 
+Promise.waitForCondition = async function (waiter: ConditionWaiter, options?: WaiterTimeoutOptions) {
+    return Promise.waitFor(async (resolve, reject) => {
+        try {
+            if (await waiter()) resolve();
+        } catch (e) {
+            reject(e);
+        }
+    }, options);
+};
+
 Promise.sleep = function (ms: number) {
     return new Promise((resolve) => setTimeout(resolve, ms));
 };
@@ -145,15 +148,11 @@ Promise.run = async function (callback: PossibleAsyncCallback) {
     await callback();
 };
 
-Promise.prototype.timeout = function (
-    this: Promise<any>,
-    ms: number,
-    msg?: string
-) {
+Promise.prototype.timeout = function (this: Promise<any>, ms: number, message?: string) {
     if (ms <= 0) return this;
 
     return new Promise(async (resolve, reject) => {
-        const [resolver, rejecter] = createTimeout(resolve, reject, ms, msg);
+        const [resolver, rejecter] = createTimeout(resolve, reject, { timeout: ms, message });
 
         try {
             resolver(await this);
