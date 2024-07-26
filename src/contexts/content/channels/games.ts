@@ -1,7 +1,7 @@
 import { Channels } from "@constants";
 import Channel from "@shared/channel";
 
-class ContentChannel {
+class GamesChannel {
     private readonly channel = Channel.window(Channels.Content);
 
     public async has(key: string): Promise<string> {
@@ -11,32 +11,25 @@ class ContentChannel {
         });
     }
 
-    public async get(key: string): Promise<string> {
+    public async getAll(): Promise<MG.Api.Game[]> {
         return this.channel.send(Channels.Extension, {
-            type: "get",
-            data: { key },
+            type: "games",
         });
     }
 
-    public async set(key: string, value: string): Promise<string> {
+    public async getGame(gameId: number): Promise<Possible<MG.Api.Game>> {
         return this.channel.send(Channels.Extension, {
-            type: "set",
-            data: { key, value },
+            type: "game",
+            data: { gameId },
         });
     }
 
-    public async remove(key: string): Promise<string> {
+    public async getGameMap(gameId: number, userId: number): Promise<Possible<MG.Api.GameMap>> {
         return this.channel.send(Channels.Extension, {
-            type: "remove",
-            data: { key },
-        });
-    }
-
-    public async keys(): Promise<string> {
-        return this.channel.send(Channels.Extension, {
-            type: "keys",
+            type: "game:map",
+            data: { gameId, userId },
         });
     }
 }
 
-export default new ContentChannel();
+export default new GamesChannel();

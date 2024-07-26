@@ -1,9 +1,8 @@
 import runContexts from "@shared/run";
 import { waitForPageType } from "@fmg/page";
 
-import Games from "@fmg/api/games";
-
-import ContentChannel from "./channel";
+import StorageChannel from "@content/channels/storage";
+import GamesChannel from "@content/channels/games";
 
 export interface PageScript {
     initScript(): Promise<void> | void;
@@ -28,10 +27,12 @@ async function initScript() {
 }
 
 async function main() {
-    await ContentChannel.set("hello", "world");
-    const value = await ContentChannel.get("hello");
+    await StorageChannel.set("hello", "world");
+    const value = await StorageChannel.get("hello");
     logger.debug("hello =", value, "@ https://mapgenie.io");
-    Games.getGame(1).then(logger.debug);
+
+    const game = await GamesChannel.getGame(1);
+    logger.debug("game:1 =", game?.title);
 }
 
 runContexts("content", initScript, main);
