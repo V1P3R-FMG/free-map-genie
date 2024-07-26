@@ -5,7 +5,7 @@ import eslintPluginPrettierRecommended from "eslint-plugin-prettier/recommended"
 
 export default [
     {
-        ignores: ["data/", "mg/", "build/", "webpack/**/*.js"],
+        ignores: ["data/", "mg/", "build/"],
     },
     { files: ["fmg/**/*.{ts,json}", "webpack/**/*.{ts,json}", "wdio/**/*.{ts,json}"] },
     { languageOptions: { globals: globals.browser } },

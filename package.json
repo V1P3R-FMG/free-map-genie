@@ -4,14 +4,13 @@
     "homepage": "https://github.com/V1P3R-FMG/free-map-genie",
     "version": "3.0.0",
     "license": "MIT",
-    "type": "module",
     "scripts": {
-        "gen:keys": "bash ./script/gen-keys",
-        "build:webpack": "tsc -p ./webpack/tsconfig.json && yarn install --check-files --force",
-        "build": "npx webpack --env",
-        "start": "npx webpack --watch --env",
+        "webpack": "npx tsx webpack/build.ts",
+        "build": "yarn webpack",
+        "start": "yarn webpack --watch",
         "lint": "npx eslint .",
-        "lint:fix": "npx eslint . --fix"
+        "lint:fix": "npx eslint . --fix",
+        "check:src": "npx tsc --noEmit"
     },
     "devDependencies": {
         "@swc/core": "^1.4.16",
@@ -25,13 +24,12 @@
         "@typescript-eslint/parser": "^7.17.0",
         "acorn": "^8.12.1",
         "copy-webpack-plugin": "^12.0.2",
+        "deepmerge": "^4.3.1",
         "dotenv": "^16.4.5",
         "eslint": "^8.56.0",
         "eslint-config-prettier": "^9.1.0",
         "eslint-plugin-prettier": "^5.2.1",
         "eslint-plugin-vue": "^9.27.0",
-        "fmg-import-globals-loader": "./webpack/loaders/fmg-import-globals",
-        "fmg-webpack-utils": "./webpack/utils",
         "generate-file-webpack-plugin": "^1.0.1",
         "globals": "^15.8.0",
         "loader-utils": "^3.2.1",
@@ -40,16 +38,14 @@
         "prettier-eslint-cli": "^8.0.1",
         "schema-utils": "^4.2.0",
         "swc-loader": "^0.2.6",
-        "ts-node": "^10.9.2",
+        "ts-node": "^11.0.0-beta.1",
         "tsconfig-paths-webpack-plugin": "^4.1.0",
         "tsx": "^4.16.2",
         "typescript": "^5.4.5",
         "typescript-eslint": "^7.17.0",
         "vue-eslint-parser": "^9.4.3",
         "web-ext-plugin": "^2.9.0",
-        "webpack": "^5.91.0",
-        "webpack-cli": "^5.1.4",
-        "webpack-web-ext-manifest": "./webpack/plugins/web-ext-manifest"
+        "webpack": "^5.91.0"
     },
     "dependencies": {
         "jquery": "^3.7.1"

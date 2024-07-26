@@ -115,12 +115,13 @@ function generateKeys(keyDir: string): GeneratedKeys {
     };
 }
 
-function getEnvInfo(env: Env): EnvInfo {
-    const isChrome = !!env.chrome;
-    const isFirefox = !!env.firefox;
-    const isDev = !!env.dev;
+function getEnvInfo(): EnvInfo {
+    const isChrome = !!process.argv.find(arg => arg === "chrome");
+    const isFirefox = !!process.argv.find(arg => arg === "firefox");
+    const isDev = !!process.argv.find(arg => arg === "dev");
+    const watch = !!process.argv.find(arg => arg === "--watch" || arg === "-w");
 
-    if (!isChrome && !isFirefox) throw "No browser provided pls add `--env chrome` or `--env firefox`.";
+    if (!isChrome && !isFirefox) throw "No browser provided pls add `chrome` or `firefox`.";
     if (isChrome && isFirefox) throw "More than one browser provided, You can only bundle one at a time.";
 
     return {
@@ -129,7 +130,7 @@ function getEnvInfo(env: Env): EnvInfo {
         isDev,
         browser: isChrome ? "chrome" : "firefox",
         mode: isDev ? "development" : "production",
-        watch: env.WEBPACK_WATCH ?? false,
+        watch
     };
 }
 
@@ -146,8 +147,8 @@ function getPackageJsonInfo(): PackageJsonInfo {
     return { version, homepage, author };
 }
 
-export function getBuildInfo(env: Env, dist: string): BuildInfo {
-    const envInfo = getEnvInfo(env);
+export default function getBuildInfo(dist: string): BuildInfo {
+    const envInfo = getEnvInfo();
     const name = `fmg-${envInfo.browser}`;
 
     return {

@@ -1,11 +1,7 @@
 {
     "compilerOptions": {
-        "target": "esnext",
         "module": "NodeNext",
         "moduleResolution": "NodeNext",
-        "allowSyntheticDefaultImports": true,
         "esModuleInterop": true,
-        "skipLibCheck": true
-    },
-    "exclude": ["../node_modules"]
+    }
 }
