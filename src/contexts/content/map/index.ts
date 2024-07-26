@@ -15,9 +15,17 @@ class MapScript implements PageScript {
     }
 
     public async reloadMapgenieScript() {
-        await Promise.sleep(250);
-        Data.fixGoogleMaps();
-        Page.reloadMapgenieScript();
+        await Data.fixGoogleMaps();
+        Page.addMapgenieScript();
+
+        const store = await Data.getStore();
+        store.dispatch({
+            type: "MG:MAP:SHOW_SPECIFIC_LOCATIONS",
+            meta: {
+                locationIds: [71259],
+                categoryIds: [],
+            },
+        });
     }
 
     public async initButtons() {

@@ -1,7 +1,11 @@
 declare namespace MG {
-    declare type StateActionType = MG.StateMapAction | MG.StateUserAction | MG.StateSearchAction;
+    declare type StateActionType = StateMapAction | StateUserAction | StateSearchAction;
 
-    declare type StateActionsMap = MG.Actions.UserStateActionsMap &
-        MG.Actions.MapStateActionsMap &
-        MG.Actions.RouteStateActionsMap;
+    declare type MetaForActionType<T extends StateActionType> = T extends StateMapAction
+        ? Actions.MapStateActionsMap[T]
+        : T extends StateUserAction
+          ? Actions.UserStateActionsMap[T]
+          : T extends StateSearchAction
+            ? Actions.SearchStateActionsMap[T]
+            : never;
 }

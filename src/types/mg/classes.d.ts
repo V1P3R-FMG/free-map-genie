@@ -99,7 +99,7 @@ declare namespace MG {
     }
 
     declare class Store {
-        public dispatch<T extends StateActionType>(action: { type: T; meta: StateActionsMap[T] }): void;
+        public dispatch<T extends StateActionType>(action: { type: T; meta: MetaForActionType<T> }): void;
         public getState(): State;
         public subscribe(f: (...args: any[]) => void): void;
         public replaceReducer(reducer: unknown);

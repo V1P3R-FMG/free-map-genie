@@ -44,13 +44,24 @@ class Data {
         return false;
     }
 
-    public fixGoogleMaps() {
+    public async fixGoogleMaps() {
+        await Promise.waitForCondition(() => window.google !== undefined);
         if (window.config?.altMapSdk) {
-            window.google ??= {} as MG.Google;
-            window.google.maps = {
+            window.google!.maps = {
                 Size: function () {},
             };
         }
+    }
+
+    public async getStore() {
+        return Promise.waitFor<MG.Store>(
+            (resolve) => {
+                if (window.store) {
+                    resolve(window.store);
+                }
+            },
+            { message: "Wait for window.store took to long." }
+        );
     }
 }
 
