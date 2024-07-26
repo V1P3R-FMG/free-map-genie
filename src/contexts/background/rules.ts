@@ -1,3 +1,19 @@
+type RuleActionType = chrome.declarativeNetRequest.RuleActionType;
+type ResourceType = chrome.declarativeNetRequest.ResourceType;
+type HeaderOperation = chrome.declarativeNetRequest.HeaderOperation;
+
+function ruleActionType(type: `${RuleActionType}`): RuleActionType {
+    return type as RuleActionType;
+}
+
+function resouceType(type: `${ResourceType}`): ResourceType {
+    return type as ResourceType;
+}
+
+function HeaderOperation(operation: `${HeaderOperation}`): HeaderOperation {
+    return operation as HeaderOperation;
+}
+
 export default async function installRules() {
     await chrome.declarativeNetRequest.updateDynamicRules({
         removeRuleIds: [1, 2],
@@ -7,15 +23,15 @@ export default async function installRules() {
                 id: 1,
                 priority: 1,
                 action: {
-                    type: chrome.declarativeNetRequest.RuleActionType.MODIFY_HEADERS,
+                    type: ruleActionType("modifyHeaders"),
                     responseHeaders: ["X-Frame-Options", "Frame-Options"].map((header) => ({
                         header,
-                        operation: chrome.declarativeNetRequest.HeaderOperation.REMOVE,
+                        operation: HeaderOperation("remove"),
                     })),
                 },
                 condition: {
                     requestDomains: ["mapgenie.io"],
-                    resourceTypes: [chrome.declarativeNetRequest.ResourceType.SUB_FRAME],
+                    resourceTypes: [resouceType("sub_frame")],
                 },
             },
             // Block map.js?id=123456abcdef but allow map.js?ready&id=123456abcdef
@@ -25,11 +41,11 @@ export default async function installRules() {
                 id: 2,
                 priority: 1,
                 action: {
-                    type: chrome.declarativeNetRequest.RuleActionType.BLOCK,
+                    type: ruleActionType("block"),
                 },
                 condition: {
                     regexFilter: "^https://cdn\\.mapgenie\\.io/js/map\\.js\\?id=\\w+$",
-                    resourceTypes: [chrome.declarativeNetRequest.ResourceType.SCRIPT],
+                    resourceTypes: [resouceType("script")],
                 },
             },
         ],
