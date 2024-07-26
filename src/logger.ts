@@ -4,14 +4,7 @@ export type ConsoleMethodName = "log" | "error" | "warn" | "trace";
 
 export type LogMethodName = "info" | "warn" | "error" | "debug";
 
-export type CssStyleEntryName =
-    | "common"
-    | "timestamp"
-    | "message"
-    | "info"
-    | "warn"
-    | "error"
-    | "debug";
+export type CssStyleEntryName = "common" | "timestamp" | "message" | "info" | "warn" | "error" | "debug";
 
 export interface CssStyleEntryValue {
     color?: string;
@@ -43,10 +36,7 @@ export class ConsoleLogTemplate {
     private readonly commonCss: CssStyleEntryValue;
     private readonly messageStyle: string;
 
-    public constructor(
-        common?: CssStyleEntryValue,
-        message?: CssStyleEntryValue
-    ) {
+    public constructor(common?: CssStyleEntryValue, message?: CssStyleEntryValue) {
         this.commonCss = common ?? {};
         this.messageStyle = this.compileCss(message ?? {});
     }
@@ -78,9 +68,7 @@ export class ConsoleLogTemplate {
      */
     private compileCss(css: CssStyleEntryValue): string {
         return Object.entries({ ...this.commonCss, ...css })
-            .map(
-                ([prop, value]) => `${this.transformKebabCase(prop)}:${value};`
-            )
+            .map(([prop, value]) => `${this.transformKebabCase(prop)}:${value};`)
             .join("");
     }
 
@@ -100,12 +88,7 @@ export class ConsoleLogTemplate {
      * @returns the concurent array of `tag.style` and `tag.value`.
      */
     private extractTags(): string[] {
-        return this.tags
-            .map((tag) => [
-                tag.style,
-                typeof tag.value === "string" ? tag.value : tag.value(),
-            ])
-            .flat(1);
+        return this.tags.map((tag) => [tag.style, typeof tag.value === "string" ? tag.value : tag.value()]).flat(1);
     }
 
     /**
@@ -113,11 +96,7 @@ export class ConsoleLogTemplate {
      * @returns a array of parameters.
      */
     public compile(): any[] {
-        return [
-            this.createTemplateFormatString(),
-            ...this.extractTags(),
-            this.messageStyle,
-        ];
+        return [this.createTemplateFormatString(), ...this.extractTags(), this.messageStyle];
     }
 }
 
@@ -152,18 +131,11 @@ export class Logger {
     protected readonly errorTemplate!: ConsoleLogTemplate;
     protected readonly debugTemplate!: ConsoleLogTemplate;
 
-    public constructor(
-        name?: string,
-        prefix?: string,
-        prefixCss?: CssStyleEntryValue
-    ) {
+    public constructor(name?: string, prefix?: string, prefixCss?: CssStyleEntryValue) {
         this.muted = !__DEBUG__; // automatically mute in production;
 
         for (const logName of ["info", "warn", "error", "debug"] as const) {
-            const template = new ConsoleLogTemplate(
-                this.css.common,
-                this.css.message
-            );
+            const template = new ConsoleLogTemplate(this.css.common, this.css.message);
 
             template.addTag(Logger.getTimestamp, this.css.timestamp);
 
@@ -186,12 +158,8 @@ export class Logger {
      * @param the name of the console method.
      * @returns the created console callback.
      */
-    private createLogCallback<M extends ConsoleMethodName>(
-        name: LogMethodName,
-        method: M
-    ): Console[M] {
-        if (this.muted || (name === "debug" && !__DEBUG__))
-            return () => () => {};
+    private createLogCallback<M extends ConsoleMethodName>(name: LogMethodName, method: M): Console[M] {
+        if (this.muted || (name === "debug" && !__DEBUG__)) return () => () => {};
         return this.bindConsoleCallback(name, method);
     }
 
@@ -201,14 +169,8 @@ export class Logger {
      * @param the name of the console method.
      * @returns the created console callback.
      */
-    private bindConsoleCallback<M extends ConsoleMethodName>(
-        name: LogMethodName,
-        method: M
-    ): Console[M] {
-        return _console[method].bind(
-            _console,
-            ...this[`${name}Template`].compile()
-        );
+    private bindConsoleCallback<M extends ConsoleMethodName>(name: LogMethodName, method: M): Console[M] {
+        return _console[method].bind(_console, ...this[`${name}Template`].compile());
     }
 
     /** Logger methods. */

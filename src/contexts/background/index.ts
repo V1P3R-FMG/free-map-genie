@@ -15,10 +15,7 @@ const GET_GAME_MAP_SCHEME = validation.validator({
 
 const START_LOGIN_SCHEME = validation.validator("string");
 
-export function forwardMessage(
-    sender: chrome.runtime.MessageSender,
-    message: ChannelMessage
-): boolean {
+export function forwardMessage(sender: chrome.runtime.MessageSender, message: ChannelMessage): boolean {
     if (sender.tab?.id) {
         chrome.tabs.sendMessage(sender.tab.id, {
             origin: sender.origin,
@@ -52,9 +49,7 @@ async function main() {
                 return false;
             }
             case "login": {
-                chrome.storage.session
-                    .get("last_mg_url")
-                    .then(({ last_mg_url }) => sendResponse(last_mg_url));
+                chrome.storage.session.get("last_mg_url").then(({ last_mg_url }) => sendResponse(last_mg_url));
                 return true;
             }
             case "games": {

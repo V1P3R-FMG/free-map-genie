@@ -33,10 +33,7 @@ export default function (env) {
         },
         output: { path: buildInfo.out },
         resolveLoader: {
-            modules: [
-                path.resolve(__dirname, "webpack", "loaders"),
-                "node_modules",
-            ],
+            modules: [path.resolve(__dirname, "webpack", "loaders"), "node_modules"],
         },
         resolve: {
             extensions: [".ts", ".js", ".json"],
@@ -74,9 +71,7 @@ export default function (env) {
             new CopyPlugin({
                 patterns: [
                     { context: "src", from: "assets", to: "assets" },
-                    ...(buildInfo.isDev & fs.existsSync("data/games.json")
-                        ? [{ from: "data/games.json" }]
-                        : []),
+                    ...(buildInfo.isDev & fs.existsSync("data/games.json") ? [{ from: "data/games.json" }] : []),
                 ],
             }),
             new ProvidePlugin({
@@ -115,14 +110,9 @@ export default function (env) {
                 selfHosted: true,
                 overwriteDest: true,
                 devtools: true,
-                startUrl: process.env.START_URL,
+                startUrl: process.env.START_URL ?? "https://mapgenie.io",
                 sourceDir: buildInfo.out,
-                args: buildInfo.isChrome
-                    ? [
-                          "--auto-open-devtools-for-tabs",
-                          "--system-developer-mode",
-                      ]
-                    : [],
+                args: buildInfo.isChrome ? ["--auto-open-devtools-for-tabs", "--system-developer-mode"] : [],
             }),
         ],
         optimization: {

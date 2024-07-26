@@ -8,8 +8,7 @@ declare namespace MG {
 
     declare type MimeType = `${string}/${string}`;
 
-    declare type IsoDateString =
-        `${number}-${number}-${number}T${number}:${number}:${number}.${number}Z`;
+    declare type IsoDateString = `${number}-${number}-${number}T${number}:${number}:${number}.${number}Z`;
 
     declare type Int = number;
     declare type Float = number;

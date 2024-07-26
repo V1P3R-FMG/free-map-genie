@@ -7,22 +7,15 @@ export default async function installRules() {
                 id: 1,
                 priority: 1,
                 action: {
-                    type: chrome.declarativeNetRequest.RuleActionType
-                        .MODIFY_HEADERS,
-                    responseHeaders: ["X-Frame-Options", "Frame-Options"].map(
-                        (header) => ({
-                            header,
-                            operation:
-                                chrome.declarativeNetRequest.HeaderOperation
-                                    .REMOVE,
-                        })
-                    ),
+                    type: chrome.declarativeNetRequest.RuleActionType.MODIFY_HEADERS,
+                    responseHeaders: ["X-Frame-Options", "Frame-Options"].map((header) => ({
+                        header,
+                        operation: chrome.declarativeNetRequest.HeaderOperation.REMOVE,
+                    })),
                 },
                 condition: {
                     requestDomains: ["mapgenie.io"],
-                    resourceTypes: [
-                        chrome.declarativeNetRequest.ResourceType.SUB_FRAME,
-                    ],
+                    resourceTypes: [chrome.declarativeNetRequest.ResourceType.SUB_FRAME],
                 },
             },
             // Block map.js?id=123456abcdef but allow map.js?ready&id=123456abcdef
@@ -35,11 +28,8 @@ export default async function installRules() {
                     type: chrome.declarativeNetRequest.RuleActionType.BLOCK,
                 },
                 condition: {
-                    regexFilter:
-                        "^https://cdn\\.mapgenie\\.io/js/map\\.js\\?id=\\w+$",
-                    resourceTypes: [
-                        chrome.declarativeNetRequest.ResourceType.SCRIPT,
-                    ],
+                    regexFilter: "^https://cdn\\.mapgenie\\.io/js/map\\.js\\?id=\\w+$",
+                    resourceTypes: [chrome.declarativeNetRequest.ResourceType.SCRIPT],
                 },
             },
         ],

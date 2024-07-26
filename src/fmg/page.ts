@@ -1,16 +1,7 @@
-export type MageniePageType =
-    | "home"
-    | "login"
-    | "map"
-    | "guide"
-    | "game-home"
-    | "unknown";
+export type MageniePageType = "home" | "login" | "map" | "guide" | "game-home" | "unknown";
 
 export function isMapgeniePage(): boolean {
-    return (
-        $('link[href^="https://cdn.mapgenie.io/favicons"]', document.head)
-            .length > 0
-    );
+    return $('link[href^="https://cdn.mapgenie.io/favicons"]', document.head).length > 0;
 }
 
 export function isMapgenieHomePage(): boolean {
@@ -45,17 +36,15 @@ export function getPageType(): MageniePageType {
     return "unknown";
 }
 
-export async function waitForPageType(
-    timeout?: number
-): Promise<MageniePageType> {
+export async function waitForPageType(timeout?: number): Promise<MageniePageType> {
     let pageType: MageniePageType = getPageType();
 
     if (pageType !== "unknown") return pageType;
 
-    return Promise.waitFor<MageniePageType>(
-        (resolve) =>
-            (pageType = getPageType()) !== "unknown" && resolve(pageType),
-        0,
-        timeout
-    ).catch(() => "unknown");
+    return Promise.waitForCondition(() => (pageType = getPageType()) !== "unknown", {
+        interval: 0,
+        timeout,
+    })
+        .then(() => pageType)
+        .catch(() => "unknown");
 }

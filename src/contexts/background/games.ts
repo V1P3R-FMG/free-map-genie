@@ -25,10 +25,7 @@ export async function getGame(gameId: number): Promise<Nullable<MG.Api.Game>> {
     return games.find((game) => game.id === gameId) ?? null;
 }
 
-export async function getGameMap(
-    gameId: number,
-    mapId: number
-): Promise<Nullable<MG.Api.GameMap>> {
+export async function getGameMap(gameId: number, mapId: number): Promise<Nullable<MG.Api.GameMap>> {
     const game = await getGame(gameId);
     return game?.maps.find((map) => map.id === mapId) ?? null;
 }

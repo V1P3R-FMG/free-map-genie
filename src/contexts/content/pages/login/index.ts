@@ -24,10 +24,7 @@ function createMockUserButton(): JQuery<HTMLButtonElement> {
 async function attachButton() {
     await document.waitForDocumentBody();
 
-    $(`form button[type="submit"]`)
-        .parent()
-        .append(createSpace())
-        .append(createMockUserButton());
+    $(`form button[type="submit"]`).parent().append(createSpace()).append(createMockUserButton());
 }
 
 export default async function main() {

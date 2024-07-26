@@ -1,5 +1,6 @@
-import "globals/async";
-import "globals/dom";
-import "globals/iframe";
-import "globals/array";
-import "globals/object";
+import "./async";
+import "./dom";
+import "./iframe";
+import "./array";
+import "./object";
+import "./jquery";

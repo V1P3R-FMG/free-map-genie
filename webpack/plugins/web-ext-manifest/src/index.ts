@@ -15,14 +15,12 @@ const schema: Schema = {
         files: {
             type: "array",
             items: { anyOf: [{ type: "object" }, { type: "string" }] },
-            description:
-                "Merges the given object and file paths into a single manifest.",
+            description: "Merges the given object and file paths into a single manifest.",
         },
         fields: {
             type: "array",
             items: { type: "string" },
-            description:
-                "Adds specified properties from your package.json file into the manifest.",
+            description: "Adds specified properties from your package.json file into the manifest.",
         },
         tabs: {
             type: "number",
@@ -67,9 +65,7 @@ export default class WebExtManifestPlugin {
             if (fs.existsSync(idPath)) {
                 return JSON.parse(fs.readFileSync(idPath, "utf-8"));
             } else {
-                compilation.warnings.push(
-                    new WebpackError(`file: ${idPath} does not exist.`)
-                );
+                compilation.warnings.push(new WebpackError(`file: ${idPath} does not exist.`));
                 return {} as Manifest;
             }
         } catch (e) {
@@ -77,10 +73,7 @@ export default class WebExtManifestPlugin {
         }
     }
 
-    private resolveManifest(
-        compilation: Compilation,
-        manifest: ManifestEntry
-    ): Partial<Manifest> {
+    private resolveManifest(compilation: Compilation, manifest: ManifestEntry): Partial<Manifest> {
         if (typeof manifest !== "string") {
             return manifest;
         }
@@ -90,9 +83,7 @@ export default class WebExtManifestPlugin {
     private getPackagesValues(compilation: Compilation): Partial<Manifest> {
         if (this.options.fields?.length) {
             const pkg = this.requireWatch(compilation, "package.json");
-            return Object.fromEntries(
-                this.options.fields.map((field) => [field, pkg[field]])
-            );
+            return Object.fromEntries(this.options.fields.map((field) => [field, pkg[field]]));
         }
         return {};
     }
@@ -106,23 +97,17 @@ export default class WebExtManifestPlugin {
     }
 
     public apply(compiler: Compiler) {
-        compiler.hooks.thisCompilation.tap(
-            WebExtManifestPlugin.name,
-            (compilation: Compilation) => {
-                compilation.hooks.processAssets.tap(
-                    {
-                        name: WebExtManifestPlugin.name,
-                        stage: compilation["PROCESS_ASSETS_STAGE_ADDITIONS"],
-                    },
-                    (_) => {
-                        const jsonString = this.generateJson(compilation);
-                        compilation.emitAsset(
-                            "manifest.json",
-                            createSource(jsonString)
-                        );
-                    }
-                );
-            }
-        );
+        compiler.hooks.thisCompilation.tap(WebExtManifestPlugin.name, (compilation: Compilation) => {
+            compilation.hooks.processAssets.tap(
+                {
+                    name: WebExtManifestPlugin.name,
+                    stage: compilation["PROCESS_ASSETS_STAGE_ADDITIONS"],
+                },
+                (_) => {
+                    const jsonString = this.generateJson(compilation);
+                    compilation.emitAsset("manifest.json", createSource(jsonString));
+                }
+            );
+        });
     }
 }

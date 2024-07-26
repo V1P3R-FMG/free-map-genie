@@ -6,30 +6,24 @@ declare global {
 }
 
 if (global.document) {
-    Document.prototype.waitForDocumentBody = async function (
-        timeout?: number
-    ): Promise<HTMLElement> {
+    Document.prototype.waitForDocumentBody = async function (timeout?: number): Promise<HTMLElement> {
         return this.body
             ? this.body
-            : Promise.waitFor<HTMLElement>(
-                  (resolve) => this.body && resolve(this.body),
-                  0,
+            : Promise.waitFor<HTMLElement>((resolve) => this.body && resolve(this.body), {
+                  interval: 0,
                   timeout,
-                  "Wait for body took to long."
-              );
+                  message: "Wait for body took to long.",
+              });
     };
 
-    Document.prototype.waitForDocumentHead = async function (
-        timeout?: number
-    ): Promise<HTMLElement> {
+    Document.prototype.waitForDocumentHead = async function (timeout?: number): Promise<HTMLElement> {
         return this.head
             ? this.head
-            : Promise.waitFor<HTMLElement>(
-                  (resolve) => this.head && resolve(this.head),
-                  undefined,
-                  0,
-                  "Wait for head took to long."
-              );
+            : Promise.waitFor<HTMLElement>((resolve) => this.head && resolve(this.head), {
+                  interval: 0,
+                  timeout,
+                  message: "Wait for head took to long.",
+              });
     };
 }
 

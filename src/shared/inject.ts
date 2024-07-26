@@ -1,9 +1,7 @@
 export function injectScript(src: string, query?: Record<string, string>) {
     const url = new URL(src);
     if (query) {
-        Object.entries(query).forEach(([key, value]) =>
-            url.searchParams.set(key, value)
-        );
+        Object.entries(query).forEach(([key, value]) => url.searchParams.set(key, value));
     }
     return new Promise(async (resolve) => {
         const script = document.createElement("script");
@@ -11,15 +9,10 @@ export function injectScript(src: string, query?: Record<string, string>) {
         script.onload = resolve;
         script.onerror = resolve;
 
-        await document
-            .waitForDocumentHead()
-            .then((head) => head.appendChild(script));
+        await document.waitForDocumentHead().then((head) => head.appendChild(script));
     });
 }
 
-export function injectExtensionScript(
-    path: string,
-    query?: Record<string, string>
-) {
+export function injectExtensionScript(path: string, query?: Record<string, string>) {
     return injectScript(chrome.runtime.getURL(path), query);
 }

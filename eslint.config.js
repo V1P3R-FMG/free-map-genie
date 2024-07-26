@@ -5,17 +5,9 @@ import eslintPluginPrettierRecommended from "eslint-plugin-prettier/recommended"
 
 export default [
     {
-        ignores: [
-            "data/",
-            "mg/",
-            "build/",
-            "script/",
-            "scripts/",
-            "webpack/**/*.js",
-            "*.json",
-        ],
+        ignores: ["data/", "mg/", "build/", "webpack/**/*.js"],
     },
-    { files: ["src/**/*.ts", "webpack/**/*.ts"] },
+    { files: ["fmg/**/*.{ts,json}", "webpack/**/*.{ts,json}", "wdio/**/*.{ts,json}"] },
     { languageOptions: { globals: globals.browser } },
     ...tseslint.configs.recommended,
     ...pluginVue.configs["flat/essential"],
@@ -25,7 +17,7 @@ export default [
     },
     {
         rules: {
-            "max-len": ["error", { code: 120 }],
+            "max-len": ["error", { code: 100 }],
             semi: "error",
             "prefer-const": "error",
             "no-unused-vars": "off",

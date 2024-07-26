@@ -1,11 +1,4 @@
-type ValueType =
-    | "string"
-    | "number"
-    | "boolean"
-    | "object"
-    | "any"
-    | "undefined"
-    | "null";
+type ValueType = "string" | "number" | "boolean" | "object" | "any" | "undefined" | "null";
 
 type OptionalValueType = `${Exclude<ValueType, "any" | "undefined">}?`;
 type UnionValueType = (ValueType | OptionalValueType)[];
@@ -32,22 +25,21 @@ type GetRawTypeFromValueType<T extends ValueType> = T extends "null"
                 ? string
                 : never;
 
-type GetValueTypeFromOptionalValueType<T extends OptionalValueType> =
-    T extends `${infer V}?` ? V : never;
+type GetValueTypeFromOptionalValueType<T extends OptionalValueType> = T extends `${infer V}?` ? V : never;
 
 type GetRawTypeFromOptionalValueType<T extends OptionalValueType> =
     | GetRawTypeFromValueType<GetValueTypeFromOptionalValueType<T>>
     | undefined;
 
-type GetValueTypeFromUnionValueType<T extends UnionValueType> =
-    T extends (infer V)[]
-        ? V extends OptionalValueType
-            ? GetValueTypeFromOptionalValueType<V> | "undefined"
-            : V
-        : never;
+type GetValueTypeFromUnionValueType<T extends UnionValueType> = T extends (infer V)[]
+    ? V extends OptionalValueType
+        ? GetValueTypeFromOptionalValueType<V> | "undefined"
+        : V
+    : never;
 
-type GetRawTypeFromUnionValueType<T extends UnionValueType> =
-    GetRawTypeFromValueType<GetValueTypeFromUnionValueType<T>>;
+type GetRawTypeFromUnionValueType<T extends UnionValueType> = GetRawTypeFromValueType<
+    GetValueTypeFromUnionValueType<T>
+>;
 
 type GetRawType<T extends SchemeValueType> = T extends ValueType
     ? GetRawTypeFromValueType<T>
@@ -67,9 +59,7 @@ type ValidatedResult<T extends Scheme> = T extends SchemeValueType
       ? ValidatedObjectResult<T>
       : never;
 
-function isOptional(
-    type: ValueType | OptionalValueType
-): type is OptionalValueType {
+function isOptional(type: ValueType | OptionalValueType): type is OptionalValueType {
     return type.endsWith("?");
 }
 
@@ -96,10 +86,7 @@ function extractInfo(scheme: SchemeValueType): ValueType[] {
     return [...types];
 }
 
-function isValid<E extends SchemeValueType>(
-    scheme: E,
-    value: any
-): value is GetRawType<E> {
+function isValid<E extends SchemeValueType>(scheme: E, value: any): value is GetRawType<E> {
     const type = typeof value;
     for (const expected of extractInfo(scheme)) {
         switch (expected) {
@@ -124,21 +111,13 @@ function schemeToString<E extends SchemeValueType>(scheme: E): string {
     return scheme;
 }
 
-function validateValue<E extends SchemeValueType>(
-    scheme: E,
-    value: any,
-    name: string
-) {
+function validateValue<E extends SchemeValueType>(scheme: E, value: any, name: string) {
     if (!isValid(scheme, value)) {
         throw `Value ${name} does not match the requested scheme, expected type ${schemeToString(scheme)}, but got type ${typeof value}.`;
     }
 }
 
-export function validate<S extends Scheme>(
-    scheme: S,
-    data: any,
-    name?: string
-): ValidatedResult<S> {
+export function validate<S extends Scheme>(scheme: S, data: any, name?: string): ValidatedResult<S> {
     name ??= "?";
 
     if (typeof scheme === "string") {
@@ -148,11 +127,7 @@ export function validate<S extends Scheme>(
 
     validateValue("object", data, name);
     for (const [prop, expected] of Object.entries(scheme)) {
-        validateValue(
-            expected as SchemeValueType,
-            data[prop],
-            name ? `${name}.${prop}` : prop
-        );
+        validateValue(expected as SchemeValueType, data[prop], name ? `${name}.${prop}` : prop);
     }
 
     return data;
@@ -162,9 +137,7 @@ export function scheme<S extends Scheme>(scheme: S): S {
     return scheme;
 }
 
-export function validator<S extends Scheme>(
-    scheme: S
-): (data: any) => ValidatedResult<S> {
+export function validator<S extends Scheme>(scheme: S): (data: any) => ValidatedResult<S> {
     return (data: any) => validate(scheme, data);
 }
 

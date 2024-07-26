@@ -9,9 +9,10 @@ if (global.HTMLIFrameElement) {
         this: HTMLIFrameElement,
         timeout?: number
     ): Promise<Window> {
-        return Promise.waitFor<Window>(
-            (resolve) => this.contentWindow && resolve(this.contentWindow)
-        ).timeout(timeout ?? 5000);
+        return Promise.waitFor<Window>((resolve) => this.contentWindow && resolve(this.contentWindow), {
+            timeout,
+            message: "Wait for iframe contentWindow took to long.",
+        });
     };
 }
 

@@ -29,19 +29,10 @@ function getFrame(): HTMLIFrameElement {
     return iframe.length > 0 ? iframe.get(0)! : createFrame();
 }
 
-async function forwardMessage<T>(
-    type: string,
-    key?: string,
-    value?: string,
-    timeout?: number
-): Promise<T> {
+async function forwardMessage<T>(type: string, key?: string, value?: string, timeout?: number): Promise<T> {
     const data = { key, value };
     const payload = { type, data };
-    return Channel.extension(Channels.Extension).send(
-        Channels.Mapgenie,
-        payload,
-        timeout
-    );
+    return Channel.extension(Channels.Extension).send(Channels.Mapgenie, payload, timeout);
 }
 
 export default async function initStorage() {
@@ -54,26 +45,20 @@ export default async function initStorage() {
     channel.allowOrigin("https://mapgenie.io");
 
     // Listens for storage request from content.js.
-    const _winChannel = Channel.window(
-        Channels.Extension,
-        (message, sendResponse, sendError) => {
-            MESSAGE_SCHEME(message);
-            switch (message.type) {
-                case "has":
-                case "get":
-                case "set":
-                case "remove":
-                case "keys":
-                    channel
-                        .send(Channels.Mapgenie, message)
-                        .then(sendResponse)
-                        .catch(sendError);
-                    return true;
-                default:
-                    return false;
-            }
+    const _winChannel = Channel.window(Channels.Extension, (message, sendResponse, sendError) => {
+        MESSAGE_SCHEME(message);
+        switch (message.type) {
+            case "has":
+            case "get":
+            case "set":
+            case "remove":
+            case "keys":
+                channel.send(Channels.Mapgenie, message).then(sendResponse).catch(sendError);
+                return true;
+            default:
+                return false;
         }
-    );
+    });
 }
 
 export async function has<T = any>(key: string, timeout?: number): Promise<T> {
@@ -84,11 +69,7 @@ export async function get<T = any>(key: string, timeout?: number): Promise<T> {
     return forwardMessage("get", key, undefined, timeout);
 }
 
-export async function set(
-    key: string,
-    value: string,
-    timeout?: number
-): Promise<void> {
+export async function set(key: string, value: string, timeout?: number): Promise<void> {
     return forwardMessage("set", key, value, timeout);
 }
 

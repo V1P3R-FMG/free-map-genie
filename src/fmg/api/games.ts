@@ -11,10 +11,7 @@ export default class Games {
 
         switch (getContext()) {
             case "main":
-                return Channel.window(Channels.Content).send(
-                    Channels.Extension,
-                    payload
-                );
+                return Channel.window(Channels.Content).send(Channels.Extension, payload);
             case "extension":
                 return chrome.runtime.sendMessage(payload);
             case "sub":
@@ -30,10 +27,7 @@ export default class Games {
         return this.send("game", gameId);
     }
 
-    public static async getGameMap(
-        gameId: number,
-        userId: number
-    ): Promise<MG.Api.GameMap | null> {
+    public static async getGameMap(gameId: number, userId: number): Promise<MG.Api.GameMap | null> {
         return this.send("game::map", gameId, userId);
     }
 }

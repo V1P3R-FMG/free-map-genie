@@ -6,10 +6,7 @@ async function runContext(context: RunContext): Promise<any> {
     return await context();
 }
 
-export default async function runContexts(
-    name: string,
-    ...contexts: RunContext[]
-): Promise<boolean> {
+export default async function runContexts(name: string, ...contexts: RunContext[]): Promise<boolean> {
     let success = true;
     await Promise.all(contexts.map(runContext))
         .then(() => logger.log(`FMG ${name} context initialized.`))

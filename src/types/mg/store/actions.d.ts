@@ -185,8 +185,7 @@ declare namespace MG.Actions {
         [StateUserAction.UPDATE_FOUND_LOCATIONS_COUNT]: Meta.Count;
         [StateUserAction.UPDATE_CATEGORY_PROGRESS]: Meta.NoMeta;
         [StateUserAction.SHOW_NOTES]: Meta.Visibility;
-        [StateUserAction.SET_NOTE_GROUP_VISIBILITY]: Meta.NoteGroup &
-            Meta.Visibility;
+        [StateUserAction.SET_NOTE_GROUP_VISIBILITY]: Meta.NoteGroup & Meta.Visibility;
         [StateUserAction.CREATE_NOTE]: Meta.Note;
         [StateUserAction.CREATE_NOTE_FULFILLED]: Meta.Note;
         [StateUserAction.UPDATE_NOTE]: Meta.Note;
@@ -220,10 +219,8 @@ declare namespace MG.Actions {
         [StateMapAction.REMOVE_NEW_LOCATION]: Meta.NoMeta;
         [StateMapAction.UPDATE_LOCATION]: Meta.Location & Meta.LocationId;
         [StateMapAction.UPDATE_LOCATIONS]: Meta.UpdateLocations;
-        [StateMapAction.UPDATE_LOCATION_POSITION]: Meta.LocationId &
-            Meta.Position;
-        [StateMapAction.UPDATE_LOCATION_FEATURES]: Meta.LocationId &
-            Meta.Features;
+        [StateMapAction.UPDATE_LOCATION_POSITION]: Meta.LocationId & Meta.Position;
+        [StateMapAction.UPDATE_LOCATION_FEATURES]: Meta.LocationId & Meta.Features;
         [StateMapAction.DELETE_LOCATION]: Meta.Location;
         [StateMapAction.DELETE_LOCATION_FULFILLED]: Meta.Location;
         [StateMapAction.SHOW_LOCATION_INFO]: Meta.Location & Meta.Visibility;
@@ -238,16 +235,14 @@ declare namespace MG.Actions {
         [StateMapAction.UPDATE_CATEGORY]: Meta.Category;
         [StateMapAction.UPDATE_CATEGORIES]: Meta.Categories;
         [StateMapAction.UPDATE_GROUP]: Meta.Group;
-        [StateMapAction.SET_HEATMAP_CATEGORY_SELECTED]: Meta.CategoryId &
-            Meta.Selected;
+        [StateMapAction.SET_HEATMAP_CATEGORY_SELECTED]: Meta.CategoryId & Meta.Selected;
         [StateMapAction.UPDATE_HEATMAP_CATEGORY]: Meta.Category;
         [StateMapAction.SET_IS_EDITING_HEATMAP]: Meta.EditingHeatmap;
         [StateMapAction.SET_LOCATION_FILTER]: Meta.LocationFilter;
         [StateMapAction.SET_REGION_FILTER]: Meta.RegionFilter;
         [StateMapAction.SET_TAG_FILTERS]: Meta.TagFilters;
         [StateMapAction.SET_TAG_FILTERS_V2]: Meta.TagFilters;
-        [StateMapAction.SHOW_SPECIFIC_LOCATIONS]: Meta.LocatiosIds &
-            Meta.CategoryIds;
+        [StateMapAction.SHOW_SPECIFIC_LOCATIONS]: Meta.LocatiosIds & Meta.CategoryIds;
         [StateMapAction.APPLY_PRESET]: Meta.Preset & Meta.Additive;
         [StateMapAction.UNAPPLY_PRESET]: Meta.Preset;
         [StateMapAction.SET_ACTIVE_PRESETS]: Meta.ActivePresets;

@@ -67,11 +67,7 @@ function generateKeys(keyDir: string): GeneratedKeys {
     const appIdFilePath = path.resolve(keyDir, "appid");
 
     let privateKeyData: string, publicKeyData: string, appIdData;
-    if (
-        !fs.existsSync(privateKeyFilePath) ||
-        !fs.existsSync(publicKeyFilePath) ||
-        !fs.existsSync(appIdFilePath)
-    ) {
+    if (!fs.existsSync(privateKeyFilePath) || !fs.existsSync(publicKeyFilePath) || !fs.existsSync(appIdFilePath)) {
         if (fs.existsSync(keyDir)) {
             fs.rmSync(keyDir);
         }
@@ -124,10 +120,8 @@ function getEnvInfo(env: Env): EnvInfo {
     const isFirefox = !!env.firefox;
     const isDev = !!env.dev;
 
-    if (!isChrome && !isFirefox)
-        throw "No browser provided pls add `--env chrome` or `--env firefox`.";
-    if (isChrome && isFirefox)
-        throw "More than one browser provided, You can only bundle one at a time.";
+    if (!isChrome && !isFirefox) throw "No browser provided pls add `--env chrome` or `--env firefox`.";
+    if (isChrome && isFirefox) throw "More than one browser provided, You can only bundle one at a time.";
 
     return {
         isChrome,

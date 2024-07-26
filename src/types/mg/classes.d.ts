@@ -3,10 +3,7 @@ declare namespace MG {
 
     declare class Map {
         //TODO
-        public setFeatureState(
-            feature: { source: MapFeatureState; id: Int },
-            state: Record<string, any>
-        ): void;
+        public setFeatureState(feature: { source: MapFeatureState; id: Int }, state: Record<string, any>): void;
     }
 
     declare class FoundLocationService {
@@ -50,10 +47,7 @@ declare namespace MG {
         public markLocationAsFound(locationId: Int, found: boolean): void;
 
         public setLocationFound(locationId: Int, found: boolean): void;
-        public setLocationHighlighted(
-            locationId: Int,
-            highlighted: boolean
-        ): void;
+        public setLocationHighlighted(locationId: Int, highlighted: boolean): void;
 
         //TODO prototypes
         public deleteNoteMarker(note: Note): void;
@@ -105,10 +99,7 @@ declare namespace MG {
     }
 
     declare class Store {
-        public dispatch<T extends StateActionType>(action: {
-            type: T;
-            meta: StateActionsMap[T];
-        }): void;
+        public dispatch<T extends StateActionType>(action: { type: T; meta: StateActionsMap[T] }): void;
         public getState(): State;
         public subscribe(f: (...args: any[]) => void): void;
         public replaceReducer(reducer: unknown);

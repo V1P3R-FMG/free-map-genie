@@ -2,12 +2,7 @@ export type Id = ReturnType<typeof crypto.randomUUID>;
 
 export type ChannelType = "window" | "extension";
 
-export type ChannelMessageType =
-    | "ping"
-    | "pong"
-    | "send"
-    | "response::success"
-    | "response::failed";
+export type ChannelMessageType = "ping" | "pong" | "send" | "response::success" | "response::failed";
 
 export interface InternalResponseHandler {
     (ev: MessageEvent<any>): void;
@@ -22,11 +17,7 @@ export type BasicMessageSendAndResponseMap<S = any, R = any> = {
 };
 
 export interface Handler {
-    (
-        message: any,
-        sendResponse: (data: any) => any,
-        sendError: (err: any) => any
-    ): Promise<boolean> | boolean;
+    (message: any, sendResponse: (data: any) => any, sendError: (err: any) => any): Promise<boolean> | boolean;
 }
 
 export interface ChannelMessage {
@@ -57,8 +48,7 @@ export interface PostOptions {
     data?: any;
 }
 
-export interface PostWithResponseOptions
-    extends Omit<PostOptions, "messageId"> {
+export interface PostWithResponseOptions extends Omit<PostOptions, "messageId"> {
     successMatch: MatchOptions;
     failedMatch?: MatchOptions;
     interval?: number;
@@ -103,17 +93,11 @@ const ToStringPrototype = {
 };
 
 export default class Channel<M extends BasicMessageSendAndResponseMap = any> {
-    private static readonly extensionChannels: Record<string, Channel<any>> =
-        {};
+    private static readonly extensionChannels: Record<string, Channel<any>> = {};
     private static readonly windowChannels: Record<string, Channel<any>> = {};
 
     public static readonly RETRY_INTERVAL = 1000;
-    public static readonly VALID_MESSAGE_KEYS = [
-        "type",
-        "origin",
-        "sender",
-        "messageId",
-    ];
+    public static readonly VALID_MESSAGE_KEYS = ["type", "origin", "sender", "messageId"];
 
     public readonly name: string;
     public readonly id: Id;
@@ -157,10 +141,7 @@ export default class Channel<M extends BasicMessageSendAndResponseMap = any> {
      * @returns The created channel
      */
     public static extension(name: string, handler?: Handler) {
-        const channel = (this.extensionChannels[name] ??= new this(
-            "extension",
-            name
-        ));
+        const channel = (this.extensionChannels[name] ??= new this("extension", name));
         if (handler) channel.addHandler(handler);
         return channel;
     }
@@ -172,10 +153,7 @@ export default class Channel<M extends BasicMessageSendAndResponseMap = any> {
      * @returns The created channel
      */
     public static window(name: string, handler?: Handler) {
-        const channel = (this.windowChannels[name] ??= new this(
-            "window",
-            name
-        ));
+        const channel = (this.windowChannels[name] ??= new this("window", name));
         if (handler) channel.addHandler(handler);
         return channel;
     }
@@ -212,11 +190,7 @@ export default class Channel<M extends BasicMessageSendAndResponseMap = any> {
      * @param data the data to send.
      * @param timeout the time after to reject the promise if not resolved yet.
      */
-    public async send<R = any>(
-        target: string,
-        data: M,
-        timeout: number = 10000
-    ): Promise<R> {
+    public async send<R = any>(target: string, data: M, timeout: number = 10000): Promise<R> {
         if (target === this.name) {
             throw new ChannelError("Target and Sender are the same");
         }
@@ -270,11 +244,7 @@ export default class Channel<M extends BasicMessageSendAndResponseMap = any> {
                 chrome.runtime.sendMessage({ type: "channel", data: message });
                 break;
             default:
-                logger.warn(
-                    "ChannelType",
-                    this.channelType,
-                    "has no postMessage implemented."
-                );
+                logger.warn("ChannelType", this.channelType, "has no postMessage implemented.");
                 break;
         }
     }
@@ -288,11 +258,7 @@ export default class Channel<M extends BasicMessageSendAndResponseMap = any> {
                 chrome.runtime.onMessage.addListener(handler);
                 break;
             default:
-                logger.warn(
-                    "ChannelType",
-                    this.channelType,
-                    "has no postMessage implemented."
-                );
+                logger.warn("ChannelType", this.channelType, "has no postMessage implemented.");
                 break;
         }
     }
@@ -306,11 +272,7 @@ export default class Channel<M extends BasicMessageSendAndResponseMap = any> {
                 chrome.runtime.onMessage.removeListener(handler);
                 break;
             default:
-                logger.warn(
-                    "ChannelType",
-                    this.channelType,
-                    "has no postMessage implemented."
-                );
+                logger.warn("ChannelType", this.channelType, "has no postMessage implemented.");
                 break;
         }
     }
@@ -328,9 +290,7 @@ export default class Channel<M extends BasicMessageSendAndResponseMap = any> {
      * @param message the message to fill.
      * @returns the filled in message.
      */
-    private createMessage(
-        message: Omit<ChannelMessage, "origin" | "sender">
-    ): ChannelMessage {
+    private createMessage(message: Omit<ChannelMessage, "origin" | "sender">): ChannelMessage {
         // const sender = `${this.name}::${this.channelType}`;
         return {
             origin: window.location.origin,
@@ -388,25 +348,13 @@ export default class Channel<M extends BasicMessageSendAndResponseMap = any> {
 
         if (!interval) {
             return new Promise<R>((resolve, reject) => {
-                this.addResponseHandler(
-                    messageId,
-                    successMatch,
-                    failedMatch,
-                    resolve,
-                    reject
-                );
+                this.addResponseHandler(messageId, successMatch, failedMatch, resolve, reject);
                 this.postMessage(message);
             });
         } else {
             return Promise.waitFor(
                 async (resolve, reject) => {
-                    this.addResponseHandler(
-                        messageId,
-                        successMatch,
-                        failedMatch,
-                        resolve,
-                        reject
-                    );
+                    this.addResponseHandler(messageId, successMatch, failedMatch, resolve, reject);
                     this.postMessage(message);
                 },
                 interval,
@@ -438,11 +386,7 @@ export default class Channel<M extends BasicMessageSendAndResponseMap = any> {
      * @param type the type for the response.
      * @param data the data for the response.
      */
-    private respond(
-        message: ChannelMessage,
-        type: ChannelMessageType,
-        data: any
-    ) {
+    private respond(message: ChannelMessage, type: ChannelMessageType, data: any) {
         this.post({
             type,
             target: message.sender,
@@ -483,14 +427,9 @@ export default class Channel<M extends BasicMessageSendAndResponseMap = any> {
      * @param options the options to check the message with.
      * @returns if the message matched.
      */
-    private messageMatches(
-        message: ChannelMessage,
-        options: MatchOptions
-    ): boolean {
+    private messageMatches(message: ChannelMessage, options: MatchOptions): boolean {
         return Object.entries(options).every(([key, value]) => {
-            return (
-                key in message && value === message[key as keyof ChannelMessage]
-            );
+            return key in message && value === message[key as keyof ChannelMessage];
         });
     }
 
@@ -517,14 +456,12 @@ export default class Channel<M extends BasicMessageSendAndResponseMap = any> {
             const willRespond = await handler(
                 message.data,
                 (data) => {
-                    if (!canResponse || hasResponded)
-                        throw new ChannelError("Response allready sended.");
+                    if (!canResponse || hasResponded) throw new ChannelError("Response allready sended.");
                     hasResponded = true;
                     this.respond(message, "response::success", data);
                 },
                 (err) => {
-                    if (!canResponse || hasResponded)
-                        throw new ChannelError("Response allready sended.");
+                    if (!canResponse || hasResponded) throw new ChannelError("Response allready sended.");
                     hasResponded = true;
                     this.respond(message, "response::failed", err);
                 }
@@ -551,10 +488,7 @@ export default class Channel<M extends BasicMessageSendAndResponseMap = any> {
             if (!this.isMessageForMe(message)) return;
 
             if (!this.checkOrigin(e)) {
-                logger.warn(
-                    "Ignoring message because the origin was not allowed",
-                    ...Channel.formatMessage(e.data)
-                );
+                logger.warn("Ignoring message because the origin was not allowed", ...Channel.formatMessage(e.data));
                 return;
             }
 
@@ -572,12 +506,7 @@ export default class Channel<M extends BasicMessageSendAndResponseMap = any> {
                         }
                         delete this.responseHandlers[message.messageId];
                     } else {
-                        logger.warn(
-                            "No handler for reponse",
-                            message,
-                            this.responseHandlers,
-                            this
-                        );
+                        logger.warn("No handler for reponse", message, this.responseHandlers, this);
                     }
                     break;
                 case "send":
@@ -586,9 +515,7 @@ export default class Channel<M extends BasicMessageSendAndResponseMap = any> {
                             if (willRespond) return;
                             this.respond(message, "response::success", void 0);
                         })
-                        .catch((e) =>
-                            this.respond(message, "response::failed", e)
-                        );
+                        .catch((e) => this.respond(message, "response::failed", e));
                     break;
                 default:
                     logger.warn("Unknown Message Type", message);
@@ -613,15 +540,8 @@ export default class Channel<M extends BasicMessageSendAndResponseMap = any> {
         const messageId = msg.messageId;
 
         const data: any =
-            typeof msg.data === "object"
-                ? Object.setPrototypeOf({ ...msg.data }, ToStringPrototype)
-                : msg.data;
+            typeof msg.data === "object" ? Object.setPrototypeOf({ ...msg.data }, ToStringPrototype) : msg.data;
 
-        return [
-            `<${type}>`,
-            `[${sender} >>> ${target}] @ ${origin}`,
-            data,
-            messageId,
-        ];
+        return [`<${type}>`, `[${sender} >>> ${target}] @ ${origin}`, data, messageId];
     }
 }

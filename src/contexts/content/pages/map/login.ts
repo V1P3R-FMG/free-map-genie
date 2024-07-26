@@ -2,6 +2,7 @@ import { FmgMockedUserKey, Channels } from "@constants";
 import Channel from "@shared/channel";
 
 function appendMockUserButton() {
+    logger.debug($("#user-panel .features"));
     $<HTMLButtonElement>("<a/>")
         .text("Mock User")
         .addClass("btn btn-outline-secondary")
@@ -13,11 +14,7 @@ function appendMockUserButton() {
         .insertBefore($("#user-panel .features"));
 }
 
-function createMockedUser(
-    id: number = -1,
-    role: MG.UserRole = "user",
-    hasPro: boolean = true
-): MG.User {
+function createMockedUser(id: number = -1, role: MG.UserRole = "user", hasPro: boolean = true): MG.User {
     const locations: number[] = [];
     const trackedCategoryIds: number[] = [];
     const presets: MG.Preset[] = [];
@@ -48,12 +45,10 @@ function loadMockUser(): boolean {
 
 async function initLoginButton() {
     try {
-        const loginButton = await Promise.waitFor<JQuery<HTMLElement>>(
-            (resolve) => {
-                const btn = $(`#user-panel a[href$="/login"]`);
-                if (btn) resolve(btn);
-            }
-        );
+        const loginButton = await Promise.waitFor<JQuery<HTMLElement>>((resolve) => {
+            const btn = $(`#user-panel a[href$="/login"]`);
+            if (btn) resolve(btn);
+        });
 
         loginButton.on("click", () => {
             Channel.window(Channels.Content).send(Channels.Extension, {
@@ -68,12 +63,10 @@ async function initLoginButton() {
 
 async function initLogoutButton() {
     try {
-        const logoutButton = await Promise.waitFor<JQuery<HTMLElement>>(
-            (resolve) => {
-                const btn = $(`.logout a[href$="/logout"]`);
-                if (btn) resolve(btn);
-            }
-        );
+        const logoutButton = await Promise.waitFor<JQuery<HTMLElement>>((resolve) => {
+            const btn = $(`.logout a[href$="/logout"]`);
+            if (btn) resolve(btn);
+        });
 
         logoutButton.on("click", () => {
             window.localStorage.removeItem(FmgMockedUserKey);
@@ -83,11 +76,12 @@ async function initLogoutButton() {
     }
 }
 
-export default function initLogin() {
+export default async function initLogin() {
+    await document.waitForDocumentBody();
     if (loadMockUser()) {
-        appendMockUserButton();
         initLogoutButton();
     } else {
+        appendMockUserButton();
         initLoginButton();
     }
 }
