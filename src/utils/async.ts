@@ -1,4 +1,4 @@
-const DEFAULT_TIMEOUT = 10000;
+const DEFAULT_TIMEOUT = 30000;
 const DEFAULT_INTERVAL = 1000;
 
 interface State {
