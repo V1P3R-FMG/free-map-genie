@@ -1,4 +1,4 @@
-import Channel from "@shared/channel";
+import Channel, { ResponseType } from "@shared/channel";
 import { Channels } from "@constants";
 import { waitForBody } from "@utils/dom";
 import s from "@shared/schema";
@@ -57,9 +57,9 @@ export default async function initStorage() {
             case "remove":
             case "keys":
                 channel.send(Channels.Mapgenie, message).then(sendResponse).catch(sendError);
-                return true;
+                return ResponseType.Pending;
             default:
-                return false;
+                return ResponseType.Handled;
         }
     });
 }

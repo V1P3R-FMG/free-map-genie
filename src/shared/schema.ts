@@ -33,7 +33,7 @@ export class SchemaError extends Error {
     constructor(errors: string | string[]) {
         errors = typeof errors === "string" ? [errors] : errors;
 
-        const message = errors.join("\n");
+        const message = errors.join(", ");
         super(message);
 
         this.errors = errors;
@@ -48,13 +48,17 @@ export class SchemaError extends Error {
     }
 }
 
+function serialize(value: unknown): string {
+    return JSON.stringify(value).replace(/"/g, "'");
+}
+
 export function string(): Schema<string> {
     return {
         parse(value: unknown): string {
             if (typeof value === "string") {
                 return value;
             }
-            throw new SchemaError(`value ${JSON.stringify(value)} is not a string`);
+            throw new SchemaError(`value ${serialize(value)} is not a string`);
         },
     };
 }
@@ -65,7 +69,7 @@ export function number(): Schema<number> {
             if (typeof value === "number") {
                 return value;
             }
-            throw new SchemaError(`value ${JSON.stringify(value)} is not a number`);
+            throw new SchemaError(`value ${serialize(value)} is not a number`);
         },
     };
 }
@@ -76,7 +80,7 @@ export function boolean(): Schema<boolean> {
             if (typeof value === "boolean") {
                 return value;
             }
-            throw new SchemaError(`value ${JSON.stringify(value)} is not a boolean`);
+            throw new SchemaError(`value ${serialize(value)} is not a boolean`);
         },
     };
 }
@@ -87,7 +91,7 @@ export function literal<T extends string | number | boolean | null | undefined>(
             if (value === lit) {
                 return value as never;
             }
-            throw new SchemaError(`value ${JSON.stringify(value)} is not a(n) ${JSON.stringify(lit)}`);
+            throw new SchemaError(`value ${serialize(value)} is equal to ${serialize(lit)}`);
         },
     };
 }
@@ -98,18 +102,14 @@ export function object<Def extends Record<string, Schema<T>>, T>(def: Def): Sche
             const errors: string[] = [];
 
             if (typeof value !== "object" || value === null || Array.isArray(value)) {
-                throw new SchemaError(`value ${JSON.stringify(value)} is not an object`);
+                throw new SchemaError(`value ${serialize(value)} is not an object`);
             }
 
             for (const k in def) {
-                if (!(k in value)) {
-                    errors.push(`key '${k}' is missing on ${value}`);
-                } else {
-                    try {
-                        def[k].parse((value as never)[k]);
-                    } catch (e) {
-                        errors.push(`key '${k}' is invalid: ${SchemaError.error(e)}`);
-                    }
+                try {
+                    def[k].parse((value as never)[k]);
+                } catch (e) {
+                    errors.push(`key \`${k}\` is invalid: ${SchemaError.error(e)}`);
                 }
             }
 
@@ -131,7 +131,7 @@ export function record<K extends string | number, V>(key: Schema<K>, value: Sche
             const errors: string[] = [];
 
             if (typeof record !== "object" || record === null || Array.isArray(record)) {
-                throw new SchemaError(`value ${JSON.stringify(value)} is not an object`);
+                throw new SchemaError(`value ${serialize(value)} is not an object`);
             }
 
             for (const [k, v] of Object.entries(record)) {
@@ -158,7 +158,7 @@ export function array<T>(schema: Schema<T>): Schema<T[]> {
             const errors: string[] = [];
 
             if (!Array.isArray(value)) {
-                throw new SchemaError(`value ${JSON.stringify(value)} is not an array`);
+                throw new SchemaError(`value ${serialize(value)} is not an array`);
             }
 
             const length = value.length;
@@ -166,7 +166,7 @@ export function array<T>(schema: Schema<T>): Schema<T[]> {
                 try {
                     schema.parse(value[i]);
                 } catch (e) {
-                    errors.push(`index '${i}' is invalid: ${SchemaError.error(e)}`);
+                    errors.push(`index ${i} is invalid: ${SchemaError.error(e)}`);
                 }
             }
 
@@ -229,7 +229,7 @@ export function instanceOf<T extends { new (): unknown }>(cls: T): Schema<Instan
             if (value instanceof cls) {
                 return value as never;
             }
-            throw new SchemaError(`value ${JSON.stringify(value)} is not an instanceof ${cls}`);
+            throw new SchemaError(`value ${serialize(value)} is not an instanceof ${cls}`);
         },
     };
 }

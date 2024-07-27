@@ -18,8 +18,18 @@ export type BasicMessageSendAndResponseMap<S = any, R = any> = {
     [type: string]: [S, R];
 };
 
+export enum ResponseType {
+    Handled = "handled",
+    NotHandled = "not:handled",
+    Pending = "pending",
+}
+
 export interface Handler {
-    (message: any, sendResponse: (data: any) => any, sendError: (err: any) => any): Promise<boolean> | boolean;
+    (
+        message: any,
+        sendResponse: (data: any) => any,
+        sendError: (err: any) => any
+    ): Promise<ResponseType> | ResponseType;
 }
 
 export interface ChannelMessage {
@@ -376,6 +386,7 @@ export default class Channel<M extends BasicMessageSendAndResponseMap = any> {
      * @param data the data for the response
      */
     private respond(message: ChannelMessage, type: ChannelMessageType, data: any) {
+        if (__DEBUG__ && type === "response::failed") debugger;
         this.post({
             type,
             target: message.sender,
@@ -434,13 +445,12 @@ export default class Channel<M extends BasicMessageSendAndResponseMap = any> {
     private async runHandler(message: ChannelMessage): Promise<boolean> {
         const errors: unknown[] = [];
 
-        // logger.debug("runHandler", message, this.handlers);
         for (const handler of this.handlers) {
             let hasResponded = false;
             let canResponse = true; // Handler is always allowed to response synchronous.
 
             try {
-                const willRespond = await handler(
+                const responseType = await handler(
                     message.data,
                     (data) => {
                         if (!canResponse || hasResponded) throw "Response allready sended.";
@@ -454,9 +464,11 @@ export default class Channel<M extends BasicMessageSendAndResponseMap = any> {
                     }
                 );
 
-                canResponse = willRespond;
+                canResponse = responseType === ResponseType.Handled || responseType === ResponseType.Pending;
 
-                if (willRespond || hasResponded) return true;
+                if (hasResponded) return true;
+                if (responseType === ResponseType.Handled) return false;
+                if (responseType === ResponseType.Pending) return true;
             } catch (e) {
                 errors.push(e);
             }

@@ -1,5 +1,5 @@
 import { Channels } from "@constants";
-import Channel from "@shared/channel";
+import Channel, { ResponseType } from "@shared/channel";
 import runContexts from "@shared/run";
 import s from "@shared/schema";
 
@@ -36,25 +36,26 @@ async function main() {
         switch (type) {
             case "has": {
                 sendResponse(window.localStorage.getItem(data.key) != null);
+                return ResponseType.Handled;
             }
             case "get": {
                 sendResponse(window.localStorage.getItem(data.key));
-                return true;
+                return ResponseType.Handled;
             }
             case "set": {
                 window.localStorage.setItem(data.key, data.value);
-                return false;
+                return ResponseType.Handled;
             }
             case "remove": {
                 window.localStorage.removeItem(data.key);
-                return false;
+                return ResponseType.Handled;
             }
             case "keys": {
                 sendResponse(Object.keys(window.localStorage));
-                return true;
+                return ResponseType.Handled;
             }
             default:
-                return false;
+                return ResponseType.NotHandled;
         }
     });
 

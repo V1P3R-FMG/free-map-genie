@@ -1,4 +1,4 @@
-import Channel from "@shared/channel";
+import Channel, { ResponseType } from "@shared/channel";
 import { Channels } from "@constants";
 import runContexts from "@shared/run";
 import { injectExtensionScript } from "@shared/inject";
@@ -45,10 +45,10 @@ async function main() {
             case "game":
             case "game:map":
                 chrome.runtime.sendMessage({ type, data }).then(sendResponse).catch(sendError);
-                return true;
+                return ResponseType.Pending;
             case "start:login":
                 chrome.runtime.sendMessage({ type, data });
-                return false;
+                return ResponseType.Handled;
             case "login":
                 chrome.runtime.sendMessage({ type, data }).then((url?: string) => {
                     if (url) return (window.location.href = url);
@@ -63,9 +63,9 @@ async function main() {
 
                     window.location.href = "https://mapgenie.io";
                 });
-                return false;
+                return ResponseType.Handled;
             default:
-                return false;
+                return ResponseType.NotHandled;
         }
     });
 
