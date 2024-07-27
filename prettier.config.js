@@ -8,6 +8,7 @@ const config = {
     printWidth: 120,
     semi: true,
     singleQuote: false,
+    quoteProps: "consistent",
 };
 
 export default config;

@@ -18,7 +18,7 @@ export default [
     {
         rules: {
             "max-len": ["error", { code: 100 }],
-            semi: "error",
+            "semi": "error",
             "prefer-const": "error",
             "no-unused-vars": "off",
             "@typescript-eslint/no-explicit-any": "off",
