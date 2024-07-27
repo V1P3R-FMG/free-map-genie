@@ -1,19 +1,36 @@
 import Channel, { type ChannelMessage } from "@shared/channel";
 import runContexts from "@shared/run";
-import validation from "@shared/validation";
+import s from "@shared/schema";
 
 import installRules from "./rules";
 import { getGames, getGame, getGameMap } from "./games";
 
-const MESSAGE_SCHEME = validation.validator({ type: "string", data: "any" });
-
-const GET_GAME_SCHEME = validation.validator({ gameId: "number" });
-const GET_GAME_MAP_SCHEME = validation.validator({
-    gameId: "number",
-    mapId: "number",
-});
-
-const START_LOGIN_SCHEME = validation.validator("string");
+const messageScheme = s.union([
+    s.object({
+        type: s.literal("channel"),
+        data: s.any(),
+    }),
+    s.object({
+        type: s.literal("games"),
+        data: s.literal(undefined),
+    }),
+    s.object({
+        type: s.literal("game"),
+        data: s.object({ gameId: s.number() }),
+    }),
+    s.object({
+        type: s.literal("game:map"),
+        data: s.object({ gameId: s.number(), mapId: s.number() }),
+    }),
+    s.object({
+        type: s.literal("start:login"),
+        data: s.string(),
+    }),
+    s.object({
+        type: s.literal("login"),
+        data: s.literal(undefined),
+    }),
+]);
 
 export function forwardMessage(sender: chrome.runtime.MessageSender, message: ChannelMessage): boolean {
     if (sender.tab?.id) {
@@ -34,7 +51,7 @@ export function logMessage(message: ChannelMessage) {
 
 async function main() {
     chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-        const { type, data } = MESSAGE_SCHEME(message);
+        const { type, data } = messageScheme.parse(message);
 
         switch (type) {
             case "channel": {
@@ -44,8 +61,7 @@ async function main() {
                 return false;
             }
             case "start:login": {
-                const last_mg_url = START_LOGIN_SCHEME(data);
-                chrome.storage.session.set({ last_mg_url });
+                chrome.storage.session.set({ last_mg_url: data });
                 return false;
             }
             case "login": {
@@ -57,13 +73,11 @@ async function main() {
                 return true;
             }
             case "game": {
-                const { gameId } = GET_GAME_SCHEME(data);
-                getGame(gameId).then(sendResponse);
+                getGame(data.gameId).then(sendResponse);
                 return true;
             }
             case "game:map": {
-                const { gameId, mapId } = GET_GAME_MAP_SCHEME(data);
-                getGameMap(gameId, mapId).then(sendResponse);
+                getGameMap(data.gameId, data.mapId).then(sendResponse);
                 return true;
             }
             default:

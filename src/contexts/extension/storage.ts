@@ -1,24 +1,26 @@
 import Channel from "@shared/channel";
 import { Channels } from "@constants";
-import validation from "@shared/validation";
 import { waitForBody } from "@utils/dom";
+import s from "@shared/schema";
 
-const MESSAGE_SCHEME = validation.validator({ type: "string" });
+const messageScheme = s.object({
+    type: s.union([s.literal("has"), s.literal("get"), s.literal("set"), s.literal("remove"), s.literal("keys")]),
+});
 
 function createFrame(): HTMLIFrameElement {
     logger.debug("Create Frame", document.body);
     return $<HTMLIFrameElement>("<iframe/>")
         .attr({
-            id: "mapgenie-storage",
-            src: `https://mapgenie.io/?origin=${window.location.origin}`,
-            width: 0,
-            height: 0,
-            marginwidth: 0,
-            marginheight: 0,
-            hspace: 0,
-            vspace: 0,
-            frameborder: 0,
-            scrolling: "no",
+            "id": "mapgenie-storage",
+            "src": `https://mapgenie.io/?origin=${window.location.origin}`,
+            "width": 0,
+            "height": 0,
+            "marginwidth": 0,
+            "marginheight": 0,
+            "hspace": 0,
+            "vspace": 0,
+            "frameborder": 0,
+            "scrolling": "no",
             "aria-hidden": true,
         })
         .appendTo(document.body)
@@ -47,8 +49,8 @@ export default async function initStorage() {
 
     // Listens for storage request from content.js.
     const _winChannel = Channel.window(Channels.Extension, (message, sendResponse, sendError) => {
-        MESSAGE_SCHEME(message);
-        switch (message.type) {
+        const { type } = messageScheme.parse(message);
+        switch (type) {
             case "has":
             case "get":
             case "set":
