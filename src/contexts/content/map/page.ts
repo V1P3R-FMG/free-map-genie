@@ -1,28 +1,23 @@
-import Data from "./data";
-import Channel from "./channel";
 import { $waitFor, type JQueryAsync } from "@utils/jquery";
 
+import data from "./data";
+import channel from "./channel";
+
 class Page {
-    /** Creates and appends a user mock button to the '#user-panel' */
-    public async addMockUserButton(): JQueryAsync<HTMLAnchorElement> {
-        const features = await $waitFor("#user-panel .features");
-        return $<HTMLAnchorElement>("<a/>")
-            .text("Mock User")
-            .addClass("btn btn-outline-secondary")
-            .attr({
-                id: "fmg-mock-user-btn",
-                href: window.location.href,
-            })
-            .on("click", () => {
-                Data.enableMockUser(true);
-                window.location.reload();
-            })
-            .insertBefore(features);
+    public get userPanel(): JQueryAsync<HTMLDivElement> {
+        return $waitFor("#user-panel");
     }
 
-    /** Creates and appends the mapgenie script */
+    public get userPanelFeatures(): JQueryAsync<HTMLDivElement> {
+        return $waitFor("#user-panel .features");
+    }
+
+    public get mapgenieScript(): JQueryAsync<HTMLScriptElement> {
+        return $waitFor<HTMLScriptElement>("script[src^='https://cdn.mapgenie.io/js/map.js?id=']");
+    }
+
     public async addMapgenieScript() {
-        const script = await $waitFor<HTMLScriptElement>("script[src^='https://cdn.mapgenie.io/js/map.js?id=']");
+        const script = await this.mapgenieScript;
 
         const src = script.remove().attr("src")!;
         const readySrc = src.replace("id=", "ready&id=");
@@ -30,16 +25,14 @@ class Page {
         $("<script/>").attr("src", readySrc).appendTo(document.body);
     }
 
-    /**  Listen for Login button click to send a start:login request to the background  */
     public async initLoginButton() {
         const btn = await $waitFor<HTMLAnchorElement>(`#user-panel a[href$="/login"]`, { message: "No login button" });
-        btn.on("click", () => Channel.sendStartLogin());
+        btn.on("click", () => channel.sendStartLogin());
     }
 
-    /**  Listen for logout button click to remove mock user object  */
     public async initLogoutButton() {
         const btn = await $waitFor<HTMLAnchorElement>(`.logout a[href$="/logout"]`, { message: "No logout button" });
-        btn.on("click", () => Data.enableMockUser(false));
+        btn.on("click", () => data.enableMockUser(false));
     }
 }
 

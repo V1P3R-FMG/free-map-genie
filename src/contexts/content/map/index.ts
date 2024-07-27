@@ -1,39 +1,25 @@
 import { PageScript } from "../index";
 
-import Page from "./page";
-import Data from "./data";
+import page from "./page";
+import data from "./data";
+import elements from "./elements";
 
 class MapScript implements PageScript {
     public async initScript() {
-        this.doLogin();
-        await this.reloadMapgenieScript();
+        await data.login();
+
+        data.fixGoogleMaps();
+        await page.addMapgenieScript();
+
         this.initButtons();
     }
 
-    public doLogin() {
-        Data.login();
-    }
-
-    public async reloadMapgenieScript() {
-        await Data.fixGoogleMaps();
-        Page.addMapgenieScript();
-
-        const store = await Data.getStore();
-        store.dispatch({
-            type: "MG:MAP:SHOW_SPECIFIC_LOCATIONS",
-            meta: {
-                locationIds: [71259],
-                categoryIds: [],
-            },
-        });
-    }
-
     public async initButtons() {
-        if (Data.isLoggedIn()) {
-            await Page.initLogoutButton();
+        if (await data.isLoggedIn()) {
+            await page.initLogoutButton();
         } else {
-            await Page.initLoginButton();
-            Page.addMockUserButton();
+            await page.initLoginButton();
+            elements.addMockUserButton();
         }
     }
 }

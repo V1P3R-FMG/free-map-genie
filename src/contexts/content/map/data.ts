@@ -1,9 +1,11 @@
 import { FmgMockedUserKey } from "@constants";
 import { waitForCondition, waitFor } from "@utils/async";
 
+import page from "./page";
+
 class Data {
-    public createMockUser(): MG.User {
-        return {
+    public createMockUser() {
+        return <MG.User>{
             id: -1,
             role: "user",
             hasPro: true,
@@ -14,11 +16,12 @@ class Data {
         };
     }
 
-    public isMockUserActive(): boolean {
+    public isMockUserActive() {
         return window.localStorage.getItem(FmgMockedUserKey) != null;
     }
 
-    public isLoggedIn(): boolean {
+    public async isLoggedIn() {
+        await page.userPanel;
         return !!window.user;
     }
 
@@ -30,10 +33,8 @@ class Data {
         }
     }
 
-    public async login(): Promise<boolean> {
-        if (window.user) {
-            return true;
-        }
+    public async login() {
+        if (window.user) return true;
 
         if (this.isMockUserActive()) {
             await waitForCondition(() => window.user !== undefined);
@@ -45,24 +46,17 @@ class Data {
         return false;
     }
 
-    public async fixGoogleMaps() {
-        await waitForCondition(() => window.google !== undefined);
+    public fixGoogleMaps() {
         if (window.config?.altMapSdk) {
-            window.google!.maps = {
-                Size: function () {},
-            };
+            window.google ??= {};
+            window.google.maps ??= { Size: function () {} };
         }
     }
 
     public async getStore() {
-        return waitFor<MG.Store>(
-            (resolve) => {
-                if (window.store) {
-                    resolve(window.store);
-                }
-            },
-            { message: "Wait for window.store took to long." }
-        );
+        return waitFor<MG.Store>((resolve) => window.store && resolve(window.store), {
+            message: "Wait for window.store took to long.",
+        });
     }
 }
 

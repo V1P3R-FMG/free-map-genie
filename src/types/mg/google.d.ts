@@ -4,6 +4,6 @@ declare namespace MG {
     }
 
     declare interface Google {
-        maps: GoogleMaps;
+        maps?: GoogleMaps;
     }
 }
