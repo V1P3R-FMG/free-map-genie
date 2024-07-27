@@ -2,7 +2,13 @@ import path from "node:path";
 
 const __dirname = import.meta.dirname;
 
-console.log(process.env["TS_NODE_PROJECT"]);
+if (process.argv.find((arg) => arg === "--throttle++")) {
+    console.log("THROTTLE = x4");
+    process.env.THROTTLE = "4";
+} else if (process.argv.find((arg) => arg === "--throttle")) {
+    console.log("THROTTLE = x2");
+    process.env.THROTTLE = "2";
+}
 
 export const config = {
     //

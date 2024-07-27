@@ -9,31 +9,20 @@ class MapPage extends Page {
         `${this.MAPGENIE_URL}elden-ring/maps/the-lands-between` as const;
     public readonly FALLOUT_4_MAP_URL = "https://fallout4map.com/" as const;
 
-    /**
-     * #fmg-mock-user-btn button
-     */
     get mockUserButton() {
         return $("#fmg-mock-user-btn");
     }
 
-    /**
-     * #toggle-found button
-     */
     get userPanel() {
         return $("#user-panel");
     }
 
-    /**
-     * Gets the current mapgenie user
-     */
     async getLoggedInUser() {
         return browser.execute("return window.user");
     }
 
-    /**
-     * Login with a mocked user
-     */
     async loginWithMockedUser() {
+        await this.mockUserButton.waitForExist({ timeout: 10000 });
         await this.mockUserButton.click();
     }
 }
