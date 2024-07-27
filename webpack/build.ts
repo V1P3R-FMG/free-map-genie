@@ -10,13 +10,11 @@ import { TsconfigPathsPlugin } from "tsconfig-paths-webpack-plugin";
 import CopyPlugin from "copy-webpack-plugin";
 import TerserPlugin from "terser-webpack-plugin";
 
-import type { WebpackConfiguration } from "webpack-cli";
-
 const { ProvidePlugin, DefinePlugin } = webpack;
 
 const __dirname = import.meta.dirname;
 
-async function webpackPromise(options: WebpackConfiguration) {
+async function webpackPromise(options: webpack.Configuration) {
     return new Promise((resolve, reject) => {
         const compiler = webpack(options, (err, stats) => {
             if (err || stats.hasErrors()) reject({ err, stats });
@@ -95,7 +93,9 @@ async function webExtPlugin(buildInfo: BuildInfo) {
         devtools: true,
         startUrl: process.env.START_URL ?? "https://mapgenie.io",
         sourceDir: buildInfo.out,
-        args: buildInfo.isChrome ? ["--auto-open-devtools-for-tabs", "--system-developer-mode"] : [],
+        args: buildInfo.isChrome
+            ? ["--auto-open-devtools-for-tabs", "--system-developer-mode", "--start-maximized"]
+            : [],
     });
 }
 
