@@ -5,13 +5,21 @@ import { browser } from "@wdio/globals";
  * that is shared across all page objects
  */
 export default class Page {
+    public readonly MAPGENIE_URL = "https://mapgenie.io/" as const;
+
+    /**
+     * Init browser
+     */
+    async init() {
+        await browser.maximizeWindow();
+    }
+
     /**
      * Opens a sub page of the page
-     * @param path path of the sub page (e.g. /path/to/page.html)
+     * @param url to open
      */
     async open(url: string) {
         await browser.url(url);
-        await browser.maximizeWindow();
     }
 
     /**
@@ -19,7 +27,7 @@ export default class Page {
      * @param game slug of the game name
      */
     openGame(game: string) {
-        return this.open(game);
+        return this.open(this.MAPGENIE_URL + game);
     }
 
     /**
@@ -28,6 +36,6 @@ export default class Page {
      * @param map slug of the map name
      */
     openMap(game: string, map: string) {
-        return this.open(`${game}/maps/${map}`);
+        return this.open(this.MAPGENIE_URL + `${game}/maps/${map}`);
     }
 }

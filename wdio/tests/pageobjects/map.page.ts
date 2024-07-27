@@ -1,13 +1,13 @@
-// import { $ } from "@wdio/globals";
+import { $ } from "@wdio/globals";
 import Page from "./page.js";
 
 /**
  * sub page containing specific selectors and methods for a specific page
  */
 class MapPage extends Page {
-    public readonly MAPGENIE_UR = "https://mapgenie.io/";
-    public readonly ELDEN_RING_THE_LAND_BETWEEN_MAP_URL = this.MAPGENIE_UR + "elden-ring/maps/the-lands-between";
-    public readonly FALLOUT_4_MAP_URL = "https://fallout4map.com/";
+    public readonly ELDEN_RING_THE_LAND_BETWEEN_MAP_URL =
+        `${this.MAPGENIE_URL}elden-ring/maps/the-lands-between` as const;
+    public readonly FALLOUT_4_MAP_URL = "https://fallout4map.com/" as const;
 
     /**
      * #fmg-mock-user-btn button
