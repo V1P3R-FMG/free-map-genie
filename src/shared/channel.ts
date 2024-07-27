@@ -62,18 +62,18 @@ export interface MatchOptions {
 }
 
 export class ChannelRequestError extends Error {
+    private readonly channelMessage: ChannelMessage;
+
     public constructor(message: ChannelMessage) {
         super(
             `ChannelRequestError[${message.sender} >>> ${message.target ?? "BROADCAST"}]\n` +
-                `    messageId: ${message.messageId}\n` +
-                `    messageData: ${message.data}`
+                `    messageId: ${message.messageId}\n`
         );
+        this.channelMessage = message;
     }
-}
 
-export class ChannelError extends Error {
-    public constructor(message: any) {
-        super(message);
+    public get data(): any {
+        return this.channelMessage.data;
     }
 }
 
@@ -182,7 +182,7 @@ export default class Channel<M extends BasicMessageSendAndResponseMap = any> {
      */
     public async send<R = any>(target: string, data: M, timeout: number = 10000): Promise<R> {
         if (target === this.name) {
-            throw new ChannelError("Target and Sender are the same");
+            throw "Target and Sender are the same";
         }
 
         if (!this.activeChannels[target]) {
@@ -432,29 +432,41 @@ export default class Channel<M extends BasicMessageSendAndResponseMap = any> {
      * @param message the message to handle
      */
     private async runHandler(message: ChannelMessage): Promise<boolean> {
+        const errors: unknown[] = [];
+
         // logger.debug("runHandler", message, this.handlers);
         for (const handler of this.handlers) {
             let hasResponded = false;
             let canResponse = true; // Handler is always allowed to response synchronous.
 
-            const willRespond = await handler(
-                message.data,
-                (data) => {
-                    if (!canResponse || hasResponded) throw new ChannelError("Response allready sended.");
-                    hasResponded = true;
-                    this.respond(message, "response::success", data);
-                },
-                (err) => {
-                    if (!canResponse || hasResponded) throw new ChannelError("Response allready sended.");
-                    hasResponded = true;
-                    this.respond(message, "response::failed", err);
-                }
-            );
+            try {
+                const willRespond = await handler(
+                    message.data,
+                    (data) => {
+                        if (!canResponse || hasResponded) throw "Response allready sended.";
+                        hasResponded = true;
+                        this.respond(message, "response::success", data);
+                    },
+                    (err) => {
+                        if (!canResponse || hasResponded) throw "Response allready sended.";
+                        hasResponded = true;
+                        this.respond(message, "response::failed", err);
+                    }
+                );
 
-            canResponse = willRespond;
+                canResponse = willRespond;
 
-            if (willRespond || hasResponded) return true;
+                if (willRespond || hasResponded) return true;
+            } catch (e) {
+                errors.push(e);
+            }
         }
+
+        if (errors.length > 0) {
+            this.respond(message, "response::failed", errors);
+            return true;
+        }
+
         return false;
     }
 

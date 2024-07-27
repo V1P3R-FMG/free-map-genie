@@ -1,3 +1,5 @@
+import { ChannelRequestError } from "./channel";
+
 export interface RunContext {
     (): Promise<any> | any;
 }
@@ -12,7 +14,13 @@ export default async function runContexts(name: string, ...contexts: RunContext[
         .then(() => logger.log(`FMG ${name} context initialized.`))
         .catch((e) => {
             success = false;
-            logger.error(`Failed to initalize ${name} context reason,`, e);
+            if (e instanceof ChannelRequestError) {
+                logger.error(`Failed to initalize ${name} context reason,`, e.message, "Data", e.data);
+            } else if (e instanceof Error) {
+                logger.error(`Failed to initalize ${name} context reason,`, e.message);
+            } else {
+                logger.error(`Failed to initalize ${name} context reason,`, e);
+            }
         });
     return success;
 }
