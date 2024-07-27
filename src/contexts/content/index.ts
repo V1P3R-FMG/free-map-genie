@@ -1,24 +1,25 @@
 import runContexts from "@shared/run";
 import { waitForPageType } from "@fmg/page";
 
-import StorageChannel from "@content/channels/storage";
-import GamesChannel from "@content/channels/games";
-
-export interface PageScript {
-    initScript(): Promise<void> | void;
-}
+import StorageChannel from "@content/channels/storage.channel";
+import GamesChannel from "@content/channels/games.channel";
 
 async function initScript() {
     const pageType = await waitForPageType();
+
     logger.log("PageType:", pageType);
 
     switch (pageType) {
         case "login": {
-            const { default: script } = await import(/* webpackChunkName: "content/login" */ "./login/index");
+            const { default: script } = await import(
+                /* webpackChunkName: "content/login.script" */ "./scripts/login.script"
+            );
             await script.initScript();
         }
         case "map": {
-            const { default: script } = await import(/* webpackChunkName: "content/map" */ "./map/index");
+            const { default: script } = await import(
+                /* webpackChunkName: "content/map.script" */ "./scripts/map.script"
+            );
             await script.initScript();
         }
         default:

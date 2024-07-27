@@ -1,8 +1,10 @@
-import Data from "./data";
-import Channel from "./channel";
 import { $waitFor, type JQueryAsync } from "@utils/jquery";
 
-class Page {
+import userChannel from "@content/channels/user.channel";
+
+import userService from "@content/services/user.service";
+
+class LoginPage {
     public async getButtonFormGroup(): JQueryAsync<HTMLElement> {
         return $waitFor(`form button[type="submit"]`).then((el) => el.parent());
     }
@@ -23,11 +25,11 @@ class Page {
             .addClass("btn btn-outline-secondary")
             .attr("type", "button")
             .on("click", () => {
-                Data.enableMockUser(true);
-                Channel.sendLogin();
+                userService.enableMockUser(true);
+                userChannel.sendLogin();
             })
             .appendTo(buttonGroup);
     }
 }
 
-export default new Page();
+export default new LoginPage();
