@@ -1,7 +1,7 @@
 import { Channels } from "@constants";
 import Channel, { ResponseType } from "@shared/channel";
 import runContexts from "@shared/run";
-import s from "@shared/schema";
+import * as s from "@shared/schema";
 
 const messageScheme = s.union([
     s.object({
@@ -25,6 +25,8 @@ const messageScheme = s.union([
         data: s.literal(undefined),
     }),
 ]);
+
+export type MessageScheme = s.Type<typeof messageScheme>;
 
 async function main() {
     const origin = new URLSearchParams(window.location.search).get("origin");

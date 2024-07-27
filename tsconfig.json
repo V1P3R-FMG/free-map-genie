@@ -15,9 +15,10 @@
             "@shared/*": ["shared/*"],
             "@fmg/*": ["fmg/*"],
             "@content/*": ["contexts/content/*"],
-            "@extension/*": ["contexts/extension/*"]
+            "@extension/*": ["contexts/extension/*"],
+            "@iframe/*": ["contexts/iframe/*"]
         }
     },
     "include": ["src"],
-    "exclude": ["node_modules"],
+    "exclude": ["node_modules"]
 }

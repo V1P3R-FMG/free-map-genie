@@ -1,41 +1,24 @@
-import { Channels } from "@constants";
-import Channel from "@shared/channel";
+import BaseChannel from "./index";
 
-class StorageChannel {
-    private readonly channel = Channel.window(Channels.Content);
-
+class StorageChannel extends BaseChannel {
     public async has(key: string): Promise<string> {
-        return this.channel.send(Channels.Extension, {
-            type: "has",
-            data: { key },
-        });
+        return this.sendIframe({ type: "has", data: { key } });
     }
 
     public async get(key: string): Promise<string> {
-        return this.channel.send(Channels.Extension, {
-            type: "get",
-            data: { key },
-        });
+        return this.sendIframe({ type: "get", data: { key } });
     }
 
     public async set(key: string, value: string): Promise<string> {
-        return this.channel.send(Channels.Extension, {
-            type: "set",
-            data: { key, value },
-        });
+        return this.sendIframe({ type: "set", data: { key, value } });
     }
 
     public async remove(key: string): Promise<string> {
-        return this.channel.send(Channels.Extension, {
-            type: "remove",
-            data: { key },
-        });
+        return this.sendIframe({ type: "remove", data: { key } });
     }
 
     public async keys(): Promise<string> {
-        return this.channel.send(Channels.Extension, {
-            type: "keys",
-        });
+        return this.sendIframe({ type: "keys", data: undefined });
     }
 }
 

@@ -2,34 +2,26 @@ import { waitFor } from "@utils/async";
 
 export type Id = ReturnType<typeof crypto.randomUUID>;
 
+export type InternalResponseHandler = (ev: MessageEvent<any>) => void;
+
+export type ResponseHandler = (ev: ChannelMessage) => boolean;
+
+export type SendCallback = (data: any) => any;
+
+export type Handler = (
+    message: any,
+    sendResponse: SendCallback,
+    sendError: SendCallback
+) => Promise<ResponseType> | ResponseType;
+
 export type ChannelType = "window" | "extension";
 
 export type ChannelMessageType = "ping" | "pong" | "send" | "response::success" | "response::failed";
-
-export interface InternalResponseHandler {
-    (ev: MessageEvent<any>): void;
-}
-
-export interface ResponseHandler {
-    (ev: ChannelMessage): boolean;
-}
-
-export type BasicMessageSendAndResponseMap<S = any, R = any> = {
-    [type: string]: [S, R];
-};
 
 export enum ResponseType {
     Handled = "handled",
     NotHandled = "not:handled",
     Pending = "pending",
-}
-
-export interface Handler {
-    (
-        message: any,
-        sendResponse: (data: any) => any,
-        sendError: (err: any) => any
-    ): Promise<ResponseType> | ResponseType;
 }
 
 export interface ChannelMessage {
@@ -61,8 +53,6 @@ export interface PostWithResponseOptions extends Omit<PostOptions, "messageId"> 
     interval?: number;
     timeout?: number;
 }
-
-export type PossibleArray<T> = T | T[];
 
 export interface MatchOptions {
     sender?: string;
@@ -97,9 +87,9 @@ const ToStringPrototype = {
     },
 };
 
-export default class Channel<M extends BasicMessageSendAndResponseMap = any> {
-    private static readonly extensionChannels: Record<string, Channel<any>> = {};
-    private static readonly windowChannels: Record<string, Channel<any>> = {};
+export default class Channel<Send = any> {
+    private static readonly extensionChannels: Record<string, Channel> = {};
+    private static readonly windowChannels: Record<string, Channel> = {};
 
     public static readonly RETRY_INTERVAL = 1000;
     public static readonly VALID_MESSAGE_KEYS = ["type", "origin", "sender", "messageId"];
@@ -110,17 +100,9 @@ export default class Channel<M extends BasicMessageSendAndResponseMap = any> {
     private readonly channelType: ChannelType;
     private readonly allowedOrigins: Set<string>;
     private readonly activeChannels: Record<string, true>;
+
     private readonly handlers: Handler[];
     private readonly responseHandlers: Record<Id, ResponseHandler>;
-
-    private internalHandler?: InternalResponseHandler;
-
-    /**
-     * Check if channel is running
-     */
-    public get running(): boolean {
-        return this.internalHandler != null;
-    }
 
     private constructor(channelType: ChannelType, name: string) {
         this.channelType = channelType;
@@ -133,7 +115,8 @@ export default class Channel<M extends BasicMessageSendAndResponseMap = any> {
         this.responseHandlers = {};
 
         this.allowOrigin("self");
-        this.start();
+
+        this.addListenerForMessage(this.createInternalHandler());
     }
 
     /**
@@ -141,8 +124,8 @@ export default class Channel<M extends BasicMessageSendAndResponseMap = any> {
      * @param name the name of the channel
      * @param handler the handler to handle sended messages with
      */
-    public static extension(name: string, handler?: Handler) {
-        const channel = (this.extensionChannels[name] ??= new this("extension", name));
+    public static extension<Send>(name: string, handler?: Handler): Channel<Send> {
+        const channel = (this.extensionChannels[name] ??= new this<Send>("extension", name));
         if (handler) channel.addHandler(handler);
         return channel;
     }
@@ -152,8 +135,8 @@ export default class Channel<M extends BasicMessageSendAndResponseMap = any> {
      * @param name the name of the channel
      * @param handler the handler to handle sended messages with
      */
-    public static window(name: string, handler?: Handler) {
-        const channel = (this.windowChannels[name] ??= new this("window", name));
+    public static window<Send>(name: string, handler?: Handler): Channel<Send> {
+        const channel = (this.windowChannels[name] ??= new this<Send>("window", name));
         if (handler) channel.addHandler(handler);
         return channel;
     }
@@ -167,30 +150,12 @@ export default class Channel<M extends BasicMessageSendAndResponseMap = any> {
     }
 
     /**
-     * Closes the channel listener
-     */
-    public close() {
-        if (!this.internalHandler) return;
-        this.removeListenerForMessage(this.internalHandler);
-        this.internalHandler = undefined;
-    }
-
-    /**
-     * Starts the channel listener
-     */
-    public start() {
-        if (this.internalHandler) return;
-        this.internalHandler = this.createInternalHandler();
-        this.addListenerForMessage(this.internalHandler);
-    }
-
-    /**
      * Send data to the target channel
      * @param target the target to send the data to
      * @param data the data to send
      * @param timeout the time after to reject the promise if not resolved yet
      */
-    public async send<R = any>(target: string, data: M, timeout: number = 10000): Promise<R> {
+    public async send<R = any>(target: string, data: Send, timeout: number = 10000): Promise<R> {
         if (target === this.name) {
             throw "Target and Sender are the same";
         }
@@ -262,7 +227,7 @@ export default class Channel<M extends BasicMessageSendAndResponseMap = any> {
         }
     }
 
-    private removeListenerForMessage(handler: (e: any) => any) {
+    private _removeListenerForMessage(handler: (e: any) => any) {
         switch (this.channelType) {
             case "window":
                 window.removeEventListener("message", handler);
@@ -506,29 +471,42 @@ export default class Channel<M extends BasicMessageSendAndResponseMap = any> {
                 case "pong":
                 case "response::success":
                 case "response::failed":
-                    const handler = this.responseHandlers[message.messageId];
-                    if (handler!) {
-                        if (!handler(message)) {
-                            logger.warn("Invalid response", message, handler);
-                        }
-                        delete this.responseHandlers[message.messageId];
-                    } else {
-                        logger.warn("No handler for reponse", message, this.responseHandlers, this);
-                    }
+                    this.handleReponseMessage(message);
                     break;
                 case "send":
-                    this.runHandler(message)
-                        .then((willRespond) => {
-                            if (willRespond) return;
-                            this.respond(message, "response::success", void 0);
-                        })
-                        .catch((e) => this.respond(message, "response::failed", e));
+                    this.handleSendMessage(message);
                     break;
                 default:
                     logger.warn("Unknown Message Type", message);
                     break;
             }
         };
+    }
+
+    /** Handle reponse messages */
+    private handleReponseMessage(message: ChannelMessage) {
+        const handler = this.responseHandlers[message.messageId];
+        if (handler!) {
+            if (!handler(message)) {
+                logger.warn("Invalid response", message, handler);
+            }
+            delete this.responseHandlers[message.messageId];
+        } else {
+            logger.warn("No handler for reponse", message, this.responseHandlers, this);
+        }
+    }
+
+    /** Handle send messages */
+    private async handleSendMessage(message: ChannelMessage) {
+        try {
+            const willRespond = await this.runHandler(message);
+
+            if (willRespond) return;
+
+            this.respond(message, "response::success", void 0);
+        } catch (e) {
+            this.respond(message, "response::failed", e);
+        }
     }
 
     /**

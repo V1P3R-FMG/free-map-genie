@@ -2,7 +2,7 @@ import Channel, { ResponseType } from "@shared/channel";
 import { Channels } from "@constants";
 import runContexts from "@shared/run";
 import { injectExtensionScript } from "@shared/inject";
-import s from "@shared/schema";
+import * as s from "@shared/schema";
 
 const messageScheme = s.union([
     s.object({
@@ -26,6 +26,8 @@ const messageScheme = s.union([
         data: s.literal(undefined),
     }),
 ]);
+
+export type MessageScheme = s.Type<typeof messageScheme>;
 
 import AdBlocker from "./ads";
 import initStorage, { get, set } from "./storage";

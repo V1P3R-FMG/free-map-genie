@@ -1,20 +1,12 @@
-import { Channels } from "@constants";
-import Channel from "@shared/channel";
+import BaseChannel from "./index";
 
-class UserChannel {
-    private readonly channel = Channel.window(Channels.Content);
-
+class UserChannel extends BaseChannel {
     public async sendStartLogin() {
-        return this.channel.send(Channels.Extension, {
-            type: "start:login",
-            data: window.location.href,
-        });
+        return this.sendExtension({ type: "start:login", data: window.location.href });
     }
 
     public async sendLogin() {
-        return this.channel.send(Channels.Extension, {
-            type: "login",
-        });
+        return this.sendExtension({ type: "login", data: undefined });
     }
 }
 

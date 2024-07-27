@@ -4,14 +4,14 @@ export type Schema<T> = {
     parse(value: unknown): T;
 };
 
-export type Result<S extends Schema<unknown>> = ReturnType<S["parse"]>;
+export type Type<S extends Schema<unknown>> = ReturnType<S["parse"]>;
 
 type ObjectParseResult<Rec extends Record<string, Schema<unknown>>> = _<{
-    [K in keyof Rec]: Result<Rec[K]>;
+    [K in keyof Rec]: Type<Rec[K]>;
 }>;
 
 type ArrayParseResult<Arr extends Schema<unknown>[]> = _<{
-    [I in keyof Arr]: Result<Arr[I]>;
+    [I in keyof Arr]: Type<Arr[I]>;
 }>;
 
 type UnionParseResult<Arr extends Schema<unknown>[]> = ArrayParseResult<Arr>[number];

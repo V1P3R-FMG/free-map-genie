@@ -10,3 +10,5 @@ declare type PickMatching<T, V> = {
 };
 
 declare type PromiseLike<T> = Promise<T> | T;
+
+declare type PossibleArray<T> = T | T[];
