@@ -1,4 +1,4 @@
-import BaseChannel from "./index";
+import BaseChannel from "./base.channel";
 
 class StorageChannel extends BaseChannel {
     public async has(key: string): Promise<string> {

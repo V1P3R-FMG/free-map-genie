@@ -1,3 +1,3 @@
-export default interface PageScript {
+declare interface PageScript {
     initScript(): Promise<void> | void;
 }

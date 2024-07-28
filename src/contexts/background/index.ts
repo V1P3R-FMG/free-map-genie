@@ -1,6 +1,6 @@
 import Channel, { type ChannelMessage } from "@shared/channel";
 import runContexts from "@shared/run";
-import s from "@shared/schema";
+import * as s from "@shared/schema";
 
 import installRules from "./rules";
 import { getGames, getGame, getGameMap } from "./games";
@@ -31,6 +31,8 @@ const messageScheme = s.union([
         data: s.literal(undefined),
     }),
 ]);
+
+export type MessageScheme = s.Type<typeof messageScheme>;
 
 export function forwardMessage(sender: chrome.runtime.MessageSender, message: ChannelMessage): boolean {
     if (sender.tab?.id) {

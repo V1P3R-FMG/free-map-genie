@@ -4,30 +4,16 @@ import runContexts from "@shared/run";
 import { injectExtensionScript } from "@shared/inject";
 import * as s from "@shared/schema";
 
-const messageScheme = s.union([
-    s.object({
-        type: s.literal("games"),
-        data: s.literal(undefined),
-    }),
-    s.object({
-        type: s.literal("game"),
-        data: s.object({ gameId: s.number() }),
-    }),
-    s.object({
-        type: s.literal("game:map"),
-        data: s.object({ gameId: s.number(), mapId: s.number() }),
-    }),
-    s.object({
-        type: s.literal("start:login"),
-        data: s.string(),
-    }),
-    s.object({
-        type: s.literal("login"),
-        data: s.literal(undefined),
-    }),
-]);
-
-export type MessageScheme = s.Type<typeof messageScheme>;
+const messageScheme = s.object({
+    type: s.union([
+        s.literal("games"),
+        s.literal("game"),
+        s.literal("game:map"),
+        s.literal("start:login"),
+        s.literal("login"),
+    ]),
+    data: s.any(),
+});
 
 import AdBlocker from "./ads";
 import initStorage, { get, set } from "./storage";

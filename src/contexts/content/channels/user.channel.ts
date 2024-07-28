@@ -1,4 +1,4 @@
-import BaseChannel from "./index";
+import BaseChannel from "./base.channel";
 
 class UserChannel extends BaseChannel {
     public async sendStartLogin() {

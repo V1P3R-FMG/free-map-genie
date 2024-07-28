@@ -16,7 +16,8 @@
             "@fmg/*": ["fmg/*"],
             "@content/*": ["contexts/content/*"],
             "@extension/*": ["contexts/extension/*"],
-            "@iframe/*": ["contexts/iframe/*"]
+            "@iframe/*": ["contexts/iframe/*"],
+            "@background/*": ["contexts/background/*"]
         }
     },
     "include": ["src"],

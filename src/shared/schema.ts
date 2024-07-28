@@ -269,21 +269,3 @@ export function nullable<T>(value: Schema<T>): Schema<T | null> {
         },
     };
 }
-
-const s = {
-    string,
-    number,
-    boolean,
-    literal,
-    object,
-    record,
-    array,
-    union,
-    intersection,
-    instanceOf,
-    any,
-    optional,
-    nullable,
-    SchemaError,
-};
-export default s;

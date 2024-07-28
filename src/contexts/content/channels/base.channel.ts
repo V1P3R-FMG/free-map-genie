@@ -1,7 +1,7 @@
 import Channel from "@shared/channel";
 import { Channels } from "@constants";
 
-import type { MessageScheme as ExtensionMessageScheme } from "@extension/index";
+import type { MessageScheme as ExtensionMessageScheme } from "@background/index";
 import type { MessageScheme as IframeMessageSceme } from "@iframe/index";
 
 export default class BaseChannel {

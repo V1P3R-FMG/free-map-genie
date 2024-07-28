@@ -1,4 +1,4 @@
-import BaseChannel from "./index";
+import BaseChannel from "./base.channel";
 
 class GamesChannel extends BaseChannel {
     public async getAll(): Promise<MG.Api.Game[]> {

@@ -1,10 +1,11 @@
 import Channel, { ResponseType } from "@shared/channel";
 import { Channels } from "@constants";
 import { waitForBody } from "@utils/dom";
-import s from "@shared/schema";
+import * as s from "@shared/schema";
 
 const messageScheme = s.object({
     type: s.union([s.literal("has"), s.literal("get"), s.literal("set"), s.literal("remove"), s.literal("keys")]),
+    data: s.any(),
 });
 
 function createFrame(): HTMLIFrameElement {

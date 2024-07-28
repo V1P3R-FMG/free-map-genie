@@ -1,5 +1,3 @@
-import type PageScript from "./index";
-
 import userService from "@content/services/user.service";
 import mapService from "@content/services/map.service";
 
@@ -12,7 +10,7 @@ class MapScript implements PageScript {
         mapService.fixGoogleMaps();
         await mapPage.addMapgenieScript();
 
-        this.initButtons();
+        await this.initButtons();
     }
 
     public async initButtons() {

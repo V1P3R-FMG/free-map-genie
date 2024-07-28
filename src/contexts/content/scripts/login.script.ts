@@ -1,5 +1,3 @@
-import type PageScript from "./index";
-
 import userService from "@content/services/user.service";
 
 import loginPage from "@content/pages/login.page";
