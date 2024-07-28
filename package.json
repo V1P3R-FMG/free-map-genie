@@ -22,6 +22,7 @@
         "@swc/helpers": "^0.5.10",
         "@types/chrome": "^0.0.269",
         "@types/fs-extra": "^11.0.4",
+        "@types/jest": "^29.5.12",
         "@types/jquery": "^3.5.29",
         "@types/loader-utils": "^2.0.6",
         "@types/node": "*",

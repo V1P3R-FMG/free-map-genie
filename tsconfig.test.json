@@ -8,7 +8,8 @@
         "esModuleInterop": true,
         "skipLibCheck": true,
         "noImplicitAny": true,
-        "strict": true
+        "strict": true,
+        "types": ["@types/jest"]
     },
     "include": ["src/**/__tests__/**/*", "tests/**/*"],
     "exclude": ["node_modules", "dist"]
