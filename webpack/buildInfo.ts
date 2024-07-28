@@ -2,12 +2,8 @@ import path from "node:path";
 import fs from "node:fs";
 import crypto from "node:crypto";
 
-import type { CallableOption } from "webpack-cli";
-
 const HEX_MAP = "0123456789abcdef";
 const CHAR_MAP = "abcdefghijklmnop";
-
-export type WebpackEnv = Parameters<CallableOption>[0];
 
 export interface GeneratedKeys {
     appId: string;
@@ -17,12 +13,6 @@ export interface GeneratedKeys {
     publicKeyFilePath: string;
     appIdFilePath: string;
 }
-
-export type Env = WebpackEnv & {
-    chrome?: string;
-    firefox?: string;
-    dev?: string;
-};
 
 export type Browser = "chrome" | "firefox";
 
