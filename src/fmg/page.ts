@@ -1,4 +1,4 @@
-import { waitForCondition } from "@utils/async";
+import { TimeoutError, waitForCondition } from "@utils/async";
 
 export type MageniePageType = "home" | "login" | "map" | "guide" | "game-home" | "unknown";
 
@@ -43,10 +43,17 @@ export async function waitForPageType(timeout?: number): Promise<MageniePageType
 
     if (pageType !== "unknown") return pageType;
 
-    return waitForCondition(() => (pageType = getPageType()) !== "unknown", {
-        interval: 0,
-        timeout,
-    })
-        .then(() => pageType)
-        .catch(() => "unknown");
+    try {
+        await waitForCondition(() => (pageType = getPageType()) !== "unknown", {
+            interval: 0,
+            timeout,
+        });
+    } catch (e) {
+        if (e instanceof TimeoutError) {
+            return "unknown";
+        }
+        throw e;
+    }
+
+    return pageType;
 }
