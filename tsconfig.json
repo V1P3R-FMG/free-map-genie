@@ -6,10 +6,11 @@
         "allowSyntheticDefaultImports": true,
         "esModuleInterop": true,
         "skipLibCheck": true,
-        "baseUrl": "src",
         "noImplicitAny": true,
         "strict": true,
+        "baseUrl": "src",
         "paths": {
+            "@src/*": ["./*"],
             "@constants": ["constants.ts"],
             "@utils/*": ["utils/*"],
             "@shared/*": ["shared/*"],
@@ -21,5 +22,5 @@
         }
     },
     "include": ["src"],
-    "exclude": ["node_modules"]
+    "exclude": ["node_modules", "**/__tests__"]
 }
