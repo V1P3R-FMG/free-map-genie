@@ -1,5 +1,3 @@
-import { expect, test } from "@jest/globals";
-
 import NumberSet from "@utils/set.js";
 
 const stringArray = (...arr: number[]) => arr.map(String);

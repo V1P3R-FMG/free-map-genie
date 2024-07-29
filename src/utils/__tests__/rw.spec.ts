@@ -1,4 +1,3 @@
-import { expect } from "@jest/globals";
 import NumberSet, { type NumberSetLayout } from "@utils/set";
 
 import * as rw from "@utils/rw.js";

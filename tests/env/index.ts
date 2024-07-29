@@ -1,7 +1,6 @@
-import { TestEnvironment } from "jest-environment-node";
-
 global.__DEBUG__ = true;
 
+import { TestEnvironment } from "jest-environment-node";
 import { Logger } from "../../src/logger";
 
 import fsService, { FsService } from "./services/fs.service";
@@ -13,14 +12,10 @@ declare global {
     var fsService: FsService;
     var jsonService: JsonService;
 
-    var logger: Logger;
-
-    var __DEBUG__: boolean;
-
     /* eslint-enable no-var */
 }
 
-export default class FMGTestEnviroment extends TestEnvironment {
+export default class FMGTestEnvironment extends TestEnvironment {
     async setup() {
         await super.setup();
 

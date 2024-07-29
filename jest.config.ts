@@ -29,4 +29,5 @@ export default {
     moduleDirectories: ["node_modules"],
     moduleNameMapper: paths ? pathsToModuleNameMapper(paths, { useESM: true }) : {},
     testEnvironment: "./tests/env/index.ts",
+    setupFilesAfterEnv: ["jest-extended/all"],
 } satisfies Config.InitialOptions;

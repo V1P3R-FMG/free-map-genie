@@ -9,8 +9,8 @@
         "skipLibCheck": true,
         "noImplicitAny": true,
         "strict": true,
-        "types": ["@types/jest"]
+        "types": ["@types/jest", "jest-extended"]
     },
-    "include": ["src/**/__tests__/**/*", "tests/**/*"],
+    "include": ["src/**/__tests__/**/*", "tests/**/*", "src/types/**/*.d.ts"],
     "exclude": ["node_modules", "dist"]
 }
