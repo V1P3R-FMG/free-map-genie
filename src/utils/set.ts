@@ -21,7 +21,7 @@ export class IndexableSetProxyHandler implements ProxyHandler<NumberSet> {
             throw "Cannot override NumberSet methods.";
         } else {
             if (typeof value !== "boolean") {
-                throw "Expected boolen value";
+                throw "Expected boolean value";
             }
             target.toggle.call(target, p, value);
             return true;

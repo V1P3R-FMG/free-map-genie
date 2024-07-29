@@ -160,10 +160,10 @@ describe.each([
         it("should error when setting a value other than a boolean", () => {
             const set = NumberSet.new();
 
-            expect(() => (set[1] = "1" as any)).toThrow("Expected boolen value");
-            expect(() => (set[1] = 50 as any)).toThrow("Expected boolen value");
-            expect(() => (set[1] = {} as any)).toThrow("Expected boolen value");
-            expect(() => (set[1] = [] as any)).toThrow("Expected boolen value");
+            expect(() => (set[1] = "1" as any)).toThrow("Expected boolean value");
+            expect(() => (set[1] = 50 as any)).toThrow("Expected boolean value");
+            expect(() => (set[1] = {} as any)).toThrow("Expected boolean value");
+            expect(() => (set[1] = [] as any)).toThrow("Expected boolean value");
         });
     });
 
