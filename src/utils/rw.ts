@@ -48,7 +48,7 @@ export function writeNumberSet<O extends object, K extends KeyOfPickLayoutNumber
     }
 }
 
-export function writeIndexableSetToRecordSet<O extends object, K extends KeyOfPickRecordSet<O>>(
+export function writeNumberSetToRecordSet<O extends object, K extends KeyOfPickRecordSet<O>>(
     target: O,
     key: K,
     set: NumberSet

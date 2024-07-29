@@ -94,7 +94,7 @@ describe("rw.js", () => {
         it("should write a NumberSet as Record<string, boolean> when not empty", () => {
             const obj: { a?: Record<string, boolean> } = {};
 
-            rw.writeIndexableSetToRecordSet(obj, "a", NumberSet.new([1, 2, 3]));
+            rw.writeNumberSetToRecordSet(obj, "a", NumberSet.new([1, 2, 3]));
 
             expect("a" in obj).toBe(true);
 
@@ -105,7 +105,7 @@ describe("rw.js", () => {
         it("should not write a NumberSet as Record<string, boolean> when empty", () => {
             const obj: { a?: Record<string, boolean> } = {};
 
-            rw.writeIndexableSetToRecordSet(obj, "a", NumberSet.new());
+            rw.writeNumberSetToRecordSet(obj, "a", NumberSet.new());
 
             expect("a" in obj).toBe(false);
         });
