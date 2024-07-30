@@ -146,13 +146,13 @@ declare namespace MG {
         title: string;
     }
 
-    declare type GeometryCoodinate = [Float, Float];
+    declare type GeometryCoordinate = [Float, Float];
 
     declare type GeometryType = "Polygon";
 
     declare interface Geometry {
         type: GeometryType;
-        coordinates: GeometryCoodinate[];
+        coordinates: GeometryCoordinate[];
     }
 
     declare interface Feature {
@@ -181,7 +181,7 @@ declare namespace MG {
     declare interface Note {
         id: string; // 11 chars
         title: string;
-        desccription: string;
+        description: string;
         color: Nullable<Color>;
         category: Nullable<Category>;
         created_at: IsoDateString;
@@ -230,7 +230,7 @@ declare namespace MG {
         proCategoryLocationCounts: unknown[];
         routes: Route[];
         searchQuery: Nullable<string>;
-        sharedNotes: Record<unknownm, unknown>;
+        sharedNotes: Record<unknown, unknown>;
         styles: MapStyles;
         tags: Tag[];
         tagsById: Record<number, Tag>;
