@@ -28,7 +28,7 @@ declare namespace MG.Api {
         default_tracked_category_id: Nullable<number>;
     }
 
-    declare interface GameMap extends IGNMeta, MetaBase {
+    declare interface Map extends IGNMeta, MetaBase {
         id: number;
         game_id: number;
         title: string;
@@ -47,13 +47,21 @@ declare namespace MG.Api {
         ign_slugs: string[];
     }
 
+    declare interface MapFull extends Map {
+        config: MG.MapConfig;
+        url: string;
+        game: Game;
+        groups: MG.GroupFull[];
+        regions: MG.Region[];
+    }
+
     declare interface Game extends IGNMeta, MetaAll {
         id: number;
         title: string;
         domain: string;
         slug: string;
         ign_slug: string;
-        availible_on_ign: boolean;
+        available_on_ign: boolean;
         status: string;
         order: number;
         mapgenie_release_date: MG.IsoDateString;
@@ -65,6 +73,10 @@ declare namespace MG.Api {
         config: GameConfig;
         image: Url;
         logo: Url;
-        maps: GameMap[];
+        maps: Map[];
+    }
+
+    declare interface GameFull extends Game {
+        maps: MapFull[];
     }
 }

@@ -46,8 +46,8 @@ export class CachedValue<T> {
 
 export class GamesService {
     private readonly games: CachedValue<MG.Api.Game[]> = new CachedValue(`${ORIGIN}/api/v1/games`);
-    private readonly gamesFull: Cache<any> = {};
-    private readonly mapsFull: Cache<any> = {};
+    private readonly gamesFull: Cache<MG.Api.GameFull> = {};
+    private readonly mapsFull: Cache<MG.Api.MapFull> = {};
 
     public getGames() {
         return this.games.data;
@@ -64,6 +64,7 @@ export class GamesService {
     }
 
     public getGame(gameId: number) {
+        if (!__DEBUG__) throw "This is not allowed in production builds";
         this.gamesFull[gameId] ??= new CachedValue(`${ORIGIN}/api/v1/games/${gameId}/full`);
         return this.gamesFull[gameId].data;
     }

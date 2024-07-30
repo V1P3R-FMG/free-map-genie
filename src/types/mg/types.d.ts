@@ -106,12 +106,17 @@ declare namespace MG {
     }
 
     declare interface Group {
+        id: Int;
         categories: Category[];
         color: Color;
         expandable: boolean;
         game_id: Int;
         order: Int;
         title: string;
+    }
+
+    declare interface GroupFull extends Group {
+        categories: CategoryFull[];
     }
 
     declare interface Category {
@@ -132,18 +137,24 @@ declare namespace MG {
         visible: boolean;
     }
 
+    declare interface CategoryFull extends Category {
+        locations: Location[];
+    }
+
     declare interface Location {
         category: Category;
         category_id: Int;
         description: string;
         id: Int;
         ign_page_id: string;
-        latitude: Float;
-        longitude: Float;
+        latitude: `${Float}`;
+        longitude: `${Float}`;
         map_id: Int;
         media: Media[];
         region_id: Nullable<Int>;
         title: string;
+        tags: number[];
+        features: Nullable<MG.Feature[]>;
     }
 
     declare type GeometryCoordinate = [Float, Float];

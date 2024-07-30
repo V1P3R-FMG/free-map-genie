@@ -13,11 +13,11 @@ class GamesChannel extends BaseChannel {
         return this.sendExtension({ type: "games:find:map", data: { gameId, mapId } });
     }
 
-    public async getGame(gameId: number): Promise<Possible<any>> {
+    public async getGame(gameId: number): Promise<MG.Api.GameFull> {
         return this.sendExtension({ type: "game", data: { gameId } });
     }
 
-    public async getMap(mapId: number): Promise<Possible<any>> {
+    public async getMap(mapId: number): Promise<MG.Api.MapFull> {
         return this.sendExtension({ type: "map", data: { mapId } });
     }
 }
