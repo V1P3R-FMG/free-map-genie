@@ -5,12 +5,20 @@ class GamesChannel extends BaseChannel {
         return this.sendExtension({ type: "games", data: undefined });
     }
 
-    public async getGame(gameId: number): Promise<Possible<MG.Api.Game>> {
+    public async findGame(gameId: number): Promise<Possible<MG.Api.Game>> {
+        return this.sendExtension({ type: "games:find:game", data: { gameId } });
+    }
+
+    public async findMap(gameId: number, mapId: number): Promise<Possible<MG.Api.Map>> {
+        return this.sendExtension({ type: "games:find:map", data: { gameId, mapId } });
+    }
+
+    public async getGame(gameId: number): Promise<Possible<any>> {
         return this.sendExtension({ type: "game", data: { gameId } });
     }
 
-    public async getGameMap(gameId: number, mapId: number): Promise<Possible<MG.Api.GameMap>> {
-        return this.sendExtension({ type: "game:map", data: { gameId, mapId } });
+    public async getMap(mapId: number): Promise<Possible<any>> {
+        return this.sendExtension({ type: "map", data: { mapId } });
     }
 }
 

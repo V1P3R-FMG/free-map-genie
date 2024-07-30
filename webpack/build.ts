@@ -10,9 +10,13 @@ import { TsconfigPathsPlugin } from "tsconfig-paths-webpack-plugin";
 import CopyPlugin from "copy-webpack-plugin";
 import TerserPlugin from "terser-webpack-plugin";
 
+import startServer from "./server.js";
+
 const { ProvidePlugin, DefinePlugin } = webpack;
 
 const __dirname = import.meta.dirname;
+const PORT = process.env.PORT ? Number(process.env.PORT) : 8080;
+const CACHE_MAX_AGE = process.env.PORT ? Number(process.env.PORT) : 30 * 60 * 1000;
 
 async function webpackPromise(options: webpack.Configuration) {
     return new Promise((resolve, reject) => {
@@ -28,6 +32,10 @@ async function webpackPromise(options: webpack.Configuration) {
                 })
             );
         });
+
+        if (options.watch && options.mode === "development") {
+            startServer(PORT);
+        }
     });
 }
 
@@ -54,6 +62,8 @@ function defines(buildInfo: BuildInfo) {
         __AUTHOR__: JSON.stringify(buildInfo.author),
         __DEBUG__: buildInfo.isDev,
         __WATCH__: buildInfo.watch,
+        __PORT__: PORT,
+        __CACHE_MAX_AGE__: CACHE_MAX_AGE,
         console: "logger",
     });
 }
@@ -92,6 +102,7 @@ async function webExtPlugin(buildInfo: BuildInfo) {
         overwriteDest: true,
         devtools: true,
         startUrl: process.env.START_URL ?? "https://mapgenie.io",
+        chromiumBinary: process.env.CHROME_BIN,
         sourceDir: buildInfo.out,
         args: buildInfo.isChrome
             ? ["--auto-open-devtools-for-tabs", "--system-developer-mode", "--start-maximized"]
@@ -99,7 +110,7 @@ async function webExtPlugin(buildInfo: BuildInfo) {
     });
 }
 
-function webExtManfestPlugin(buildInfo: BuildInfo) {
+function webExtManifestPlugin(buildInfo: BuildInfo) {
     return new WebExtManifestPlugin({
         files: [
             "./src/manifest.json",
@@ -150,7 +161,7 @@ async function build() {
             defines(buildInfo),
             copies(buildInfo),
             provides(buildInfo),
-            webExtManfestPlugin(buildInfo),
+            webExtManifestPlugin(buildInfo),
             await webExtPlugin(buildInfo),
         ],
         optimization: {

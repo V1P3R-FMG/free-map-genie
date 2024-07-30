@@ -28,12 +28,15 @@ async function initScript() {
 }
 
 async function main() {
-    await StorageChannel.set("hello", "world");
-    const value = await StorageChannel.get("hello");
-    logger.debug("hello =", value, "@ https://mapgenie.io");
+    // await StorageChannel.set("hello", "world");
+    // const value = await StorageChannel.get("hello");
+    // logger.debug("hello =", value, "@ https://mapgenie.io");
+    // const game = await GamesChannel.getGame(1);
+    // logger.debug("game:1 =", game?.title);
 
-    const game = await GamesChannel.getGame(1);
-    logger.debug("game:1 =", game?.title);
+    logger.log(await GamesChannel.getAll());
+    logger.log(await GamesChannel.getGame(1));
+    logger.log(await GamesChannel.getMap(1));
 }
 
 runContexts("content", initScript, main);

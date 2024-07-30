@@ -3,7 +3,7 @@ import runContexts from "@shared/run";
 import * as s from "@shared/schema";
 
 import installRules from "./rules";
-import { getGames, getGame, getGameMap } from "./games";
+import Games from "./games";
 
 const messageScheme = s.union([
     s.object({
@@ -15,12 +15,20 @@ const messageScheme = s.union([
         data: s.literal(undefined),
     }),
     s.object({
+        type: s.literal("games:find:game"),
+        data: s.object({ gameId: s.number() }),
+    }),
+    s.object({
+        type: s.literal("games:find:map"),
+        data: s.object({ gameId: s.number(), mapId: s.number() }),
+    }),
+    s.object({
         type: s.literal("game"),
         data: s.object({ gameId: s.number() }),
     }),
     s.object({
-        type: s.literal("game:map"),
-        data: s.object({ gameId: s.number(), mapId: s.number() }),
+        type: s.literal("map"),
+        data: s.object({ mapId: s.number() }),
     }),
     s.object({
         type: s.literal("start:login"),
@@ -71,15 +79,23 @@ async function main() {
                 return true;
             }
             case "games": {
-                getGames().then(sendResponse);
+                Games.getGames().then(sendResponse);
                 return true;
             }
             case "game": {
-                getGame(data.gameId).then(sendResponse);
+                Games.getGame(data.gameId).then(sendResponse);
                 return true;
             }
-            case "game:map": {
-                getGameMap(data.gameId, data.mapId).then(sendResponse);
+            case "map": {
+                Games.getMap(data.mapId).then(sendResponse);
+                return true;
+            }
+            case "games:find:game": {
+                Games.findGame(data.gameId).then(sendResponse);
+                return true;
+            }
+            case "games:find:map": {
+                Games.findMap(data.gameId, data.mapId).then(sendResponse);
                 return true;
             }
             default:

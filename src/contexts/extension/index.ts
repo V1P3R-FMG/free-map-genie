@@ -7,8 +7,10 @@ import * as s from "@shared/schema";
 const messageScheme = s.object({
     type: s.union([
         s.literal("games"),
+        s.literal("games:find:game"),
+        s.literal("games:find:map"),
         s.literal("game"),
-        s.literal("game:map"),
+        s.literal("map"),
         s.literal("start:login"),
         s.literal("login"),
     ]),
@@ -30,8 +32,10 @@ async function main() {
 
         switch (type) {
             case "games":
+            case "games:find:game":
+            case "games:find:map":
             case "game":
-            case "game:map":
+            case "map":
                 chrome.runtime.sendMessage({ type, data }).then(sendResponse).catch(sendError);
                 return ResponseType.Pending;
             case "start:login":
