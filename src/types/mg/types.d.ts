@@ -194,7 +194,7 @@ declare namespace MG {
         title: string;
         description: string;
         color: Nullable<Color>;
-        category: Nullable<Category>;
+        category: Nullable<number>;
         created_at: IsoDateString;
         latitude: Float;
         longitude: Float;
