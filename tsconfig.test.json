@@ -11,6 +11,6 @@
         "strict": true,
         "types": ["@types/jest", "jest-extended"]
     },
-    "include": ["src/**/__tests__/**/*", "tests/**/*", "src/types/**/*.d.ts"],
+    "include": ["**/__tests__", "**/__tests__", "tests/**/*", "src/types/**/*.d.ts"],
     "exclude": ["node_modules", "dist"]
 }
