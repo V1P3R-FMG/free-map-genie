@@ -4,18 +4,19 @@ import DataManager, { type Backup } from "../index";
 
 import { loadMigrateData, loadStorageDriver } from "../__utils__/data";
 
-import { V3DataWriter } from "../v3";
+import V3DataManager, { V3DataWriter } from "../v3";
 import type { V1DataLayout } from "../v1";
 import type { V2DataLayout } from "../v2";
+import V1DataManager from "../v1";
 
 const writer = new V3DataWriter();
 
 describe("storage migrate", () => {
-    describe.each(["v1", "v2"] as const)("migrate data from %s -> v3", (version) => {
-        const migrateData = loadMigrateData(version);
+    describe.each([1, 2] as const)("migrate data from v%s -> v3", (version) => {
+        const migrateData = loadMigrateData(`v${version}`);
 
         describe("migration", () => {
-            const mng = new DataManager(loadStorageDriver<V1DataLayout | V2DataLayout>(migrateData[version]));
+            const mng = new DataManager(loadStorageDriver<V1DataLayout | V2DataLayout>(migrateData[`v${version}`]));
 
             test.each(migrateData.keys.map(({ key, keyData }) => [key, keyData]))(
                 "should have the correct data under key %s after migration",
@@ -33,11 +34,11 @@ describe("storage migrate", () => {
         });
 
         describe("backups", () => {
-            let mng: DataManager;
+            const mng: DataManager = new DataManager(
+                loadStorageDriver<V1DataLayout | V2DataLayout>(migrateData[`v${version}`])
+            );
 
             beforeAll(async () => {
-                mng = new DataManager(loadStorageDriver<V1DataLayout | V2DataLayout>(migrateData[version]));
-
                 for (const { keyData } of migrateData.keys) {
                     await mng.load(keyData);
                 }
@@ -57,6 +58,29 @@ describe("storage migrate", () => {
             });
         });
 
-        describe("remove old", () => {});
+        describe("remove old", () => {
+            const mng: DataManager = new DataManager(
+                loadStorageDriver<V1DataLayout | V2DataLayout>(migrateData[`v${version}`])
+            );
+
+            const v1Mng = new V1DataManager(mng.driver);
+            const v2Mng = new V1DataManager(mng.driver);
+            const v3Mng = new V3DataManager(mng.driver);
+
+            beforeAll(async () => {
+                for (const { keyData } of migrateData.keys) {
+                    await mng.load(keyData);
+                }
+            });
+
+            test.each(migrateData.keys.map(({ keyData }) => keyData))(
+                "should remove the key %p for v1 and v2, and have only have data left for v3",
+                (keyData) => {
+                    expect(v1Mng.has(keyData)).resolves.toBeFalse();
+                    expect(v2Mng.has(keyData)).resolves.toBeFalse();
+                    expect(v3Mng.has(keyData)).resolves.toBeTrue();
+                }
+            );
+        });
     });
 });
