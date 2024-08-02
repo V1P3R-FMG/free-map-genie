@@ -1,6 +1,6 @@
 import { TimeoutError, waitForCondition } from "@utils/async";
 
-export type MageniePageType = "home" | "login" | "map" | "guide" | "game-home" | "unknown";
+export type MapgeniePageType = "home" | "login" | "map" | "guide" | "game-home" | "unknown";
 
 export function isMapgeniePage(): boolean {
     return $('link[href^="https://cdn.mapgenie.io/favicons"]', document.head).length > 0;
@@ -26,7 +26,7 @@ export function isMapgenieGameHomePage(): boolean {
     return $("body.game-home").length > 0;
 }
 
-export function getPageType(): MageniePageType {
+export function getPageType(): MapgeniePageType {
     if (!isMapgeniePage()) return "unknown";
 
     if (isMapgenieHomePage()) return "home";
@@ -38,8 +38,8 @@ export function getPageType(): MageniePageType {
     return "unknown";
 }
 
-export async function waitForPageType(timeout?: number): Promise<MageniePageType> {
-    let pageType: MageniePageType = getPageType();
+export async function waitForPageType(timeout?: number): Promise<MapgeniePageType> {
+    let pageType: MapgeniePageType = getPageType();
 
     if (pageType !== "unknown") return pageType;
 

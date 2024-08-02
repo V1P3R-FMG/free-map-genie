@@ -269,13 +269,13 @@ export default class Channel<Send = any> {
      */
     private addResponseHandler<R>(
         messageId: Id,
-        successatch: MatchOptions,
+        successMatch: MatchOptions,
         failedMatch: MatchOptions | undefined,
         resolve: (data: R) => any,
         reject: (e: any) => any
     ) {
         this.responseHandlers[messageId] ??= (response: ChannelMessage) => {
-            if (this.messageMatches(response, successatch)) {
+            if (this.messageMatches(response, successMatch)) {
                 resolve(response.data);
                 return true;
             }
@@ -375,7 +375,7 @@ export default class Channel<Send = any> {
     }
 
     /**
-     * Check if the message traget is this channel and that the sender is not this channel
+     * Check if the message target is this channel and that the sender is not this channel
      * @param message the message to check
      */
     private isMessageForMe(message: ChannelMessage): boolean {
@@ -418,12 +418,12 @@ export default class Channel<Send = any> {
                 const responseType = await handler(
                     message.data,
                     (data) => {
-                        if (!canResponse || hasResponded) throw "Response allready sended.";
+                        if (!canResponse || hasResponded) throw "Response already sended.";
                         hasResponded = true;
                         this.respond(message, "response::success", data);
                     },
                     (err) => {
-                        if (!canResponse || hasResponded) throw "Response allready sended.";
+                        if (!canResponse || hasResponded) throw "Response already sended.";
                         hasResponded = true;
                         this.respond(message, "response::failed", err);
                     }
@@ -471,7 +471,7 @@ export default class Channel<Send = any> {
                 case "pong":
                 case "response::success":
                 case "response::failed":
-                    this.handleReponseMessage(message);
+                    this.handleResponseMessage(message);
                     break;
                 case "send":
                     this.handleSendMessage(message);
@@ -483,8 +483,8 @@ export default class Channel<Send = any> {
         };
     }
 
-    /** Handle reponse messages */
-    private handleReponseMessage(message: ChannelMessage) {
+    /** Handle response messages */
+    private handleResponseMessage(message: ChannelMessage) {
         const handler = this.responseHandlers[message.messageId];
         if (handler!) {
             if (!handler(message)) {
@@ -492,7 +492,7 @@ export default class Channel<Send = any> {
             }
             delete this.responseHandlers[message.messageId];
         } else {
-            logger.warn("No handler for reponse", message, this.responseHandlers, this);
+            logger.warn("No handler for response", message, this.responseHandlers, this);
         }
     }
 

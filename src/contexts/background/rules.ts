@@ -6,7 +6,7 @@ function ruleActionType(type: `${RuleActionType}`): RuleActionType {
     return type as RuleActionType;
 }
 
-function resouceType(type: `${ResourceType}`): ResourceType {
+function resourceType(type: `${ResourceType}`): ResourceType {
     return type as ResourceType;
 }
 
@@ -31,7 +31,7 @@ export default async function installRules() {
                 },
                 condition: {
                     requestDomains: ["mapgenie.io"],
-                    resourceTypes: [resouceType("sub_frame")],
+                    resourceTypes: [resourceType("sub_frame")],
                 },
             },
             // Block map.js?id=123456abcdef but allow map.js?ready&id=123456abcdef
@@ -45,7 +45,7 @@ export default async function installRules() {
                 },
                 condition: {
                     regexFilter: "^https://cdn\\.mapgenie\\.io/js/map\\.js\\?id=\\w+$",
-                    resourceTypes: [resouceType("script")],
+                    resourceTypes: [resourceType("script")],
                 },
             },
         ],

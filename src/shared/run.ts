@@ -15,11 +15,11 @@ export default async function runContexts(name: string, ...contexts: RunContext[
         .catch((e) => {
             success = false;
             if (e instanceof ChannelRequestError) {
-                logger.error(`Failed to initalize ${name} context reason,`, e.message, "Data", e.data);
+                logger.error(`Failed to initialize ${name} context reason,`, e.message, "Data", e.data);
             } else if (e instanceof Error) {
-                logger.error(`Failed to initalize ${name} context reason,`, e.message);
+                logger.error(`Failed to initialize ${name} context reason,`, e.message);
             } else {
-                logger.error(`Failed to initalize ${name} context reason,`, e);
+                logger.error(`Failed to initialize ${name} context reason,`, e);
             }
         });
     return success;

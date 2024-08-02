@@ -208,7 +208,7 @@ describe.each([
 
 describe("NumberSet statics", () => {
     /** NumberSet.isIndexableSet */
-    it("should give true for NumberSet's and false for any oter value when NumberSet.isIndexableSet is called", () => {
+    it("should give true for NumberSet's and false for any other value when NumberSet.isIndexableSet is called", () => {
         expect(NumberSet.isIndexableSet([1, 2, 3])).toBe(false);
         expect(NumberSet.isIndexableSet(["1", "2", "3"])).toBe(false);
         expect(NumberSet.isIndexableSet(1)).toBe(false);

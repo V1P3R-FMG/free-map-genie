@@ -34,7 +34,7 @@ declare namespace MG.Actions {
             query: string;
         }
 
-        declare interface LocatiosIds {
+        declare interface LocationsIds {
             locationIds: number[];
         }
 
@@ -246,7 +246,7 @@ declare namespace MG.Actions {
         ["MG:MAP:SET_REGION_FILTER"]: Meta.RegionFilter;
         ["MG:MAP:SET_TAG_FILTERS"]: Meta.TagFilters;
         ["MG:MAP:SET_TAG_FILTERS_V2"]: Meta.TagFilters;
-        ["MG:MAP:SHOW_SPECIFIC_LOCATIONS"]: Meta.LocatiosIds & Meta.CategoryIds;
+        ["MG:MAP:SHOW_SPECIFIC_LOCATIONS"]: Meta.LocationsIds & Meta.CategoryIds;
         ["MG:MAP:APPLY_PRESET"]: Meta.Preset & Meta.Additive;
         ["MG:MAP:UNAPPLY_PRESET"]: Meta.Preset;
         ["MG:MAP:SET_ACTIVE_PRESETS"]: Meta.ActivePresets;

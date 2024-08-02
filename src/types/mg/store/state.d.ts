@@ -3,7 +3,7 @@ declare namespace MG {
         activePresets: RecordSetById;
         categories: RecordById<Category>;
         categoryIds: number[];
-        excludedLoctions: number[];
+        excludedLocations: number[];
         groups: Group[];
         groupsById: RecordById<Group>;
         heatmapCategories: unknown[];
@@ -37,7 +37,7 @@ declare namespace MG {
         foundLocationsCount: number;
         isEditingNote: boolean;
         isMovingNote: boolean;
-        noteGroupVisiblities: RecordSet<PrefixedColor>;
+        noteGroupVisibilities: RecordSet<PrefixedColor>;
         notes: Note[];
         notesShown: boolean;
         presets: Preset[];
