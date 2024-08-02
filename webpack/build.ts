@@ -17,6 +17,7 @@ const { ProvidePlugin, DefinePlugin } = webpack;
 const __dirname = import.meta.dirname;
 const PORT = process.env.PORT ? Number(process.env.PORT) : 8080;
 const CACHE_MAX_AGE = process.env.PORT ? Number(process.env.PORT) : 30 * 60 * 1000;
+const MAX_BACKUPS_COUNT = process.env.MAX_BACKUPS_COUNT ? Number(process.env.MAX_BACKUPS_COUNT) : 10;
 
 async function webpackPromise(options: webpack.Configuration) {
     return new Promise((resolve, reject) => {
@@ -64,6 +65,7 @@ function defines(buildInfo: BuildInfo) {
         __WATCH__: buildInfo.watch,
         __PORT__: PORT,
         __CACHE_MAX_AGE__: CACHE_MAX_AGE,
+        __MAX_BACKUPS_COUNT__: MAX_BACKUPS_COUNT,
         console: "logger",
     });
 }

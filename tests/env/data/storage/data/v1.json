@@ -1,0 +1,119 @@
+{
+    "storage": {
+        "mg:game_20:user_-1:v5": {
+            "sharedData": {
+                "locations": {
+                    "24660": true,
+                    "24886": true,
+                    "24896": true,
+                    "24897": true,
+                    "24910": true,
+                    "24914": true,
+                    "24945": true,
+                    "24946": true,
+                    "24947": true,
+                    "24948": true,
+                    "25006": true
+                }
+            },
+            "mapData": {
+                "68": { "categories": { "944": true, "947": true, "951": true, "955": true, "1013": true } },
+                "69": {
+                    "categories": { "951": true, "953": true, "960": true, "1011": true },
+                    "presets": {
+                        "0": { "id": 0, "title": "BOSS", "order": 1, "categories": [951] },
+                        "1": { "id": 1, "title": "CULTIST", "order": 2, "categories": [4737] }
+                    },
+                    "presets_order": [-1, 0, 1],
+                    "visible_categories": { "953": true, "954": true }
+                },
+                "72": {
+                    "categories": { "941": true },
+                    "presets": {
+                        "0": { "id": 0, "title": "EE", "order": 2, "categories": [1014] },
+                        "1": { "id": 1, "title": "QUESTS", "order": 1, "categories": [955] }
+                    },
+                    "presets_order": [-1, 1, 0],
+                    "visible_categories": { "955": true }
+                }
+            },
+            "settings": {
+                "69": { "remember_categories": true },
+                "72": { "remember_categories": true }
+            }
+        }
+    },
+    "emptyData": {
+        "sharedData": {
+            "locations": {}
+        },
+        "mapData": {
+            "69": {
+                "categories": {},
+                "presets": {},
+                "presets_order": [],
+                "visible_categories": {}
+            }
+        },
+        "settings": {
+            "69": { "remember_categories": false }
+        }
+    },
+    "nonEmptyData": {
+        "data": {
+            "sharedData": {
+                "locations": {}
+            },
+            "mapData": {
+                "68": {
+                    "categories": {},
+                    "presets": {},
+                    "presets_order": [],
+                    "visible_categories": { "955": true }
+                },
+                "69": {
+                    "categories": { "951": true },
+                    "presets": {},
+                    "presets_order": [],
+                    "visible_categories": {}
+                },
+                "72": {
+                    "categories": {},
+                    "presets": {
+                        "0": { "id": 0, "title": "EE", "order": 2, "categories": [1014] },
+                        "1": { "id": 1, "title": "QUESTS", "order": 1, "categories": [955] }
+                    },
+                    "presets_order": [-1, 1, 0],
+                    "visible_categories": { "955": true }
+                }
+            },
+            "settings": {
+                "69": { "remember_categories": true },
+                "72": { "remember_categories": false }
+            }
+        },
+        "expected": {
+            "mapData": {
+                "68": {
+                    "visible_categories": { "955": true }
+                },
+                "69": {
+                    "categories": { "951": true }
+                },
+                "72": {
+                    "presets": {
+                        "0": { "id": 0, "title": "EE", "order": 2, "categories": [1014] },
+                        "1": { "id": 1, "title": "QUESTS", "order": 1, "categories": [955] }
+                    },
+                    "presets_order": [-1, 1, 0],
+                    "visible_categories": { "955": true }
+                }
+            },
+            "settings": {
+                "69": { "remember_categories": true }
+            }
+        }
+    },
+    "nonExistingKey": { "key": "mg:game_-1:user_-1:v5", "keyData": { "user": -1, "game": -1, "map": -1 } },
+    "keys": [{ "key": "mg:game_20:user_-1:v5", "keyData": { "user": -1, "game": 20, "map": -1 } }]
+}

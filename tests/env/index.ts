@@ -1,4 +1,5 @@
 global.__DEBUG__ = true;
+global.__MAX_BACKUPS_COUNT__ = 10;
 
 import { TestEnvironment } from "jest-environment-node";
 import { Logger } from "../../src/logger";

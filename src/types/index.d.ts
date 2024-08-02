@@ -10,6 +10,7 @@ declare var __WATCH__: boolean;
 declare var __PORT__: number;
 
 declare var __CACHE_MAX_AGE__: number;
+declare var __MAX_BACKUPS_COUNT__: number;
 /* eslint-enable no-var */
 
 declare let logger: InstanceType<typeof import("../logger").Logger>;

@@ -1,0 +1,116 @@
+{
+    "v1": {
+        "mg:game_20:user_-1:v5": {
+            "sharedData": {
+                "locations": {
+                    "33741": true,
+                    "25064": true,
+                    "324335": true,
+                    "26144": true,
+                    "25096": true,
+                    "24967": true,
+                    "65787": true,
+                    "212507": true,
+                    "118725": true,
+                    "35277": true,
+                    "28128": true,
+                    "155284": true,
+                    "80957": true,
+                    "323676": true,
+                    "292863": true
+                }
+            },
+            "mapData": {
+                "68": { "categories": { "944": true, "947": true, "951": true, "955": true, "1013": true } },
+                "69": {
+                    "categories": { "951": true, "953": true, "960": true, "1011": true },
+                    "presets": {
+                        "0": { "id": 0, "title": "BOSS", "order": 1, "categories": [951] },
+                        "1": { "id": 1, "title": "CULTIST", "order": 2, "categories": [4737] }
+                    },
+                    "presets_order": [-1, 0, 1],
+                    "visible_categories": { "953": true, "954": true }
+                },
+                "72": {
+                    "categories": { "941": true },
+                    "presets": {
+                        "0": { "id": 0, "title": "EE", "order": 2, "categories": [1014] },
+                        "1": { "id": 1, "title": "QUESTS", "order": 1, "categories": [955] }
+                    },
+                    "presets_order": [-1, 1, 0],
+                    "visible_categories": { "955": true }
+                }
+            },
+            "settings": {
+                "69": { "remember_categories": true },
+                "72": { "remember_categories": true }
+            }
+        }
+    },
+    "v2": {},
+    "v3": {
+        "fmg:user_-1:game_20:map_68:v3": [
+            [25096, 292863, 33741, 25064, 212507],
+            [944, 947, 951, 955, 1013],
+            [],
+            [],
+            []
+        ],
+        "fmg:user_-1:game_20:map_69:v3": [
+            [118725, 35277, 80957, 65787, 24967],
+            [951, 953, 960, 1011],
+            [953, 954],
+            [
+                [0, "BOSS", 1, [951]],
+                [1, "CULTIST", 2, [4737]]
+            ],
+            []
+        ],
+        "fmg:user_-1:game_20:map_72:v3": [
+            [26144, 28128, 323676, 324335, 155284],
+            [941],
+            [955],
+            [
+                [0, "EE", 2, [1014]],
+                [1, "QUESTS", 1, [955]]
+            ],
+            []
+        ]
+    },
+    "keys": [
+        { "key": "fmg:user_-1:game_20:map_68:v3", "keyData": { "user": -1, "game": 20, "map": 68 } },
+        { "key": "fmg:user_-1:game_20:map_69:v3", "keyData": { "user": -1, "game": 20, "map": 69 } },
+        { "key": "fmg:user_-1:game_20:map_72:v3", "keyData": { "user": -1, "game": 20, "map": 72 } }
+    ],
+    "backupKeys": {
+        "v1": [{ "key": "mg:game_20:user_-1:v5:backup", "count": 3 }],
+        "v2": [
+            {
+                "key": "fmg:game_20:map_68:user_-1:backup",
+                "count": 1
+            },
+            {
+                "key": "fmg:game_20:map_69:user_-1:backup",
+                "count": 1
+            },
+            {
+                "key": "fmg:game_20:map_72:user_-1:backup",
+                "count": 1
+            }
+        ],
+        "v3": [
+            {
+                "key": "fmg:user_-1:game_20:map_68:v3:backup",
+                "count": 0
+            },
+            {
+                "key": "fmg:user_-1:game_20:map_69:v3:backup",
+                "count": 0
+            },
+            {
+                "key": "fmg:user_-1:game_20:map_72:v3:backup",
+                "count": 0
+            }
+        ]
+    }
+}

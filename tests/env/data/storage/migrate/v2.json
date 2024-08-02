@@ -1,0 +1,107 @@
+{
+    "v1": {},
+    "v2": {
+        "fmg:game_20:map_68:user_-1": {
+            "locationIds": [25096, 292863, 33741, 25064, 212507],
+            "categoryIds": [944, 947, 951, 955, 1013]
+        },
+        "fmg:game_20:map_69:user_-1": {
+            "locationIds": [118725, 35277, 80957, 65787, 24967],
+            "categoryIds": [951, 953, 960, 1011],
+            "presets": [
+                { "id": 0, "title": "BOSS", "order": 1, "categories": [951] },
+                { "id": 1, "title": "CULTIST", "order": 2, "categories": [4737] }
+            ],
+            "notes": [
+                {
+                    "map_id": 69,
+                    "title": "hello",
+                    "description": "world",
+                    "color": null,
+                    "latitude": 0.7628507874493948,
+                    "longitude": -0.6984048588847145,
+                    "category": null,
+                    "id": "OOZXu19Rqv",
+                    "user_id": 777247
+                }
+            ],
+            "presetOrder": [-1, 0, 1],
+            "visibleCategoriesIds": [953, 954]
+        },
+        "fmg:game_20:map_72:user_-1": {
+            "locationIds": [26144, 28128, 323676, 324335, 155284],
+            "categoryIds": [941],
+            "presets": [
+                { "id": 0, "title": "EE", "order": 2, "categories": [1014] },
+                { "id": 1, "title": "QUESTS", "order": 1, "categories": [955] }
+            ],
+            "presetOrder": [-1, 1, 0],
+            "visibleCategoriesIds": [955]
+        }
+    },
+    "v3": {
+        "fmg:user_-1:game_20:map_68:v3": [
+            [25096, 292863, 33741, 25064, 212507],
+            [944, 947, 951, 955, 1013],
+            [],
+            [],
+            []
+        ],
+        "fmg:user_-1:game_20:map_69:v3": [
+            [118725, 35277, 80957, 65787, 24967],
+            [951, 953, 960, 1011],
+            [953, 954],
+            [
+                [0, "BOSS", 1, [951]],
+                [1, "CULTIST", 2, [4737]]
+            ],
+            [["OOZXu19Rqv", 69, 777247, "hello", "world", 0.7628507874493948, -0.6984048588847145, null, null]]
+        ],
+        "fmg:user_-1:game_20:map_72:v3": [
+            [26144, 28128, 323676, 324335, 155284],
+            [941],
+            [955],
+            [
+                [0, "EE", 2, [1014]],
+                [1, "QUESTS", 1, [955]]
+            ],
+            []
+        ]
+    },
+    "keys": [
+        { "key": "fmg:user_-1:game_20:map_68:v3", "keyData": { "user": -1, "game": 20, "map": 68 } },
+        { "key": "fmg:user_-1:game_20:map_69:v3", "keyData": { "user": -1, "game": 20, "map": 69 } },
+        { "key": "fmg:user_-1:game_20:map_72:v3", "keyData": { "user": -1, "game": 20, "map": 72 } }
+    ],
+    "backupKeys": {
+        "v1": [{ "key": "mg:game_20:user_-1:v5:backup", "count": 0 }],
+        "v2": [
+            {
+                "key": "fmg:game_20:map_68:user_-1:backup",
+                "count": 1
+            },
+            {
+                "key": "fmg:game_20:map_69:user_-1:backup",
+                "count": 1
+            },
+            {
+                "key": "fmg:game_20:map_72:user_-1:backup",
+                "count": 1
+            }
+        ],
+        "v3": [
+            {
+                "key": "fmg:user_-1:game_20:map_68:v3:backup",
+                "count": 0
+            },
+            {
+                "key": "fmg:user_-1:game_20:map_69:v3:backup",
+                "count": 0
+            },
+            {
+                "key": "fmg:user_-1:game_20:map_72:v3:backup",
+                "count": 0
+            }
+        ]
+    }
+}

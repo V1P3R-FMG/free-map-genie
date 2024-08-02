@@ -1,0 +1,70 @@
+{
+    "storage": {
+        "fmg:game_20:map_75:user_-1": {
+            "locationIds": [39366, 40135, 40907, 63916, 119775, 119777, 141870, 153862, 292918, 292919, 319062],
+            "categoryIds": [947, 969],
+            "notes": [
+                {
+                    "map_id": 75,
+                    "title": "hello",
+                    "description": "world",
+                    "color": null,
+                    "latitude": 0.7628507874493948,
+                    "longitude": -0.6984048588847145,
+                    "category": null,
+                    "id": "OOZXu19Rqv",
+                    "user_id": 777247
+                }
+            ],
+            "presets": [
+                {
+                    "id": 0,
+                    "title": "hello",
+                    "categories": [969],
+                    "order": 0
+                }
+            ],
+            "presetOrder": [0],
+            "visibleCategoriesIds": [969]
+        }
+    },
+    "emptyData": {
+        "locationIds": [],
+        "categoryIds": [],
+        "notes": [],
+        "presets": [],
+        "presetOrder": [],
+        "visibleCategoriesIds": []
+    },
+    "nonEmptyData": {
+        "data": {
+            "locationIds": [39366, 40135],
+            "categoryIds": [],
+            "notes": [],
+            "presets": [
+                {
+                    "id": 0,
+                    "title": "hello",
+                    "categories": [969],
+                    "order": 0
+                }
+            ],
+            "presetOrder": [0],
+            "visibleCategoriesIds": []
+        },
+        "expected": {
+            "locationIds": [39366, 40135],
+            "presets": [
+                {
+                    "id": 0,
+                    "title": "hello",
+                    "categories": [969],
+                    "order": 0
+                }
+            ],
+            "presetOrder": [0]
+        }
+    },
+    "nonExistingKey": { "key": "fmg:game_-1:map_-1:user_-1", "keyData": { "user": -1, "game": -1, "map": -1 } },
+    "keys": [{ "key": "fmg:game_20:map_75:user_-1", "keyData": { "user": -1, "game": 20, "map": 75 } }]
+}
