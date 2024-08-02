@@ -15,6 +15,10 @@ export class FsService {
     public readFileAsync(path: string, encoding?: BufferEncoding) {
         return fs.promises.readFile(nodePath.resolve(this.root, path), { encoding });
     }
+
+    public fileExists(path: string): boolean {
+        return fs.existsSync(nodePath.resolve(this.root, path));
+    }
 }
 
 export default new FsService();
