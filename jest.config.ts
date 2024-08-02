@@ -24,10 +24,10 @@ export default {
             },
         ],
     },
-    roots: ["src"],
+    rootDir: "src",
     modulePaths: baseUrl ? [baseUrl] : [],
     moduleDirectories: ["node_modules"],
-    moduleNameMapper: paths ? pathsToModuleNameMapper(paths, { useESM: true }) : {},
-    testEnvironment: "./tests/env/index.ts",
+    moduleNameMapper: paths ? pathsToModuleNameMapper(paths, { useESM: true, prefix: path.join("..", baseUrl) }) : {},
+    testEnvironment: "../tests/env/index.ts",
     setupFilesAfterEnv: ["jest-extended/all"],
 } satisfies Config.InitialOptions;
