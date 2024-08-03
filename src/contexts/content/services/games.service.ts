@@ -1,7 +1,11 @@
+import Key from "@content/storage/key";
 import gamesChannel from "../channels/games.channel";
 
 class MapData {
     public readonly config: MG.MapConfig;
+
+    public readonly mapId: number;
+    public readonly gameId: number;
 
     public readonly groupById: Record<string, MG.GroupFull>;
     public readonly categoriesById: Record<string, MG.CategoryFull>;
@@ -13,6 +17,9 @@ class MapData {
 
     public constructor(map: MG.Api.MapFull) {
         this.config = map.config;
+
+        this.mapId = map.id;
+        this.gameId = map.game_id;
 
         this.groups = map.groups;
         this.categories = map.groups.map((group) => group.categories).flat();
@@ -47,6 +54,22 @@ class GamesService {
     public async filterCategories(mapId: number, categories: number[]) {
         const mapData = await this.mapData(mapId);
         return categories.filter((id) => !!mapData.categoriesById[id]);
+    }
+
+    public async getKeyForLocation(maps: number[], locationId: number) {
+        if (!window.user) throw "No window user!";
+
+        for (const mapId of maps) {
+            const mapData = await this.mapData(mapId);
+            if (mapData.locationsById[locationId]) {
+                return Key.fromKeyData({
+                    map: mapId,
+                    game: mapData.gameId,
+                    user: window.user.id,
+                });
+            }
+        }
+        return null;
     }
 }
 

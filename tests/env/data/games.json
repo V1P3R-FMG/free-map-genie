@@ -1,0 +1,21 @@
+{
+    "maps": [68, 69, 72],
+    "locations": [
+        { "id": 25128, "expected": { "mapId": 68, "gameId": 20 } },
+        { "id": 27940, "expected": { "mapId": 72, "gameId": 20 } },
+        { "id": 88024, "expected": { "mapId": 68, "gameId": 20 } },
+        { "id": 153215, "expected": { "mapId": 69, "gameId": 20 } },
+        { "id": 27930, "expected": { "mapId": 72, "gameId": 20 } },
+        { "id": 25078, "expected": { "mapId": 68, "gameId": 20 } },
+        { "id": 25089, "expected": { "mapId": 68, "gameId": 20 } },
+        { "id": 177470, "expected": { "mapId": 69, "gameId": 20 } },
+        { "id": 27873, "expected": { "mapId": 72, "gameId": 20 } },
+        { "id": 65747, "expected": { "mapId": 69, "gameId": 20 } },
+        { "id": 28131, "expected": { "mapId": 72, "gameId": 20 } },
+        { "id": 27978, "expected": { "mapId": 72, "gameId": 20 } },
+        { "id": 83819, "expected": { "mapId": 69, "gameId": 20 } },
+        { "id": 24896, "expected": { "mapId": 69, "gameId": 20 } },
+        { "id": 28068, "expected": { "mapId": 72, "gameId": 20 } },
+        { "id": 292843, "expected": { "mapId": 68, "gameId": 20 } }
+    ]
+}
