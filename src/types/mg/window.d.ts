@@ -20,4 +20,6 @@ interface Window {
     store?: MG.Store;
     mapManager?: MG.MapManager;
     map?: MG.Map;
+
+    axios?: Axios;
 }
