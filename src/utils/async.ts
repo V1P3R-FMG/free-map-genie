@@ -3,6 +3,8 @@ const DEFAULT_INTERVAL = 1000;
 
 interface State {
     resolved: boolean;
+    timeoutHandle?: number;
+    intervalHandle?: number;
 }
 
 export interface Resolver<T> {
@@ -41,12 +43,12 @@ export class TimeoutError extends Error {
     }
 }
 
-function callbackWrapper<F extends (arg: any) => any>(cb: F, handle: number | undefined, state: State): F {
+function callbackWrapper<F extends (arg: any) => any>(cb: F, state: State): F {
     return ((arg: any) => {
         if (state.resolved) return;
-        // logger.debug("Resolved", arg, handle);
         state.resolved = true;
-        window.clearTimeout(handle);
+        window.clearTimeout(state.timeoutHandle);
+        window.clearInterval(state.intervalHandle);
         return cb(arg);
     }) as F;
 }
@@ -55,26 +57,25 @@ function createTimeout<T>(
     resolve: Resolver<T>,
     reject: Rejecter,
     { timeout, message }: TimeoutOptions = {}
-): [Resolver<T>, Rejecter, State, number | undefined] {
+): [Resolver<T>, Rejecter, State] {
     const state: State = { resolved: false };
 
-    let handle;
     if (timeout === undefined || timeout > 0) {
-        handle = window.setTimeout(
-            callbackWrapper(() => reject(new TimeoutError(message)), undefined, state),
+        state.timeoutHandle = window.setTimeout(
+            callbackWrapper(() => reject(new TimeoutError(message)), state),
             timeout ?? DEFAULT_TIMEOUT
         );
     }
 
-    return [callbackWrapper(resolve, handle, state), callbackWrapper(reject, handle, state), state, handle];
+    return [callbackWrapper(resolve, state), callbackWrapper(reject, state), state];
 }
 
 export function waitFor<T = void>(waiter: Waiter<T>, { timeout, message, interval }: WaiterTimeoutOptions = {}) {
     return new Promise<T>(async (resolve, reject) => {
         const [resolver, rejecter, state] = createTimeout(resolve, reject, { timeout, message });
 
-        const handle = window.setInterval(async () => {
-            if (state.resolved) return window.clearInterval(handle);
+        state.intervalHandle = window.setInterval(async () => {
+            if (state.resolved) return window.clearInterval(state.intervalHandle);
             try {
                 await waiter(resolver, rejecter);
             } catch (e) {
