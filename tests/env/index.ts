@@ -23,5 +23,7 @@ export default class FMGTestEnvironment extends TestEnvironment {
         this.global.logger = new Logger();
         this.global.fsService = fsService;
         this.global.jsonService = jsonService;
+
+        this.global.window = global as any;
     }
 }
