@@ -33,6 +33,8 @@ export interface ChannelMessage {
 
     messageId: Id;
     data?: any;
+
+    source: string[];
 }
 
 export interface EventMessage<T = any> {
@@ -252,11 +254,12 @@ export default class Channel<Send = any> {
      * Creates a message and fills in extra info about sender, origin, ...
      * @param message the message to fill
      */
-    private createMessage(message: Omit<ChannelMessage, "origin" | "sender">): ChannelMessage {
+    private createMessage(message: Omit<ChannelMessage, "origin" | "sender" | "source">): ChannelMessage {
         // const sender = `${this.name}::${this.channelType}`;
         return {
             origin: window.location.origin,
             sender: this.name,
+            source: ["react"], // just to silent map.js
             ...message,
         };
     }
