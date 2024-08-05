@@ -11,6 +11,7 @@ const messageScheme = s.object({
         s.literal("games:find:map"),
         s.literal("game"),
         s.literal("map"),
+        s.literal("heatmaps"),
         s.literal("start:login"),
         s.literal("login"),
     ]),
@@ -36,6 +37,7 @@ async function main() {
             case "games:find:map":
             case "game":
             case "map":
+            case "heatmaps":
                 chrome.runtime.sendMessage({ type, data }).then(sendResponse).catch(sendError);
                 return ResponseType.Pending;
             case "start:login":

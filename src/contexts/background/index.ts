@@ -31,6 +31,10 @@ const messageScheme = s.union([
         data: s.object({ mapId: s.number() }),
     }),
     s.object({
+        type: s.literal("heatmaps"),
+        data: s.object({ mapId: s.number() }),
+    }),
+    s.object({
         type: s.literal("start:login"),
         data: s.string(),
     }),
@@ -75,27 +79,34 @@ async function main() {
                 return false;
             }
             case "login": {
-                chrome.storage.session.get("last_mg_url").then(({ last_mg_url }) => sendResponse(last_mg_url));
+                chrome.storage.session
+                    .get("last_mg_url")
+                    .then(({ last_mg_url }) => sendResponse(last_mg_url))
+                    .catch(console.error);
                 return true;
             }
             case "games": {
-                Games.getGames().then(sendResponse);
+                Games.getGames().then(sendResponse).catch(console.error);
                 return true;
             }
             case "game": {
-                Games.getGame(data.gameId).then(sendResponse);
+                Games.getGame(data.gameId).then(sendResponse).catch(console.error);
                 return true;
             }
             case "map": {
-                Games.getMap(data.mapId).then(sendResponse);
+                Games.getMap(data.mapId).then(sendResponse).catch(console.error);
+                return true;
+            }
+            case "heatmaps": {
+                Games.getHeatmaps(data.mapId).then(sendResponse).catch(console.error);
                 return true;
             }
             case "games:find:game": {
-                Games.findGame(data.gameId).then(sendResponse);
+                Games.findGame(data.gameId).then(sendResponse).catch(console.error);
                 return true;
             }
             case "games:find:map": {
-                Games.findMap(data.gameId, data.mapId).then(sendResponse);
+                Games.findMap(data.gameId, data.mapId).then(sendResponse).catch(console.error);
                 return true;
             }
             default:

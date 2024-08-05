@@ -79,4 +79,6 @@ declare namespace MG.Api {
     declare interface GameFull extends Game {
         maps: MapFull[];
     }
+
+    declare type Heatmaps = HeatmapGroup[];
 }

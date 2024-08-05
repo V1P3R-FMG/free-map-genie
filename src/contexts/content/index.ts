@@ -1,8 +1,7 @@
 import runContexts from "@shared/run";
 import { waitForPageType } from "@fmg/page";
 
-import StorageChannel from "@content/channels/storage.channel";
-import GamesChannel from "@content/channels/games.channel";
+import gamesChannel from "@content/channels/games.channel";
 
 async function initScript() {
     const pageType = await waitForPageType();
@@ -34,9 +33,10 @@ async function main() {
     // const game = await GamesChannel.getGame(1);
     // logger.debug("game:1 =", game?.title);
 
-    logger.log(await GamesChannel.getAll());
-    logger.log(await GamesChannel.getGame(1));
-    logger.log(await GamesChannel.getMap(1));
+    logger.log(await gamesChannel.getHeatmaps(1));
+    logger.log(await gamesChannel.getAll());
+    logger.log(await gamesChannel.getGame(1));
+    logger.log(await gamesChannel.getMap(1));
 }
 
 runContexts("content", initScript, main);

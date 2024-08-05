@@ -187,7 +187,36 @@ declare namespace MG {
 
     declare interface Route {}
 
-    declare interface Heatmap {}
+    declare type HeatmapDisplayType = "marker";
+
+    declare interface HeatmapCategory {
+        id: number;
+        group_id: number;
+        title: string;
+        icon: string;
+        display_type: HeatmapDisplayType;
+        descriptions: Nullable<string>;
+        has_heatmap: boolean;
+        premium: boolean;
+        visible: boolean;
+        features_enabled: boolean;
+        ign_enabled: boolean;
+        ign_visible: boolean;
+        order: number;
+        points: Vector2[];
+        info: Nullable<unknown>;
+        template: Nullable<unknown>;
+    }
+
+    declare interface HeatmapGroup {
+        id: number;
+        game_id: number;
+        title: string;
+        heatmap_categories: HeatmapCategory[];
+        order: number;
+        color: string;
+        expandable: boolean;
+    }
 
     declare interface Note {
         id: string; // 11 chars
@@ -229,8 +258,8 @@ declare namespace MG {
     declare interface MapData {
         categories: Record<number, Category>;
         groups: Group[];
-        heatmapCategories: unknown[];
-        heatmapGroups: unknown[];
+        heatmapCategories: HeatmapCategory[];
+        heatmapGroups: HeatmapGroup[];
         locations: Location[];
         map: Map;
         mapConfig: MapConfig;
