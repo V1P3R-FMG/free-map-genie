@@ -1,4 +1,4 @@
-import NumberSet, { NumberSetLayout } from "@utils/set";
+import type { IndexableNumberSet, NumberSetLayout } from "@utils/set";
 
 import GamesService from "@content/services/games.service";
 
@@ -22,12 +22,12 @@ export interface V2DataLayout {
 
 export class V2Data {
     public constructor(
-        public readonly locations: NumberSet,
-        public readonly categories: NumberSet,
+        public readonly locations: IndexableNumberSet,
+        public readonly categories: IndexableNumberSet,
         public readonly notes: MG.Note[],
         public readonly presets: MG.Preset[],
         public readonly presetOrder: number[],
-        public readonly visibleCategoriesIds: NumberSet
+        public readonly visibleCategoriesIds: IndexableNumberSet
     ) {}
 }
 

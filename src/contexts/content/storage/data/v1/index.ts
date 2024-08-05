@@ -1,4 +1,4 @@
-import NumberSet from "@utils/set";
+import type { IndexableNumberSet } from "@utils/set";
 
 import Key from "../../key";
 
@@ -31,10 +31,10 @@ export interface V1DataLayout {
 
 export class V1MapData {
     public constructor(
-        public readonly categories: NumberSet,
+        public readonly categories: IndexableNumberSet,
         public readonly presets: MG.Preset[],
         public readonly preset_order: number[],
-        public readonly visible_categories: NumberSet
+        public readonly visible_categories: IndexableNumberSet
     ) {}
 }
 
@@ -44,7 +44,7 @@ export class V1SettingsData {
 
 export class V1Data {
     public constructor(
-        public readonly locations: NumberSet,
+        public readonly locations: IndexableNumberSet,
         public readonly maps: Record<string, V1MapData>,
         public readonly settings: Record<string, V1SettingsData>
     ) {}

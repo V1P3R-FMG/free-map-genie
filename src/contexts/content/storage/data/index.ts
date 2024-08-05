@@ -27,7 +27,7 @@ export default class DataManager {
         this.managers = [new V1DataManager(driver), new V2DataManager(driver), new V3DataManager(driver)];
     }
 
-    private get current(): LatestManager {
+    public get current(): LatestManager {
         return this.managers.at(-1)! as LatestManager;
     }
 
@@ -37,7 +37,7 @@ export default class DataManager {
         }
     }
 
-    private async backup(version: number, keys: BackupKey[]) {
+    public async backup(version: number, keys: BackupKey[]) {
         await Promise.all(
             keys.map(async ({ key, backupKey }) => {
                 if (!(await this.driver.has(key))) return;
@@ -75,5 +75,13 @@ export default class DataManager {
 
     public async save(key: Key, data: LatestData) {
         await this.current.save(key, data);
+    }
+
+    public async remove(key: Key) {
+        await this.current.remove(key);
+    }
+
+    public async has(key: Key) {
+        return this.current.has(key);
     }
 }

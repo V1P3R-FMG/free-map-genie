@@ -1,5 +1,4 @@
-import type NumberSet from "@utils/set";
-import type { NumberSetLayout } from "@utils/set";
+import type { IndexableNumberSet, NumberSetLayout } from "@utils/set";
 
 import type V2DataManager from "../v2/index";
 import Key from "../../key";
@@ -74,7 +73,7 @@ export class V3PresetData {
         public readonly id: number,
         public readonly title: string,
         public readonly order: number,
-        public readonly categories: NumberSet
+        public readonly categories: IndexableNumberSet
     ) {}
 }
 
@@ -94,9 +93,9 @@ export class V3NoteData {
 
 export class V3Data {
     public constructor(
-        public readonly locations: NumberSet,
-        public readonly categories: NumberSet,
-        public readonly visibleCategories: NumberSet,
+        public readonly locations: IndexableNumberSet,
+        public readonly categories: IndexableNumberSet,
+        public readonly visibleCategories: IndexableNumberSet,
         public readonly presets: V3PresetData[],
         public readonly notes: V3NoteData[]
     ) {}
