@@ -167,6 +167,9 @@ async function build() {
             await webExtPlugin(buildInfo),
         ],
         optimization: {
+            splitChunks: {
+                filename: "chunks/[name].js",
+            },
             minimize: !buildInfo.isDev,
             minimizer: [new TerserPlugin()],
         },
