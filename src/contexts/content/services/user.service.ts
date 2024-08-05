@@ -1,6 +1,11 @@
-import { waitForCondition } from "@utils/async";
+import * as async from "@utils/async";
+
 import { FmgMockedUserKey } from "@constants";
 import { getPageType } from "@fmg/page";
+
+import Key from "@content/storage/key";
+
+import storageService from "@content/services/storage.service";
 
 class UserService {
     public createMockUser(): MG.User {
@@ -8,7 +13,7 @@ class UserService {
             id: -1,
             role: "user",
             hasPro: true,
-            locations: [],
+            locations: {},
             trackedCategoryIds: [],
             presets: [],
             suggestions: [],
@@ -18,7 +23,7 @@ class UserService {
     public async getUser() {
         switch (getPageType()) {
             case "map":
-                await waitForCondition(() => window.user !== undefined);
+                await async.waitForCondition(() => window.user !== undefined);
                 return window.user;
             default:
                 return null;
@@ -45,13 +50,23 @@ class UserService {
         if (window.user) return true;
 
         if (this.isMockUserActive()) {
-            await waitForCondition(() => window.user !== undefined);
+            await async.waitForCondition(() => window.user !== undefined);
             window.user = this.createMockUser();
             logger.debug("Loaded mocked user");
             return true;
         }
 
         return false;
+    }
+
+    public async load() {
+        if (!window.user) return;
+
+        const data = await storageService.load(Key.fromWindow(window));
+
+        window.user.hasPro = true;
+        window.user.locations = data.locations;
+        window.user.trackedCategoryIds = data.categories.values();
     }
 }
 

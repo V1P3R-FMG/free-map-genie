@@ -1,28 +1,29 @@
 import userService from "@content/services/user.service";
 import mapService from "@content/services/map.service";
+import apiService from "@content/services/api.service";
+import storeService from "@content/services/store.service";
 
 import mapPage from "@content/pages/map.page";
-
-import ApiFilter from "@fmg/filters/api-filter";
 
 class MapScript implements PageScript {
     public async initScript() {
         await userService.login();
+        await userService.load();
+
+        if (window.config) {
+            window.config.checklistEnabled = true;
+            window.config.presetsEnabled = true;
+        } else {
+            logger.warn("Failed to modify mapConfig window.config not found.");
+        }
 
         mapService.fixGoogleMaps();
         await mapPage.addMapgenieScript();
 
-        const filter = await ApiFilter.install(window);
-
-        filter.registerFilter("put", { path: "locations", hasId: true }, ({ id }) => {
-            logger.log("id", id);
-            return { block: true };
-        });
-
-        filter.registerFilter("delete", { path: "locations", hasId: true }, ({ id }) => {
-            logger.log("id", id);
-            return { block: true };
-        });
+        if (window.user) {
+            await storeService.install();
+            await apiService.install();
+        }
 
         await this.initButtons();
     }

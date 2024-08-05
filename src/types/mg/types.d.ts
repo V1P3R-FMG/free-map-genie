@@ -1,6 +1,6 @@
 declare namespace MG {
-    declare type RecordSet<T> = Record<T, true>;
-    declare type RecordSetById = RecordSet<number>;
+    declare type RecordSet<T> = Record<T, boolean>;
+    declare type RecordSetById = RecordSet<number | string>;
     declare type RecordById<T> = Record<number, T>;
     declare type RecordByStrId<T> = RecordById<string, T>;
 
@@ -46,9 +46,9 @@ declare namespace MG {
         id: Int;
         role: UserRole;
         hasPro: boolean;
-        locations: unknown[];
-        trackedCategoryIds: unknown[];
-        presets: unknown[];
+        locations: RecordSetById;
+        trackedCategoryIds: number[];
+        presets: MG.Preset[];
         suggestions: unknown[];
     }
 
