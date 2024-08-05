@@ -12,7 +12,7 @@ async function downloadFile(url: string, filepath: string, headers?: Record<stri
     await fs.promises.writeFile(filepath, text, { flag: "w", encoding: "utf-8" });
 }
 
-async function sendJson(res: express.Response, filepath: string) {
+function sendJson(res: express.Response, filepath: string) {
     const text = fs.readFileSync(filepath, { encoding: "utf-8" });
 
     res.setHeader("Content-Type", "application/json");
@@ -69,6 +69,20 @@ export default async function startServer(port: number) {
 
         if (!fs.existsSync(filepath)) {
             await downloadFile(`https://mapgenie.io/api/v1/maps/${mapId}/full`, filepath, {
+                "X-Api-Secret": process.env.API_SECRET,
+            });
+        }
+
+        sendJson(res, filepath);
+    });
+
+    app.get("/api/v1/maps/:mapId/heatmaps", async (req, res) => {
+        const { mapId } = req.params;
+
+        const filepath = path.join(cacheDir, `heatmaps_${mapId}.json`);
+
+        if (!fs.existsSync(filepath)) {
+            await downloadFile(`https://mapgenie.io/api/v1/maps/${mapId}/heatmaps`, filepath, {
                 "X-Api-Secret": process.env.API_SECRET,
             });
         }

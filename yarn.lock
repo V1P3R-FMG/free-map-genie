@@ -4221,6 +4221,16 @@ globule@^1.0.0:
     lodash "^4.17.21"
     minimatch "~3.0.2"
 
+gnirts-loader@^1.0.7:
+  version "1.0.7"
+  resolved "https://registry.yarnpkg.com/gnirts-loader/-/gnirts-loader-1.0.7.tgz#58266a7ca8a6ce40b795fcf493304dbed23f1f27"
+  integrity sha512-npNC3PdZHn2002cmM1wOhlaI/QZ6PDTo2Ce++wEEIw3ccxaAKxhQexinIHNPnptIu9hRfI0DVqQe5rKRGhXnHA==
+
+gnirts@^1.1.7:
+  version "1.1.7"
+  resolved "https://registry.yarnpkg.com/gnirts/-/gnirts-1.1.7.tgz#2ac1a00c891f658374f032a5c93916a9df310f03"
+  integrity sha512-Yu4IflQT9BnLvSC3ZbxUsMdniHgy5S97+X++REsNJSSLVm+5U0W/9ViukhyLE9DZiNy/qr1ZBTEcNd3UhAr40w==
+
 gopd@^1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/gopd/-/gopd-1.0.1.tgz#29ff76de69dac7489b7c0918a5788e56477c332c"

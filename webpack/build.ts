@@ -15,6 +15,7 @@ import startServer from "./server.js";
 const { ProvidePlugin, DefinePlugin } = webpack;
 
 const __dirname = import.meta.dirname;
+
 const PORT = process.env.PORT ? Number(process.env.PORT) : 8080;
 const CACHE_MAX_AGE = process.env.PORT ? Number(process.env.PORT) : 30 * 60 * 1000;
 const MAX_BACKUPS_COUNT = process.env.MAX_BACKUPS_COUNT ? Number(process.env.MAX_BACKUPS_COUNT) : 10;
@@ -155,7 +156,11 @@ async function build() {
                 {
                     test: /\.ts$/,
                     exclude: /(node_modules)/,
-                    use: swcLoader(buildInfo),
+                    use: [
+                        "gnirts-loader",
+                        path.resolve(__dirname, "loaders", "inject-globals.js"),
+                        swcLoader(buildInfo),
+                    ],
                 },
             ],
         },
