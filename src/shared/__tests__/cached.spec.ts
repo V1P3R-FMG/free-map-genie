@@ -1,8 +1,12 @@
-import CachedValue from "@utils/cached";
+import CachedValue from "@shared/cached";
 
 jest.useFakeTimers();
 
-const fetchMock = jest.fn(() => response("mocked"));
+interface FetchOptions {
+    headers: Record<string, string>;
+}
+
+const fetchMock = jest.fn((_src: string, _options: FetchOptions) => response("mocked"));
 
 function response(value: any): any {
     return Promise.resolve({
@@ -29,7 +33,7 @@ describe("CachedValue", () => {
     it("should be keep the value cached", async () => {
         fetchMock.mockReturnValueOnce(response("hello"));
 
-        const cached = new CachedValue("https://test.com", 5000);
+        const cached = new CachedValue("https://test.com", { maxAge: 5000 });
 
         await expect(cached.data).resolves.toBe("hello");
 
@@ -39,12 +43,22 @@ describe("CachedValue", () => {
     it("should re-fetch the value after the age expires", async () => {
         fetchMock.mockReturnValueOnce(response("hello"));
 
-        const cached = new CachedValue("https://test.com", 5000);
+        const cached = new CachedValue("https://test.com", { maxAge: 5000 });
 
         await expect(cached.data).resolves.toBe("hello");
 
         jest.setSystemTime(jest.now() + 6000);
 
         await expect(cached.data).resolves.toBe("mocked");
+    });
+
+    it("should call fetch with the correct headers", async () => {
+        const headers = { hello: "world" };
+
+        const cached = new CachedValue("https://test.com", { headers });
+
+        await cached.data;
+
+        expect(fetchMock.mock.calls[0]?.[1].headers).toEqual(headers);
     });
 });
