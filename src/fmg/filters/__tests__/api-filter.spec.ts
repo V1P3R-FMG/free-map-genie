@@ -151,7 +151,7 @@ describe("ApiFilter", () => {
             expect(info?.type).toEqual("user");
             expect(info?.path).toEqual(path);
             expect(info?.id).toEqual(id);
-            expect(info?.data).toEqual(data);
+            expect(info?.postData).toEqual(data);
         });
     });
 });

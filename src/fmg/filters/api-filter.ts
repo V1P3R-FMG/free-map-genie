@@ -14,13 +14,13 @@ export type AxiosMethodAndAny = (typeof AxiosMethodsAndAny)[number];
 
 export type MGApiType = "user";
 
-export interface ApiFilterCallInfo {
+export interface ApiFilterCallInfo<D = void> {
     method: string;
     url: string;
     path: string;
     type: MGApiType;
     id?: string;
-    data?: any;
+    postData: D;
 }
 
 export interface ApiFilterCallbackResult {
@@ -29,8 +29,8 @@ export interface ApiFilterCallbackResult {
     result?: any;
 }
 
-export interface ApiFilterCallback {
-    (info: ApiFilterCallInfo): Promise<ApiFilterCallbackResult | void> | ApiFilterCallbackResult | void;
+export interface ApiFilterCallback<D = void> {
+    (info: ApiFilterCallInfo<D>): Promise<ApiFilterCallbackResult | void> | ApiFilterCallbackResult | void;
 }
 
 export interface ApiFilterRegexResult {
@@ -42,7 +42,7 @@ export interface ApiFilterRegexResult {
 export interface Filter {
     regex: RegExp;
     type: MGApiType;
-    callback: ApiFilterCallback;
+    callback: ApiFilterCallback<any>;
 }
 
 export interface ApiEndpointInfo {
@@ -142,24 +142,31 @@ export default class ApiFilter {
     protected async applyFilter(
         method: AxiosMethod,
         url: string,
-        data?: any
+        postData?: any
     ): Promise<[boolean, any | undefined, any | undefined]> {
         const [filter, info] = this.findFilter(method, url);
 
         if (filter && info) {
-            const { block, result, newData } = (await filter.callback({ method, url, data, ...info })) ?? {};
+            const { block, result, newData } = (await filter.callback({ method, url, postData, ...info })) ?? {};
 
-            return [block ?? false, result, newData ?? data];
+            return [block ?? false, result, newData ?? postData];
         }
 
         return [false, undefined, undefined];
     }
 
-    public registerFilter(method: AxiosMethodAndAny, info: ApiEndpointInfo, callback: ApiFilterCallback) {
-        this.filters[method].push({
-            regex: ApiFilter.compileToRegex(info),
-            type: info.type ?? "user",
-            callback,
+    public registerFilter<D = void>(
+        methods: AxiosMethodAndAny | AxiosMethodAndAny[],
+        info: ApiEndpointInfo,
+        callback: ApiFilterCallback<D>
+    ) {
+        methods = Array.isArray(methods) ? methods : [methods];
+        methods.forEach((method) => {
+            this.filters[method].push({
+                regex: ApiFilter.compileToRegex(info),
+                type: info.type ?? "user",
+                callback,
+            });
         });
     }
 }
