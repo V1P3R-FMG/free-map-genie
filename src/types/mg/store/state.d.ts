@@ -89,4 +89,12 @@ declare namespace MG {
         search: SearchState;
         user: UserState;
     }
+
+    declare interface PartialState {
+        editor?: Partial<EditorState>;
+        map?: Partial<MapState>;
+        routes?: Partial<RoutesState>;
+        search?: Partial<SearchState>;
+        user?: Partial<UserState>;
+    }
 }
