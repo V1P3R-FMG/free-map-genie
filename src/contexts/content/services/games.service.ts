@@ -71,6 +71,25 @@ class GamesService {
         }
         return null;
     }
+
+    public async getMapForHref(gameId: number, href: string) {
+        const game = await gamesChannel.findGame(gameId);
+        if (!game) throw `Game with gameId ${gameId} not found.`;
+
+        if (game.maps.length === 1) return game.maps[0];
+
+        const url = new URL(href, window.origin);
+        const slug = url.pathname.split("/").at(-1);
+        if (!slug) throw `Invalid href ${href} no slug found.`;
+
+        const map = game.maps.find((map) => map.slug === slug);
+
+        if (map) {
+            return this.mapData(map.id);
+        }
+
+        return null;
+    }
 }
 
 export default new GamesService();
