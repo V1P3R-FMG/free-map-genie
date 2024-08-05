@@ -26,4 +26,8 @@ export default class Key {
 
         return new this(window.mapData.map.id, window.game.id, window.user.id);
     }
+
+    public toString(): string {
+        return `${this.user}:${this.game}:${this.map}`;
+    }
 }
