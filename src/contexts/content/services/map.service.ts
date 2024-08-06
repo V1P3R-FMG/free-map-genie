@@ -58,6 +58,35 @@ class MapService {
         return !object.isEmpty(window.mapData.proCategoryLocationCounts);
     }
 
+    public findFreeMapUrl() {
+        let lockedMaps = 0;
+        for (const link of mapPage.mapLinks) {
+            if (link.href.endsWith("/upgrade")) {
+                lockedMaps++;
+            } else if (!link.href.endsWith("/upgrade")) {
+                return link.href;
+            }
+        }
+        if (lockedMaps > 0) {
+            logger.warn("No free maps found could not unlock maps in map switcher panel");
+        }
+        return null;
+    }
+
+    public getMapNameFromLabel(label: string) {
+        return label.replace(/\s?\[\w+\]/i, "");
+    }
+
+    public getMapFromName(name: string) {
+        if (!window.mapData) throw `Failed to get map slug for map ${name}, window.mapData not found.`;
+        return window.mapData.maps.find((map) => map.title === name);
+    }
+
+    public getMapFromSlug(slug: string) {
+        if (!window.mapData) throw `Failed to get map slug for map slug ${slug}, window.mapData not found.`;
+        return window.mapData.maps.find((m) => m.slug === slug.toLowerCase());
+    }
+
     public async loadMapData() {
         if (window.mapData) {
             if (window.mapData.heatmapGroups.length) {
@@ -66,10 +95,10 @@ class MapService {
                 window.mapData.heatmapCategories = heatmaps.categories;
             }
 
-            const mockMapId = urlService.getMockMapId();
-            if (mockMapId || this.hasProCategories) {
+            const mockMap = urlService.getMockMap();
+            if (mockMap || this.hasProCategories) {
                 if (window.game) {
-                    const mapData = await gamesService.mapData(window.game.id, mockMapId ?? window.mapData.map.id);
+                    const mapData = await gamesService.mapData(window.game.id, mockMap?.id ?? window.mapData.map.id);
                     window.mapData.map = mapData.map;
                     window.mapData.groups = mapData.groups;
                     window.mapData.categories = mapData.categoriesById;
@@ -78,13 +107,13 @@ class MapService {
                     window.mapData.mapConfig.tile_sets = mapData.config.tile_sets;
                     window.mapData.proCategoryLocationCounts = [];
                 } else {
-                    logger.warn("Failed to load pro map data window.game not found.");
+                    logger.warn("Failed to load pro map data, window.game not found.");
                 }
             }
 
             window.mapData.maxMarkedLocations = Infinity;
         } else {
-            logger.warn("Failed to modify mapData window.mapData not found.");
+            logger.warn("Failed to modify mapData, window.mapData not found.");
         }
     }
 }

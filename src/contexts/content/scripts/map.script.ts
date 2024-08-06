@@ -19,6 +19,7 @@ class MapScript implements PageScript {
 
         await mapService.waitForMapData();
         await mapService.loadMapData();
+        mapPage.unlockProMapsInMapSelectorPanel();
 
         mapService.fixGoogleMaps();
         await mapPage.addMapgenieScript();

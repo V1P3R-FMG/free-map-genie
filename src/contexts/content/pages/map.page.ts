@@ -4,6 +4,7 @@ import userChannel from "@content/channels/user.channel";
 
 import userService from "@content/services/user.service";
 import mapService from "@content/services/map.service";
+import urlService from "@content/services/url.service";
 
 class MapPage {
     public get userPanel() {
@@ -26,9 +27,63 @@ class MapPage {
         return $waitFor<HTMLAnchorElement>(`.logout a[href$="/logout"]`, { message: "No logout button" });
     }
 
+    public get mapSelectorPanel() {
+        return $waitFor<HTMLDivElement>(".map-switcher-panel");
+    }
+
+    public get mapLinks() {
+        return $<HTMLAnchorElement>(".map-switcher-panel .map-link");
+    }
+
     public async addMapgenieScript() {
         const src = await mapService.getMapSrc();
         $("<script/>").attr("src", src.replace("id=", "ready&id=")).appendTo(document.body);
+    }
+
+    public async unlockProMapsInMapSelectorPanel() {
+        await this.mapSelectorPanel;
+
+        const freeMapUrl = mapService.findFreeMapUrl();
+        if (!freeMapUrl) {
+            console.warn(`Unable to unlock pro maps in map selector panel, free map url not found.`);
+        }
+
+        for (const link of this.mapLinks) {
+            const mapName = mapService.getMapNameFromLabel(link.innerText);
+            const mapSlug = mapService.getMapFromName(mapName)?.slug;
+
+            const mockMap = urlService.getMockMap();
+            if (mockMap) {
+                if (mapSlug !== mockMap.slug) {
+                    link.classList.remove("selected");
+                } else {
+                    link.classList.add("selected");
+                }
+            }
+
+            if (!link.href || !link.href.endsWith("/upgrade")) continue;
+
+            if (!mapSlug) {
+                console.warn(`Unable to unlock pro map ${link.innerText} in map selector panel slug not found.`);
+                continue;
+            }
+
+            if (!freeMapUrl) continue;
+
+            const url = new URL(freeMapUrl);
+            url.searchParams.set("map-slug", mapSlug);
+            link.setAttribute("href", url.toString());
+
+            // Remove style
+            link.removeAttribute("style");
+
+            // Remove unnecessary attributes
+            link.removeAttribute("target");
+            link.removeAttribute("data-toggle");
+            link.removeAttribute("title");
+            link.removeAttribute("data-original-title");
+            link.removeAttribute("data-placement");
+        }
     }
 
     public async addMockUserButton() {
