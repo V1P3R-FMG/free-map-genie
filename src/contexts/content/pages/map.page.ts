@@ -37,9 +37,11 @@ class MapPage {
             .addClass("btn btn-outline-secondary")
             .attr({
                 id: "fmg-mock-user-btn",
-                href: window.location.href,
             })
-            .on("click", () => userService.enableMockUser(true))
+            .on("click", () => {
+                userService.enableMockUser(true);
+                window.location.reload();
+            })
             .insertBefore(await this.userPanelFeatures);
     }
 
@@ -51,6 +53,15 @@ class MapPage {
     public async initLogoutButton() {
         const btn = await this.logoutButton;
         btn.on("click", () => userService.enableMockUser(false));
+    }
+
+    public async initButtons() {
+        if (await userService.isLoggedIn()) {
+            await this.initLogoutButton();
+        } else {
+            await this.initLoginButton();
+            this.addMockUserButton();
+        }
     }
 }
 

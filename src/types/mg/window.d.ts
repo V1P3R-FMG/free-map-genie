@@ -19,7 +19,7 @@ interface Window {
 
     store?: MG.Store;
     mapManager?: MG.MapManager;
-    map?: MG.Map;
+    map?: MG.MapboxglMap;
 
     axios?: Axios;
 }

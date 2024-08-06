@@ -47,8 +47,14 @@ declare namespace MG.Api {
         ign_slugs: string[];
     }
 
+    declare type MapFullTileSet = Omit<TileSet, "pattern">;
+
+    declare interface MapFullMapConfig extends MG.MapConfig {
+        tile_sets: MapFullTileSet[];
+    }
+
     declare interface MapFull extends Map {
-        config: MG.MapConfig;
+        config: MapFullMapConfig;
         url: string;
         game: Game;
         groups: MG.GroupFull[];
@@ -64,7 +70,7 @@ declare namespace MG.Api {
         available_on_ign: boolean;
         status: string;
         order: number;
-        mapgenie_release_date: MG.IsoDateString;
+        mapgenie_release_date: IsoDateString;
         default_tracked_category_id: Nullable<number>;
         series_id: number;
         series_order: number;
@@ -76,9 +82,21 @@ declare namespace MG.Api {
         maps: Map[];
     }
 
-    declare interface GameFull extends Game {
-        maps: MapFull[];
+    declare interface MapFullForGame extends MapFull {
+        config: MapConfig;
     }
 
-    declare type Heatmaps = HeatmapGroup[];
+    declare interface GameFull extends Game {
+        maps: MapFullForGame[];
+    }
+
+    declare interface HeatmapGroup {
+        id: number;
+        game_id: number;
+        title: string;
+        categories: HeatmapCategory[];
+        order: number;
+        color: string;
+        expandable: boolean;
+    }
 }

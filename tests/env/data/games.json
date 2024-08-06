@@ -1,4 +1,5 @@
 {
+    "gameId": 20,
     "maps": [68, 69, 72],
     "locations": [
         { "id": 25128, "expected": { "mapId": 68, "gameId": 20 } },

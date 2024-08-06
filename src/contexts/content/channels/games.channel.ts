@@ -21,7 +21,7 @@ class GamesChannel extends BaseChannel {
         return this.sendExtension({ type: "map", data: { mapId } });
     }
 
-    public async getHeatmaps(mapId: number): Promise<MG.Api.Heatmaps> {
+    public async getHeatmaps(mapId: number): Promise<MG.Api.HeatmapGroup[]> {
         return this.sendExtension({ type: "heatmaps", data: { mapId } });
     }
 }

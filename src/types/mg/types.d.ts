@@ -256,18 +256,19 @@ declare namespace MG {
     }
 
     declare interface MapData {
-        categories: Record<number, Category>;
+        categories: RecordById<Category>;
         groups: Group[];
-        heatmapCategories: HeatmapCategory[];
+        heatmapCategories: RecordById<HeatmapCategory>;
         heatmapGroups: HeatmapGroup[];
         locations: Location[];
+        regions: Region[];
         map: Map;
         mapConfig: MapConfig;
         maps: Map[];
         maxMarkedLocations: number;
         notes: unknown[];
         presets: Preset[];
-        proCategoryLocationCounts: unknown[];
+        proCategoryLocationCounts: RecordById<number> | [];
         routes: Route[];
         searchQuery: Nullable<string>;
         sharedNotes: Record<unknown, unknown>;

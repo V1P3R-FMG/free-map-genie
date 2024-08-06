@@ -17,6 +17,9 @@ class MapScript implements PageScript {
             logger.warn("Failed to modify mapConfig window.config not found.");
         }
 
+        await mapService.waitForMapData();
+        await mapService.loadMapData();
+
         mapService.fixGoogleMaps();
         await mapPage.addMapgenieScript();
 
@@ -25,16 +28,7 @@ class MapScript implements PageScript {
             await apiService.install();
         }
 
-        await this.initButtons();
-    }
-
-    public async initButtons() {
-        if (await userService.isLoggedIn()) {
-            await mapPage.initLogoutButton();
-        } else {
-            await mapPage.initLoginButton();
-            mapPage.addMockUserButton();
-        }
+        await mapPage.initButtons();
     }
 }
 

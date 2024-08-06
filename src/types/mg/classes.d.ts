@@ -1,7 +1,7 @@
 declare namespace MG {
     declare type MapFeatureState = "locations-data" | "circle-locations-data";
 
-    declare class Map {
+    declare class MapboxglMap {
         //TODO
         public setFeatureState(feature: { source: MapFeatureState; id: Int }, state: Record<string, any>): void;
     }

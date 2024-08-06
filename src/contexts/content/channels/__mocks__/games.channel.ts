@@ -11,13 +11,15 @@ class GamesChannel {
         throw "No mock implemented";
     }
 
-    public async getGame(_gameId: number): Promise<MG.Api.GameFull> {
-        throw "No mock implemented";
+    public async getGame(gameId: number): Promise<MG.Api.GameFull> {
+        const file = `games/game_${gameId}.json`;
+        if (!fsService.fileExists(file)) throw `Game json for gameId ${gameId} does not exists.`;
+        return jsonService.readJsonAsync(file);
     }
 
     public async getMap(mapId: number): Promise<MG.Api.MapFull> {
         const file = `maps/map_${mapId}.json`;
-        if (!fsService.fileExists(file)) throw `Map json for map_id ${mapId} does not exists.`;
+        if (!fsService.fileExists(file)) throw `Map json for mapId ${mapId} does not exists.`;
         return jsonService.readJsonAsync(file);
     }
 }

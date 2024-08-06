@@ -66,7 +66,7 @@ export default class V2DataManager implements DataManagerImpl<V2Data, V1DataMana
     public async upgrade(dm: V1DataManager, key: Key) {
         const v1Data = await dm.load(key);
 
-        const locations = await GamesService.filterLocations(key.map, v1Data.locations.values());
+        const locations = await GamesService.filterLocations(key.game, key.map, v1Data.locations.values());
 
         const v2Data = this.reader.readV1(locations, v1Data.maps[key.map], v1Data.settings[key.map]);
 
