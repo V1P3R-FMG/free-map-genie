@@ -1,13 +1,19 @@
 import DataManager, { type LatestData } from "@content/storage/data/index";
 
+import StorageFilter from "@fmg/filters/storage-filter";
+
 import WindowStorageDriver from "@content/storage/drivers/window.driver";
 import IframeStorageDriver from "@content/storage/drivers/iframe.driver";
+import Key from "@content/storage/key";
 
 export interface Updater {
     (data: LatestData): Promise<any> | any;
 }
 
 class StorageService {
+    private readonly rememberCategoriesRegex =
+        /mg:settings:game_(?<gameId>\d+):visible_categories:id_(?<categoryId>\d+)/;
+
     private readonly localStorage = new DataManager(new WindowStorageDriver());
     private readonly iframeStorage = new DataManager(new IframeStorageDriver());
 
@@ -61,6 +67,46 @@ class StorageService {
         const data = await this.load(key);
         await updater(data);
         await this.save(key);
+    }
+
+    public async installFilter() {
+        const filter = StorageFilter.install(window);
+
+        filter.registerFilter<["gameId", "categoryId"]>(
+            "get",
+            this.rememberCategoriesRegex,
+            (_storage, _action, _key, _value, { categoryId }, block) => {
+                block();
+                const data = this.loadFromCache(Key.fromWindow(window));
+                return data?.visibleCategories[categoryId!] ? "true" : undefined;
+            }
+        );
+
+        filter.registerFilter<["gameId", "categoryId"]>(
+            "set",
+            this.rememberCategoriesRegex,
+            (_storage, _action, _key, _value, { categoryId }, block) => {
+                block();
+                const data = this.loadFromCache(Key.fromWindow(window));
+                if (data) {
+                    data.visibleCategories.add(categoryId!);
+                    this.save(Key.fromWindow(window)).catch(logger.error);
+                }
+            }
+        );
+
+        filter.registerFilter<["gameId", "categoryId"]>(
+            "remove",
+            this.rememberCategoriesRegex,
+            (_storage, _action, _key, _value, { categoryId }, block) => {
+                block();
+                const data = this.loadFromCache(Key.fromWindow(window));
+                if (data) {
+                    data.visibleCategories.delete(categoryId!);
+                    this.save(Key.fromWindow(window)).catch(logger.error);
+                }
+            }
+        );
     }
 }
 

@@ -4,7 +4,7 @@ import Key from "@content/storage/key";
 import storageService from "@content/services/storage.service";
 
 class ApiService {
-    public async install() {
+    public async installFilter() {
         const filter = await ApiFilter.install(window);
 
         filter.registerFilter(["put", "delete"], { path: "locations", hasId: true }, async ({ id, method }) => {
