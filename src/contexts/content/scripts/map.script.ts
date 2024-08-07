@@ -8,7 +8,6 @@ import mapPage from "@content/pages/map.page";
 class MapScript implements PageScript {
     public async initScript() {
         await userService.login();
-        await userService.load();
 
         if (window.config) {
             window.config.checklistEnabled = true;
@@ -20,6 +19,8 @@ class MapScript implements PageScript {
         await mapService.waitForMapData();
         await mapService.loadMapData();
         mapPage.unlockProMapsInMapSelectorPanel();
+
+        await userService.load();
 
         mapService.fixGoogleMaps();
         await mapPage.addMapgenieScript();
