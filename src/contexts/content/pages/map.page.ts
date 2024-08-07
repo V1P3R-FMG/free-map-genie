@@ -41,7 +41,10 @@ class MapPage {
     }
 
     public async unlockProMapsInMapSelectorPanel() {
-        await this.mapSelectorPanel;
+        let noPanel = false;
+        await this.mapSelectorPanel.catch(() => (noPanel = true));
+
+        if (noPanel) return;
 
         const freeMapUrl = mapService.findFreeMapUrl();
         if (!freeMapUrl) return;
