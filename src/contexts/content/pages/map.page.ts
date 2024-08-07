@@ -32,7 +32,7 @@ class MapPage {
     }
 
     public get mapLinks() {
-        return $<HTMLAnchorElement>(".map-switcher-panel .map-link");
+        return $<HTMLAnchorElement>(".map-switcher-panel .map-link:not(.region-link)");
     }
 
     public async addMapgenieScript() {
@@ -44,9 +44,7 @@ class MapPage {
         await this.mapSelectorPanel;
 
         const freeMapUrl = mapService.findFreeMapUrl();
-        if (!freeMapUrl) {
-            console.warn(`Unable to unlock pro maps in map selector panel, free map url not found.`);
-        }
+        if (!freeMapUrl) return;
 
         for (const link of this.mapLinks) {
             const mapName = mapService.getMapNameFromLabel(link.innerText);
@@ -64,7 +62,7 @@ class MapPage {
             if (!link.href || !link.href.endsWith("/upgrade")) continue;
 
             if (!mapSlug) {
-                console.warn(`Unable to unlock pro map ${link.innerText} in map selector panel slug not found.`);
+                logger.warn(`Unable to unlock pro map ${link.innerText} in map selector panel slug not found.`);
                 continue;
             }
 
