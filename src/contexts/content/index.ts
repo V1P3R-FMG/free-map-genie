@@ -14,12 +14,21 @@ async function initScript() {
                 /* webpackChunkName: "content/login.script" */ "./scripts/login.script"
             );
             await script.initScript();
+            break;
         }
         case "map": {
             const { default: script } = await import(
                 /* webpackChunkName: "content/map.script" */ "./scripts/map.script"
             );
             await script.initScript();
+            break;
+        }
+        case "game-home": {
+            const { default: script } = await import(
+                /* webpackChunkName: "content/game-home.script" */ "./scripts/game-home.script"
+            );
+            await script.initScript();
+            break;
         }
         default:
             return;
