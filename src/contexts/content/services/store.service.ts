@@ -41,6 +41,13 @@ class StoreService {
     public async dispatch<T extends MG.StateActionType>(action: { type: T; meta: MG.MetaForActionType<T> }) {
         this.store.dispatch(action);
     }
+
+    public async updateFoundLocationsCount(count: number) {
+        await this.dispatch({
+            type: "MG:USER:UPDATE_FOUND_LOCATIONS_COUNT",
+            meta: { count },
+        });
+    }
 }
 
 export default new StoreService();

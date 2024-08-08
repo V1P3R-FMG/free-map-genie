@@ -2,6 +2,7 @@ import ApiFilter from "@fmg/filters/api-filter";
 import Key from "@content/storage/key";
 
 import storageService from "@content/services/storage.service";
+import storeService from "@content/services/store.service";
 
 class ApiService {
     public async installFilter() {
@@ -10,6 +11,7 @@ class ApiService {
         filter.registerFilter(["put", "delete"], { path: "locations", hasId: true }, async ({ id, method }) => {
             await storageService.update(Key.fromWindow(window), (data) => {
                 data.locations.toggle(id!, method === "put");
+                storeService.updateFoundLocationsCount(data.locations.size);
             });
             return { block: true };
         });
