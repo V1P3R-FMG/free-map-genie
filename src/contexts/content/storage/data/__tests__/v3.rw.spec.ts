@@ -40,6 +40,10 @@ describe("v3 reader and writer", () => {
                 expect(v3Data.notes[i].color).toEqual(color);
                 expect(v3Data.notes[i].category).toEqual(category);
             });
+
+            //expect(v3Data.settings)
+
+            expect(v3Data.latestUpdate).toBeGreaterThan(0);
         });
     });
 

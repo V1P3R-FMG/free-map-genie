@@ -38,15 +38,16 @@ class StoreService {
         return window.store;
     }
 
-    public async dispatch<T extends MG.StateActionType>(action: { type: T; meta: MG.MetaForActionType<T> }) {
+    public get mapState() {
+        return this.store.getState().map;
+    }
+
+    public dispatch<T extends MG.StateActionType>(action: { type: T; meta: MG.MetaForActionType<T> }) {
         this.store.dispatch(action);
     }
 
-    public async updateFoundLocationsCount(count: number) {
-        await this.dispatch({
-            type: "MG:USER:UPDATE_FOUND_LOCATIONS_COUNT",
-            meta: { count },
-        });
+    public get mapLocationIds() {
+        return this.store.getState().map.locations.map((l) => l.id);
     }
 }
 

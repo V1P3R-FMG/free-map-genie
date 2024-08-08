@@ -3,12 +3,14 @@ import * as array from "@utils/array";
 import { BaseWriter } from "../../util/rw";
 
 import {
-    V3Data,
-    V3PresetData,
-    V3NoteData,
+    type V3Data,
+    type V3PresetData,
+    type V3NoteData,
     type V3DataLayout,
     type V3PresetDataLayout,
     type V3NoteDataLayout,
+    type V3SettingsData,
+    type V3SettingsLayout,
 } from "./index";
 
 export default class V3DataWriter extends BaseWriter<Readonly<V3DataLayout>, V3Data> {
@@ -19,9 +21,11 @@ export default class V3DataWriter extends BaseWriter<Readonly<V3DataLayout>, V3D
             data.visibleCategories.values(),
             this.writePresets(data.presets),
             this.writeNotes(data.notes),
+            this.writeSettings(data.settings),
+            data.latestUpdate,
         ] as const;
 
-        if (array.sumArray(dataLayout.map((arr) => arr.length)) === 0) {
+        if (array.sumArray(dataLayout.map((arr) => (Array.isArray(arr) ? arr.length : 0))) === 0) {
             return null;
         }
 
@@ -52,5 +56,9 @@ export default class V3DataWriter extends BaseWriter<Readonly<V3DataLayout>, V3D
 
     private writeNotes(data: V3NoteData[]): V3NoteDataLayout[] {
         return data.map((n) => this.writeNote(n));
+    }
+
+    private writeSettings(_data: V3SettingsData): V3SettingsLayout {
+        return [];
     }
 }

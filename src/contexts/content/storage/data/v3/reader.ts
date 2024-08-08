@@ -8,13 +8,15 @@ import {
     V3Data,
     V3PresetData,
     V3NoteData,
+    V3SettingsData,
     type V3DataLayout,
     type V3PresetDataLayout,
     type V3NoteDataLayout,
+    type V3SettingsLayout,
 } from "./index";
 
 export default class V3DataReader extends BaseReader<V3DataLayout, V3Data> {
-    public readonly default = "[[],[],[],[],[]]";
+    public readonly default = "[[],[],[],[],[],[],0]";
 
     public read(data: V3DataLayout): V3Data {
         return new V3Data(
@@ -22,7 +24,9 @@ export default class V3DataReader extends BaseReader<V3DataLayout, V3Data> {
             rw.readNumberSet(data[1]),
             rw.readNumberSet(data[2]),
             data[3].map((p) => this.readV3Preset(p)),
-            data[4].map((n) => this.readV3Note(n))
+            data[4].map((n) => this.readV3Note(n)),
+            this.readSettings(data[5]),
+            data[6] === 0 ? Date.now() : data[6]
         );
     }
 
@@ -32,7 +36,9 @@ export default class V3DataReader extends BaseReader<V3DataLayout, V3Data> {
             data.categories,
             data.visibleCategoriesIds,
             data.presets.map((p) => this.readV2Preset(p)),
-            data.notes.map((n) => this.readV2Note(n))
+            data.notes.map((n) => this.readV2Note(n)),
+            V3SettingsData.default,
+            Date.now()
         );
     }
 
@@ -60,5 +66,9 @@ export default class V3DataReader extends BaseReader<V3DataLayout, V3Data> {
             data.color,
             data.category
         );
+    }
+
+    private readSettings(_data: V3SettingsLayout): V3SettingsData {
+        return new V3SettingsData();
     }
 }

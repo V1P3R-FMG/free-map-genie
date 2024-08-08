@@ -6,9 +6,10 @@ import mapPage from "@content/pages/map.page";
 import gamesService from "@content/services/games.service";
 import storeService from "@content/services/store.service";
 import storageService from "@content/services/storage.service";
+import urlService from "./url.service";
 
 import Key from "@content/storage/key";
-import urlService from "./url.service";
+import type { LatestData } from "@content/storage/data/index";
 
 class MapService {
     public fixGoogleMaps() {
@@ -23,15 +24,34 @@ class MapService {
         return script.remove().attr("src")!;
     }
 
-    public async load() {
+    public async load(old?: LatestData) {
         const data = await storageService.load(Key.fromWindow(window));
 
-        for (const id in data.locations) {
-            this.markLocation(Number(id), true);
+        if (old) {
+            for (const id in old.locations) {
+                if (!data.locations.has(id)) this.markLocation(id, false);
+            }
+            for (const id in data.locations) {
+                if (!old.locations.has(id)) this.markLocation(id, true);
+            }
+        } else {
+            for (const location of storeService.mapState.locations) {
+                this.markLocation(location.id, data.locations.has(location.id));
+            }
         }
+        this.updateFoundLocations();
 
-        for (const id in data.categories) {
-            this.trackCategory(Number(id), true);
+        if (old) {
+            for (const id in old.categories) {
+                if (!data.categories.has(id)) this.trackCategory(Number(id), false);
+            }
+            for (const id in data.categories) {
+                if (!old.categories.has(id)) this.trackCategory(Number(id), true);
+            }
+        } else {
+            for (const id of storeService.mapState.categoryIds) {
+                this.trackCategory(Number(id), data.categories.has(id));
+            }
         }
     }
 
@@ -40,8 +60,26 @@ class MapService {
         return window.mapData!;
     }
 
-    public markLocation(id: number, marked: boolean) {
-        window.mapManager?.setLocationFound(id, marked);
+    public get hasCircleLocationMarkers() {
+        if (!window.map) throw "Failed to get info hasCircleLocationMarkers, window.map not found.";
+        return window.map.getSource("circle-locations-data")._data.features.length > 0;
+    }
+
+    public markLocation(id: number | string, marked: boolean) {
+        if (!window.game) throw "Failed to mark location, window.game not found.";
+        if (!window.map) throw "Failed to mark location, window.map not found.";
+
+        window.map.setFeatureState({ source: "locations-data", id }, { found: marked });
+        if (this.hasCircleLocationMarkers)
+            window.map.setFeatureState({ source: "circle-locations-data", id }, { found: marked });
+    }
+
+    public updateFoundLocations() {
+        if (!window.mapManager) throw "Failed to mark location, window.mapManager not found.";
+
+        if (window.mapManager.showFoundLocations) {
+            window.mapManager.updateFoundLocationsStyle();
+        }
     }
 
     public trackCategory(id: number, tracked: boolean) {

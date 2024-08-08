@@ -184,7 +184,7 @@ declare namespace MG.Actions {
 
     declare interface UserStateActionsMap {
         ["MG:USER:INITIALIZE"]: Meta.Initialize;
-        ["MG:USER:MARK_LOCATION"]: Meta.Location & Meta.Found;
+        ["MG:USER:MARK_LOCATION"]: Meta.LocationId & Meta.Found;
         ["MG:USER:MARK_LOCATIONS"]: Meta.LocationIds & Meta.Found;
         ["MG:USER:UPDATE_FOUND_LOCATIONS_COUNT"]: Meta.Count;
         ["MG:USER:UPDATE_CATEGORY_PROGRESS"]: Meta.NoMeta;

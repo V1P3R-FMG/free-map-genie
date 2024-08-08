@@ -1,9 +1,14 @@
 declare namespace MG {
-    declare type MapFeatureState = "locations-data" | "circle-locations-data";
+    declare type MapFeatureSource = "locations-data" | "circle-locations-data";
 
     declare class MapboxglMap {
         //TODO
-        public setFeatureState(feature: { source: MapFeatureState; id: Int }, state: Record<string, any>): void;
+        public setFeatureState(
+            feature: { source: MapFeatureSource; id: number | string },
+            state: Record<string, any>
+        ): void;
+
+        public getSource(sourceId: MapFeatureSource): MapboxGl.Source;
     }
 
     declare class FoundLocationService {
@@ -54,6 +59,14 @@ declare namespace MG {
         public createNote(note: Note): void;
         public openInfoWindow(location: Location): void;
         public autoPanPopup(): void;
+
+        public setMarkerVisible(locationId: number, visible: boolean): void;
+        public setMarkersVisible(locations: MG.Location[], visible: boolean): void;
+        public setMarkersVisibleById(locationIds: number[], visible: boolean): void;
+
+        public hideAllLocationMarkers(): void;
+
+        public updateFoundLocationsStyle(): void;
     }
 
     declare type Alignment = "auto";

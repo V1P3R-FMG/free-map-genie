@@ -42,6 +42,14 @@ class StorageService {
         return this.cache[`${key}`];
     }
 
+    public removeFromCache(key: Key) {
+        delete this.cache[`${key}`];
+    }
+
+    public async has(key: Key) {
+        return this.iframeStorage.has(key);
+    }
+
     public async load(key: Key) {
         if (!this.cache[`${key}`]) {
             await this.migrate(key);
@@ -55,6 +63,7 @@ class StorageService {
             logger.warn("Tried to save data that is not loaded.", key);
             return;
         }
+        this.cache[`${key}`].latestUpdate = Date.now();
         await this.iframeStorage.save(key, this.cache[`${key}`]);
     }
 

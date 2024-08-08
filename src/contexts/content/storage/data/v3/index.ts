@@ -46,10 +46,14 @@ export type V3NoteDataLayout = [
     Nullable<number>,
 ];
 
+export type V3SettingsLayout = [];
+
 /**
  * V3PresetDataLayout = {@link V3PresetDataLayout}
  *
  * V3NoteDataLayout = {@link V3NoteDataLayout}
+ *
+ * V3SettingsLayout = {@link V3SettingsLayout}
  *
  * @example
  * type V3DataLayout = [
@@ -58,6 +62,8 @@ export type V3NoteDataLayout = [
  *  NumberSetLayout,        // data.visibleCategories
  *  V3PresetDataLayout[],   // data.presets
  *  V3NoteDataLayout[],     // data.notes
+ *  V3SettingsLayout,       // data.settings
+ *  number                  // data.lastUpdate
  * ];
  */
 export type V3DataLayout = [
@@ -66,6 +72,8 @@ export type V3DataLayout = [
     NumberSetLayout,
     V3PresetDataLayout[],
     V3NoteDataLayout[],
+    V3SettingsLayout,
+    number,
 ];
 
 export class V3PresetData {
@@ -91,13 +99,23 @@ export class V3NoteData {
     ) {}
 }
 
+export class V3SettingsData {
+    public constructor() {}
+
+    public static get default() {
+        return new V3SettingsData();
+    }
+}
+
 export class V3Data {
     public constructor(
         public readonly locations: IndexableNumberSet,
         public readonly categories: IndexableNumberSet,
         public readonly visibleCategories: IndexableNumberSet,
         public readonly presets: V3PresetData[],
-        public readonly notes: V3NoteData[]
+        public readonly notes: V3NoteData[],
+        public readonly settings: V3SettingsData,
+        public latestUpdate: number
     ) {}
 }
 
