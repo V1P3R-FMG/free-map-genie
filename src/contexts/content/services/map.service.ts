@@ -28,8 +28,6 @@ class MapService {
     public async load(old?: LatestData) {
         const data = await storageService.load(Key.fromWindow(window));
 
-        logger.debug("update", data, old);
-
         for (const [id, marked] of this.iterateDataSet(data.locations, storeService.mapLocationIds, old?.locations)) {
             this.markLocation(id, marked);
         }
