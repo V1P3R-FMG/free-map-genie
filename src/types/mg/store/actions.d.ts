@@ -111,7 +111,7 @@ declare namespace MG.Actions {
         }
 
         declare interface CategoryId {
-            categoryId: number;
+            categoryId: number | string;
         }
 
         declare interface PresetId {

@@ -10,6 +10,7 @@ import urlService from "./url.service";
 
 import Key from "@content/storage/key";
 import type { LatestData } from "@content/storage/data/index";
+import type { IndexableNumberSet } from "@utils/set";
 
 class MapService {
     public fixGoogleMaps() {
@@ -27,31 +28,28 @@ class MapService {
     public async load(old?: LatestData) {
         const data = await storageService.load(Key.fromWindow(window));
 
-        if (old) {
-            for (const id in old.locations) {
-                if (!data.locations.has(id)) this.markLocation(id, false);
-            }
-            for (const id in data.locations) {
-                if (!old.locations.has(id)) this.markLocation(id, true);
-            }
-        } else {
-            for (const location of storeService.mapState.locations) {
-                this.markLocation(location.id, data.locations.has(location.id));
-            }
+        logger.debug("update", data, old);
+
+        for (const [id, marked] of this.iterateDataSet(data.locations, storeService.mapLocationIds, old?.locations)) {
+            this.markLocation(id, marked);
         }
         this.updateFoundLocations();
 
-        if (old) {
-            for (const id in old.categories) {
-                if (!data.categories.has(id)) this.trackCategory(Number(id), false);
-            }
-            for (const id in data.categories) {
-                if (!old.categories.has(id)) this.trackCategory(Number(id), true);
-            }
+        for (const [id, tracked] of this.iterateDataSet(
+            data.categories,
+            storeService.mapState.categoryIds,
+            old?.categories
+        )) {
+            this.trackCategory(id as number, tracked);
+        }
+    }
+
+    private *iterateDataSet(data: IndexableNumberSet, all: number[], oldSet?: IndexableNumberSet) {
+        if (oldSet) {
+            for (const id in oldSet) if (!data.has(id)) yield [id, false] as const;
+            for (const id in data) if (!oldSet.has(id)) yield [id, true] as const;
         } else {
-            for (const id of storeService.mapState.categoryIds) {
-                this.trackCategory(Number(id), data.categories.has(id));
-            }
+            for (const id of all) yield [id, data.has(id)] as const;
         }
     }
 
@@ -82,7 +80,7 @@ class MapService {
         }
     }
 
-    public trackCategory(id: number, tracked: boolean) {
+    public trackCategory(id: number | string, tracked: boolean) {
         storeService.dispatch({
             type: tracked ? "MG:USER:ADD_TRACKED_CATEGORY" : "MG:USER:REMOVE_TRACKED_CATEGORY",
             meta: {
