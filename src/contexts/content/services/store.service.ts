@@ -28,6 +28,13 @@ class StoreService {
         };
     }
 
+    public updateFoundLocationsCount(count: number) {
+        this.dispatch({
+            type: "MG:USER:UPDATE_FOUND_LOCATIONS_COUNT",
+            meta: { count },
+        });
+    }
+
     public async waitForStore() {
         await async.waitForCondition(() => !!window.store, { message: "Wait for window.store took to long." });
         return window.store!;
