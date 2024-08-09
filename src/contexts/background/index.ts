@@ -54,13 +54,13 @@ export function forwardMessage(sender: chrome.runtime.MessageSender, message: Ch
         });
         return true;
     } else {
-        logger.warn("Unable to forward message sender has no tab.id", sender);
+        logging.warn("Unable to forward message sender has no tab.id", sender);
         return false;
     }
 }
 
 export function logMessage(message: ChannelMessage) {
-    logger.debug("[FORWARDED CHANNEL MSG]", ...Channel.formatMessage(message));
+    logging.debug("[FORWARDED CHANNEL MSG]", ...Channel.formatMessage(message));
 }
 
 async function main() {
@@ -82,31 +82,31 @@ async function main() {
                 chrome.storage.session
                     .get("last_mg_url")
                     .then(({ last_mg_url }) => sendResponse(last_mg_url))
-                    .catch(logger.error);
+                    .catch(logging.error);
                 return true;
             }
             case "games": {
-                Games.getGames().then(sendResponse).catch(logger.error);
+                Games.getGames().then(sendResponse).catch(logging.error);
                 return true;
             }
             case "game": {
-                Games.getGame(data.gameId).then(sendResponse).catch(logger.error);
+                Games.getGame(data.gameId).then(sendResponse).catch(logging.error);
                 return true;
             }
             case "map": {
-                Games.getMap(data.mapId).then(sendResponse).catch(logger.error);
+                Games.getMap(data.mapId).then(sendResponse).catch(logging.error);
                 return true;
             }
             case "heatmaps": {
-                Games.getHeatmaps(data.mapId).then(sendResponse).catch(logger.error);
+                Games.getHeatmaps(data.mapId).then(sendResponse).catch(logging.error);
                 return true;
             }
             case "games:find:game": {
-                Games.findGame(data.gameId).then(sendResponse).catch(logger.error);
+                Games.findGame(data.gameId).then(sendResponse).catch(logging.error);
                 return true;
             }
             case "games:find:map": {
-                Games.findMap(data.gameId, data.mapId).then(sendResponse).catch(logger.error);
+                Games.findMap(data.gameId, data.mapId).then(sendResponse).catch(logging.error);
                 return true;
             }
             default:

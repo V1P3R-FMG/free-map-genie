@@ -102,7 +102,7 @@ class MapService {
             }
         }
         if (lockedMaps > 0) {
-            logger.warn("No free maps found could not unlock maps in map switcher panel");
+            logging.warn("No free maps found could not unlock maps in map switcher panel");
         }
         return null;
     }
@@ -141,13 +141,13 @@ class MapService {
                     window.mapData.mapConfig.tile_sets = mapData.config.tile_sets;
                     window.mapData.proCategoryLocationCounts = [];
                 } else {
-                    logger.warn("Failed to load pro map data, window.game not found.");
+                    logging.warn("Failed to load pro map data, window.game not found.");
                 }
             }
 
             window.mapData.maxMarkedLocations = Infinity;
         } else {
-            logger.warn("Failed to modify mapData, window.mapData not found.");
+            logging.warn("Failed to modify mapData, window.mapData not found.");
         }
     }
 }

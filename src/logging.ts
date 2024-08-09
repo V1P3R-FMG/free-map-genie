@@ -219,7 +219,7 @@ export class Logger {
     }
 }
 
-const logger = new Logger("FMG");
+const logging = new Logger("FMG");
 // const winConsole = new Logger();
 
 // // Overwrite console method with logger methods.
@@ -230,4 +230,4 @@ const logger = new Logger("FMG");
 //     }
 // });
 
-export default logger;
+export default logging;

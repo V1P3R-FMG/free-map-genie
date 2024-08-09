@@ -11,15 +11,15 @@ async function runContext(context: RunContext): Promise<any> {
 export default async function runContexts(name: string, ...contexts: RunContext[]): Promise<boolean> {
     let success = true;
     await Promise.all(contexts.map(runContext))
-        .then(() => logger.log(`FMG ${name} context initialized.`))
+        .then(() => logging.log(`FMG ${name} context initialized.`))
         .catch((e) => {
             success = false;
             if (e instanceof ChannelRequestError) {
-                logger.error(`Failed to initialize ${name} context reason,`, e.message, "Data", e.data, "\n", e.stack);
+                logging.error(`Failed to initialize ${name} context reason,`, e.message, "Data", e.data, "\n", e.stack);
             } else if (e instanceof Error) {
-                logger.error(`Failed to initialize ${name} context reason,`, e.message, e.stack);
+                logging.error(`Failed to initialize ${name} context reason,`, e.message, e.stack);
             } else {
-                logger.error(`Failed to initialize ${name} context reason,`, e);
+                logging.error(`Failed to initialize ${name} context reason,`, e);
             }
             if (__DEBUG__) debugger;
         });

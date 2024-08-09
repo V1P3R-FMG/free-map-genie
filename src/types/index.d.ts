@@ -14,4 +14,4 @@ declare var __MAX_BACKUPS_COUNT__: number;
 declare var __GLOBAL__API__: string;
 /* eslint-enable no-var */
 
-declare let logger: InstanceType<typeof import("../logger").Logger>;
+declare let logging: InstanceType<typeof import("../logging").Logger>;

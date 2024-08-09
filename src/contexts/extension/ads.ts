@@ -80,7 +80,7 @@ export default class AdBlocker {
         if (this.autoStop && this.totalAdsRemoveLastCoupleTicks.every((x) => x !== undefined)) {
             const ms = this.REMOVE_CHECK_INTERVAL * this.totalAdsRemoveLastCoupleTicks.length;
             const seconds = ms / 1000;
-            logger.debug(`AdBlocker stopped no more ads removed in the last ${seconds} seconds.`);
+            logging.debug(`AdBlocker stopped no more ads removed in the last ${seconds} seconds.`);
             this.stop();
         }
     }
@@ -109,7 +109,7 @@ export default class AdBlocker {
         if (!__DEBUG__) throw "This should be removed for release builds.";
 
         await waitForCondition(() => !!this.removePrivacyPopupElement()).catch(() =>
-            logger.debug("Privacy popup not visible.")
+            logging.debug("Privacy popup not visible.")
         );
     }
 }

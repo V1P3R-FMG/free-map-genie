@@ -210,7 +210,7 @@ export default class Channel<Send = any> {
                 chrome.runtime.sendMessage({ type: "channel", data: message });
                 break;
             default:
-                logger.error("ChannelType", this.channelType, "has no postMessage implemented.");
+                logging.error("ChannelType", this.channelType, "has no postMessage implemented.");
                 break;
         }
     }
@@ -224,7 +224,7 @@ export default class Channel<Send = any> {
                 chrome.runtime.onMessage.addListener(handler);
                 break;
             default:
-                logger.error("ChannelType", this.channelType, "has no postMessage implemented.");
+                logging.error("ChannelType", this.channelType, "has no postMessage implemented.");
                 break;
         }
     }
@@ -238,7 +238,7 @@ export default class Channel<Send = any> {
                 chrome.runtime.onMessage.removeListener(handler);
                 break;
             default:
-                logger.error("ChannelType", this.channelType, "has no postMessage implemented.");
+                logging.error("ChannelType", this.channelType, "has no postMessage implemented.");
                 break;
         }
     }
@@ -463,7 +463,7 @@ export default class Channel<Send = any> {
             if (!this.isMessageForMe(message)) return;
 
             if (!this.checkOrigin(e)) {
-                logger.warn("Ignoring message because the origin was not allowed", ...Channel.formatMessage(e.data));
+                logging.warn("Ignoring message because the origin was not allowed", ...Channel.formatMessage(e.data));
                 return;
             }
 
@@ -480,7 +480,7 @@ export default class Channel<Send = any> {
                     this.handleSendMessage(message);
                     break;
                 default:
-                    logger.warn("Unknown Message Type", message);
+                    logging.warn("Unknown Message Type", message);
                     break;
             }
         };
@@ -491,11 +491,11 @@ export default class Channel<Send = any> {
         const handler = this.responseHandlers[message.messageId];
         if (handler!) {
             if (!handler(message)) {
-                logger.warn("Invalid response", message, handler);
+                logging.warn("Invalid response", message, handler);
             }
             delete this.responseHandlers[message.messageId];
         } else {
-            logger.warn("No handler for response", message, this.responseHandlers, this);
+            logging.warn("No handler for response", message, this.responseHandlers, this);
         }
     }
 

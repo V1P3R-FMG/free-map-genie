@@ -31,7 +31,7 @@ export type MessageScheme = s.Type<typeof messageScheme>;
 async function main() {
     const origin = new URLSearchParams(window.location.search).get("origin");
 
-    logger.debug("Localstorage script is loaded by origin:", origin);
+    logging.debug("Localstorage script is loaded by origin:", origin);
 
     const channel = Channel.extension(Channels.Mapgenie, (message, sendResponse) => {
         const { type, data } = messageScheme.parse(message);

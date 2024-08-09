@@ -60,7 +60,7 @@ class StorageService {
 
     public async save(key: Key) {
         if (!this.cache[`${key}`]) {
-            logger.warn("Tried to save data that is not loaded.", key);
+            logging.warn("Tried to save data that is not loaded.", key);
             return;
         }
         this.cache[`${key}`].latestUpdate = Date.now();
@@ -99,7 +99,7 @@ class StorageService {
                 const data = this.loadFromCache(Key.fromWindow(window));
                 if (data) {
                     data.visibleCategories.add(categoryId!);
-                    this.save(Key.fromWindow(window)).catch(logger.error);
+                    this.save(Key.fromWindow(window)).catch(logging.error);
                 }
             }
         );
@@ -112,7 +112,7 @@ class StorageService {
                 const data = this.loadFromCache(Key.fromWindow(window));
                 if (data) {
                     data.visibleCategories.delete(categoryId!);
-                    this.save(Key.fromWindow(window)).catch(logger.error);
+                    this.save(Key.fromWindow(window)).catch(logging.error);
                 }
             }
         );

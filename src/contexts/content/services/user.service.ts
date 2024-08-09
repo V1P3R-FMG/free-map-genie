@@ -52,7 +52,7 @@ class UserService {
         if (this.isMockUserActive()) {
             await async.waitForCondition(() => window.user !== undefined);
             window.user = this.createMockUser();
-            logger.debug("Loaded mocked user");
+            logging.debug("Loaded mocked user");
             return true;
         }
 

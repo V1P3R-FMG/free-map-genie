@@ -9,7 +9,7 @@ const messageScheme = s.object({
 });
 
 function createFrame(): HTMLIFrameElement {
-    logger.debug("Create Frame", document.body);
+    logging.debug("Create Frame", document.body);
     return $<HTMLIFrameElement>("<iframe/>")
         .attr({
             "id": "mapgenie-storage",

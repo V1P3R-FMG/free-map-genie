@@ -3,7 +3,7 @@ global.__MAX_BACKUPS_COUNT__ = 10;
 global.__CACHE_MAX_AGE__ = 30 * 60 * 1000;
 
 import { TestEnvironment } from "jest-environment-node";
-import { Logger } from "../../src/logger";
+import { Logger } from "../../src/logging";
 
 import fsService, { type FsService } from "./services/fs.service";
 import jsonService, { type JsonService } from "./services/json.service";
@@ -21,7 +21,7 @@ export default class FMGTestEnvironment extends TestEnvironment {
     async setup() {
         await super.setup();
 
-        this.global.logger = new Logger();
+        this.global.logging = new Logger();
         this.global.fsService = fsService;
         this.global.jsonService = jsonService;
 
