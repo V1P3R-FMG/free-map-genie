@@ -82,31 +82,31 @@ async function main() {
                 chrome.storage.session
                     .get("last_mg_url")
                     .then(({ last_mg_url }) => sendResponse(last_mg_url))
-                    .catch(console.error);
+                    .catch(logger.error);
                 return true;
             }
             case "games": {
-                Games.getGames().then(sendResponse).catch(console.error);
+                Games.getGames().then(sendResponse).catch(logger.error);
                 return true;
             }
             case "game": {
-                Games.getGame(data.gameId).then(sendResponse).catch(console.error);
+                Games.getGame(data.gameId).then(sendResponse).catch(logger.error);
                 return true;
             }
             case "map": {
-                Games.getMap(data.mapId).then(sendResponse).catch(console.error);
+                Games.getMap(data.mapId).then(sendResponse).catch(logger.error);
                 return true;
             }
             case "heatmaps": {
-                Games.getHeatmaps(data.mapId).then(sendResponse).catch(console.error);
+                Games.getHeatmaps(data.mapId).then(sendResponse).catch(logger.error);
                 return true;
             }
             case "games:find:game": {
-                Games.findGame(data.gameId).then(sendResponse).catch(console.error);
+                Games.findGame(data.gameId).then(sendResponse).catch(logger.error);
                 return true;
             }
             case "games:find:map": {
-                Games.findMap(data.gameId, data.mapId).then(sendResponse).catch(console.error);
+                Games.findMap(data.gameId, data.mapId).then(sendResponse).catch(logger.error);
                 return true;
             }
             default:

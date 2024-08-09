@@ -18,7 +18,7 @@ class GameHomeService {
     public async getMapFromName(name: string) {
         const game = await this.getGameFromTitle();
         if (!game) {
-            console.warn("Failed to unlock pro maps, game not found from document.title.");
+            logger.warn("Failed to unlock pro maps, game not found from document.title.");
             return null;
         }
         return game.maps.find((map) => map.title === name);
@@ -50,7 +50,7 @@ class GameHomeService {
 
                 const map = await this.getMapFromName(mapName);
                 if (!map) {
-                    console.warn(`Failed to unlock pro map ${label}, map not found.`);
+                    logger.warn(`Failed to unlock pro map ${label}, map not found.`);
                     return;
                 }
 
