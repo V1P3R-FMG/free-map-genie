@@ -31,10 +31,11 @@ class UI {
     private mountControlPanel(props?: ComponentProps<typeof ControlPanel>) {
         const $container = $("<div>")
             .css({
-                position: "absolute",
-                top: 0,
-                bottom: 0,
-                width: "404px",
+                "pointer-events": "none",
+                "position": "absolute",
+                "top": 0,
+                "bottom": 0,
+                "width": "404px",
             })
             .appendTo("#app");
         return this.mount($container[0], ControlPanel, props);

@@ -26,6 +26,7 @@ defineExpose({ show, hide, toggle });
 
 <style lang="css" scoped>
 #fmg-control-panel {
+    pointer-events: auto;
     padding: 16px;
     height: 100%;
     position: relative;
