@@ -9,6 +9,9 @@ import mapPage from "@content/pages/map.page";
 
 import Key from "@content/storage/key";
 
+import ui from "@content/ui/map.ui";
+import assetsChannel from "@content/channels/assets.channel";
+
 class MapScript implements PageScript {
     public async initScript() {
         await userService.login();
@@ -18,7 +21,7 @@ class MapScript implements PageScript {
             window.config.presetsEnabled = true;
             window.config.iconSizeToggleEnabled = true;
         } else {
-            logger.warn("Failed to modify mapConfig window.config not found.");
+            logging.warn("Failed to modify mapConfig window.config not found.");
         }
 
         await storageService.installFilter();
@@ -38,6 +41,9 @@ class MapScript implements PageScript {
         }
 
         await mapPage.initButtons();
+
+        await assetsChannel.injectStyle("css/content/map.script.css");
+        await ui.attach();
 
         pageService.onreload = async () => {
             const key = Key.fromWindow(window);

@@ -19,3 +19,15 @@ export function injectScript(src: string, query?: Record<string, string>) {
 export function injectExtensionScript(path: string, query?: Record<string, string>) {
     return injectScript(chrome.runtime.getURL(path), query);
 }
+
+export function injectStyle(href: string) {
+    return new Promise<void>(async (resolve) => {
+        const link = document.createElement("link");
+        link.rel = "stylesheet";
+        link.type = "text/css";
+        link.href = href;
+        const head = await waitForHead(document);
+        head.appendChild(link);
+        resolve();
+    });
+}

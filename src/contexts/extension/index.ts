@@ -1,10 +1,10 @@
 import Channel, { ResponseType } from "@shared/channel";
 import { Channels } from "@constants";
 import runContexts from "@shared/run";
-import { injectExtensionScript } from "@shared/inject";
+import { injectExtensionScript, injectStyle } from "@shared/inject";
 import * as s from "@shared/schema";
 
-const messageScheme = s.object({
+const forwardedMessagesScheme = s.object({
     type: s.union([
         s.literal("games"),
         s.literal("games:find:game"),
@@ -18,13 +18,28 @@ const messageScheme = s.object({
     data: s.any(),
 });
 
+const extensionMessageScheme = s.union([
+    s.object({
+        type: s.literal("asset"),
+        data: s.string(),
+    }),
+    s.object({
+        type: s.literal("inject:style"),
+        data: s.string(),
+    }),
+]);
+
+const messageScheme = s.union([forwardedMessagesScheme, extensionMessageScheme]);
+
+export type MessageScheme = s.Type<typeof extensionMessageScheme>;
+
 import AdBlocker from "./ads";
 import initStorage, { get, set } from "./storage";
 
 // const MESSAGE_SCHEME = validation.validator({ type: "string", data: "any" });
 
 async function main() {
-    // AdBlocker.onTick(logger.debug.bind("FMG AdBlocker stats:"));
+    // AdBlocker.onTick(logging.debug.bind("FMG AdBlocker stats:"));
     AdBlocker.start();
     AdBlocker.removePrivacyPopup();
 
@@ -58,6 +73,12 @@ async function main() {
                     window.location.href = "https://mapgenie.io";
                 });
                 return ResponseType.Handled;
+            case "asset":
+                sendResponse(chrome.runtime.getURL(["assets", data.replace(/^\//, "")].join("/")));
+                return ResponseType.Handled;
+            case "inject:style":
+                injectStyle(chrome.runtime.getURL(data)).then(sendResponse).catch(logging.error);
+                return ResponseType.Pending;
             default:
                 return ResponseType.NotHandled;
         }
@@ -67,7 +88,7 @@ async function main() {
 
     await set("hello", "world");
 
-    logger.debug("Mapgenie Iframe Send data for key 'hello'", await get("hello"));
+    logging.debug("Mapgenie Iframe Send data for key 'hello'", await get("hello"));
 }
 
 runContexts("extension", initStorage, main);

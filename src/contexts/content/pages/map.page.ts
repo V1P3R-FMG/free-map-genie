@@ -35,6 +35,10 @@ class MapPage {
         return $<HTMLAnchorElement>(".map-switcher-panel .map-link:not(.region-link)");
     }
 
+    public get app() {
+        return $waitFor<HTMLDivElement>("#app");
+    }
+
     public async addMapgenieScript() {
         const src = await mapService.getMapSrc();
         $("<script/>").attr("src", src.replace("id=", "ready&id=")).appendTo(document.body);
@@ -65,7 +69,7 @@ class MapPage {
             if (!link.href || !link.href.endsWith("/upgrade")) continue;
 
             if (!mapSlug) {
-                logger.warn(`Unable to unlock pro map ${link.innerText} in map selector panel slug not found.`);
+                logging.warn(`Unable to unlock pro map ${link.innerText} in map selector panel slug not found.`);
                 continue;
             }
 
