@@ -1,4 +1,4 @@
-import FmgWindow from "@fmg/window";
+import FmgWindow from "@shared/fmg-window";
 
 export const ApiFiltered = Symbol("ApiFiltered");
 

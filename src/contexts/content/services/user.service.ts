@@ -1,7 +1,7 @@
 import * as async from "@utils/async";
 
 import { FmgMockedUserKey } from "@constants";
-import { getPageType } from "@fmg/page";
+import { getPageType } from "@utils/fmg-page";
 
 import Key from "@content/storage/key";
 

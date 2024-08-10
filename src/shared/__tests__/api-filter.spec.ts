@@ -1,9 +1,4 @@
-import ApiFilter, {
-    ApiFiltered,
-    AxiosMethods,
-    type AxiosMethod,
-    type ApiFilterCallInfo,
-} from "@fmg/filters/api-filter";
+import ApiFilter, { ApiFiltered, AxiosMethods, type AxiosMethod, type ApiFilterCallInfo } from "@shared/api-filter";
 
 import * as array from "@utils/array";
 

@@ -1,5 +1,5 @@
 import runContexts from "@shared/run";
-import { waitForPageType } from "@fmg/page";
+import { waitForPageType } from "@utils/fmg-page";
 
 import gamesChannel from "@content/channels/games.channel";
 

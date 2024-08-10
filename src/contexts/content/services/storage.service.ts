@@ -1,6 +1,6 @@
 import DataManager, { type LatestData } from "@content/storage/data/index";
 
-import StorageFilter from "@fmg/filters/storage-filter";
+import StorageFilter from "@shared//storage-filter";
 
 import WindowStorageDriver from "@content/storage/drivers/window.driver";
 import IframeStorageDriver from "@content/storage/drivers/iframe.driver";

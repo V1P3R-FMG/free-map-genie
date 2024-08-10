@@ -1,4 +1,4 @@
-import ApiFilter from "@fmg/filters/api-filter";
+import ApiFilter from "@shared/api-filter";
 import Key from "@content/storage/key";
 
 import storageService from "@content/services/storage.service";

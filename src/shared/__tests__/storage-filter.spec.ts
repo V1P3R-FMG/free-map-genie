@@ -1,4 +1,4 @@
-import StorageFilter, { type StorageFilterCallback } from "@fmg/filters/storage-filter";
+import StorageFilter, { type StorageFilterCallback } from "@shared/storage-filter";
 
 function createWindow(): any {
     let storage: Record<string, string> = {};

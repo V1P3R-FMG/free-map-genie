@@ -14,7 +14,6 @@
             "@constants": ["constants.ts"],
             "@utils/*": ["utils/*"],
             "@shared/*": ["shared/*"],
-            "@fmg/*": ["fmg/*"],
             "@content/*": ["contexts/content/*"],
             "@extension/*": ["contexts/extension/*"],
             "@iframe/*": ["contexts/iframe/*"],
