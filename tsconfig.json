@@ -19,7 +19,8 @@
             "@extension/*": ["contexts/extension/*"],
             "@iframe/*": ["contexts/iframe/*"],
             "@background/*": ["contexts/background/*"],
-            "@assets/*": ["assets"]
+            "@assets/*": ["assets/*"],
+            "@ui/*": ["ui/*"]
         }
     },
     "include": ["src"],

@@ -1,5 +1,12 @@
 {
     "manifest_version": 3,
+    "icons": {
+        "128": "./assets/icons/128.png"
+    },
+    "action": {
+        "default_popup": "popup/index.html",
+        "default_title": "FMG Control Panel"
+    },
     "permissions": ["declarativeNetRequest", "storage"],
     "host_permissions": ["https://mapgenie.io/", "https://cdn.mapgenie.io/"],
     "content_scripts": [

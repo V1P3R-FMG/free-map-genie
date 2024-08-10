@@ -1,6 +1,6 @@
 <script lang="ts" setup>
-import MapControl from "./components/map-control.vue";
-import FmgImage from "./components/fmg-image.vue";
+import MapControl from "@ui/components/content/map-control.vue";
+import FmgImage from "@ui/components/content/fmg-image.vue";
 
 defineEmits<{
     click: [];

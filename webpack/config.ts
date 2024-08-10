@@ -7,6 +7,7 @@ import getBuildInfo from "./buildInfo.js";
 import WebExtManifestPlugin from "./plugins/web-ext-manifest.js";
 import FantasticonPlugin from "./plugins/fantasticon.js";
 
+import HtmlPlugin from "html-webpack-plugin";
 import CopyPlugin from "copy-webpack-plugin";
 import TerserPlugin from "terser-webpack-plugin";
 import MiniCssExtractPlugin from "mini-css-extract-plugin";
@@ -27,10 +28,11 @@ export default async function getConfig(): Promise<webpack.Configuration> {
 
     return {
         entry: {
-            extension: "./src/contexts/extension/index.ts",
-            background: "./src/contexts/background/index.ts",
-            content: "./src/contexts/content/index.ts",
-            iframe: "./src/contexts/iframe/index.ts",
+            "extension": "./src/contexts/extension/index.ts",
+            "background": "./src/contexts/background/index.ts",
+            "content": "./src/contexts/content/index.ts",
+            "iframe": "./src/contexts/iframe/index.ts",
+            "popup/index": "./src/popup/index.ts",
         },
         output: { path: buildInfo.out },
         resolve: {
@@ -52,6 +54,7 @@ export default async function getConfig(): Promise<webpack.Configuration> {
                     test: /\.ts$/,
                     exclude: /(node_modules)/,
                     use: [
+                        "import-glob",
                         "gnirts-loader",
                         path.resolve(__dirname, "loaders", "inject-globals.js"),
                         {
@@ -104,6 +107,11 @@ export default async function getConfig(): Promise<webpack.Configuration> {
                         json: "./misc/icon-codepoints.json",
                     },
                 },
+            }),
+            new HtmlPlugin({
+                chunks: ["popup/index"],
+                filename: "popup/index.html",
+                template: "./src/popup/index.html",
             }),
             new MiniCssExtractPlugin({
                 filename: "css/[name].css",
