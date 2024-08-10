@@ -18,7 +18,8 @@
             "@content/*": ["contexts/content/*"],
             "@extension/*": ["contexts/extension/*"],
             "@iframe/*": ["contexts/iframe/*"],
-            "@background/*": ["contexts/background/*"]
+            "@background/*": ["contexts/background/*"],
+            "@assets/*": ["assets"]
         }
     },
     "include": ["src"],

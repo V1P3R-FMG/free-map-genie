@@ -45,6 +45,7 @@
         "eslint-plugin-prettier": "^5.2.1",
         "eslint-plugin-vue": "^9.27.0",
         "express": "^4.19.2",
+        "fantasticon": "^3.0.0",
         "generate-file-webpack-plugin": "^1.0.1",
         "globals": "^15.8.0",
         "gnirts": "^1.1.7",

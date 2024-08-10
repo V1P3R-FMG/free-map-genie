@@ -1,14 +1,16 @@
 import path from "node:path";
 import webpack from "webpack";
+import { FontAssetType, ASSET_TYPES } from "fantasticon";
 import "dotenv/config";
 
 import getBuildInfo from "./buildInfo.js";
 import WebExtManifestPlugin from "./plugins/web-ext-manifest.js";
+import FantasticonPlugin from "./plugins/fantasticon.js";
 
-import { TsconfigPathsPlugin } from "tsconfig-paths-webpack-plugin";
 import CopyPlugin from "copy-webpack-plugin";
 import TerserPlugin from "terser-webpack-plugin";
 import MiniCssExtractPlugin from "mini-css-extract-plugin";
+import { TsconfigPathsPlugin } from "tsconfig-paths-webpack-plugin";
 import { VueLoaderPlugin } from "vue-loader";
 
 const { ProvidePlugin, DefinePlugin } = webpack;
@@ -85,6 +87,24 @@ export default async function getConfig(): Promise<webpack.Configuration> {
             ],
         },
         plugins: [
+            new FantasticonPlugin({
+                config: {
+                    name: "fmg-font",
+                    prefix: "fmg-icon",
+                    tag: "i",
+                    inputDir: "./icons",
+                    outputDir: "[dist]/assets/font",
+                    fontTypes: [FontAssetType.TTF, FontAssetType.WOFF, FontAssetType.WOFF2],
+                    assetTypes: [ASSET_TYPES.CSS],
+                    formatOptions: {
+                        json: { indent: 2 },
+                    },
+                    pathOptions: {
+                        ts: "./src/types/icon-types.ts",
+                        json: "./misc/icon-codepoints.json",
+                    },
+                },
+            }),
             new MiniCssExtractPlugin({
                 filename: "css/[name].css",
             }),
