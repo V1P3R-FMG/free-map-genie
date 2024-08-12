@@ -14,6 +14,11 @@ const forwardedMessagesScheme = s.object({
         s.literal("heatmaps"),
         s.literal("start:login"),
         s.literal("login"),
+        s.literal("has"),
+        s.literal("get"),
+        s.literal("set"),
+        s.literal("remove"),
+        s.literal("keys"),
     ]),
     data: s.any(),
 });
@@ -34,7 +39,6 @@ const messageScheme = s.union([forwardedMessagesScheme, extensionMessageScheme])
 export type MessageScheme = s.Type<typeof extensionMessageScheme>;
 
 import AdBlocker from "./ads";
-import initStorage, { get, set } from "./storage";
 
 // const MESSAGE_SCHEME = validation.validator({ type: "string", data: "any" });
 
@@ -43,8 +47,10 @@ async function main() {
     AdBlocker.start();
     AdBlocker.removePrivacyPopup();
 
+    const channel = Channel.extension(Channels.Extension);
     const _ = Channel.window(Channels.Extension, (e, sendResponse, sendError) => {
-        const { type, data } = messageScheme.parse(e);
+        const message = messageScheme.parse(e);
+        const { type, data } = message;
 
         switch (type) {
             case "games":
@@ -74,10 +80,19 @@ async function main() {
                 });
                 return ResponseType.Handled;
             case "asset":
-                sendResponse(chrome.runtime.getURL(["assets", data.replace(/^\//, "")].join("/")));
+                const path = data.replace(/^\//, "");
+                const url = ["assets", path].join("/");
+                sendResponse(chrome.runtime.getURL(url));
                 return ResponseType.Handled;
             case "inject:style":
-                injectStyle(chrome.runtime.getURL(data)).then(sendResponse).catch(logging.error);
+                injectStyle(chrome.runtime.getURL(data)).then(sendResponse).catch(sendError);
+                return ResponseType.Pending;
+            case "has":
+            case "get":
+            case "set":
+            case "remove":
+            case "keys":
+                channel.send(Channels.Mapgenie, message).then(sendResponse).catch(sendError);
                 return ResponseType.Pending;
             default:
                 return ResponseType.NotHandled;
@@ -85,10 +100,6 @@ async function main() {
     });
 
     injectExtensionScript("content.js");
-
-    await set("hello", "world");
-
-    logging.debug("Mapgenie Iframe Send data for key 'hello'", await get("hello"));
 }
 
-runContexts("extension", initStorage, main);
+runContexts("extension", main);

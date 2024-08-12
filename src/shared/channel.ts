@@ -14,7 +14,7 @@ export type Handler = (
     sendError: SendCallback
 ) => Promise<ResponseType> | ResponseType;
 
-export type ChannelType = "window" | "extension";
+export type ChannelType = "window" | "extension" | "port";
 
 export type ChannelMessageType = "ping" | "pong" | "send" | "response::success" | "response::failed";
 
@@ -35,11 +35,14 @@ export interface ChannelMessage {
     data?: any;
 
     source: string[];
+
+    tabId?: number;
 }
 
 export interface EventMessage<T = any> {
     origin?: string;
     data?: T;
+    tabId?: number;
 }
 
 export interface PostOptions {
@@ -47,6 +50,7 @@ export interface PostOptions {
     messageId?: Id;
     target?: string;
     data?: any;
+    tabId?: number;
 }
 
 export interface PostWithResponseOptions extends Omit<PostOptions, "messageId"> {
@@ -92,6 +96,7 @@ const ToStringPrototype = {
 export default class Channel<Send = any> {
     private static readonly extensionChannels: Record<string, Channel> = {};
     private static readonly windowChannels: Record<string, Channel> = {};
+    private static readonly portChannels: Record<string, Channel> = {};
 
     public static readonly RETRY_INTERVAL = 1000;
     public static readonly VALID_MESSAGE_KEYS = ["type", "origin", "sender", "messageId"];
@@ -106,6 +111,8 @@ export default class Channel<Send = any> {
     private readonly handlers: Handler[];
     private readonly responseHandlers: Record<Id, ResponseHandler>;
 
+    private readonly port?: chrome.runtime.Port;
+
     private constructor(channelType: ChannelType, name: string) {
         this.channelType = channelType;
         this.id = crypto.randomUUID();
@@ -115,6 +122,10 @@ export default class Channel<Send = any> {
         this.activeChannels = {};
         this.handlers = [];
         this.responseHandlers = {};
+
+        if (channelType === "port") {
+            this.port = chrome.runtime.connect({ name: this.name });
+        }
 
         this.allowOrigin("self");
 
@@ -139,6 +150,17 @@ export default class Channel<Send = any> {
      */
     public static window<Send>(name: string, handler?: Handler): Channel<Send> {
         const channel = (this.windowChannels[name] ??= new this<Send>("window", name));
+        if (handler) channel.addHandler(handler);
+        return channel;
+    }
+
+    /**
+     * Create a channel via extension port
+     * @param name the name of the channel
+     * @param handler the handler to handle sended messages with
+     */
+    public static port<Send>(name: string, handler?: Handler): Channel<Send> {
+        const channel = (this.portChannels[name] ??= new this<Send>("port", name));
         if (handler) channel.addHandler(handler);
         return channel;
     }
@@ -209,6 +231,10 @@ export default class Channel<Send = any> {
             case "extension":
                 chrome.runtime.sendMessage({ type: "channel", data: message });
                 break;
+            case "port":
+                if (!this.port) throw "Failed to post message on port, port is not defined";
+                this.port.postMessage({ type: "channel", data: message });
+                break;
             default:
                 logging.error("ChannelType", this.channelType, "has no postMessage implemented.");
                 break;
@@ -222,6 +248,10 @@ export default class Channel<Send = any> {
                 break;
             case "extension":
                 chrome.runtime.onMessage.addListener(handler);
+                break;
+            case "port":
+                if (!this.port) throw "Failed to add listener on port, port is not defined";
+                this.port.onMessage.addListener(handler);
                 break;
             default:
                 logging.error("ChannelType", this.channelType, "has no postMessage implemented.");
@@ -237,6 +267,9 @@ export default class Channel<Send = any> {
             case "extension":
                 chrome.runtime.onMessage.removeListener(handler);
                 break;
+            case "port":
+                if (!this.port) throw "Failed to disconnect port, port is not defined";
+                this.port.disconnect();
             default:
                 logging.error("ChannelType", this.channelType, "has no postMessage implemented.");
                 break;
@@ -336,13 +369,14 @@ export default class Channel<Send = any> {
      * @param message the message to send
      * @param options the options to create the message with
      */
-    private post({ type, data, target, messageId }: PostOptions) {
+    private post({ type, data, target, messageId, tabId }: PostOptions) {
         this.postMessage(
             this.createMessage({
                 type,
                 target,
                 data,
                 messageId: messageId ?? this.generateMessageId(),
+                tabId,
             })
         );
     }
@@ -353,13 +387,14 @@ export default class Channel<Send = any> {
      * @param type the type for the response
      * @param data the data for the response
      */
-    private respond(message: ChannelMessage, type: ChannelMessageType, data: any) {
+    private respond(message: ChannelMessage, type: ChannelMessageType, data: any, tabId?: number) {
         if (__DEBUG__ && type === "response::failed") debugger;
         this.post({
             type,
             target: message.sender,
             messageId: message.messageId,
             data,
+            tabId,
         });
     }
 
@@ -403,14 +438,17 @@ export default class Channel<Send = any> {
      * @param e the message to extract the origin from
      */
     private checkOrigin(e: EventMessage): boolean {
-        return e.origin ? this.allowedOrigins.has(e.origin) : true;
+        if (this.channelType === "window") {
+            return e.origin ? this.allowedOrigins.has(e.origin) : true;
+        }
+        return true;
     }
 
     /**
      * Runs the provided handler provider when constructing
      * @param message the message to handle
      */
-    private async runHandler(message: ChannelMessage): Promise<boolean> {
+    private async runHandler(message: ChannelMessage, tabId?: number): Promise<boolean> {
         const errors: unknown[] = [];
 
         for (const handler of this.handlers) {
@@ -423,12 +461,12 @@ export default class Channel<Send = any> {
                     (data) => {
                         if (!canResponse || hasResponded) throw "Response already sended.";
                         hasResponded = true;
-                        this.respond(message, "response::success", data);
+                        this.respond(message, "response::success", data, tabId);
                     },
                     (err) => {
                         if (!canResponse || hasResponded) throw "Response already sended.";
                         hasResponded = true;
-                        this.respond(message, "response::failed", err);
+                        this.respond(message, "response::failed", err, tabId);
                     }
                 );
 
@@ -443,7 +481,7 @@ export default class Channel<Send = any> {
         }
 
         if (errors.length > 0) {
-            this.respond(message, "response::failed", errors);
+            this.respond(message, "response::failed", errors, tabId);
             return true;
         }
 
@@ -469,7 +507,7 @@ export default class Channel<Send = any> {
 
             switch (message.type) {
                 case "ping":
-                    this.respond(message, "pong", undefined);
+                    this.respond(message, "pong", undefined, e.tabId);
                     break;
                 case "pong":
                 case "response::success":
@@ -477,7 +515,7 @@ export default class Channel<Send = any> {
                     this.handleResponseMessage(message);
                     break;
                 case "send":
-                    this.handleSendMessage(message);
+                    this.handleSendMessage(message, e.tabId);
                     break;
                 default:
                     logging.warn("Unknown Message Type", message);
@@ -500,15 +538,15 @@ export default class Channel<Send = any> {
     }
 
     /** Handle send messages */
-    private async handleSendMessage(message: ChannelMessage) {
+    private async handleSendMessage(message: ChannelMessage, tabId?: number) {
         try {
-            const willRespond = await this.runHandler(message);
+            const willRespond = await this.runHandler(message, tabId);
 
             if (willRespond) return;
 
-            this.respond(message, "response::success", void 0);
+            this.respond(message, "response::success", void 0, tabId);
         } catch (e) {
-            this.respond(message, "response::failed", e);
+            this.respond(message, "response::failed", e, tabId);
         }
     }
 

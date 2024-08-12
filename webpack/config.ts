@@ -31,7 +31,8 @@ export default async function getConfig(): Promise<webpack.Configuration> {
             "extension": "./src/contexts/extension/index.ts",
             "background": "./src/contexts/background/index.ts",
             "content": "./src/contexts/content/index.ts",
-            "iframe": "./src/contexts/iframe/index.ts",
+            "storage/main": "./src/contexts/storage/main.ts",
+            "storage/offscreen": "./src/contexts/storage/offscreen.ts",
             "popup/index": "./src/popup/index.ts",
         },
         output: { path: buildInfo.out },
@@ -112,6 +113,12 @@ export default async function getConfig(): Promise<webpack.Configuration> {
                 chunks: ["popup/index"],
                 filename: "popup/index.html",
                 template: "./src/popup/index.html",
+            }),
+            new HtmlPlugin({
+                // chunks: ["iframe"],
+                chunks: ["storage/offscreen"],
+                filename: "storage/offscreen.html",
+                template: "./src/contexts/storage/offscreen.html",
             }),
             new MiniCssExtractPlugin({
                 filename: "css/[name].css",

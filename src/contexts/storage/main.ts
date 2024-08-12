@@ -29,11 +29,11 @@ const messageScheme = s.union([
 export type MessageScheme = s.Type<typeof messageScheme>;
 
 async function main() {
-    const origin = new URLSearchParams(window.location.search).get("origin");
+    try {
+        if (window.top === window) return;
+    } catch {}
 
-    logging.debug("Localstorage script is loaded by origin:", origin);
-
-    const channel = Channel.extension(Channels.Mapgenie, (message, sendResponse) => {
+    const _ = Channel.port(Channels.Mapgenie, (message, sendResponse) => {
         const { type, data } = messageScheme.parse(message);
         switch (type) {
             case "has": {
@@ -60,8 +60,6 @@ async function main() {
                 return ResponseType.NotHandled;
         }
     });
-
-    if (origin) channel.allowOrigin(origin);
 }
 
-runContexts("iframe", main);
+runContexts("storage", main);

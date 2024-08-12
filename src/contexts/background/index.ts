@@ -1,8 +1,9 @@
-import Channel, { type ChannelMessage } from "@shared/channel";
 import runContexts from "@shared/run";
 import * as s from "@shared/schema";
 
 import installRules from "./rules";
+import createStorageIframe from "./storage";
+import { forwardMessage, logMessage } from "./message";
 import Games from "./games";
 
 const messageScheme = s.union([
@@ -46,73 +47,64 @@ const messageScheme = s.union([
 
 export type MessageScheme = s.Type<typeof messageScheme>;
 
-export function forwardMessage(sender: chrome.runtime.MessageSender, message: ChannelMessage): boolean {
-    if (sender.tab?.id) {
-        chrome.tabs.sendMessage(sender.tab.id, {
-            origin: sender.origin,
-            data: message,
-        });
-        return true;
-    } else {
-        logging.warn("Unable to forward message sender has no tab.id", sender);
-        return false;
-    }
-}
-
-export function logMessage(message: ChannelMessage) {
-    logging.debug("[FORWARDED CHANNEL MSG]", ...Channel.formatMessage(message));
-}
-
 async function main() {
     chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-        const { type, data } = messageScheme.parse(message);
+        try {
+            const { type, data } = messageScheme.parse(message);
 
-        switch (type) {
-            case "channel": {
-                if (forwardMessage(sender, data)) {
-                    logMessage(data);
+            switch (type) {
+                case "channel": {
+                    if (forwardMessage(sender, data)) {
+                        logMessage(data);
+                    }
+                    return false;
                 }
-                return false;
+                case "start:login": {
+                    chrome.storage.session.set({ last_mg_url: data });
+                    return false;
+                }
+                case "login": {
+                    chrome.storage.session
+                        .get("last_mg_url")
+                        .then(({ last_mg_url }) => sendResponse(last_mg_url))
+                        .catch(logging.error);
+                    return true;
+                }
+                case "games": {
+                    Games.getGames().then(sendResponse).catch(logging.error);
+                    return true;
+                }
+                case "game": {
+                    Games.getGame(data.gameId).then(sendResponse).catch(logging.error);
+                    return true;
+                }
+                case "map": {
+                    Games.getMap(data.mapId).then(sendResponse).catch(logging.error);
+                    return true;
+                }
+                case "heatmaps": {
+                    Games.getHeatmaps(data.mapId).then(sendResponse).catch(logging.error);
+                    return true;
+                }
+                case "games:find:game": {
+                    Games.findGame(data.gameId).then(sendResponse).catch(logging.error);
+                    return true;
+                }
+                case "games:find:map": {
+                    Games.findMap(data.gameId, data.mapId).then(sendResponse).catch(logging.error);
+                    return true;
+                }
+                default:
+                    return false;
             }
-            case "start:login": {
-                chrome.storage.session.set({ last_mg_url: data });
-                return false;
-            }
-            case "login": {
-                chrome.storage.session
-                    .get("last_mg_url")
-                    .then(({ last_mg_url }) => sendResponse(last_mg_url))
-                    .catch(logging.error);
-                return true;
-            }
-            case "games": {
-                Games.getGames().then(sendResponse).catch(logging.error);
-                return true;
-            }
-            case "game": {
-                Games.getGame(data.gameId).then(sendResponse).catch(logging.error);
-                return true;
-            }
-            case "map": {
-                Games.getMap(data.mapId).then(sendResponse).catch(logging.error);
-                return true;
-            }
-            case "heatmaps": {
-                Games.getHeatmaps(data.mapId).then(sendResponse).catch(logging.error);
-                return true;
-            }
-            case "games:find:game": {
-                Games.findGame(data.gameId).then(sendResponse).catch(logging.error);
-                return true;
-            }
-            case "games:find:map": {
-                Games.findMap(data.gameId, data.mapId).then(sendResponse).catch(logging.error);
-                return true;
-            }
-            default:
-                return false;
+        } catch (err) {
+            if (err instanceof s.SchemaError) return;
+            throw err;
         }
     });
+
+    await installRules();
+    await createStorageIframe();
 }
 
-runContexts("background", installRules, main);
+runContexts("background", main);

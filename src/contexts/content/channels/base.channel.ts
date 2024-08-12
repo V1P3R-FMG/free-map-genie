@@ -3,7 +3,7 @@ import { Channels } from "@constants";
 
 import type { MessageScheme as BackgroundMessageScheme } from "@background/index";
 import type { MessageScheme as ExtensionMessageScheme } from "@extension/index";
-import type { MessageScheme as IframeMessageScheme } from "@iframe/index";
+import type { MessageScheme as IframeMessageScheme } from "contexts/storage/main";
 
 export default class BaseChannel {
     private readonly extension = Channel.window(Channels.Content);

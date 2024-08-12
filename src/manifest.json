@@ -7,7 +7,7 @@
         "default_popup": "popup/index.html",
         "default_title": "FMG Control Panel"
     },
-    "permissions": ["declarativeNetRequest", "storage"],
+    "permissions": ["declarativeNetRequest", "storage", "offscreen"],
     "host_permissions": ["https://mapgenie.io/", "https://cdn.mapgenie.io/"],
     "content_scripts": [
         {
@@ -16,8 +16,8 @@
             "run_at": "document_start"
         },
         {
-            "matches": ["https://mapgenie.io/?origin=*"],
-            "js": ["iframe.js"],
+            "matches": ["https://mapgenie.io/*"],
+            "js": ["storage/main.js"],
             "all_frames": true,
             "run_at": "document_start"
         }
