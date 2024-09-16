@@ -74,6 +74,9 @@ export function waitFor<T = void>(waiter: Waiter<T>, { timeout, message, interva
     return new Promise<T>(async (resolve, reject) => {
         const [resolver, rejecter, state] = createTimeout(resolve, reject, { timeout, message });
 
+        waiter(resolver, rejecter);
+        if (state.resolved) return;
+
         state.intervalHandle = window.setInterval(async () => {
             if (state.resolved) return window.clearInterval(state.intervalHandle);
             try {
@@ -85,7 +88,9 @@ export function waitFor<T = void>(waiter: Waiter<T>, { timeout, message, interva
     });
 }
 
-export function waitForCondition(waiter: ConditionWaiter, options?: WaiterTimeoutOptions) {
+export async function waitForCondition(waiter: ConditionWaiter, options?: WaiterTimeoutOptions) {
+    if (await waiter()) return;
+
     return waitFor(async (resolve, reject) => {
         try {
             if (await waiter()) resolve();
