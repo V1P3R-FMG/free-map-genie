@@ -11,6 +11,10 @@ export default class Key {
         public readonly user: number
     ) {}
 
+    public static get current() {
+        return this.fromWindow(window);
+    }
+
     public static new(map: number, game: number, user: number): Key {
         return new this(map, game, user);
     }
