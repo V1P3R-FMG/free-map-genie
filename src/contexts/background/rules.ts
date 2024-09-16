@@ -10,7 +10,7 @@ function resourceType(type: `${ResourceType}`): ResourceType {
     return type as ResourceType;
 }
 
-function HeaderOperation(operation: `${HeaderOperation}`): HeaderOperation {
+function headerOperation(operation: `${HeaderOperation}`): HeaderOperation {
     return operation as HeaderOperation;
 }
 
@@ -26,7 +26,7 @@ export default async function installRules() {
                     type: ruleActionType("modifyHeaders"),
                     responseHeaders: ["X-Frame-Options", "Frame-Options"].map((header) => ({
                         header,
-                        operation: HeaderOperation("remove"),
+                        operation: headerOperation("remove"),
                     })),
                 },
                 condition: {
