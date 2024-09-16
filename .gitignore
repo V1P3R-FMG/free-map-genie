@@ -6,4 +6,5 @@
 /.env
 /mg
 /workspace
+/profiles
 .cache
