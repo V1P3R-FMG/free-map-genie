@@ -1,10 +1,18 @@
-import Channel, { ResponseType } from "@shared/channel";
+import { injectExtensionScript, injectStyle } from "@shared/inject";
+import Channel, { ResponseType, type SendCallback } from "@shared/channel";
 import { Channels } from "@constants";
 import runContexts from "@shared/run";
-import { injectExtensionScript, injectStyle } from "@shared/inject";
 import * as s from "@shared/schema";
+import { getPageType, type MapgeniePageType } from "@utils/fmg-page";
 
-const forwardedMessagesScheme = s.object({
+import type { BookmarkData } from "@ui/components/bookmarks/bookmark-button.vue";
+
+import { forwardBackground, forwardStorage, forwardContent } from "./forward";
+import AdBlocker from "./ads";
+import { isIframeContext } from "@shared/context";
+
+// Messages that need to be forwarded to background context
+export const forwardedBackgroundMessageScheme = s.object({
     type: s.union([
         s.literal("games"),
         s.literal("games:find:game"),
@@ -14,16 +22,28 @@ const forwardedMessagesScheme = s.object({
         s.literal("heatmaps"),
         s.literal("start:login"),
         s.literal("login"),
-        s.literal("has"),
-        s.literal("get"),
-        s.literal("set"),
-        s.literal("remove"),
-        s.literal("keys"),
+        s.literal("start:login"),
+        s.literal("login"),
     ]),
     data: s.any(),
 });
 
-const extensionMessageScheme = s.union([
+// Messages that need to be forwarded to storage context
+export const forwardedStorageMessagesScheme = s.object({
+    type: s.union([s.literal("has"), s.literal("get"), s.literal("set"), s.literal("remove"), s.literal("keys")]),
+    data: s.any(),
+});
+
+// Messages that need to be forwarded to content context
+export const forwardedContentMessageScheme = s.union([
+    s.object({
+        type: s.union([s.literal("settings"), s.literal("create-bookmark")]),
+        data: s.any(),
+    }),
+]);
+
+// Messages that gets handled by the extension context
+export const thisMessageScheme = s.union([
     s.object({
         type: s.literal("asset"),
         data: s.string(),
@@ -34,22 +54,190 @@ const extensionMessageScheme = s.union([
     }),
 ]);
 
-const messageScheme = s.union([forwardedMessagesScheme, extensionMessageScheme]);
+// Messages that gets send over in web-extension env
+export const extensionMessageScheme = s.union([forwardedContentMessageScheme]);
 
-export type MessageScheme = s.Type<typeof extensionMessageScheme>;
+// Messages that gets send in the window env
+export const windowMessageScheme = s.union([
+    forwardedBackgroundMessageScheme,
+    forwardedStorageMessagesScheme,
+    thisMessageScheme,
+]);
 
-import AdBlocker from "./ads";
+export type ExtensionMessageScheme = s.Type<typeof extensionMessageScheme>;
+export type WindowMessageScheme = s.Type<typeof windowMessageScheme>;
 
-// const MESSAGE_SCHEME = validation.validator({ type: "string", data: "any" });
+async function handleAsync(promise: Promise<any>, sendResponse: SendCallback, sendError: SendCallback) {
+    try {
+        sendResponse(await promise);
+    } catch (err) {
+        sendError(err);
+    }
+}
+
+function getAsset(path: string) {
+    path = path.replace(/^\//, "");
+    const url = ["assets", path].join("/");
+    return chrome.runtime.getURL(url);
+}
+
+async function restorePreLoginPageHref(data: any) {
+    const url = await chrome.runtime.sendMessage({ type: "login", data });
+
+    if (url) {
+        window.location.href = url;
+        return ResponseType.Handled;
+    }
+
+    if (window.location.pathname.endsWith("/login")) {
+        const location = new URL(window.location.href);
+        location.search = "";
+        window.location.href = location.href.split("/").slice(0, -1).join("/");
+        return ResponseType.Handled;
+    }
+
+    window.location.href = "https://mapgenie.io";
+}
+
+function getMeta(name: string) {
+    const content = document.querySelector(`head > meta[property='${name}']`)?.getAttribute("content");
+    if (!content) {
+        throw `meta[${name}] not found.`;
+    }
+    return content;
+}
+
+function getAppleTouchIcon() {
+    const href = document.querySelector("head > link[rel='apple-touch-icon']")?.getAttribute("href");
+    if (!href) {
+        throw `apple touch icon not found.`;
+    }
+    return href;
+}
+
+function getLocationUrl() {
+    const params = new URLSearchParams(window.location.search);
+    const url = new URL(window.location.pathname, window.location.origin);
+
+    if (params.has("map-slug")) {
+        url.searchParams.append("map-slug", params.get("map-slug")!);
+    }
+
+    return url.toString();
+}
+
+async function getIconForPageType(pageType: MapgeniePageType) {
+    switch (pageType) {
+        case "guide":
+            return chrome.runtime.getURL("assets/images/checklist.png");
+        case "game-home":
+            return chrome.runtime.getURL("assets/images/home.png");
+        default:
+            return undefined;
+    }
+}
+
+export type CreateBookmarkResult = { success: true; data: BookmarkData } | { success: false; data: string };
+
+async function createBookmark(): Promise<CreateBookmarkResult> {
+    const pageType = getPageType();
+
+    switch (pageType) {
+        case "map":
+            const mapInfo: MG.Map | undefined = await forwardContent({ type: "map", data: undefined });
+            if (!mapInfo) {
+                return {
+                    success: false,
+                    data: "failed to create bookmark, window.mapData.map not found.",
+                };
+            }
+
+            const map: MG.Api.MapFull = await forwardBackground({
+                type: "map",
+                data: { mapId: mapInfo.id },
+            });
+
+            if (!map) {
+                return {
+                    success: false,
+                    data: `failed to create bookmark, map with id ${mapInfo.id} not found`,
+                };
+            }
+
+            try {
+                return {
+                    success: true,
+                    data: {
+                        title: map.meta_title ?? map.title,
+                        url: getLocationUrl(),
+                        icon: getAppleTouchIcon(),
+                        preview: map.image ?? undefined,
+                    },
+                };
+            } catch (err) {
+                return {
+                    success: false,
+                    data: `failed to create bookmark, ${err}.`,
+                };
+            }
+        case "guide":
+        case "game-home":
+        case "home":
+            const icon = await getIconForPageType(pageType);
+            try {
+                return {
+                    success: true,
+                    data: {
+                        title: getMeta("og:title"),
+                        url: getLocationUrl(),
+                        icon: icon ?? getAppleTouchIcon(),
+                        preview: icon && getAppleTouchIcon(),
+                    },
+                };
+            } catch (err) {
+                return {
+                    success: false,
+                    data: `failed to create bookmark, ${err}.`,
+                };
+            }
+        case "unknown":
+        case "login":
+        default:
+            return {
+                success: false,
+                data: `Unable to create bookmark for current page type ${pageType}.`,
+            };
+    }
+}
 
 async function main() {
-    // AdBlocker.onTick(logging.debug.bind("FMG AdBlocker stats:"));
     AdBlocker.start();
-    AdBlocker.removePrivacyPopup();
 
-    const channel = Channel.extension(Channels.Extension);
-    const _ = Channel.window(Channels.Extension, (e, sendResponse, sendError) => {
-        const message = messageScheme.parse(e);
+    if (__DEBUG__) {
+        AdBlocker.onTick(logging.debug.bind("FMG AdBlocker stats:"));
+        AdBlocker.removePrivacyPopup();
+    }
+
+    if (!isIframeContext()) {
+        Channel.extension(Channels.Extension, (e, sendResponse, sendError) => {
+            const message = extensionMessageScheme.parse(e);
+            const { type } = message;
+
+            switch (type) {
+                case "settings":
+                    handleAsync(forwardContent(message as any), sendResponse, sendError);
+                    return ResponseType.Pending;
+                case "create-bookmark":
+                    handleAsync(createBookmark(), sendResponse, sendError);
+                    return ResponseType.Pending;
+                default:
+                    return ResponseType.NotHandled;
+            }
+        });
+    }
+
+    Channel.window(Channels.Extension, (e, sendResponse, sendError) => {
+        const message = windowMessageScheme.parse(e);
         const { type, data } = message;
 
         switch (type) {
@@ -59,40 +247,24 @@ async function main() {
             case "game":
             case "map":
             case "heatmaps":
-                chrome.runtime.sendMessage({ type, data }).then(sendResponse).catch(sendError);
-                return ResponseType.Pending;
             case "start:login":
-                chrome.runtime.sendMessage({ type, data });
-                return ResponseType.Handled;
+                handleAsync(forwardBackground(message), sendResponse, sendError);
+                return ResponseType.Pending;
             case "login":
-                chrome.runtime.sendMessage({ type, data }).then((url?: string) => {
-                    if (url) return (window.location.href = url);
-
-                    const location = new URL(window.location.href);
-                    location.search = "";
-
-                    if (location.pathname.endsWith("/login")) {
-                        window.location.href = location.href.split("/").slice(0, -1).join("/");
-                        return;
-                    }
-
-                    window.location.href = "https://mapgenie.io";
-                });
-                return ResponseType.Handled;
+                handleAsync(restorePreLoginPageHref(data), sendResponse, sendError);
+                return ResponseType.Pending;
             case "asset":
-                const path = data.replace(/^\//, "");
-                const url = ["assets", path].join("/");
-                sendResponse(chrome.runtime.getURL(url));
+                sendResponse(getAsset(data));
                 return ResponseType.Handled;
             case "inject:style":
-                injectStyle(chrome.runtime.getURL(data)).then(sendResponse).catch(sendError);
+                handleAsync(injectStyle(chrome.runtime.getURL(data)), sendResponse, sendError);
                 return ResponseType.Pending;
             case "has":
             case "get":
             case "set":
             case "remove":
             case "keys":
-                channel.send(Channels.Mapgenie, message).then(sendResponse).catch(sendError);
+                handleAsync(forwardStorage(message), sendResponse, sendError);
                 return ResponseType.Pending;
             default:
                 return ResponseType.NotHandled;

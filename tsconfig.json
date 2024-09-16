@@ -1,7 +1,7 @@
 {
     "compilerOptions": {
         "module": "ESNext",
-        "lib": ["DOM", "ES2020.Promise"],
+        "lib": ["DOM", "DOM.Iterable", "ES2020.Promise"],
         "target": "ES2020",
         "moduleResolution": "Bundler",
         "allowSyntheticDefaultImports": true,
@@ -16,8 +16,9 @@
             "@shared/*": ["shared/*"],
             "@content/*": ["contexts/content/*"],
             "@extension/*": ["contexts/extension/*"],
-            "@iframe/*": ["contexts/iframe/*"],
+            "@storage/*": ["contexts/storage/*"],
             "@background/*": ["contexts/background/*"],
+            "@popup/*": ["popup/*"],
             "@assets/*": ["assets/*"],
             "@ui/*": ["ui/*"]
         }

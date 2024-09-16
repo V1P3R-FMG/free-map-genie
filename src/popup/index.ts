@@ -15,4 +15,4 @@ import App from "./app.vue";
 //     .then(() => logger.log("extension script loaded"))
 //     .catch((err) => logger.error(err));
 
-createApp(App).mount("#app");
+export const app = createApp(App).mount("#app");

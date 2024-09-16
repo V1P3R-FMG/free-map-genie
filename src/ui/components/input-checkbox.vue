@@ -38,8 +38,8 @@ const emit = defineEmits<{
                 <input
                     class="checkbox"
                     type="checkbox"
-                    :id="name"
                     ref="checkbox"
+                    :id="name"
                     :checked="checked"
                     :value="checked"
                     @click="click"

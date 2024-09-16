@@ -47,58 +47,54 @@ const messageScheme = s.union([
 
 export type MessageScheme = s.Type<typeof messageScheme>;
 
+async function handleAsync(promise: Promise<any>, sendResponse: (response?: any) => void) {
+    try {
+        sendResponse(await promise);
+    } catch (err) {
+        logging.error(err);
+    }
+}
+
 async function main() {
     chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         try {
             const { type, data } = messageScheme.parse(message);
 
             switch (type) {
-                case "channel": {
-                    if (forwardMessage(sender, data)) {
-                        logMessage(data);
-                    }
+                case "channel":
+                    forwardMessage(sender, data).then((forwarded) => forwarded && logMessage(data));
                     return false;
-                }
-                case "start:login": {
+                case "start:login":
                     chrome.storage.session.set({ last_mg_url: data });
                     return false;
-                }
-                case "login": {
-                    chrome.storage.session
-                        .get("last_mg_url")
-                        .then(({ last_mg_url }) => sendResponse(last_mg_url))
-                        .catch(logging.error);
+                case "login":
+                    return handleAsync(
+                        chrome.storage.session.get("last_mg_url").then(({ last_mg_url }) => last_mg_url),
+                        sendResponse
+                    );
+                case "games":
+                    handleAsync(Games.getGames(), sendResponse);
                     return true;
-                }
-                case "games": {
-                    Games.getGames().then(sendResponse).catch(logging.error);
+                case "game":
+                    handleAsync(Games.getGame(data.gameId), sendResponse);
                     return true;
-                }
-                case "game": {
-                    Games.getGame(data.gameId).then(sendResponse).catch(logging.error);
+                case "map":
+                    handleAsync(Games.getMap(data.mapId), sendResponse);
                     return true;
-                }
-                case "map": {
-                    Games.getMap(data.mapId).then(sendResponse).catch(logging.error);
+                case "heatmaps":
+                    handleAsync(Games.getHeatmaps(data.mapId), sendResponse);
                     return true;
-                }
-                case "heatmaps": {
-                    Games.getHeatmaps(data.mapId).then(sendResponse).catch(logging.error);
+                case "games:find:game":
+                    handleAsync(Games.findGame(data.gameId), sendResponse);
                     return true;
-                }
-                case "games:find:game": {
-                    Games.findGame(data.gameId).then(sendResponse).catch(logging.error);
+                case "games:find:map":
+                    handleAsync(Games.findMap(data.gameId, data.mapId), sendResponse);
                     return true;
-                }
-                case "games:find:map": {
-                    Games.findMap(data.gameId, data.mapId).then(sendResponse).catch(logging.error);
-                    return true;
-                }
                 default:
                     return false;
             }
         } catch (err) {
-            if (err instanceof s.SchemaError) return;
+            if (err instanceof s.SchemaError) return false;
             throw err;
         }
     });

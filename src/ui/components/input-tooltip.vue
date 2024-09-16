@@ -1,6 +1,6 @@
 <script lang="ts" setup>
 import { ref } from "vue";
-import Icon from "./fmg-icon.vue";
+import FontIcon from "./font-icon.vue";
 
 const $div = ref<HTMLDivElement>();
 
@@ -17,12 +17,12 @@ defineProps<Props>();
         <div class="tooltip-container">
             <slot></slot>
         </div>
-        <Icon
+        <FontIcon
             icon="info-circled"
             size="18px"
             @mouseover="$div?.classList.add('hover')"
             @mouseout="$div?.classList.remove('hover')"
-        ></Icon>
+        ></FontIcon>
     </div>
 </template>
 
