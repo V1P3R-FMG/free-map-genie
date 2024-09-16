@@ -98,7 +98,7 @@ export default class Channel<Send = any> {
     private static readonly windowChannels: Record<string, Channel> = {};
     private static readonly portChannels: Record<string, Channel> = {};
 
-    public static readonly RETRY_INTERVAL = 1000;
+    public static readonly RETRY_INTERVAL = 100;
     public static readonly VALID_MESSAGE_KEYS = ["type", "origin", "sender", "messageId"];
 
     public readonly name: string;
@@ -211,7 +211,7 @@ export default class Channel<Send = any> {
      * @param name the name of the target channel to wait for
      * @param timeout the time after to reject the promise if not resolved yet
      */
-    private async waitForChannel(name: string, timeout: number): Promise<void> {
+    public async waitForChannel(name: string, timeout: number): Promise<void> {
         if (this.activeChannels[name]) return;
 
         return this.postWithResponse({
@@ -223,13 +223,22 @@ export default class Channel<Send = any> {
         });
     }
 
-    private postMessage(message: ChannelMessage) {
+    private async postMessage(message: ChannelMessage) {
         switch (this.channelType) {
             case "window":
                 window.postMessage(message);
                 break;
             case "extension":
-                chrome.runtime.sendMessage({ type: "channel", data: message });
+                try {
+                    await chrome.runtime.sendMessage({ type: "channel", data: message });
+                } catch (err) {
+                    if (
+                        err instanceof Error &&
+                        err.message.includes("Could not establish connection. Receiving end does not exist.")
+                    ) {
+                        throw err;
+                    }
+                }
                 break;
             case "port":
                 if (!this.port) throw "Failed to post message on port, port is not defined";
@@ -345,15 +354,23 @@ export default class Channel<Send = any> {
         const message = this.createMessage({ type, target, messageId, data });
 
         if (!interval) {
-            return new Promise<R>((resolve, reject) => {
+            return new Promise<R>(async (resolve, reject) => {
                 this.addResponseHandler(messageId, successMatch, failedMatch, resolve, reject);
-                this.postMessage(message);
+                try {
+                    await this.postMessage(message);
+                } catch (err) {
+                    reject(err);
+                }
             });
         } else {
             return waitFor(
                 async (resolve, reject) => {
                     this.addResponseHandler(messageId, successMatch, failedMatch, resolve, reject);
-                    this.postMessage(message);
+                    try {
+                        await this.postMessage(message);
+                    } catch (err) {
+                        reject(err);
+                    }
                 },
                 {
                     interval,
@@ -369,8 +386,8 @@ export default class Channel<Send = any> {
      * @param message the message to send
      * @param options the options to create the message with
      */
-    private post({ type, data, target, messageId, tabId }: PostOptions) {
-        this.postMessage(
+    private async post({ type, data, target, messageId, tabId }: PostOptions) {
+        await this.postMessage(
             this.createMessage({
                 type,
                 target,
@@ -387,9 +404,9 @@ export default class Channel<Send = any> {
      * @param type the type for the response
      * @param data the data for the response
      */
-    private respond(message: ChannelMessage, type: ChannelMessageType, data: any, tabId?: number) {
+    private async respond(message: ChannelMessage, type: ChannelMessageType, data: any, tabId?: number) {
         if (__DEBUG__ && type === "response::failed") debugger;
-        this.post({
+        await this.post({
             type,
             target: message.sender,
             messageId: message.messageId,
@@ -532,7 +549,7 @@ export default class Channel<Send = any> {
                 logging.warn("Invalid response", message, handler);
             }
             delete this.responseHandlers[message.messageId];
-        } else {
+        } else if (message.type !== "pong") {
             logging.warn("No handler for response", message, this.responseHandlers, this);
         }
     }
