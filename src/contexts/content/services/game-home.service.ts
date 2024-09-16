@@ -40,8 +40,10 @@ class GameHomeService {
             return;
         }
 
+        logging.debug(gameHomePage.gameCards);
         for (const item of gameHomePage.gameCards) {
             if (item.classList.contains("unavailable")) {
+                logging.debug(item);
                 // Fix the href
                 const url = new URL(freeMapUrl);
 
@@ -50,11 +52,11 @@ class GameHomeService {
 
                 const map = await this.getMapFromName(mapName);
                 if (!map) {
-                    logging.warn(`Failed to unlock pro map ${label}, map not found.`);
-                    return;
+                    logging.warn(`Failed to unlock PRO/WIP map ${label}, map not found.`);
+                    continue;
                 }
 
-                if (map.available) return;
+                if (!map.available) continue;
 
                 url.searchParams.set("map-slug", map.slug);
                 item.setAttribute("href", url.toString());
