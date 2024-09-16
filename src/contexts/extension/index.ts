@@ -3,7 +3,7 @@ import Channel, { ResponseType, type SendCallback } from "@shared/channel";
 import { Channels } from "@constants";
 import runContexts from "@shared/run";
 import * as s from "@shared/schema";
-import { getPageType, type MapgeniePageType } from "@utils/fmg-page";
+import { getPageType, waitForPageType, type MapgeniePageType } from "@utils/fmg-page";
 
 import type { BookmarkData } from "@ui/components/bookmarks/bookmark-button.vue";
 
@@ -210,13 +210,20 @@ async function createBookmark(): Promise<CreateBookmarkResult> {
     }
 }
 
-async function main() {
-    AdBlocker.start();
+async function startAdBlocker() {
+    switch (await waitForPageType()) {
+        case "map":
+            AdBlocker.start();
 
-    if (__DEBUG__) {
-        AdBlocker.onTick(logging.debug.bind("FMG AdBlocker stats:"));
-        AdBlocker.removePrivacyPopup();
+            if (__DEBUG__) {
+                AdBlocker.onTick(logging.debug.bind("FMG AdBlocker stats:"));
+                AdBlocker.removePrivacyPopup();
+            }
     }
+}
+
+async function main() {
+    startAdBlocker().catch(logging.error);
 
     if (!isIframeContext()) {
         Channel.extension(Channels.Extension, (e, sendResponse, sendError) => {
