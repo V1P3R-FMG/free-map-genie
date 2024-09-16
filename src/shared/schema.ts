@@ -7,7 +7,7 @@ export type Schema<T> = {
 export type Type<S extends Schema<unknown>> = ReturnType<S["parse"]>;
 
 type ObjectParseResult<Rec extends Record<string, Schema<unknown>>> = _<{
-    [K in keyof Rec]: Type<Rec[K]>;
+    [K in keyof Rec as undefined extends Rec[K] ? never : K]: Type<Rec[K]>;
 }>;
 
 type ArrayParseResult<Arr extends Schema<unknown>[]> = _<{
@@ -85,7 +85,9 @@ export function boolean(): Schema<boolean> {
     };
 }
 
-export function literal<T extends string | number | boolean | null | undefined>(lit: T): Schema<T> {
+export type Literal = string | number | boolean | null | undefined;
+
+export function literal<T extends Literal>(lit: T): Schema<T> {
     return {
         parse(value: unknown): T {
             if (value === lit) {
