@@ -100,13 +100,6 @@ export default async function getConfig(): Promise<webpack.Configuration> {
                     outputDir: "[dist]/assets/font",
                     fontTypes: [FontAssetType.TTF, FontAssetType.WOFF, FontAssetType.WOFF2],
                     assetTypes: [ASSET_TYPES.CSS],
-                    formatOptions: {
-                        json: { indent: 2 },
-                    },
-                    pathOptions: {
-                        ts: "./src/types/icon-types.ts",
-                        json: "./misc/icon-codepoints.json",
-                    },
                 },
             }),
             new HtmlPlugin({
@@ -171,6 +164,10 @@ export default async function getConfig(): Promise<webpack.Configuration> {
                 args: buildInfo.isChrome
                     ? ["--auto-open-devtools-for-tabs", "--system-developer-mode", "--start-maximized"]
                     : [],
+                profileCreateIfMissing: true,
+                chromiumProfile: process.env.CHROMIUM_PROFILE,
+                firefoxProfile: process.env.FIREFOX_PROFILE,
+                keepProfileChanges: process.env.KEEP_CHANGES?.toLowerCase() in [1, "1", "true"],
             }),
         ],
         optimization: {
