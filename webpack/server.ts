@@ -90,8 +90,12 @@ export default async function startServer(port: number) {
         sendJson(res, filepath);
     });
 
-    app.listen(port, () => {
+    const server = app.listen(port, () => {
         console.log(`Server listening on http://localhost:${port}`);
+
+        process.on("exit", () => {
+            server.close();
+        });
     });
 }
 
