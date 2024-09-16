@@ -16,6 +16,8 @@ class MapScript implements PageScript {
     public async initScript() {
         await userService.login();
 
+        const loggedIn = await userService.isLoggedIn();
+
         if (window.config) {
             window.config.checklistEnabled = true;
             window.config.presetsEnabled = true;
@@ -35,7 +37,7 @@ class MapScript implements PageScript {
         mapService.fixGoogleMaps();
         await mapPage.addMapgenieScript();
 
-        if (window.user) {
+        if (loggedIn) {
             await storeService.install();
             await apiService.installFilter();
         }
@@ -45,18 +47,20 @@ class MapScript implements PageScript {
         await assetsChannel.injectStyle("css/content/map.script.css");
         await ui.attach();
 
-        pageService.onreload = async () => {
-            const key = Key.fromWindow(window);
-            const cur = storageService.loadFromCache(key);
-            const hasData = await storageService.has(key);
+        if (loggedIn) {
+            pageService.onreload = async () => {
+                const key = Key.fromWindow(window);
+                const cur = storageService.loadFromCache(key);
+                const hasData = await storageService.has(key);
 
-            storageService.removeFromCache(key);
-            const data = await storageService.load(key);
+                storageService.removeFromCache(key);
+                const data = await storageService.load(key);
 
-            if (!cur || !hasData || cur.latestUpdate < data.latestUpdate) {
-                await mapService.load(cur);
-            }
-        };
+                if (!cur || !hasData || cur.latestUpdate < data.latestUpdate) {
+                    await mapService.load(cur);
+                }
+            };
+        }
     }
 }
 
