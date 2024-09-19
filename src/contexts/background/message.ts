@@ -1,8 +1,8 @@
 import { Channels } from "@constants";
 import Channel, { type ChannelMessage } from "@shared/channel";
 
-function sendMessageToTab(tabId: number, sender: chrome.runtime.MessageSender, message: ChannelMessage) {
-    chrome.tabs.sendMessage(tabId, {
+async function sendMessageToTab(tabId: number, sender: chrome.runtime.MessageSender, message: ChannelMessage) {
+    await chrome.tabs.sendMessage(tabId, {
         origin: sender.origin,
         data: message,
     });
@@ -17,10 +17,7 @@ async function getActiveTabId() {
 async function sendMessageToActiveTab(sender: chrome.runtime.MessageSender, message: ChannelMessage) {
     const tabId = await getActiveTabId();
     if (typeof tabId === "number") {
-        chrome.tabs.sendMessage(tabId, {
-            origin: sender.origin,
-            data: message,
-        });
+        await sendMessageToTab(tabId, sender, message);
         return true;
     } else {
         logging.warn("Failed to send message from popup active tab.id not found", sender);
@@ -42,6 +39,10 @@ export async function forwardMessage(sender: chrome.runtime.MessageSender, messa
     }
 }
 
-export function logMessage(message: ChannelMessage) {
-    logging.debug("[FORWARDED CHANNEL MSG]", ...Channel.formatMessage(message));
+export function logMessage(message: ChannelMessage, sender?: chrome.runtime.MessageSender) {
+    if (sender) {
+        logging.debug("[FORWARDED CHANNEL MSG]", ...Channel.formatMessage(message), "Sender", sender);
+    } else {
+        logging.debug("[FORWARDED CHANNEL MSG]", ...Channel.formatMessage(message));
+    }
 }

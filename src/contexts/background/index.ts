@@ -62,8 +62,11 @@ async function main() {
 
             switch (type) {
                 case "channel":
-                    forwardMessage(sender, data).then((forwarded) => forwarded && logMessage(data));
-                    return false;
+                    forwardMessage(sender, data)
+                        .then((forwarded) => forwarded && logMessage(data, sender))
+                        .then((_) => sendResponse({ success: true }))
+                        .catch((err) => sendResponse({ success: false, data: `${err}` }));
+                    return true;
                 case "start:login":
                     chrome.storage.session.set({ last_mg_url: data });
                     return false;

@@ -67,6 +67,15 @@ export interface MatchOptions {
     data?: any;
 }
 
+export type SendMessageResult =
+    | {
+          success: true;
+      }
+    | {
+          success: false;
+          data: string;
+      };
+
 export class ChannelRequestError extends Error {
     private readonly channelMessage: ChannelMessage;
 
@@ -229,15 +238,9 @@ export default class Channel<Send = any> {
                 window.postMessage(message);
                 break;
             case "extension":
-                try {
-                    await chrome.runtime.sendMessage({ type: "channel", data: message });
-                } catch (err) {
-                    if (
-                        err instanceof Error &&
-                        err.message.includes("Could not establish connection. Receiving end does not exist.")
-                    ) {
-                        throw err;
-                    }
+                const result: SendMessageResult = await chrome.runtime.sendMessage({ type: "channel", data: message });
+                if (!result.success) {
+                    throw result.data;
                 }
                 break;
             case "port":
