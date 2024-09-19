@@ -1,7 +1,9 @@
 import { Channels } from "@constants";
 import Channel, { ResponseType } from "@shared/channel";
+import { isIframeContext } from "@shared/context";
 import runContexts from "@shared/run";
 import * as s from "@shared/schema";
+import { isIfStatement } from "typescript";
 
 const messageScheme = s.union([
     s.object({
@@ -29,9 +31,8 @@ const messageScheme = s.union([
 export type MessageScheme = s.Type<typeof messageScheme>;
 
 async function main() {
-    try {
-        if (window.top === window) return;
-    } catch {}
+    const params = new URLSearchParams(window.location.search);
+    if (!isIframeContext() || !params.get("storage")) return false;
 
     const _ = Channel.port(Channels.Mapgenie, (message, sendResponse) => {
         const { type, data } = messageScheme.parse(message);
