@@ -13,7 +13,11 @@ export default async function runContexts(name: string, ...contexts: RunContext[
     await Promise.all(contexts.map(runContext))
         .then((results) => {
             if (results.every((r) => r === undefined || r)) {
-                logging.log(`FMG ${name} context initialized.\n@ ${window.location.href}`);
+                if (global.window) {
+                    logging.log(`FMG ${name} context initialized.\n@ ${window.location.href}`);
+                } else {
+                    logging.log(`FMG ${name} context initialized.`);
+                }
             }
         })
         .catch((e) => {
