@@ -11,7 +11,11 @@ async function runContext(context: RunContext): Promise<any> {
 export default async function runContexts(name: string, ...contexts: RunContext[]): Promise<boolean> {
     let success = true;
     await Promise.all(contexts.map(runContext))
-        .then(() => logging.log(`FMG ${name} context initialized.`))
+        .then((results) => {
+            if (results.every((r) => r === undefined || r)) {
+                logging.log(`FMG ${name} context initialized.\n@ ${window.location.href}`);
+            }
+        })
         .catch((e) => {
             success = false;
             if (e instanceof ChannelRequestError) {
