@@ -3,7 +3,6 @@ import Channel, { ResponseType } from "@shared/channel";
 import { isIframeContext } from "@shared/context";
 import runContexts from "@shared/run";
 import * as s from "@shared/schema";
-import { isIfStatement } from "typescript";
 
 const messageScheme = s.union([
     s.object({
