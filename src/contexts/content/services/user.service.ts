@@ -1,6 +1,4 @@
 import * as async from "@utils/async";
-
-import { FmgMockedUserKey } from "@constants";
 import { getPageType } from "@utils/fmg-page";
 
 import Key from "@content/storage/key";
@@ -32,14 +30,14 @@ class UserService {
 
     public enableMockUser(enabled: boolean) {
         if (enabled) {
-            window.localStorage.setItem(FmgMockedUserKey, "1");
+            window.localStorage.setItem("fmg:mocked:user:v3", "1");
         } else {
-            window.localStorage.removeItem(FmgMockedUserKey);
+            window.localStorage.removeItem("fmg:mocked:user:v3");
         }
     }
 
     public isMockUserActive() {
-        return window.localStorage.getItem(FmgMockedUserKey) != null;
+        return window.localStorage.getItem("fmg:mocked:user:v3") != null;
     }
 
     public async isLoggedIn() {
