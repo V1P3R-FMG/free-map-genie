@@ -100,6 +100,12 @@ main();
     border-top: solid 1px var(--border);
 }
 
+@-moz-document url-prefix() {
+    .footer {
+        font-size: 0.8em;
+    }
+}
+
 .author {
     cursor: pointer;
 }
