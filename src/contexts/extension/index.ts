@@ -5,6 +5,7 @@ import { onMessage, sendMessage, ChannelEventDef } from "@shared/channel/extensi
 
 import { createBookmark, type CreateBookmarkResult } from "./bookmarks";
 import AdBlocker from "./ads";
+import { isIframeContext } from "@shared/context";
 
 declare global {
     export interface Channels {
@@ -17,40 +18,6 @@ declare global {
         };
     }
 }
-
-onMessage("login", async () => {
-    const url = await sendMessage("background", "login", {});
-
-    if (url) {
-        window.location.href = url;
-        return;
-    }
-
-    if (window.location.pathname.endsWith("/login")) {
-        const location = new URL(window.location.href);
-        location.search = "";
-        window.location.href = location.href.split("/").slice(0, -1).join("/");
-        return;
-    }
-
-    window.location.href = "https://mapgenie.io";
-});
-
-onMessage("inject:style", async ({ path }) => {
-    await injectStyle(chrome.runtime.getURL(path));
-});
-
-onMessage("asset", ({ path }) => {
-    return getAsset(path);
-});
-
-onMessage("ping", () => {
-    return "pong" as const;
-});
-
-onMessage("bookmark:create", () => {
-    return createBookmark();
-});
 
 function getAsset(path: string) {
     path = path.replace(/^\//, "");
@@ -71,11 +38,45 @@ async function startAdBlocker() {
 }
 
 async function main() {
-    // if ((await waitForPageType()) === "unknown") return false;
+    if (isIframeContext()) return false;
 
     startAdBlocker().catch(logging.error);
 
     injectExtensionScript("content.js");
+
+    onMessage("login", async () => {
+        const url = await sendMessage("background", "login", {});
+
+        if (url) {
+            window.location.href = url;
+            return;
+        }
+
+        if (window.location.pathname.endsWith("/login")) {
+            const location = new URL(window.location.href);
+            location.search = "";
+            window.location.href = location.href.split("/").slice(0, -1).join("/");
+            return;
+        }
+
+        window.location.href = "https://mapgenie.io";
+    });
+
+    onMessage("inject:style", async ({ path }) => {
+        await injectStyle(chrome.runtime.getURL(path));
+    });
+
+    onMessage("asset", ({ path }) => {
+        return getAsset(path);
+    });
+
+    onMessage("ping", () => {
+        return "pong" as const;
+    });
+
+    onMessage("bookmark:create", () => {
+        return createBookmark();
+    });
 }
 
 runContexts("extension", main);
