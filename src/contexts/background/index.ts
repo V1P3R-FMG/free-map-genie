@@ -23,6 +23,7 @@ declare global {
             "games:find:map:from:slug": ChannelEventDef<{ gameSlug: string; mapSlug: string }, MG.Api.Map | undefined>;
             "games:find:game:from:domain": ChannelEventDef<{ domain: string }, MG.Api.Game | undefined>;
             "reload:active:tab": ChannelEventDef<void, boolean>;
+            "reload:extension": ChannelEventDef;
             "open:popup": ChannelEventDef;
         };
     }
@@ -87,6 +88,10 @@ onMessage("reload:active:tab", async () => {
     return true;
 });
 
+onMessage("reload:extension", () => {
+    chrome.runtime.reload();
+});
+
 onMessage("open:popup", async () => {
     await chrome.action.openPopup();
 });
@@ -97,18 +102,6 @@ async function main() {
     if (__BROWSER__ === "chrome") {
         await createStorageIframe();
     }
-
-    if (__DEBUG__) {
-        const tabs = await chrome.tabs.query({ title: "Inspect with Chrome Developer Tools" });
-
-        if (!tabs.length) {
-            await chrome.tabs.create({
-                url: "chrome://inspect/#service-workers",
-            });
-        }
-    }
 }
-
-chrome.runtime.onInstalled.addListener(async () => {});
 
 runContexts("background", main);

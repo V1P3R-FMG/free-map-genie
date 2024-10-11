@@ -5,6 +5,7 @@ import AlertContainer from "@ui/components/alerts/alert-container.vue";
 import ThemeProvider from "@ui/components/theme-provider.vue";
 import PageContainer from "@ui/components/page-container.vue";
 import FontIcon from "@ui/components/font-icon.vue";
+// import FmgImage from "@ui/components/content/fmg-image.vue";
 
 import BookmarksPage from "./pages/bookmarks-page.vue";
 import SettingsPage from "./pages/settings-page.vue";
@@ -21,6 +22,14 @@ const state = ref<State>("disconnected");
 
 function openHomepage() {
     chrome.tabs.create({ url: __HOMEPAGE__ });
+}
+
+function openMapgenie() {
+    chrome.tabs.create({ url: "https://mapgenie.io" });
+}
+
+function close() {
+    window.close();
 }
 
 async function reloadActiveTab() {
@@ -48,6 +57,10 @@ async function reloadActiveTab() {
     }, 10000);
 }
 
+async function reloadExtension() {
+    await channel.reloadExtension();
+}
+
 channel.getMapSettings().then(logging.debug);
 
 async function main() {
@@ -63,9 +76,22 @@ main();
         <AlertContainer />
         <div class="app-container">
             <div class="titlebar">
+                <div class="buttons buttons-left">
+                    <button class="btn" @click="openMapgenie">
+                        <img id="mapgenie-logo" src="/assets/icons/mapgenie-icon.png" />
+                    </button>
+                </div>
                 <h3 class="title">
                     <span class="bold">map</span> <span class="light">genie</span><sup class="pro">PRO</sup>
                 </h3>
+                <div class="buttons buttons-right">
+                    <button class="btn" @click="reloadExtension">
+                        <FontIcon icon="reload" />
+                    </button>
+                    <button class="btn" @click="close">
+                        <FontIcon icon="cross" />
+                    </button>
+                </div>
             </div>
 
             <PageContainer page="bookmarks">
@@ -76,7 +102,7 @@ main();
             <div class="footer">
                 <span class="author" @click="openHomepage">by {{ author }}</span>
                 <span class="state" :class="{ connected: state === 'connected' }">
-                    <button id="footer-reload-button" @click="reloadActiveTab">
+                    <button class="btn" @click="reloadActiveTab">
                         <FontIcon v-if="state === 'disconnected'" icon="reload" size="0.8rem" />
                     </button>
                     {{ state }}
@@ -105,8 +131,12 @@ main();
 }
 
 .titlebar {
-    display: grid;
-    justify-content: center;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 0 5px;
+    padding-bottom: 5px;
+    border-bottom: solid 1px var(--border);
 }
 
 .title {
@@ -143,23 +173,33 @@ main();
     cursor: pointer;
 }
 
-#footer-reload-button {
-    background: none;
-    color: none;
-    border: none;
-    padding: 0;
-    transform: translateY(2px);
-    color: inherit;
-    cursor: pointer;
-}
-
 .state {
     color: red;
-
-    gap: 5px;
 }
 
 .state.connected {
     color: green;
+}
+
+.btn {
+    background: none;
+    color: none;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    transform: translateY(2px);
+    color: inherit;
+}
+
+.buttons {
+    display: flex;
+    gap: 10px;
+}
+
+#mapgenie-logo {
+    position: relative;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
 }
 </style>

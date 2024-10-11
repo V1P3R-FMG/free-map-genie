@@ -18,6 +18,10 @@ class PopupChannel {
         return sendMessage("background", "reload:active:tab", {}, timeout);
     }
 
+    async reloadExtension(timeout?: number) {
+        return sendMessage("background", "reload:extension", {}, timeout);
+    }
+
     async getMapSettings(timeout?: number) {
         return sendMessage("content-script", "settings", {}, timeout);
     }
