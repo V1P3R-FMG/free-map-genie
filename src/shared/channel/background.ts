@@ -45,8 +45,9 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
 chrome.runtime.onConnect.addListener((port) => {
     const tabId = port.sender?.tab?.id;
+    const frameId = port.sender?.frameId;
 
-    const connArgs = decodeConnectionArgs(port.name, tabId);
+    const connArgs = decodeConnectionArgs(port.name, { tabId, frameId });
 
     if (connMap.get(connArgs.endpointName)?.fingerprint === connArgs.fingerprint) {
         return;
@@ -65,12 +66,14 @@ chrome.runtime.onConnect.addListener((port) => {
         }
 
         message.sender.tabId ??= tabId;
+        message.sender.frameId ??= frameId;
 
         if (
             isMessageFor(["extension", "content-script"], message) ||
             isMessageFrom(["popup", "offscreen", "background"], message)
         ) {
             message.target.tabId ??= tabId || (await getActiveTabId());
+            message.target.frameId ??= 0;
         }
 
         if (channel.isMessageForMe(message)) {
@@ -102,5 +105,9 @@ chrome.runtime.onConnect.addListener((port) => {
 
     logging.debug(`Port added ${connArgs.endpointName}#${connArgs.fingerprint}.`, port.name, port.sender);
 });
+
+if (__DEBUG__) {
+    global.getConnections = () => connMap;
+}
 
 export const { onMessage, sendMessage } = channel;

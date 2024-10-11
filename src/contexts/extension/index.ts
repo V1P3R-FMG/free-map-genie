@@ -71,7 +71,7 @@ async function startAdBlocker() {
 }
 
 async function main() {
-    if ((await waitForPageType()) === "unknown") return false;
+    // if ((await waitForPageType()) === "unknown") return false;
 
     startAdBlocker().catch(logging.error);
 

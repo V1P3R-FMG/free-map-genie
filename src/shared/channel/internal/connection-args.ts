@@ -1,28 +1,33 @@
 import { isValidFingerprint } from "./fingerprint";
-import type { ChannelContext, ConnectionArgs, ConnectionArgsWithEndpoint, EndpointNameArgs } from "./types";
+import type { ChannelContext, ConnectionArgs, ConnectionArgsWithEndpoint, EndpointNameArgs, PortInfo } from "./types";
 
-export function formatEndpointTargetName({ context, tabId }: EndpointNameArgs) {
+export function formatEndpointTargetName({ context, tabId, frameId }: EndpointNameArgs) {
     switch (context as ChannelContext) {
         case "background":
         case "popup":
         case "offscreen":
             return context;
         case "content-script":
-            return formatEndpointName({ context: "extension", tabId });
+            return formatEndpointName({ context: "extension", tabId, frameId });
         default:
-            return formatEndpointName({ context, tabId });
+            return formatEndpointName({ context, tabId, frameId });
     }
 }
 
-export function formatEndpointName({ context, tabId }: EndpointNameArgs) {
-    return tabId !== undefined ? `${context}@${tabId}` : context;
+export function formatEndpointName({ context, tabId, frameId }: EndpointNameArgs) {
+    if (tabId !== undefined && frameId !== undefined) {
+        return `${context}@${tabId}:${frameId}`;
+    } else if (tabId !== undefined) {
+        return `${context}@${tabId}`;
+    }
+    return context;
 }
 
 export function encodeConnectionArgs({ context, fingerprint }: ConnectionArgs): string {
     return `${context}#${fingerprint}`;
 }
 
-export function decodeConnectionArgs(args: string, tabId?: number): ConnectionArgsWithEndpoint {
+export function decodeConnectionArgs(args: string, portInfo: PortInfo): ConnectionArgsWithEndpoint {
     const parts = args.split("#");
     const [context, fingerprint] = parts;
 
@@ -36,7 +41,7 @@ export function decodeConnectionArgs(args: string, tabId?: number): ConnectionAr
 
     return {
         context,
-        endpointName: formatEndpointName({ context, tabId }),
+        endpointName: formatEndpointName({ context, ...portInfo }),
         fingerprint,
     };
 }

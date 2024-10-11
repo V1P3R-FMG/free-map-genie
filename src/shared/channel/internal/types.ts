@@ -9,27 +9,29 @@ export interface ConnectionArgs {
     fingerprint: Fingerprint;
 }
 
+export interface PortInfo {
+    tabId?: number;
+    frameId?: number;
+}
+
 export interface ConnectionArgsWithEndpoint extends ConnectionArgs {
     endpointName: string;
 }
 
-export interface EndpointNameArgs {
+export interface EndpointNameArgs extends PortInfo {
     context: string;
-    tabId?: number;
 }
 
 export type ChannelContext = "content-script" | "extension" | "popup" | "background" | "offscreen";
 
 export type MessageType = "message" | "reply" | "error";
 
-export interface MessageSender {
+export interface MessageSender extends PortInfo {
     context: ChannelContext;
-    tabId?: number;
 }
 
-export interface MessageTarget {
+export interface MessageTarget extends PortInfo {
     context: ChannelContext;
-    tabId?: number;
 }
 
 export interface InternalMessage {

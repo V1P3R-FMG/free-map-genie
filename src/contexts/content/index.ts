@@ -6,7 +6,7 @@ import Key from "./storage/key";
 import storageService from "./services/storage.service";
 import userService from "./services/user.service";
 import { V3SettingsData } from "./storage/data/v3";
-import { sendMessage, onMessage, type ChannelEventDef } from "@shared/channel/content";
+import { onMessage, type ChannelEventDef } from "@shared/channel/content";
 
 declare global {
     export interface Channels {
