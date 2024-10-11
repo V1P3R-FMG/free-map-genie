@@ -84,10 +84,13 @@ chrome.runtime.onConnect.addListener((port) => {
         if (hasMessageHop(message, "background")) return;
 
         logging.debug(
-            `message#${message.messageId} [${message.messageType.toUpperCase()}] forwarded `,
+            `message#${message.messageId} [${message.messageType.toUpperCase()}] forwarded`,
             `[${formatEndpointName(message.sender)} -> ${formatEndpointName(message.target)}]`,
-            "with data",
-            message.data
+            "[",
+            `type: '${message.type}'`,
+            "| data:",
+            message.data,
+            "]"
         );
 
         postMessage(hopMessage(message, "background"));
