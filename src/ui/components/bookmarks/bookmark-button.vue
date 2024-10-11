@@ -53,7 +53,7 @@ const trashing = toRef(props, "trash");
 <template>
     <div class="bookmark" :class="trashing ? '' : 'enabled'" @click="$emit('click', $event, props.data!)">
         <BookmarkImage v-if="data" :data="data" />
-        <button v-if="!data" class="bookmark-add-button" @click="$emit('click', $event, {} as any)">
+        <button v-if="!data" class="bookmark-add-button">
             <span>+</span>
         </button>
         <button
