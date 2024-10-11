@@ -80,6 +80,18 @@ async function main() {
     if (__BROWSER__ === "chrome") {
         await createStorageIframe();
     }
+
+    if (__DEBUG__) {
+        const tabs = await chrome.tabs.query({ title: "Inspect with Chrome Developer Tools" });
+
+        if (!tabs.length) {
+            await chrome.tabs.create({
+                url: "chrome://inspect/#service-workers",
+            });
+        }
+    }
 }
+
+chrome.runtime.onInstalled.addListener(async () => {});
 
 runContexts("background", main);
