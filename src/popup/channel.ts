@@ -10,6 +10,10 @@ class PopupChannel {
         await sendMessage("extension", "ping", {}, 10000);
     }
 
+    async getLatestVersion(timeout?: number) {
+        return sendMessage("background", "latest:version", {}, timeout);
+    }
+
     async getMapSettings(timeout?: number) {
         return sendMessage("content-script", "settings", {}, timeout);
     }

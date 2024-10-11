@@ -1,31 +1,18 @@
 <script lang="ts" setup>
 import { onMounted, ref } from "vue";
 import FontIcon from "@ui/components/font-icon.vue";
+import channel from "./channel";
 
 import * as version from "@utils/version";
 
-const extensionVersion = "2.0.5"; // __VERSION__;
+const extensionVersion = __VERSION__;
 
 const latestVersion = ref(version.full(__VERSION__));
 const updateAvailable = ref(false);
 
-async function getLatestVersion(): Promise<string> {
-    const url = new URL("https://raw.githubusercontent.com");
-    url.pathname = new URL(__HOMEPAGE__).pathname + "/main/package.json";
-
-    const res = await fetch(url.toString());
-    const json = await res.json();
-
-    logging.debug("Package.json url:", url.toString());
-    logging.debug("Package.json:", json);
-
-    latestVersion.value = json.version;
-    return json.version;
-}
-
 async function updateCheck() {
-    const latest = await getLatestVersion();
-    const current = "2.0.5"; //__VERSION__;
+    const latest = await channel.getLatestVersion();
+    const current = "2.0.5"; // __VERSION__;
 
     logging.debug("Current version:", current);
     logging.debug("Latest version:", latest);
@@ -41,6 +28,7 @@ function click() {
 
 onMounted(async () => {
     updateAvailable.value = await updateCheck();
+    latestVersion.value = await channel.getLatestVersion();
     console.log(latestVersion);
 });
 </script>
