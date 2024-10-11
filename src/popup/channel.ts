@@ -6,12 +6,16 @@ import type { BookmarkData } from "@ui/components/bookmarks/bookmark-button.vue"
 import { sendMessage } from "@shared/channel/popup";
 
 class PopupChannel {
-    public async waitForConnected() {
-        await sendMessage("extension", "ping", {}, 10000);
+    public async waitForConnected(timeout: number = 10000) {
+        await sendMessage("extension", "ping", {}, timeout);
     }
 
     async getLatestVersion(timeout?: number) {
         return sendMessage("background", "latest:version", {}, timeout);
+    }
+
+    async reloadActiveTab(timeout?: number) {
+        return sendMessage("background", "reload:active:tab", {}, timeout);
     }
 
     async getMapSettings(timeout?: number) {

@@ -1,3 +1,5 @@
+import { getActiveTabId } from "@utils/chrome";
+
 import { createChannel } from "./internal";
 import { decodeConnectionArgs, formatEndpointName, formatEndpointTargetName } from "./internal/connection-args";
 import { hasMessageHop, hopMessage, isInternalMessage, isMessageFor, isMessageFrom } from "./internal/message";
@@ -13,11 +15,6 @@ const connMap: Map<
         context: string;
     }
 > = new Map();
-
-async function getActiveTabId() {
-    const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
-    return tabs[0].id;
-}
 
 function postMessage(message: InternalMessage) {
     if (message.type === "inject:style") {

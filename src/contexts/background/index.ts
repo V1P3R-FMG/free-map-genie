@@ -1,5 +1,6 @@
 import runContexts from "@shared/run";
 import { onMessage, type ChannelEventDef } from "@shared/channel/background";
+import { getActiveTab } from "@utils/chrome";
 
 import installRules from "./rules";
 import createStorageIframe from "./storage";
@@ -21,6 +22,8 @@ declare global {
             "games:find:game:from:slug": ChannelEventDef<{ gameSlug: string }, MG.Api.Game | undefined>;
             "games:find:map:from:slug": ChannelEventDef<{ gameSlug: string; mapSlug: string }, MG.Api.Map | undefined>;
             "games:find:game:from:domain": ChannelEventDef<{ domain: string }, MG.Api.Game | undefined>;
+            "reload:active:tab": ChannelEventDef<void, boolean>;
+            "open:popup": ChannelEventDef;
         };
     }
 }
@@ -72,6 +75,20 @@ onMessage("games:find:map:from:slug", ({ gameSlug, mapSlug }) => {
 
 onMessage("games:find:game:from:domain", ({ domain }) => {
     return Games.findGameFromDomain(domain);
+});
+
+onMessage("reload:active:tab", async () => {
+    const tab = await getActiveTab();
+
+    if (!tab?.id) return false;
+
+    await chrome.tabs.reload(tab.id);
+
+    return true;
+});
+
+onMessage("open:popup", async () => {
+    await chrome.action.openPopup();
 });
 
 async function main() {

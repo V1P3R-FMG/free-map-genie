@@ -4,12 +4,15 @@ import { ref } from "vue";
 import AlertContainer from "@ui/components/alerts/alert-container.vue";
 import ThemeProvider from "@ui/components/theme-provider.vue";
 import PageContainer from "@ui/components/page-container.vue";
-import AppVersion from "./app-version.vue";
+import FontIcon from "@ui/components/font-icon.vue";
 
 import BookmarksPage from "./pages/bookmarks-page.vue";
 import SettingsPage from "./pages/settings-page.vue";
 
+import AppVersion from "./app-version.vue";
+
 import channel from "./channel";
+import bus from "./bus";
 
 type State = "connected" | "disconnected";
 
@@ -18,6 +21,31 @@ const state = ref<State>("disconnected");
 
 function openHomepage() {
     chrome.tabs.create({ url: __HOMEPAGE__ });
+}
+
+async function reloadActiveTab() {
+    if (!(await channel.reloadActiveTab())) {
+        bus.$emit("alert-error", "Failed to reload active tab.");
+        return;
+    }
+
+    const clean = () => {
+        clearInterval(iHandle);
+        clearTimeout(tHandle);
+    }; //
+
+    const iHandle = setInterval(async () => {
+        try {
+            await channel.waitForConnected(250);
+            window.location.reload();
+            clean();
+        } catch {}
+    }, 250);
+
+    const tHandle = setTimeout(() => {
+        bus.$emit("alert-error", "Failed to reload active tab.");
+        clean();
+    }, 10000);
 }
 
 channel.getMapSettings().then(logging.debug);
@@ -47,7 +75,12 @@ main();
 
             <div class="footer">
                 <span class="author" @click="openHomepage">by {{ author }}</span>
-                <span class="state" :class="{ connected: state === 'connected' }">{{ state }}</span>
+                <span class="state" :class="{ connected: state === 'connected' }">
+                    <button id="footer-reload-button" @click="reloadActiveTab">
+                        <FontIcon v-if="state === 'disconnected'" icon="reload" size="0.8rem" />
+                    </button>
+                    {{ state }}
+                </span>
                 <AppVersion />
             </div>
         </div>
@@ -110,8 +143,20 @@ main();
     cursor: pointer;
 }
 
+#footer-reload-button {
+    background: none;
+    color: none;
+    border: none;
+    padding: 0;
+    transform: translateY(2px);
+    color: inherit;
+    cursor: pointer;
+}
+
 .state {
     color: red;
+
+    gap: 5px;
 }
 
 .state.connected {
