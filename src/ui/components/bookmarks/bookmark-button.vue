@@ -1,13 +1,34 @@
 <script lang="ts" setup>
 import { toRef } from "vue";
-import FontIcon from "../font-icon.vue";
+import { MapgeniePageType } from "@utils/fmg-page";
 
-export interface BookmarkData {
+import FontIcon from "../font-icon.vue";
+import BookmarkImage from "./bookmark-image.vue";
+
+export interface BaseBookmarkData {
+    type: MapgeniePageType;
     title: string;
     url: string;
     icon: string;
     preview?: string;
+    gameIcon: string;
 }
+
+export interface MapBookmarkData extends BaseBookmarkData {
+    type: "map";
+    game: string;
+    gameId: number;
+    map: string;
+    mapId: number;
+}
+
+export interface GameBookmarkData extends BaseBookmarkData {
+    type: "guide" | "game-home";
+    game: string;
+    gameId: number;
+}
+
+export type BookmarkData = GameBookmarkData | MapBookmarkData;
 
 export type Props = {
     isAdd?: boolean;
@@ -27,28 +48,12 @@ defineEmits<{
 }>();
 
 const trashing = toRef(props, "trash");
-const dummyBookmarkData: BookmarkData = {
-    title: "",
-    url: "",
-    icon: "",
-    preview: "",
-};
 </script>
 
 <template>
-    <div class="bookmark" :class="trashing ? '' : 'enabled'">
-        <img
-            v-if="data"
-            class="bookmark-preview"
-            :src="data.preview ?? data.icon"
-            :alt="data.title"
-            :title="data.title"
-            @click="$emit('click', $event, props.data!)"
-            @auxclick="$emit('click', $event, props.data!)"
-            :draggable="false"
-        />
-        <img class="bookmark-icon" v-if="data?.preview" :src="data.icon" />
-        <button v-if="!data" class="bookmark-add-button" @click="$emit('click', $event, dummyBookmarkData)">
+    <div class="bookmark" :class="trashing ? '' : 'enabled'" @click="$emit('click', $event, props.data!)">
+        <BookmarkImage v-if="data" :data="data" />
+        <button v-if="!data" class="bookmark-add-button" @click="$emit('click', $event, {} as any)">
             <span>+</span>
         </button>
         <button
@@ -66,62 +71,32 @@ const dummyBookmarkData: BookmarkData = {
 <style lang="css" scoped>
 .bookmark {
     --bookmark-size: 60px;
-    --game-icon-size: 25px;
 
     display: grid;
+
     justify-content: center;
     align-items: center;
     outline: var(--border) solid 1px;
     outline-offset: 0.5px;
     background-color: var(--item);
+
     width: var(--bookmark-size);
     height: var(--bookmark-size);
-    grid-template-columns: auto var(--game-icon-size);
-    grid-template-rows: auto var(--game-icon-size);
+}
+
+.bookmark > * {
+    grid-column: 1;
+    grid-row: 1;
 }
 
 .bookmark,
-.bookmark-preview,
 .bookmark-trash-button {
     border-radius: 5px;
-}
-
-.bookmark-icon {
-    border-bottom-right-radius: 5px;
-    border-top-left-radius: 5px;
-    box-shadow: -1px -1px 3px 2px rgba(0, 0, 0, 0.712);
 }
 
 .bookmark.enabled:hover {
     outline-color: var(--active);
     outline-width: 2px;
-}
-
-.bookmark-preview {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    -webkit-user-select: none;
-    user-select: none;
-}
-
-.bookmark-icon {
-    width: var(--game-icon-size);
-    height: var(--game-icon-size);
-    -webkit-user-select: none;
-    user-select: none;
-}
-
-.bookmark-trash-button,
-.bookmark-preview,
-.bookmark-add-button {
-    grid-column: 1 / 3;
-    grid-row: 1 / 3;
-}
-
-.bookmark-icon {
-    grid-column: 2;
-    grid-row: 2;
 }
 
 .bookmark-trash-button {
