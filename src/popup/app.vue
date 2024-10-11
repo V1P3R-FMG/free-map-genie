@@ -99,7 +99,7 @@ channel.getMapSettings().then(logging.debug);
         <AlertContainer />
         <div class="app-container">
             <div class="titlebar">
-                <div class="buttons buttons-left">
+                <div class="buttons">
                     <button class="btn" id="mapgenie-btn" @click="openMapgenie">
                         <img id="mapgenie-logo" src="/assets/icons/mapgenie-icon.png" />
                     </button>
@@ -107,7 +107,7 @@ channel.getMapSettings().then(logging.debug);
                 <h3 class="title">
                     <span class="bold">map</span> <span class="light">genie</span><sup class="pro">PRO</sup>
                 </h3>
-                <div class="buttons buttons-right">
+                <div class="buttons flex-right">
                     <button v-if="theme === 'dark'" class="btn" @click="setTheme('light')">
                         <FontIcon icon="light" />
                     </button>
@@ -229,6 +229,10 @@ channel.getMapSettings().then(logging.debug);
 .buttons {
     display: flex;
     gap: 10px;
+}
+
+.flex-right {
+    justify-content: right;
 }
 
 #mapgenie-logo {
