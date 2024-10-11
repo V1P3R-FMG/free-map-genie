@@ -160,9 +160,10 @@ channel.getMapSettings().then(logging.debug);
 }
 
 .titlebar {
-    display: flex;
-    justify-content: space-between;
+    display: grid;
+    justify-content: center;
     align-items: center;
+    grid-template-columns: 1fr 3fr 1fr;
     margin: 0 5px;
     padding-bottom: 5px;
     border-bottom: solid 1px var(--border);
@@ -173,6 +174,7 @@ channel.getMapSettings().then(logging.debug);
     text-transform: uppercase;
     grid-column: 2;
     margin: 0;
+    text-align: center;
 }
 
 .pro {
