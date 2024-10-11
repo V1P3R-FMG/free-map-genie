@@ -1,5 +1,5 @@
 {
     "background": {
-        "scripts": ["background.js"]
+        "page": "storage/background.html"
     }
 }

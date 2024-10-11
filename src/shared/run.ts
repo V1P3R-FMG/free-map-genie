@@ -1,5 +1,3 @@
-import { ChannelRequestError } from "./channel";
-
 export interface RunContext {
     (): Promise<any> | any;
 }
@@ -22,9 +20,7 @@ export default async function runContexts(name: string, ...contexts: RunContext[
         })
         .catch((e) => {
             success = false;
-            if (e instanceof ChannelRequestError) {
-                logging.error(`Failed to initialize ${name} context reason,`, e.message, "Data", e.data, "\n", e.stack);
-            } else if (e instanceof Error) {
+            if (e instanceof Error) {
                 logging.error(`Failed to initialize ${name} context reason,`, e.message, e.stack);
             } else {
                 logging.error(`Failed to initialize ${name} context reason,`, e);

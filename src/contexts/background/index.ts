@@ -1,109 +1,85 @@
 import runContexts from "@shared/run";
-import * as s from "@shared/schema";
+import { onMessage, type ChannelEventDef } from "@shared/channel/background";
 
 import installRules from "./rules";
 import createStorageIframe from "./storage";
-import { forwardMessage, logMessage } from "./message";
+import fetchLatestVersion from "./version";
 import Games from "./games";
 
-const messageScheme = s.union([
-    s.object({
-        type: s.literal("channel"),
-        data: s.any(),
-    }),
-    s.object({
-        type: s.literal("games"),
-        data: s.literal(undefined),
-    }),
-    s.object({
-        type: s.literal("games:find:game"),
-        data: s.object({ gameId: s.number() }),
-    }),
-    s.object({
-        type: s.literal("games:find:map"),
-        data: s.object({ gameId: s.number(), mapId: s.number() }),
-    }),
-    s.object({
-        type: s.literal("game"),
-        data: s.object({ gameId: s.number() }),
-    }),
-    s.object({
-        type: s.literal("map"),
-        data: s.object({ mapId: s.number() }),
-    }),
-    s.object({
-        type: s.literal("heatmaps"),
-        data: s.object({ mapId: s.number() }),
-    }),
-    s.object({
-        type: s.literal("start:login"),
-        data: s.string(),
-    }),
-    s.object({
-        type: s.literal("login"),
-        data: s.literal(undefined),
-    }),
-]);
-
-export type MessageScheme = s.Type<typeof messageScheme>;
-
-async function handleAsync(promise: Promise<any>, sendResponse: (response?: any) => void) {
-    try {
-        sendResponse(await promise);
-    } catch (err) {
-        logging.error(err);
+declare global {
+    export interface Channels {
+        background: {
+            "latest:version": ChannelEventDef<void, string>;
+            "start:login": ChannelEventDef<{ url: string }>;
+            "login": ChannelEventDef<void, string>;
+            "games": ChannelEventDef<void, MG.Api.Game[]>;
+            "game": ChannelEventDef<{ gameId: number }, MG.Api.GameFull>;
+            "map": ChannelEventDef<{ mapId: number }, MG.Api.MapFull>;
+            "heatmaps": ChannelEventDef<{ mapId: number }, MG.Api.HeatmapGroup>;
+            "games:find:game": ChannelEventDef<{ gameId: number }, MG.Api.Game | undefined>;
+            "games:find:map": ChannelEventDef<{ mapId: number; gameId: number }, MG.Api.Map | undefined>;
+            "games:find:game:from:slug": ChannelEventDef<{ gameSlug: string }, MG.Api.Game | undefined>;
+            "games:find:map:from:slug": ChannelEventDef<{ gameSlug: string; mapSlug: string }, MG.Api.Map | undefined>;
+            "games:find:game:from:domain": ChannelEventDef<{ domain: string }, MG.Api.Game | undefined>;
+        };
     }
 }
 
+onMessage("latest:version", () => {
+    return fetchLatestVersion();
+});
+
+onMessage("start:login", ({ url }) => {
+    return chrome.storage.session.set({ last_mg_url: url });
+});
+
+onMessage("login", async () => {
+    const { last_mg_url } = await chrome.storage.session.get("last_mg_url");
+    return last_mg_url;
+});
+
+onMessage("games", () => {
+    return Games.getGames();
+});
+
+onMessage("game", ({ gameId }) => {
+    return Games.getGame(gameId);
+});
+
+onMessage("map", ({ mapId }) => {
+    return Games.getMap(mapId);
+});
+
+onMessage("heatmaps", ({ mapId }) => {
+    return Games.getHeatmaps(mapId);
+});
+
+onMessage("games:find:game", ({ gameId }) => {
+    return Games.findGame(gameId);
+});
+
+onMessage("games:find:map", ({ gameId, mapId }) => {
+    return Games.findMap(gameId, mapId);
+});
+
+onMessage("games:find:game:from:slug", ({ gameSlug }) => {
+    return Games.findGameFromSlug(gameSlug);
+});
+
+onMessage("games:find:map:from:slug", ({ gameSlug, mapSlug }) => {
+    return Games.findMapFromSlug(gameSlug, mapSlug);
+});
+
+onMessage("games:find:game:from:domain", ({ domain }) => {
+    return Games.findGameFromDomain(domain);
+});
+
 async function main() {
-    chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-        try {
-            const { type, data } = messageScheme.parse(message);
-
-            switch (type) {
-                case "channel":
-                    forwardMessage(sender, data)
-                        .then((forwarded) => forwarded && logMessage(data, sender))
-                        .then((_) => sendResponse({ success: true }))
-                        .catch((err) => sendResponse({ success: false, data: `${err}` }));
-                    return true;
-                case "start:login":
-                    chrome.storage.session.set({ last_mg_url: data });
-                    return false;
-                case "login":
-                    return handleAsync(
-                        chrome.storage.session.get("last_mg_url").then(({ last_mg_url }) => last_mg_url),
-                        sendResponse
-                    );
-                case "games":
-                    handleAsync(Games.getGames(), sendResponse);
-                    return true;
-                case "game":
-                    handleAsync(Games.getGame(data.gameId), sendResponse);
-                    return true;
-                case "map":
-                    handleAsync(Games.getMap(data.mapId), sendResponse);
-                    return true;
-                case "heatmaps":
-                    handleAsync(Games.getHeatmaps(data.mapId), sendResponse);
-                    return true;
-                case "games:find:game":
-                    handleAsync(Games.findGame(data.gameId), sendResponse);
-                    return true;
-                case "games:find:map":
-                    handleAsync(Games.findMap(data.gameId, data.mapId), sendResponse);
-                    return true;
-                default:
-                    return false;
-            }
-        } catch (err) {
-            if (err instanceof s.SchemaError) return false;
-            throw err;
-        }
-    });
-
     await installRules();
-    await createStorageIframe();
+
+    if (__BROWSER__ === "chrome") {
+        await createStorageIframe();
+    }
 }
 
 runContexts("background", main);

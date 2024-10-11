@@ -28,22 +28,38 @@ export class GamesService {
         return games.find((game) => game.id === gameId);
     }
 
+    public async findGameFromSlug(gameSlug: string) {
+        const games = await this.getGames();
+        return games.find((game) => game.slug === gameSlug);
+    }
+
     public async findMap(gameId: number, mapId: number) {
         const game = await this.findGame(gameId);
         return game?.maps.find((map) => map.id === mapId);
     }
 
-    public getGame(gameId: number) {
+    public async findMapFromSlug(gameSlug: string, mapSlug: string) {
+        const game = await this.findGameFromSlug(gameSlug);
+        return game?.maps.find((map) => map.slug === mapSlug);
+    }
+
+    public async findGameFromDomain(domain: string) {
+        domain = domain.replace(/^https:\/\//, "");
+        const games = await this.getGames();
+        return games.find((game) => game.domain === domain);
+    }
+
+    public async getGame(gameId: number) {
         this.gamesFull[gameId] ??= this.fetch(`${ORIGIN}/api/v1/games/${gameId}/full`);
         return this.gamesFull[gameId].data;
     }
 
-    public getMap(mapId: number) {
+    public async getMap(mapId: number) {
         this.mapsFull[mapId] ??= this.fetch(`${ORIGIN}/api/v1/maps/${mapId}/full`);
         return this.mapsFull[mapId].data;
     }
 
-    public getHeatmaps(mapId: number) {
+    public async getHeatmaps(mapId: number) {
         this.heatmaps[mapId] ??= this.fetch(`${ORIGIN}/api/v1/maps/${mapId}/heatmaps`);
         return this.heatmaps[mapId].data;
     }

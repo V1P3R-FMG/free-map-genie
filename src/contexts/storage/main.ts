@@ -1,65 +1,48 @@
-import { Channels } from "@constants";
-import Channel, { ResponseType } from "@shared/channel";
+import { onMessage, type ChannelEventDef } from "@shared/channel/offscreen";
 import { isIframeContext } from "@shared/context";
 import runContexts from "@shared/run";
-import * as s from "@shared/schema";
 
-const messageScheme = s.union([
-    s.object({
-        type: s.literal("has"),
-        data: s.object({ key: s.string() }),
-    }),
-    s.object({
-        type: s.literal("get"),
-        data: s.object({ key: s.string() }),
-    }),
-    s.object({
-        type: s.literal("set"),
-        data: s.object({ key: s.string(), value: s.string() }),
-    }),
-    s.object({
-        type: s.literal("remove"),
-        data: s.object({ key: s.string() }),
-    }),
-    s.object({
-        type: s.literal("keys"),
-        data: s.literal(undefined),
-    }),
-]);
+declare global {
+    export interface Channels {
+        offscreen: {
+            has: ChannelEventDef<{ key: string }, boolean>;
+            get: ChannelEventDef<{ key: string }, string | null>;
+            set: ChannelEventDef<{ key: string; value: string }>;
+            remove: ChannelEventDef<{ key: string }>;
+            keys: ChannelEventDef<void, string[]>;
+        };
+    }
+}
 
-export type MessageScheme = s.Type<typeof messageScheme>;
-
-async function main() {
+function isOffscreen() {
     const params = new URLSearchParams(window.location.search);
-    if (!isIframeContext() || !params.get("storage")) return false;
+    return isIframeContext() || params.get("storage");
+}
 
-    const _ = Channel.port(Channels.Mapgenie, (message, sendResponse) => {
-        const { type, data } = messageScheme.parse(message);
-        switch (type) {
-            case "has": {
-                sendResponse(window.localStorage.getItem(data.key) != null);
-                return ResponseType.Handled;
-            }
-            case "get": {
-                sendResponse(window.localStorage.getItem(data.key));
-                return ResponseType.Handled;
-            }
-            case "set": {
-                window.localStorage.setItem(data.key, data.value);
-                return ResponseType.Handled;
-            }
-            case "remove": {
-                window.localStorage.removeItem(data.key);
-                return ResponseType.Handled;
-            }
-            case "keys": {
-                sendResponse(Object.keys(window.localStorage));
-                return ResponseType.Handled;
-            }
-            default:
-                return ResponseType.NotHandled;
-        }
+if (isOffscreen()) {
+    onMessage("has", ({ key }) => {
+        return window.localStorage.getItem(key) != null;
+    });
+
+    onMessage("get", ({ key }) => {
+        return window.localStorage.getItem(key);
+    });
+
+    onMessage("set", ({ key, value }) => {
+        window.localStorage.setItem(key, value);
+    });
+
+    onMessage("remove", ({ key }) => {
+        window.localStorage.removeItem(key);
+    });
+
+    onMessage("keys", () => {
+        return Object.keys(window.localStorage);
     });
 }
 
-runContexts("storage", main);
+setInterval(() => 1000);
+
+runContexts("mapgenie storage", async () => isOffscreen());
+
+logging.debug("hello world", localStorage);

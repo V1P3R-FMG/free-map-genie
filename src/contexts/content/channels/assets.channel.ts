@@ -1,12 +1,12 @@
 import BaseChannel from "./base.channel";
 
 class AssetsChannel extends BaseChannel {
-    public async getAsset(path: string): Promise<string> {
-        return this.sendExtension({ type: "asset", data: path });
+    public async getAsset(path: string, timeout?: number) {
+        return this.sendExtension("asset", { path }, timeout);
     }
 
-    public async injectStyle(path: string): Promise<string> {
-        return this.sendExtension({ type: "inject:style", data: path });
+    public async injectStyle(path: string, timeout?: number) {
+        return this.sendExtension("inject:style", { path }, timeout);
     }
 }
 

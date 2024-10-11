@@ -32,10 +32,11 @@ export default async function getConfig(): Promise<webpack.Configuration> {
             "background": "./src/contexts/background/index.ts",
             "content": "./src/contexts/content/index.ts",
             "storage/main": "./src/contexts/storage/main.ts",
-            "storage/offscreen": "./src/contexts/storage/offscreen.ts",
             "popup/index": "./src/popup/index.ts",
         },
-        output: { path: buildInfo.out },
+        output: {
+            path: buildInfo.out,
+        },
         resolve: {
             extensions: [".ts", ".js", ".json", ".vue"],
             alias: {
@@ -91,6 +92,16 @@ export default async function getConfig(): Promise<webpack.Configuration> {
             ],
         },
         plugins: [
+            // ...(buildInfo.browser === "firefox"
+            //     ? [
+            //           new HtmlPlugin({
+            //               chunks: [],
+            //               filename: "background.html",
+            //               template: "./src/contexts/background/index.html",
+            //           }),
+            //       ]
+            //     : []),
+            // ...(buildInfo.browser === "chrome" ? [] : []),
             new FantasticonPlugin({
                 config: {
                     name: "fmg-font",
@@ -108,10 +119,9 @@ export default async function getConfig(): Promise<webpack.Configuration> {
                 template: "./src/popup/index.html",
             }),
             new HtmlPlugin({
-                // chunks: ["iframe"],
-                chunks: ["storage/offscreen"],
-                filename: "storage/offscreen.html",
-                template: "./src/contexts/storage/offscreen.html",
+                chunks: buildInfo.browser === "firefox" ? ["background"] : [],
+                filename: "storage/background.html",
+                template: "./src/contexts/storage/background.html",
             }),
             new MiniCssExtractPlugin({
                 filename: "css/[name].css",

@@ -1,57 +1,33 @@
 import bus from "@popup/bus";
 
-import Channel from "@shared/channel";
-import { Channels } from "@constants";
-
-import type { MessageScheme as ContentMessageScheme } from "@content/index";
-import type { ExtensionMessageScheme, CreateBookmarkResult } from "@extension/index";
-import type { MessageScheme as StorageMessageScheme } from "contexts/storage/main";
-import type { V3SettingsData } from "@content/storage/data/v3";
+import type { CreateBookmarkResult } from "@extension/bookmarks";
 
 import type { BookmarkData } from "@ui/components/bookmarks/bookmark-button.vue";
+import { sendMessage } from "@shared/channel/popup";
 
 class PopupChannel {
-    private readonly channel = Channel.extension(Channels.Popup);
-
-    private async sendContent(data: ContentMessageScheme, timeout?: number) {
-        return this.channel.send(Channels.Extension, data, timeout);
-    }
-
-    private async sendExtension(data: ExtensionMessageScheme, timeout?: number) {
-        return this.channel.send(Channels.Extension, data, timeout);
-    }
-
-    private async sendStorage(data: StorageMessageScheme, timeout?: number) {
-        return this.channel.send(Channels.Mapgenie, data, timeout);
-    }
-
     public async waitForConnected() {
-        await this.channel.waitForChannel(Channels.Extension, 10000);
+        await sendMessage("extension", "ping", {}, 10000);
     }
 
-    async getMapSettings(timeout?: number): Promise<V3SettingsData> {
-        return this.sendContent({ type: "settings", data: undefined }, timeout);
+    async getMapSettings(timeout?: number) {
+        return sendMessage("content-script", "settings", {}, timeout);
     }
 
     async getBookmarks(timeout?: number): Promise<BookmarkData[]> {
-        return JSON.parse(
-            (await this.sendStorage({ type: "get", data: { key: "fmg:bookmarks:v3" } }, timeout)) ?? "[]"
-        );
+        return JSON.parse((await sendMessage("offscreen", "get", { key: "fmg:bookmarks:v3" }, timeout)) ?? "[]");
     }
 
     async setBookmarks(bookmarks: BookmarkData[], timeout?: number) {
-        return this.sendStorage(
-            { type: "set", data: { key: "fmg:bookmarks:v3", value: JSON.stringify(bookmarks) } },
-            timeout
-        );
+        return sendMessage("offscreen", "set", { key: "fmg:bookmarks:v3", value: JSON.stringify(bookmarks) }, timeout);
     }
 
     async clearBookmarks(timeout?: number) {
-        return this.sendStorage({ type: "remove", data: { key: "fmg:bookmarks:v3" } }, timeout);
+        return sendMessage("offscreen", "remove", { key: "fmg:bookmarks:v3" }, timeout);
     }
 
     async createBookmark(timeout?: number): Promise<CreateBookmarkResult> {
-        return this.sendExtension({ type: "create-bookmark", data: undefined }, timeout);
+        return sendMessage("extension", "bookmark:create", {}, timeout);
     }
 
     async addBookmark(timeout?: number): Promise<BookmarkData[]> {

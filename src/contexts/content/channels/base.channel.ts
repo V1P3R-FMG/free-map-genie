@@ -1,24 +1,32 @@
-import Channel from "@shared/channel";
-import { Channels } from "@constants";
-
-import type { MessageScheme as BackgroundMessageScheme } from "@background/index";
-import type { ExtensionMessageScheme } from "@extension/index";
-import type { MessageScheme as IframeMessageScheme } from "contexts/storage/main";
+import {
+    type ChannelEventData,
+    type ChannelEventRet,
+    type ChannelEventNames,
+    sendMessage,
+} from "@shared/channel/content";
 
 export default class BaseChannel {
-    private readonly channel = Channel.window(Channels.Content);
-
-    protected sendBackground(message: BackgroundMessageScheme, timeout?: number) {
-        // Still sending to extension but it will forward this message
-        return this.channel.send(Channels.Extension, message, timeout);
+    protected sendBackground<T extends ChannelEventNames<"background">>(
+        type: T,
+        data: ChannelEventData<"background", T>,
+        timeout?: number
+    ): ChannelEventRet<"background", T> {
+        return sendMessage("background", type, data, timeout);
     }
 
-    protected sendExtension(message: ExtensionMessageScheme, timeout?: number) {
-        return this.channel.send(Channels.Extension, message, timeout);
+    protected sendExtension<T extends ChannelEventNames<"extension">>(
+        type: T,
+        data: ChannelEventData<"extension", T>,
+        timeout?: number
+    ) {
+        return sendMessage("extension", type, data, timeout);
     }
 
-    protected sendIframe(message: IframeMessageScheme, timeout?: number) {
-        // Still sending to extension but it will forward this message
-        return this.channel.send(Channels.Extension, message, timeout);
+    protected sendOffscreen<T extends ChannelEventNames<"offscreen">>(
+        type: T,
+        data: ChannelEventData<"offscreen", T>,
+        timeout?: number
+    ) {
+        return sendMessage("offscreen", type, data, timeout);
     }
 }

@@ -1,28 +1,28 @@
 import BaseChannel from "./base.channel";
 
 class GamesChannel extends BaseChannel {
-    public async getAll(): Promise<MG.Api.Game[]> {
-        return this.sendBackground({ type: "games", data: undefined });
+    public async getAll(timeout?: number) {
+        return this.sendBackground("games", {}, timeout);
     }
 
-    public async findGame(gameId: number): Promise<Possible<MG.Api.Game>> {
-        return this.sendBackground({ type: "games:find:game", data: { gameId } });
+    public async findGame(gameId: number, timeout?: number) {
+        return this.sendBackground("games:find:game", { gameId }, timeout);
     }
 
-    public async findMap(gameId: number, mapId: number): Promise<Possible<MG.Api.Map>> {
-        return this.sendBackground({ type: "games:find:map", data: { gameId, mapId } });
+    public async findMap(gameId: number, mapId: number, timeout?: number) {
+        return this.sendBackground("games:find:map", { gameId, mapId }, timeout);
     }
 
-    public async getGame(gameId: number): Promise<MG.Api.GameFull> {
-        return this.sendBackground({ type: "game", data: { gameId } });
+    public async getGame(gameId: number, timeout?: number) {
+        return this.sendBackground("game", { gameId }, timeout);
     }
 
-    public async getMap(mapId: number): Promise<MG.Api.MapFull> {
-        return this.sendBackground({ type: "map", data: { mapId } });
+    public async getMap(mapId: number, timeout?: number) {
+        return this.sendBackground("map", { mapId }, timeout);
     }
 
-    public async getHeatmaps(mapId: number): Promise<MG.Api.HeatmapGroup[]> {
-        return this.sendBackground({ type: "heatmaps", data: { mapId } });
+    public async getHeatmaps(mapId: number, timeout?: number) {
+        return this.sendBackground("heatmaps", { mapId }, timeout);
     }
 }
 

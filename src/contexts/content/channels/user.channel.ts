@@ -1,12 +1,12 @@
 import BaseChannel from "./base.channel";
 
 class UserChannel extends BaseChannel {
-    public async sendStartLogin() {
-        return this.sendBackground({ type: "start:login", data: window.location.href });
+    public async sendStartLogin(timeout?: number) {
+        return this.sendBackground("start:login", { url: window.location.href }, timeout);
     }
 
-    public async sendLogin() {
-        return this.sendBackground({ type: "login", data: undefined });
+    public async sendLogin(timeout?: number) {
+        return this.sendBackground("login", {}, timeout);
     }
 }
 

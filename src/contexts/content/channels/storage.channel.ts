@@ -1,24 +1,24 @@
 import BaseChannel from "./base.channel";
 
 class StorageChannel extends BaseChannel {
-    public async has(key: string): Promise<boolean> {
-        return this.sendIframe({ type: "has", data: { key } });
+    public async has(key: string, timeout?: number) {
+        return this.sendOffscreen("has", { key }, timeout);
     }
 
-    public async get(key: string): Promise<string> {
-        return this.sendIframe({ type: "get", data: { key } });
+    public async get(key: string, timeout?: number) {
+        return this.sendOffscreen("get", { key }, timeout);
     }
 
-    public async set(key: string, value: string): Promise<void> {
-        return this.sendIframe({ type: "set", data: { key, value } });
+    public async set(key: string, value: string, timeout?: number) {
+        return this.sendOffscreen("set", { key, value }, timeout);
     }
 
-    public async remove(key: string): Promise<void> {
-        return this.sendIframe({ type: "remove", data: { key } });
+    public async remove(key: string, timeout?: number) {
+        return this.sendOffscreen("remove", { key }, timeout);
     }
 
-    public async keys(): Promise<string[]> {
-        return this.sendIframe({ type: "keys", data: undefined });
+    public async keys(timeout?: number) {
+        return this.sendOffscreen("keys", {}, timeout);
     }
 }
 

@@ -8423,6 +8423,11 @@ timers-ext@^0.1.7:
     es5-ext "^0.10.64"
     next-tick "^1.1.0"
 
+tiny-uid@^1.1.2:
+  version "1.1.2"
+  resolved "https://registry.yarnpkg.com/tiny-uid/-/tiny-uid-1.1.2.tgz#6ccf1bd9877151daedada63f896a4b20d315c0dc"
+  integrity sha512-0beRFXR+fv4C40ND2PqgNjq6iyB1dKXciKJjslLw0kPYCcR82aNd2b+Tt2yy06LimIlvtoehgvrm/fUZCutSfg==
+
 titleize@^3.0.0:
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/titleize/-/titleize-3.0.0.tgz#71c12eb7fdd2558aa8a44b0be83b8a76694acd53"

@@ -1,5 +1,5 @@
-const DEFAULT_TIMEOUT = 30000;
-const DEFAULT_INTERVAL = 1000;
+export const DEFAULT_TIMEOUT = 30000;
+export const DEFAULT_INTERVAL = 1000;
 
 interface State {
     resolved: boolean;

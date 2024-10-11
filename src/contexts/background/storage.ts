@@ -5,20 +5,17 @@ function offscreenDocumentReason(reason: `${chrome.offscreen.Reason}`): chrome.o
 function contextType(type: `${chrome.runtime.ContextType}`): chrome.runtime.ContextType {
     return type as chrome.runtime.ContextType;
 }
-
 export default async function createStorageIframe() {
     const existingContexts = await chrome.runtime.getContexts({
         contextTypes: [contextType("OFFSCREEN_DOCUMENT")],
-        documentUrls: [chrome.runtime.getURL("storage/offscreen.html")],
+        documentUrls: [chrome.runtime.getURL("storage/background.html")],
     });
 
-    if (existingContexts.length > 0) {
-        return;
-    }
+    if (existingContexts.length) return;
 
     await chrome.offscreen.createDocument({
-        url: "storage/offscreen.html",
-        reasons: [offscreenDocumentReason("LOCAL_STORAGE")],
+        url: "storage/background.html",
+        reasons: [offscreenDocumentReason("IFRAME_SCRIPTING")],
         justification: "saving / loading user data",
     });
 }
