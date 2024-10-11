@@ -191,6 +191,10 @@ main();
     color: inherit;
 }
 
+.btn:hover {
+    color: var(--active);
+}
+
 .buttons {
     display: flex;
     gap: 10px;
