@@ -46,5 +46,6 @@ bus.$on("alert-error", (message) => addAlert("error", message));
     right: 5px;
     margin: 5px;
     gap: 5px;
+    z-index: 2;
 }
 </style>
