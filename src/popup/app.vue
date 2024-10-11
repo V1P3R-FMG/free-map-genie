@@ -5,7 +5,6 @@ import AlertContainer from "@ui/components/alerts/alert-container.vue";
 import ThemeProvider from "@ui/components/theme-provider.vue";
 import PageContainer from "@ui/components/page-container.vue";
 import FontIcon from "@ui/components/font-icon.vue";
-// import FmgImage from "@ui/components/content/fmg-image.vue";
 
 import BookmarksPage from "./pages/bookmarks-page.vue";
 import SettingsPage from "./pages/settings-page.vue";
@@ -72,7 +71,7 @@ main();
 </script>
 
 <template>
-    <ThemeProvider theme="dark">
+    <ThemeProvider theme="dark" :modify="{ active: '#ED6363' }">
         <AlertContainer />
         <div class="app-container">
             <div class="titlebar">

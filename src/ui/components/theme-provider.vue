@@ -1,26 +1,32 @@
 <script lang="ts" setup>
 import "../themes/*.css";
-import { watch, ref } from "vue";
+import { toRef, computed } from "vue";
+
+import * as string from "@utils/string";
+
+export interface Theme {
+    active?: string;
+}
 
 export interface Props {
     theme: string;
+    modify: Theme;
 }
 
 const props = defineProps<Props>();
+const theme = toRef(props, "theme");
+const modify = toRef(props, "modify");
 
-const currentTheme = ref("auto");
-
-watch(
-    () => props.theme,
-    (theme) => {
-        currentTheme.value = theme;
-    }
-);
+const style = computed(() => {
+    return Object.entries(modify.value)
+        .map(([k, v]) => `--${string.kebabCase(k)}: ${v}`)
+        .join(";");
+});
 
 function updateTheme() {
-    if (currentTheme.value === "auto") {
+    if (theme.value === "auto") {
         const isDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-        currentTheme.value = isDark ? "dark" : "light";
+        theme.value = isDark ? "dark" : "light";
     }
 }
 
@@ -28,17 +34,22 @@ window.matchMedia("(prefers-color-scheme: dark)").onchange = updateTheme;
 
 updateTheme();
 
-function setTheme(theme: string) {
-    currentTheme.value = theme;
+function setTheme(name: string) {
+    theme.value = name;
+}
+
+function setModify(theme: Theme) {
+    modify.value = theme;
 }
 
 defineExpose({
-    setTheme: setTheme,
+    setTheme,
+    setModify,
 });
 </script>
 
 <template>
-    <div class="theme-provider" :theme="currentTheme">
+    <div :style="style" class="theme-provider" :theme="theme">
         <slot></slot>
     </div>
 </template>
