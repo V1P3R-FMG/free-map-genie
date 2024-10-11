@@ -92,16 +92,6 @@ export default async function getConfig(): Promise<webpack.Configuration> {
             ],
         },
         plugins: [
-            // ...(buildInfo.browser === "firefox"
-            //     ? [
-            //           new HtmlPlugin({
-            //               chunks: [],
-            //               filename: "background.html",
-            //               template: "./src/contexts/background/index.html",
-            //           }),
-            //       ]
-            //     : []),
-            // ...(buildInfo.browser === "chrome" ? [] : []),
             new FantasticonPlugin({
                 config: {
                     name: "fmg-font",
