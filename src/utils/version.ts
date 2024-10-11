@@ -1,6 +1,6 @@
 export function full(version: string): string {
     const parts = version.split(".").slice(0, 4);
-    while (parts.length < 4) {
+    while (parts.length < 3) {
         parts.push("0");
     }
     return parts.join(".");
