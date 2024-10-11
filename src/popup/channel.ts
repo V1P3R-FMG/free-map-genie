@@ -4,6 +4,7 @@ import type { CreateBookmarkResult } from "@extension/bookmarks";
 
 import type { BookmarkData } from "@ui/components/bookmarks/bookmark-button.vue";
 import { sendMessage } from "@shared/channel/popup";
+import { ThemeName } from "@ui/components/theme-provider.vue";
 
 class PopupChannel {
     public async waitForConnected(timeout: number = 10000) {
@@ -16,6 +17,15 @@ class PopupChannel {
 
     async reloadActiveTab(timeout?: number) {
         return sendMessage("background", "reload:active:tab", {}, timeout);
+    }
+
+    async getThemePreference(timeout?: number) {
+        const theme = await sendMessage("offscreen", "get", { key: "fmg:theme:v3" }, timeout);
+        return (theme as ThemeName | null) ?? "auto";
+    }
+
+    async setThemePreference(theme: ThemeName, timeout?: number) {
+        await sendMessage("offscreen", "set", { key: "fmg:theme:v3", value: theme }, timeout);
     }
 
     async reloadExtension(timeout?: number) {

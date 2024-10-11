@@ -1,8 +1,8 @@
 <script lang="ts" setup>
-import { ref } from "vue";
+import { ComponentInstance, onMounted, ref } from "vue";
 
 import AlertContainer from "@ui/components/alerts/alert-container.vue";
-import ThemeProvider from "@ui/components/theme-provider.vue";
+import ThemeProvider, { type ThemeName } from "@ui/components/theme-provider.vue";
 import PageContainer from "@ui/components/page-container.vue";
 import FontIcon from "@ui/components/font-icon.vue";
 
@@ -14,10 +14,15 @@ import AppVersion from "./app-version.vue";
 import channel from "./channel";
 import bus from "./bus";
 
+const themeProvider = ref<ComponentInstance<typeof ThemeProvider>>();
+
 type State = "connected" | "disconnected";
 
 const author = __AUTHOR__;
 const state = ref<State>("disconnected");
+
+const themePreference = ref<ThemeName | "auto">("auto");
+const theme = ref<ThemeName | undefined>();
 
 function openHomepage() {
     chrome.tabs.create({ url: __HOMEPAGE__ });
@@ -60,23 +65,42 @@ async function reloadExtension() {
     await channel.reloadExtension();
 }
 
-channel.getMapSettings().then(logging.debug);
+async function setTheme(name: ThemeName) {
+    themeProvider.value?.setTheme(name);
+    await channel.setThemePreference(name);
+}
 
-async function main() {
+async function setThemePreference() {
+    logging.debug(await channel.getThemePreference());
+    themePreference.value = await channel.getThemePreference();
+}
+
+async function setConnectionState() {
     await channel.waitForConnected();
     state.value = "connected";
 }
 
-main();
+onMounted(async () => {
+    theme.value = themeProvider.value?.getTheme();
+
+    await Promise.all([setThemePreference(), setConnectionState()]);
+});
+
+channel.getMapSettings().then(logging.debug);
 </script>
 
 <template>
-    <ThemeProvider theme="dark" :modify="{ active: '#ED6363' }">
+    <ThemeProvider
+        :theme="themePreference"
+        :modify="{ active: '#ED6363' }"
+        ref="themeProvider"
+        @changed="(name) => (theme = name)"
+    >
         <AlertContainer />
         <div class="app-container">
             <div class="titlebar">
                 <div class="buttons buttons-left">
-                    <button class="btn" @click="openMapgenie">
+                    <button class="btn" id="mapgenie-btn" @click="openMapgenie">
                         <img id="mapgenie-logo" src="/assets/icons/mapgenie-icon.png" />
                     </button>
                 </div>
@@ -84,6 +108,12 @@ main();
                     <span class="bold">map</span> <span class="light">genie</span><sup class="pro">PRO</sup>
                 </h3>
                 <div class="buttons buttons-right">
+                    <button v-if="theme === 'dark'" class="btn" @click="setTheme('light')">
+                        <FontIcon icon="light" />
+                    </button>
+                    <button v-if="theme === 'light'" class="btn" @click="setTheme('dark')">
+                        <FontIcon icon="dark" />
+                    </button>
                     <button class="btn" @click="reloadExtension">
                         <FontIcon icon="reload" />
                     </button>
@@ -204,5 +234,10 @@ main();
     width: 26px;
     height: 26px;
     border-radius: 50%;
+}
+
+#mapgenie-btn {
+    --drop-shadow-color: color-mix(in srgb, var(--color) 50%, transparent);
+    filter: drop-shadow(0 0 1px var(--drop-shadow-color));
 }
 </style>
