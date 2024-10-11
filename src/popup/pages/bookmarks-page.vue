@@ -46,7 +46,7 @@ onBeforeMount(async () => {
 </script>
 
 <template>
-    <PageView name="bookmarks" icon="attention">
+    <PageView name="bookmarks" icon="bookmark">
         <div class="action-bar">
             <button class="trash-button" :class="{ active: trashing }" @click="trashing = !trashing">
                 <FontIcon icon="trash" />
