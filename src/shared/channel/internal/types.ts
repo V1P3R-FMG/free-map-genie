@@ -52,6 +52,7 @@ export interface DriverOnMessageCallback {
 export interface ChannelDriver {
     postMessage(message: InternalMessage): void;
     onMessage(cb: DriverOnMessageCallback): void;
+    disconnect(): void;
 }
 
 export type Fingerprint = `uid::${string}`;

@@ -31,6 +31,7 @@ function postMessage(message: InternalMessage) {
 const channel = createChannel("background", {
     onMessage: (cb) => chrome.runtime.onMessage.addListener(cb),
     postMessage,
+    disconnect: () => {},
 });
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
@@ -99,11 +100,11 @@ chrome.runtime.onConnect.addListener((port) => {
     port.onDisconnect.addListener(() => {
         if (connMap.get(connArgs.endpointName)?.fingerprint === connArgs.fingerprint) {
             connMap.delete(connArgs.endpointName);
-            logging.debug(`Port removed ${connArgs.endpointName}#${connArgs.fingerprint}.`, port.name, port.sender);
+            //logging.debug(`Port removed ${connArgs.endpointName}#${connArgs.fingerprint}.`, port.name, port.sender);
         }
     });
 
-    logging.debug(`Port added ${connArgs.endpointName}#${connArgs.fingerprint}.`, port.name, port.sender);
+    //logging.debug(`Port added ${connArgs.endpointName}#${connArgs.fingerprint}.`, port.name, port.sender);
 });
 
 if (__DEBUG__) {

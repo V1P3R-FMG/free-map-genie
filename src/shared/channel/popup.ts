@@ -10,4 +10,4 @@ const port = createPortChannelDriver("popup", fingerprint);
 
 const channel = createChannel("popup", port);
 
-export const { onMessage, sendMessage } = channel;
+export const { onMessage, sendMessage, disconnect } = channel;

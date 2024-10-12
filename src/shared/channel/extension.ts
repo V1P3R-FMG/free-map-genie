@@ -33,4 +33,4 @@ win.onMessage(async (message) => {
     port.postMessage(message);
 });
 
-export const { onMessage, sendMessage } = channel;
+export const { onMessage, sendMessage, disconnect } = channel;

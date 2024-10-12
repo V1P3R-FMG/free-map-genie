@@ -1,7 +1,7 @@
 import runContexts from "@shared/run";
 import { injectExtensionScript, injectStyle } from "@shared/inject";
 import { waitForPageType } from "@utils/fmg-page";
-import { onMessage, sendMessage, ChannelEventDef } from "@shared/channel/extension";
+import { onMessage, sendMessage, disconnect, ChannelEventDef } from "@shared/channel/extension";
 
 import { createBookmark, type CreateBookmarkResult } from "./bookmarks";
 import AdBlocker from "./ads";
@@ -37,46 +37,55 @@ async function startAdBlocker() {
     }
 }
 
+onMessage("login", async () => {
+    const url = await sendMessage("background", "login", {});
+
+    if (url) {
+        window.location.href = url;
+        return;
+    }
+
+    if (window.location.pathname.endsWith("/login")) {
+        const location = new URL(window.location.href);
+        location.search = "";
+        window.location.href = location.href.split("/").slice(0, -1).join("/");
+        return;
+    }
+
+    window.location.href = "https://mapgenie.io";
+});
+
+onMessage("inject:style", async ({ path }) => {
+    await injectStyle(chrome.runtime.getURL(path));
+});
+
+onMessage("asset", ({ path }) => {
+    return getAsset(path);
+});
+
+onMessage("ping", () => {
+    return "pong" as const;
+});
+
+onMessage("bookmark:create", () => {
+    return createBookmark();
+});
+
 async function main() {
-    if (isIframeContext()) return false;
+    if (isIframeContext()) {
+        disconnect();
+        return false;
+    }
+
+    const pageType = await waitForPageType(5000);
+    if (pageType === "unknown") {
+        disconnect();
+        return false;
+    }
 
     startAdBlocker().catch(logging.error);
 
     injectExtensionScript("content.js");
-
-    onMessage("login", async () => {
-        const url = await sendMessage("background", "login", {});
-
-        if (url) {
-            window.location.href = url;
-            return;
-        }
-
-        if (window.location.pathname.endsWith("/login")) {
-            const location = new URL(window.location.href);
-            location.search = "";
-            window.location.href = location.href.split("/").slice(0, -1).join("/");
-            return;
-        }
-
-        window.location.href = "https://mapgenie.io";
-    });
-
-    onMessage("inject:style", async ({ path }) => {
-        await injectStyle(chrome.runtime.getURL(path));
-    });
-
-    onMessage("asset", ({ path }) => {
-        return getAsset(path);
-    });
-
-    onMessage("ping", () => {
-        return "pong" as const;
-    });
-
-    onMessage("bookmark:create", () => {
-        return createBookmark();
-    });
 }
 
 runContexts("extension", main);

@@ -34,6 +34,7 @@ export interface Channel<C extends ChannelContext> {
     onMessage<T extends ChannelEventNames<C>>(type: T, cb: MessageHandler<C, T>): void;
     handleMessage(message: any): void;
     isMessageForMe(message: InternalMessage): boolean;
+    disconnect(): void;
 }
 
 type Handler = (data: any) => any;
@@ -145,6 +146,10 @@ export function createChannel<C extends ChannelContext>(context: C, driver: Chan
         return isMessageFor(context, message);
     }
 
+    function disconnect() {
+        driver.disconnect();
+    }
+
     driver.onMessage(handleMessage);
 
     return {
@@ -152,5 +157,6 @@ export function createChannel<C extends ChannelContext>(context: C, driver: Chan
         sendMessage,
         handleMessage,
         isMessageForMe,
+        disconnect,
     };
 }

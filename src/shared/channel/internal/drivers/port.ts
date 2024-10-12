@@ -24,5 +24,8 @@ export default function createPortChannelDriver(name: string, fingerprint: Finge
         postMessage(message) {
             port.postMessage(message);
         },
+        disconnect() {
+            port.disconnect();
+        },
     } satisfies ChannelDriver;
 }

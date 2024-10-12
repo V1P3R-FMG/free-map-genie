@@ -7,4 +7,4 @@ const win = createWindowChannelDriver(window);
 
 const channel = createChannel("content-script", win);
 
-export const { onMessage, sendMessage } = channel;
+export const { onMessage, sendMessage, disconnect } = channel;

@@ -1,4 +1,4 @@
-import { onMessage, type ChannelEventDef } from "@shared/channel/offscreen";
+import { onMessage, disconnect, type ChannelEventDef } from "@shared/channel/offscreen";
 import { isIframeContext } from "@shared/context";
 import runContexts from "@shared/run";
 
@@ -14,35 +14,32 @@ declare global {
     }
 }
 
-function isOffscreen() {
-    const params = new URLSearchParams(window.location.search);
-    return isIframeContext() || params.get("storage");
-}
+const params = new URLSearchParams(window.location.search);
+const isOffscreen = isIframeContext() && params.get("storage");
 
-if (isOffscreen()) {
-    onMessage("has", ({ key }) => {
-        return window.localStorage.getItem(key) != null;
-    });
+onMessage("has", ({ key }) => {
+    return window.localStorage.getItem(key) != null;
+});
 
-    onMessage("get", ({ key }) => {
-        return window.localStorage.getItem(key);
-    });
+onMessage("get", ({ key }) => {
+    return window.localStorage.getItem(key);
+});
 
-    onMessage("set", ({ key, value }) => {
-        window.localStorage.setItem(key, value);
-    });
+onMessage("set", ({ key, value }) => {
+    window.localStorage.setItem(key, value);
+});
 
-    onMessage("remove", ({ key }) => {
-        window.localStorage.removeItem(key);
-    });
+onMessage("remove", ({ key }) => {
+    window.localStorage.removeItem(key);
+});
 
-    onMessage("keys", () => {
-        return Object.keys(window.localStorage);
-    });
-}
+onMessage("keys", () => {
+    return Object.keys(window.localStorage);
+});
 
-setInterval(() => 1000);
-
-runContexts("mapgenie storage", async () => isOffscreen());
-
-logging.debug("hello world", localStorage);
+runContexts("mapgenie storage", async () => {
+    if (!isOffscreen) {
+        disconnect();
+        return false;
+    }
+});
