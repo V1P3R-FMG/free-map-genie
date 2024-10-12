@@ -10,6 +10,7 @@ declare global {
             set: ChannelEventDef<{ key: string; value: string }>;
             remove: ChannelEventDef<{ key: string }>;
             keys: ChannelEventDef<void, string[]>;
+            ping: ChannelEventDef<void, "pong">;
         };
     }
 }
@@ -35,6 +36,10 @@ onMessage("remove", ({ key }) => {
 
 onMessage("keys", () => {
     return Object.keys(window.localStorage);
+});
+
+onMessage("ping", () => {
+    return "pong" as const;
 });
 
 runContexts("mapgenie storage", async () => {

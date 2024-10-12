@@ -39,26 +39,23 @@ function close() {
 async function reloadActiveTab() {
     if (!(await channel.reloadActiveTab())) {
         bus.$emit("alert-error", "Failed to reload active tab.");
+        window.location.reload();
         return;
     }
 
-    const clean = () => {
-        clearInterval(iHandle);
-        clearTimeout(tHandle);
-    }; //
-
-    const iHandle = setInterval(async () => {
-        try {
-            await channel.waitForConnected(250);
-            window.location.reload();
-            clean();
-        } catch {}
-    }, 250);
-
     const tHandle = setTimeout(() => {
         bus.$emit("alert-error", "Failed to reload active tab.");
-        clean();
+        window.location.reload();
+        clearTimeout(tHandle);
     }, 10000);
+
+    try {
+        await channel.waitForConnected(10000);
+        window.location.reload();
+        clearTimeout(tHandle);
+    } catch {
+        bus.$emit("alert-error", "failed to connect to extension");
+    }
 }
 
 async function reloadExtension() {

@@ -5,10 +5,37 @@ import type { CreateBookmarkResult } from "@extension/bookmarks";
 import type { BookmarkData } from "@ui/components/bookmarks/bookmark-button.vue";
 import { sendMessage } from "@shared/channel/popup";
 import { ThemeName } from "@ui/components/theme-provider.vue";
+import { waitFor } from "@utils/async";
 
 class PopupChannel {
     public async waitForConnected(timeout: number = 10000) {
-        await sendMessage("extension", "ping", {}, timeout);
+        return waitFor(
+            async (resolve) => {
+                try {
+                    await sendMessage("extension", "ping", {}, 500);
+                    resolve();
+                } catch {}
+            },
+            {
+                timeout,
+                message: "Waiting for extension took to long.",
+            }
+        );
+    }
+
+    public async waitForOffscreenConnected(timeout: number = 10000) {
+        return waitFor(
+            async (resolve) => {
+                try {
+                    await sendMessage("offscreen", "ping", {}, 500);
+                    resolve();
+                } catch {}
+            },
+            {
+                timeout,
+                message: "Waiting for offscreen took to long.",
+            }
+        );
     }
 
     async getLatestVersion(timeout?: number) {
@@ -37,6 +64,7 @@ class PopupChannel {
     }
 
     async getBookmarks(timeout?: number): Promise<BookmarkData[]> {
+        await this.waitForOffscreenConnected(timeout);
         return JSON.parse((await sendMessage("offscreen", "get", { key: "fmg:bookmarks:v3" }, timeout)) ?? "[]");
     }
 
