@@ -51,13 +51,12 @@ onMounted(async () => {
 .version {
     display: flex;
     align-items: center;
-    justify-content: center;
 }
 
 .warning {
     position: relative;
     color: var(--yellow);
-    transform: translateX(-50%);
+    margin-right: 5px;
     cursor: pointer;
 }
 
@@ -72,7 +71,6 @@ onMounted(async () => {
     border: 1px solid var(--border);
     border-radius: 5px;
     padding: 5px;
-    translate: translateX(-50%);
     font-size: 0.8rem;
     width: max-content;
 }

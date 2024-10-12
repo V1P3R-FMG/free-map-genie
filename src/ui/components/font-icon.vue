@@ -7,6 +7,7 @@ export interface Props {
     color?: string;
     textStroke?: string;
     textShadow?: string;
+    margin?: string;
 }
 
 const props = defineProps<Props>();
@@ -17,7 +18,8 @@ const style = computed(() =>
         props.size ? { fontSize: props.size } : {},
         props.textStroke ? { "text-stroke": props.textStroke } : {},
         props.textShadow ? { "text-shadow": props.textShadow } : {},
-        props.color ? { color: props.color } : {}
+        props.color ? { color: props.color } : {},
+        props.margin ? { margin: props.margin } : {}
     )
 );
 
@@ -33,7 +35,6 @@ defineEmits<{
 <style lang="css" scoped>
 .font-icon {
     font-size: 1rem;
-    margin-top: 4px;
 }
 
 .font-icon:before,

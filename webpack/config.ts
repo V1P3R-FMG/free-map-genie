@@ -99,6 +99,7 @@ export default async function getConfig(): Promise<webpack.Configuration> {
                     tag: "i",
                     inputDir: "./icons",
                     outputDir: "[dist]/assets/font",
+                    descent: 50,
                     fontTypes: [FontAssetType.TTF, FontAssetType.WOFF, FontAssetType.WOFF2],
                     assetTypes: [ASSET_TYPES.CSS],
                 },

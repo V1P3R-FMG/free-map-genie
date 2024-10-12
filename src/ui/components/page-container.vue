@@ -85,7 +85,7 @@ function changePage(page: string) {
     margin-top: 5px;
     display: flex;
     flex-direction: row;
-    align-items: center;
+    /* align-items: center; */
     padding-bottom: 5px;
     gap: 5px;
     border-bottom: 1px solid var(--border);

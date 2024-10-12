@@ -109,16 +109,16 @@ channel.getMapSettings().then(logging.debug);
                 </h3>
                 <div class="buttons flex-right">
                     <button v-if="theme === 'dark'" class="btn" @click="setTheme('light')">
-                        <FontIcon icon="light" />
+                        <FontIcon icon="light" size="1.1rem" />
                     </button>
                     <button v-if="theme === 'light'" class="btn" @click="setTheme('dark')">
-                        <FontIcon icon="dark" />
+                        <FontIcon icon="dark" size="1.1rem" />
                     </button>
                     <button class="btn" @click="reloadExtension">
-                        <FontIcon icon="reload" />
+                        <FontIcon icon="reload" size="1.1rem" />
                     </button>
                     <button class="btn" @click="close">
-                        <FontIcon icon="cross" />
+                        <FontIcon icon="cross" size="1.1rem" />
                     </button>
                 </div>
             </div>
@@ -218,7 +218,6 @@ channel.getMapSettings().then(logging.debug);
     border: none;
     padding: 0;
     cursor: pointer;
-    transform: translateY(2px);
     color: inherit;
 }
 
