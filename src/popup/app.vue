@@ -128,7 +128,7 @@ channel.getMapSettings().then(logging.debug);
             <div class="footer">
                 <span class="author" @click="openHomepage">by {{ author }}</span>
                 <span class="state" :class="{ connected: state === 'connected' }">
-                    <button class="btn" @click="reloadActiveTab">
+                    <button id="reload-btn" class="btn" @click="reloadActiveTab">
                         <FontIcon v-if="state === 'disconnected'" icon="reload" size="0.8rem" />
                     </button>
                     {{ state }}
@@ -215,6 +215,10 @@ channel.getMapSettings().then(logging.debug);
     border: none;
     padding: 0;
     cursor: pointer;
+    color: inherit;
+}
+
+#reload-btn {
     color: inherit;
 }
 
