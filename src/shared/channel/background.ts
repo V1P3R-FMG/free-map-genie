@@ -50,10 +50,6 @@ chrome.runtime.onConnect.addListener((port) => {
 
     const connArgs = decodeConnectionArgs(port.name, { tabId, frameId });
 
-    if (connMap.get(connArgs.endpointName)?.fingerprint === connArgs.fingerprint) {
-        return;
-    }
-
     connMap.set(connArgs.endpointName, {
         context: connArgs.context,
         fingerprint: connArgs.fingerprint,
@@ -97,14 +93,21 @@ chrome.runtime.onConnect.addListener((port) => {
         postMessage(hopMessage(message, "background"));
     });
 
+    const added = Date.now();
+
     port.onDisconnect.addListener(() => {
         if (connMap.get(connArgs.endpointName)?.fingerprint === connArgs.fingerprint) {
             connMap.delete(connArgs.endpointName);
-            //logging.debug(`Port removed ${connArgs.endpointName}#${connArgs.fingerprint}.`, port.name, port.sender);
+
+            if (Date.now() - added <= 500) {
+                logging.debug(`Port removed ${connArgs.endpointName}#${connArgs.fingerprint}.`, port.name, port.sender);
+            }
         }
     });
 
-    //logging.debug(`Port added ${connArgs.endpointName}#${connArgs.fingerprint}.`, port.name, port.sender);
+    setTimeout(() => {
+        logging.debug(`Port added ${connArgs.endpointName}#${connArgs.fingerprint}.`, port.name, port.sender);
+    }, 500);
 });
 
 if (__DEBUG__) {
