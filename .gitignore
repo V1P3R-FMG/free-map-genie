@@ -1,4 +1,3 @@
-/webpack/**/*.js
 /build
 /data
 /node_modules
