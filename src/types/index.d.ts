@@ -13,16 +13,8 @@ declare var __MAX_BACKUPS_COUNT__: number;
 
 declare var __GLOBAL__API__: string;
 
-declare var getConnections: () =>
-    | Map<
-          string,
-          {
-              context: string;
-              port: chrome.runtime.Port;
-              fingerprint: string;
-          }
-      >
-    | undefined;
+// Background debug functions
+declare var getConnections: (() => Map<string, import("@shared/channel/background").CachedPortInfo>) | undefined;
 /* eslint-enable no-var */
 
 declare let logging: InstanceType<typeof import("../logging").Logger>;

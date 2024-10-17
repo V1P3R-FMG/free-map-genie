@@ -7,14 +7,13 @@ import type { Fingerprint, InternalMessage } from "./internal/types";
 
 export type * from "./internal/types";
 
-const connMap: Map<
-    string,
-    {
-        port: chrome.runtime.Port;
-        fingerprint: Fingerprint;
-        context: string;
-    }
-> = new Map();
+export interface CachedPortInfo {
+    port: chrome.runtime.Port;
+    fingerprint: Fingerprint;
+    context: string;
+}
+
+const connMap: Map<string, CachedPortInfo> = new Map();
 
 function postMessage(message: InternalMessage) {
     if (message.type === "inject:style") {
