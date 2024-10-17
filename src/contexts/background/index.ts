@@ -5,6 +5,7 @@ import { getActiveTab } from "@utils/chrome";
 import installRules from "./rules";
 import createStorageIframe from "./storage";
 import fetchLatestVersion from "./version";
+import getPageType from "./page";
 import Games from "./games";
 
 declare global {
@@ -25,6 +26,7 @@ declare global {
             "reload:active:tab": ChannelEventDef<void, boolean>;
             "reload:extension": ChannelEventDef;
             "open:popup": ChannelEventDef;
+            "get:page:type": ChannelEventDef<{ url: string }, MG.PageType>;
         };
     }
 }
@@ -94,6 +96,10 @@ onMessage("reload:extension", () => {
 
 onMessage("open:popup", async () => {
     await chrome.action.openPopup();
+});
+
+onMessage("get:page:type", async ({ url }) => {
+    return getPageType(url);
 });
 
 async function main() {

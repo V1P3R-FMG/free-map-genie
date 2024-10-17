@@ -1,12 +1,11 @@
 import runContexts from "@shared/run";
-import { MapgeniePageType, waitForPageType } from "@utils/fmg-page";
 
 import Key from "./storage/key";
 
 import storageService from "./services/storage.service";
 import userService from "./services/user.service";
 import { V3SettingsData } from "./storage/data/v3";
-import { onMessage, type ChannelEventDef } from "@shared/channel/content";
+import { onMessage, sendMessage, type ChannelEventDef } from "@shared/channel/content";
 
 declare global {
     export interface Channels {
@@ -16,7 +15,7 @@ declare global {
     }
 }
 
-async function getScript(pageType: MapgeniePageType): Promise<PageScript | null> {
+async function getScript(pageType: MG.PageType): Promise<PageScript | null> {
     switch (pageType) {
         case "login":
             return (
@@ -54,7 +53,7 @@ onMessage("settings", async () => {
 });
 
 async function main() {
-    const pageType = await waitForPageType();
+    const pageType = await sendMessage("background", "get:page:type", { url: window.location.href });
 
     logging.log("PageType:", pageType);
 

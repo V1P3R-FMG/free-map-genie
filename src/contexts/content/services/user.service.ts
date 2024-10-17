@@ -1,9 +1,10 @@
 import * as async from "@utils/async";
-import { getPageType } from "@utils/fmg-page";
 
 import Key from "@content/storage/key";
 
 import storageService from "@content/services/storage.service";
+
+import pageChannel from "@content/channels/page.channel";
 
 class UserService {
     public createMockUser(): MG.User {
@@ -19,7 +20,7 @@ class UserService {
     }
 
     public async getUser() {
-        switch (getPageType()) {
+        switch (await pageChannel.getPageType()) {
             case "map":
                 await async.waitForCondition(() => window.user !== undefined);
                 return window.user;

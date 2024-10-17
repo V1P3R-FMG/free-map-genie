@@ -1,11 +1,10 @@
 import runContexts from "@shared/run";
 import { injectExtensionScript, injectStyle } from "@shared/inject";
-import { waitForPageType } from "@utils/fmg-page";
-import { onMessage, sendMessage, disconnect, ChannelEventDef } from "@shared/channel/extension";
-
-import { createBookmark, type CreateBookmarkResult } from "./bookmarks";
-import AdBlocker from "./ads";
+import { onMessage, disconnect, ChannelEventDef } from "@shared/channel/extension";
 import { isIframeContext } from "@shared/context";
+
+import AdBlocker from "./ads";
+import channel from "./channel";
 
 declare global {
     export interface Channels {
@@ -14,7 +13,6 @@ declare global {
             "asset": ChannelEventDef<{ path: string }, string>;
             "login": ChannelEventDef;
             "ping": ChannelEventDef<void, "pong">;
-            "bookmark:create": ChannelEventDef<void, CreateBookmarkResult>;
         };
     }
 }
@@ -26,7 +24,7 @@ function getAsset(path: string) {
 }
 
 async function startAdBlocker() {
-    switch (await waitForPageType()) {
+    switch (await channel.getPageType()) {
         case "map":
             AdBlocker.start();
 
@@ -38,7 +36,7 @@ async function startAdBlocker() {
 }
 
 onMessage("login", async () => {
-    const url = await sendMessage("background", "login", {});
+    const url = await channel.login();
 
     if (url) {
         window.location.href = url;
@@ -67,17 +65,14 @@ onMessage("ping", () => {
     return "pong" as const;
 });
 
-onMessage("bookmark:create", () => {
-    return createBookmark();
-});
-
 async function main() {
     if (isIframeContext()) {
         disconnect();
         return false;
     }
 
-    const pageType = await waitForPageType(5000);
+    const pageType = await channel.getPageType();
+    logging.debug("Page type", pageType);
     if (pageType === "unknown") {
         disconnect();
         return false;
