@@ -20,28 +20,15 @@ function postMessage(message: InternalMessage) {
     if (message.type === "inject:style") {
         logging.debug(message, formatEndpointTargetName(message.target));
     }
-    connMap
-        .get(
-            ///
-            formatEndpointTargetName(message.target)
-        )
-        ?.port.postMessage(message);
+
+    const endpointName = formatEndpointTargetName(message.target);
+    connMap.get(endpointName)?.port.postMessage(message);
 }
 
 const channel = createChannel("background", {
     onMessage: (cb) => chrome.runtime.onMessage.addListener(cb),
     postMessage,
     disconnect: () => {},
-});
-
-chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-    if (typeof message === "object" && message.type === "tabId") {
-        sendResponse(sender.tab?.id);
-        return true;
-    }
-
-    logging.warn("Invalid background message", message);
-    return false;
 });
 
 chrome.runtime.onConnect.addListener((port) => {
@@ -66,11 +53,19 @@ chrome.runtime.onConnect.addListener((port) => {
         message.sender.frameId ??= frameId;
 
         if (
-            isMessageFor(["extension", "content-script"], message) ||
+            isMessageFor(["extension", "content-script"], message) &&
             isMessageFrom(["popup", "offscreen", "background"], message)
         ) {
-            message.target.tabId ??= tabId || (await getActiveTabId());
+            message.target.tabId ??= await getActiveTabId();
             message.target.frameId ??= 0;
+        }
+
+        if (
+            isMessageFor(["extension", "content-script"], message) &&
+            isMessageFrom(["extension", "content-script"], message)
+        ) {
+            message.target.tabId ??= tabId;
+            message.target.frameId ??= frameId;
         }
 
         if (channel.isMessageForMe(message)) {
