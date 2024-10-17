@@ -44,6 +44,20 @@ type ResponseHandler = {
     reject: Handler;
 };
 
+function stringifyError(err: any) {
+    if (err instanceof Error) {
+        return err.stack || err.message;
+    } else if (typeof err === "object") {
+        return JSON.stringify(err);
+    } else if (typeof err === "symbol") {
+        return err.toString();
+    } else if (typeof err === "function") {
+        return err.toString();
+    } else {
+        return `${err}`;
+    }
+}
+
 export class DuplicateHandlerError extends Error {
     public readonly handler: Handler;
 
@@ -115,7 +129,7 @@ export function createChannel<C extends ChannelContext>(context: C, driver: Chan
         const handler = handlers[message.type];
 
         if (!handler) {
-            logging.warn(`No message handler for ${message.type} @ ${context}`, message);
+            driver.postMessage(createErrorResponse(message, `No message handler for ${message.type} @ ${context}`));
             return;
         }
 
@@ -123,7 +137,7 @@ export function createChannel<C extends ChannelContext>(context: C, driver: Chan
             const data = await handler(message.data);
             driver.postMessage(createResponse(message, data));
         } catch (err) {
-            driver.postMessage(createErrorResponse(message, err));
+            driver.postMessage(createErrorResponse(message, stringifyError(err)));
         }
     }
 

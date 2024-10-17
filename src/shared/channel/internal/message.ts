@@ -81,6 +81,6 @@ export function createResponse(message: InternalMessage, data: any): InternalMes
     return createMessage(message.target, message.sender, "reply", "", data, message.messageId);
 }
 
-export function createErrorResponse(message: InternalMessage, data: any): InternalMessage {
+export function createErrorResponse(message: InternalMessage, data: string): InternalMessage {
     return createMessage(message.target, message.sender, "error", "", data, message.messageId);
 }
