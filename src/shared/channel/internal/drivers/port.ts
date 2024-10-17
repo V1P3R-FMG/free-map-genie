@@ -5,6 +5,7 @@ export type Listener = (message: any) => any;
 
 export default function createPortChannelDriver(name: string, fingerprint: Fingerprint) {
     let port: chrome.runtime.Port;
+    let disconnected = false;
 
     const listeners: Set<Listener> = new Set();
 
@@ -32,7 +33,11 @@ export default function createPortChannelDriver(name: string, fingerprint: Finge
             port.postMessage(message);
         },
         disconnect() {
+            disconnected = true;
             port.disconnect();
+        },
+        get disconnected() {
+            return disconnected;
         },
     } satisfies ChannelDriver;
 }

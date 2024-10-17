@@ -29,6 +29,7 @@ const channel = createChannel("background", {
     onMessage: (cb) => chrome.runtime.onMessage.addListener(cb),
     postMessage,
     disconnect: () => {},
+    disconnected: false,
 });
 
 chrome.runtime.onConnect.addListener((port) => {
