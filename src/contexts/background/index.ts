@@ -23,6 +23,8 @@ declare global {
             "games:find:game:from:slug": ChannelEventDef<{ gameSlug: string }, MG.Api.Game | undefined>;
             "games:find:map:from:slug": ChannelEventDef<{ gameSlug: string; mapSlug: string }, MG.Api.Map | undefined>;
             "games:find:game:from:domain": ChannelEventDef<{ domain: string }, MG.Api.Game | undefined>;
+            "games:find:game:from:url": ChannelEventDef<{ url: string }, MG.Api.Game | undefined>;
+            "games:find:map:from:url": ChannelEventDef<{ url: string }, MG.Api.Map | undefined>;
             "reload:active:tab": ChannelEventDef<void, boolean>;
             "reload:extension": ChannelEventDef;
             "open:popup": ChannelEventDef;
@@ -78,6 +80,14 @@ onMessage("games:find:map:from:slug", ({ gameSlug, mapSlug }) => {
 
 onMessage("games:find:game:from:domain", ({ domain }) => {
     return Games.findGameFromDomain(domain);
+});
+
+onMessage("games:find:game:from:url", ({ url }) => {
+    return Games.findGameFromUrl(url);
+});
+
+onMessage("games:find:map:from:url", ({ url }) => {
+    return Games.findMapFromUrl(url);
 });
 
 onMessage("reload:active:tab", async () => {

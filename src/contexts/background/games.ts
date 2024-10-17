@@ -49,6 +49,22 @@ export class GamesService {
         return games.find((game) => game.domain === domain);
     }
 
+    public async findGameFromUrl(url: string) {
+        const [_, gameSlug, __, mapSlug] = new URL(url).pathname.split("/");
+        if (!gameSlug && !mapSlug) {
+            return this.findGameFromDomain(origin);
+        } else if (gameSlug) {
+            return this.findGameFromSlug(gameSlug);
+        }
+    }
+
+    public async findMapFromUrl(url: string) {
+        const [_, gameSlug, __, mapSlug] = new URL(url).pathname.split("/");
+        if (gameSlug && mapSlug) {
+            return this.findMapFromSlug(gameSlug, mapSlug);
+        }
+    }
+
     public async getGame(gameId: number) {
         this.gamesFull[gameId] ??= this.fetch(`${ORIGIN}/api/v1/games/${gameId}/full`);
         return this.gamesFull[gameId].data;
