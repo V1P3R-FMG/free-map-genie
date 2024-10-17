@@ -1,4 +1,4 @@
-import debounce from "@utils/debounce";
+import { onDocumentFocused } from "@shared/event";
 
 export interface ReloadCallback {
     (): void;
@@ -8,16 +8,7 @@ class PageService {
     private onReloadCallbacks: ReloadCallback[] = [];
 
     constructor() {
-        document.addEventListener(
-            "visibilitychange",
-            debounce(() => {
-                switch (document.visibilityState) {
-                    case "visible":
-                        this.onReloadCallbacks.forEach((cb) => cb());
-                        break;
-                }
-            }, 250)
-        );
+        onDocumentFocused(() => this.onReloadCallbacks.forEach((cb) => cb()));
     }
 
     public set onreload(cb: ReloadCallback) {
