@@ -15,6 +15,7 @@ declare var __GLOBAL__API__: string;
 
 // Background debug functions
 declare var getConnections: (() => Map<string, import("@shared/channel/background").CachedPortInfo>) | undefined;
+declare var getActiveTab: (() => import("@shared/channel/background").ActiveTab | undefined) | undefined;
 /* eslint-enable no-var */
 
 declare let logging: InstanceType<typeof import("../logging").Logger>;

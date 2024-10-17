@@ -13,7 +13,13 @@ export interface CachedPortInfo {
     context: string;
 }
 
+export interface ActiveTab {
+    url?: string;
+    id?: number;
+}
+
 const connMap: Map<string, CachedPortInfo> = new Map();
+let activeTab: ActiveTab | undefined;
 
 function postMessage(message: InternalMessage) {
     if (message.type === "inject:style") {
@@ -29,6 +35,21 @@ const channel = createChannel("background", {
     postMessage,
     disconnect: () => {},
     disconnected: false,
+});
+
+chrome.runtime.onMessage.addListener((message, sender) => {
+    if (typeof message !== "object") return;
+
+    switch (message.type) {
+        case "focused": {
+            activeTab = {
+                url: sender.url,
+                id: sender.tab?.id,
+            };
+            logging.debug("Active tab focused", activeTab);
+            break;
+        }
+    }
 });
 
 chrome.runtime.onConnect.addListener((port) => {
@@ -56,7 +77,7 @@ chrome.runtime.onConnect.addListener((port) => {
             isMessageFor(["extension", "content-script"], message) &&
             isMessageFrom(["popup", "offscreen", "background"], message)
         ) {
-            message.target.tabId ??= await getActiveTabId();
+            message.target.tabId ??= activeTab?.id ?? (await getActiveTabId());
             message.target.frameId ??= 0;
         }
 
@@ -107,6 +128,7 @@ chrome.runtime.onConnect.addListener((port) => {
 
 if (__DEBUG__) {
     global.getConnections = () => connMap;
+    global.getActiveTab = () => activeTab;
 }
 
 export const { onMessage, sendMessage } = channel;

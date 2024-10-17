@@ -3,6 +3,7 @@ import { createFingerprint } from "./internal/fingerprint";
 import createWindowChannelDriver from "./internal/drivers/window";
 import createPortChannelDriver from "./internal/drivers/port";
 import { hasMessageHop, hopMessage, isInternalMessage, isMessageFor } from "./internal/message";
+import { onDocumentFocused } from "@shared/event";
 
 export type * from "./internal/types";
 
@@ -31,6 +32,14 @@ win.onMessage(async (message) => {
     }
 
     port.postMessage(message);
+});
+
+const offDocumentFocused = onDocumentFocused(() => {
+    if (port.disconnected) {
+        offDocumentFocused();
+        return;
+    }
+    chrome.runtime.sendMessage({ type: "focused" });
 });
 
 export const { onMessage, sendMessage, disconnect } = channel;
