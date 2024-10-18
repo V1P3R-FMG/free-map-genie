@@ -3,8 +3,8 @@ export const DEFAULT_INTERVAL = 1000;
 
 interface State {
     resolved: boolean;
-    timeoutHandle?: number;
-    intervalHandle?: number;
+    timeoutHandle?: ReturnType<typeof setTimeout>;
+    intervalHandle?: ReturnType<typeof setInterval>;
 }
 
 export interface Resolver<T> {
@@ -47,8 +47,8 @@ function callbackWrapper<F extends (arg: any) => any>(cb: F, state: State): F {
     return ((arg: any) => {
         if (state.resolved) return;
         state.resolved = true;
-        window.clearTimeout(state.timeoutHandle);
-        window.clearInterval(state.intervalHandle);
+        clearTimeout(state.timeoutHandle);
+        clearInterval(state.intervalHandle);
         return cb(arg);
     }) as F;
 }
@@ -61,7 +61,7 @@ function createTimeout<T>(
     const state: State = { resolved: false };
 
     if (timeout === undefined || timeout > 0) {
-        state.timeoutHandle = window.setTimeout(
+        state.timeoutHandle = setTimeout(
             callbackWrapper(() => reject(new TimeoutError(message)), state),
             timeout ?? DEFAULT_TIMEOUT
         );
@@ -77,7 +77,7 @@ export function waitFor<T = void>(waiter: Waiter<T>, { timeout, message, interva
         waiter(resolver, rejecter);
         if (state.resolved) return;
 
-        state.intervalHandle = window.setInterval(async () => {
+        state.intervalHandle = setInterval(async () => {
             if (state.resolved) return window.clearInterval(state.intervalHandle);
             try {
                 await waiter(resolver, rejecter);
