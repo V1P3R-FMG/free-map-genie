@@ -63,7 +63,7 @@ const trashing = toRef(props, "trash");
             :title="data?.title"
             @click="$emit('remove', $event, props.data!)"
         >
-            <FontIcon icon="trash" size="22px" text-shadow="1px 1px 5px rgba(0,0,0,1)"></FontIcon>
+            <FontIcon icon="trash" :style="{ fontSize: '22px', textShadow: '1px 1px 5px rgba(0,0,0,1)' }"></FontIcon>
         </button>
     </div>
 </template>

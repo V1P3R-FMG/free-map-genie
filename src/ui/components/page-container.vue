@@ -63,7 +63,7 @@ function changePage(page: string) {
                 <FontIcon
                     class="page-container-tab-icon"
                     :icon="tab.icon"
-                    size="18px"
+                    :style="{ fontSize: '18px' }"
                     :color="curPage === tab.name ? 'var(--active)' : 'var(--color)'"
                 ></FontIcon>
             </h4>

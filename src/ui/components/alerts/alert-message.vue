@@ -26,7 +26,7 @@ defineEmits<{
     <div class="alert" :class="{ [type]: true }" ref="div">
         <FontIcon :icon="type" :color="colors[type]" />
         <span>{{ message }}</span>
-        <FontIcon icon="cross" :color="colors[type]" size="0.8rem" @click="$emit('remove')" />
+        <FontIcon icon="cross" :style="{ fontSize: '0.8rem', color: colors[type] }" @click="$emit('remove')" />
     </div>
 </template>
 

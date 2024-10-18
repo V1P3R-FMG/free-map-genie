@@ -1,27 +1,16 @@
 <script lang="ts" setup>
-import { computed } from "vue";
+import { toRef } from "vue";
 
 export interface Props {
     icon: string;
-    size?: string;
-    color?: string;
-    textStroke?: string;
-    textShadow?: string;
-    margin?: string;
+    style?: Record<string, string>;
 }
 
-const props = defineProps<Props>();
+const props = withDefaults(defineProps<Props>(), {
+    style: () => ({}),
+});
 
-const style = computed(() =>
-    Object.assign(
-        {},
-        props.size ? { fontSize: props.size } : {},
-        props.textStroke ? { "text-stroke": props.textStroke } : {},
-        props.textShadow ? { "text-shadow": props.textShadow } : {},
-        props.color ? { color: props.color } : {},
-        props.margin ? { margin: props.margin } : {}
-    )
-);
+const style = toRef(props, "style");
 
 defineEmits<{
     click: [MouseEvent];

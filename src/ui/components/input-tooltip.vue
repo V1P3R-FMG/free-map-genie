@@ -19,7 +19,7 @@ defineProps<Props>();
         </div>
         <FontIcon
             icon="info-circled"
-            size="18px"
+            :style="{ fontSize: '18px' }"
             @mouseover="$div?.classList.add('hover')"
             @mouseout="$div?.classList.remove('hover')"
         ></FontIcon>

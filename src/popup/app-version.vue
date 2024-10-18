@@ -40,7 +40,7 @@ onMounted(async () => {
             :data-version="latestVersion"
             class="warning"
             icon="attention"
-            size="0.8rem"
+            :style="{ fontSize: '0.8rem' }"
             @click="click"
         />
         <span>v{{ extensionVersion }}</span>

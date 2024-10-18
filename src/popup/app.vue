@@ -106,16 +106,16 @@ channel.getMapSettings().then(logging.debug);
                 </h3>
                 <div class="buttons flex-right">
                     <button v-if="theme === 'dark'" class="btn" @click="setTheme('light')">
-                        <FontIcon icon="light" size="1.1rem" />
+                        <FontIcon icon="light" :style="{ fontSize: '1.1rem' }" />
                     </button>
                     <button v-if="theme === 'light'" class="btn" @click="setTheme('dark')">
-                        <FontIcon icon="dark" size="1.1rem" />
+                        <FontIcon icon="dark" :style="{ fontSize: '1.1rem' }" />
                     </button>
                     <button class="btn" @click="reloadExtension">
-                        <FontIcon icon="reload" size="1.1rem" />
+                        <FontIcon icon="reload" :style="{ fontSize: '1.1rem' }" />
                     </button>
                     <button class="btn" @click="close">
-                        <FontIcon icon="cross" size="1.1rem" />
+                        <FontIcon icon="cross" :style="{ fontSize: '1.1rem' }" />
                     </button>
                 </div>
             </div>
@@ -129,7 +129,7 @@ channel.getMapSettings().then(logging.debug);
                 <span class="author" @click="openHomepage">by {{ author }}</span>
                 <span class="state" :class="{ connected: state === 'connected' }">
                     <button id="reload-btn" class="btn" @click="reloadActiveTab">
-                        <FontIcon v-if="state === 'disconnected'" icon="reload" size="0.8rem" />
+                        <FontIcon v-if="state === 'disconnected'" icon="reload" :style="{ fontSize: '0.8rem' }" />
                     </button>
                     {{ state }}
                 </span>
