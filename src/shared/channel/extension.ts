@@ -1,9 +1,11 @@
+import { onDocumentFocusChanged } from "@shared/event";
+import { isIframeContext } from "@shared/context";
+
 import { createChannel } from "./internal";
 import { createFingerprint } from "./internal/fingerprint";
 import createWindowChannelDriver from "./internal/drivers/window";
 import createPortChannelDriver from "./internal/drivers/port";
 import { hasMessageHop, hopMessage, isInternalMessage, isMessageFor } from "./internal/message";
-import { onDocumentFocused } from "@shared/event";
 
 export type * from "./internal/types";
 
@@ -34,12 +36,21 @@ win.onMessage(async (message) => {
     port.postMessage(message);
 });
 
-const offDocumentFocused = onDocumentFocused(() => {
+const offDocumentFocused = onDocumentFocusChanged((visible) => {
     if (port.disconnected) {
         offDocumentFocused();
         return;
     }
-    chrome.runtime.sendMessage({ type: "focused" });
+    if (visible) chrome.runtime.sendMessage({ type: "focused" });
 });
+
+setTimeout(() => {
+    if (port.disconnected) return;
+    if (isIframeContext()) return;
+    if (document.visibilityState === "hidden") return;
+
+    logging.debug("Document is focused, sending focused message");
+    chrome.runtime.sendMessage({ type: "focused" });
+}, 500);
 
 export const { onMessage, sendMessage, disconnect } = channel;

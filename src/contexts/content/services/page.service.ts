@@ -1,4 +1,4 @@
-import { onDocumentFocused } from "@shared/event";
+import { onDocumentFocusChanged } from "@shared/event";
 
 export interface ReloadCallback {
     (): void;
@@ -8,7 +8,7 @@ class PageService {
     private onReloadCallbacks: ReloadCallback[] = [];
 
     constructor() {
-        onDocumentFocused(() => this.onReloadCallbacks.forEach((cb) => cb()));
+        onDocumentFocusChanged((visilbe) => (visilbe ? this.onReloadCallbacks.forEach((cb) => cb()) : void 0));
     }
 
     public set onreload(cb: ReloadCallback) {

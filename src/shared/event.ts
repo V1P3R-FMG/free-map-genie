@@ -1,24 +1,23 @@
 import debounce from "@utils/debounce";
 
-const documentFocusedCallbacks: Set<() => void> = new Set();
+export type DocumentVisibliityChangedCallback = (visible: boolean) => void;
 
-export function onDocumentFocused(cb: () => void) {
+const documentFocusedCallbacks: Set<DocumentVisibliityChangedCallback> = new Set();
+
+export function onDocumentFocusChanged(cb: DocumentVisibliityChangedCallback) {
     documentFocusedCallbacks.add(cb);
 
-    return () => offDocumentFocused(cb);
+    return () => offDocumentFocusChanged(cb);
 }
 
-export function offDocumentFocused(cb: () => void) {
+export function offDocumentFocusChanged(cb: DocumentVisibliityChangedCallback) {
     documentFocusedCallbacks.delete(cb);
 }
 
 document.addEventListener(
     "visibilitychange",
     debounce(() => {
-        switch (document.visibilityState) {
-            case "visible":
-                documentFocusedCallbacks.forEach((cb) => cb());
-                break;
-        }
+        const visible = document.visibilityState === "visible";
+        documentFocusedCallbacks.forEach((cb) => cb(visible));
     }, 250)
 );
