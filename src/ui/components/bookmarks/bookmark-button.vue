@@ -1,12 +1,11 @@
 <script lang="ts" setup>
 import { toRef } from "vue";
-import { MapgeniePageType } from "@utils/fmg-page";
 
 import FontIcon from "../font-icon.vue";
 import BookmarkImage from "./bookmark-image.vue";
 
 export interface BaseBookmarkData {
-    type: MapgeniePageType;
+    type: MG.PageType;
     title: string;
     url: string;
     icon: string;

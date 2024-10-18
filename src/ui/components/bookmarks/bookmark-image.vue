@@ -19,13 +19,10 @@ const icon = computed(() => {
         case "guide":
             return bookmark.value.icon || chrome.runtime.getURL("assets/images/checklist.png");
         default:
-            throw `Unexpected bookmark type: ${bookmark.value["type"]}.`;
+            logging.error(`Unexpected bookmark type: ${bookmark.value["type"]}.`);
+            return "";
     }
 });
-
-defineEmits<{
-    click: [MouseEvent, BookmarkData];
-}>();
 </script>
 
 <template>

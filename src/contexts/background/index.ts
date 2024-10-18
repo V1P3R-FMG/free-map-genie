@@ -1,12 +1,14 @@
 import runContexts from "@shared/run";
-import { onMessage, type ChannelEventDef } from "@shared/channel/background";
-import { getActiveTab } from "@utils/chrome";
+import { onMessage, getActiveTab, type ChannelEventDef } from "@shared/channel/background";
+import * as chromeUtils from "@utils/chrome";
+import type { BookmarkData } from "@ui/components/bookmarks/bookmark-button.vue";
 
 import installRules from "./rules";
 import createStorageIframe from "./storage";
 import fetchLatestVersion from "./version";
 import getPageType from "./page";
 import Games from "./games";
+import createBookmark from "./bookmarks";
 
 declare global {
     export interface Channels {
@@ -29,6 +31,7 @@ declare global {
             "reload:extension": ChannelEventDef;
             "open:popup": ChannelEventDef;
             "get:page:type": ChannelEventDef<{ url: string }, MG.PageType>;
+            "create:bookmark": ChannelEventDef<void, BookmarkData>;
         };
     }
 }
@@ -91,7 +94,7 @@ onMessage("games:find:map:from:url", ({ url }) => {
 });
 
 onMessage("reload:active:tab", async () => {
-    const tab = await getActiveTab();
+    const tab = await chromeUtils.getActiveTab();
 
     if (!tab?.id) return false;
 
@@ -109,7 +112,14 @@ onMessage("open:popup", async () => {
 });
 
 onMessage("get:page:type", async ({ url }) => {
+    logging.debug("Getting page type", url, await getPageType(url));
     return getPageType(url);
+});
+
+onMessage("create:bookmark", () => {
+    const activeTab = getActiveTab();
+    if (!activeTab?.url) throw "Active tab url not found.";
+    return createBookmark(activeTab.url);
 });
 
 async function main() {

@@ -1,11 +1,9 @@
 import bus from "@popup/bus";
 
-import type { CreateBookmarkResult } from "@extension/bookmarks";
-
-import type { BookmarkData } from "@ui/components/bookmarks/bookmark-button.vue";
 import { sendMessage } from "@shared/channel/popup";
-import { ThemeName } from "@ui/components/theme-provider.vue";
 import { waitFor } from "@utils/async";
+import { ThemeName } from "@ui/components/theme-provider.vue";
+import type { BookmarkData } from "@ui/components/bookmarks/bookmark-button.vue";
 
 class PopupChannel {
     public async waitForConnected(timeout: number = 10000) {
@@ -76,24 +74,24 @@ class PopupChannel {
         return sendMessage("offscreen", "remove", { key: "fmg:bookmarks:v3" }, timeout);
     }
 
-    async createBookmark(timeout?: number): Promise<CreateBookmarkResult> {
-        return sendMessage("extension", "bookmark:create", {}, timeout);
+    async createBookmark(timeout?: number): Promise<BookmarkData | undefined> {
+        try {
+            return sendMessage("background", "create:bookmark", {}, timeout);
+        } catch (error) {
+            bus.$emit("alert-error", `${error}`);
+        }
     }
 
     async addBookmark(timeout?: number): Promise<BookmarkData[]> {
         const bookmarks = await this.getBookmarks(timeout);
-        const result = await this.createBookmark(timeout);
 
-        if (!result.success) {
-            bus.$emit("alert-error", result.data);
-            return bookmarks;
-        }
+        const bookmark = await this.createBookmark(timeout);
 
-        const bookmark = result.data;
+        if (!bookmark) return bookmarks;
 
         const bookmarkDoesNotExists = !!bookmarks.find((b) => b.url === bookmark.url);
         if (bookmarkDoesNotExists) {
-            bus.$emit("alert-warn", "Skipping bookmark because it already exists");
+            bus.$emit("alert-warn", `Skipping bookmark for ${bookmark.title}, Because it already exists`);
             return bookmarks;
         }
 

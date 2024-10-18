@@ -11,6 +11,7 @@ declare global {
             remove: ChannelEventDef<{ key: string }>;
             keys: ChannelEventDef<void, string[]>;
             ping: ChannelEventDef<void, "pong">;
+            title: ChannelEventDef<{ url: string }, string>;
         };
     }
 }
@@ -40,6 +41,14 @@ onMessage("keys", () => {
 
 onMessage("ping", () => {
     return "pong" as const;
+});
+
+onMessage("title", async ({ url }) => {
+    const parser = new DOMParser();
+    const res = await fetch(url);
+    const text = await res.text();
+    const doc = parser.parseFromString(text, "text/html");
+    return doc.title;
 });
 
 runContexts("mapgenie storage", async () => {

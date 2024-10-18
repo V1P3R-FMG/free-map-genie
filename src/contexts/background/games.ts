@@ -44,14 +44,18 @@ export class GamesService {
     }
 
     public async findGameFromDomain(domain: string) {
-        domain = domain.replace(/^https:\/\//, "");
+        domain = domain.replace(/^https:\/{2}|\/$/g, "");
         const games = await this.getGames();
         return games.find((game) => game.domain === domain);
     }
 
     public async findGameFromUrl(url: string) {
-        const [_, gameSlug, __, mapSlug] = new URL(url).pathname.split("/");
+        const { origin, pathname } = new URL(url);
+        const [_, gameSlug, __, mapSlug] = pathname.split("/");
+
         if (!gameSlug && !mapSlug) {
+            if (origin === "https://mapgenie.io") return undefined;
+
             return this.findGameFromDomain(origin);
         } else if (gameSlug) {
             return this.findGameFromSlug(gameSlug);
@@ -59,8 +63,17 @@ export class GamesService {
     }
 
     public async findMapFromUrl(url: string) {
-        const [_, gameSlug, __, mapSlug] = new URL(url).pathname.split("/");
-        if (gameSlug && mapSlug) {
+        const { origin, pathname } = new URL(url);
+        const [_, gameSlug, __, mapSlug] = pathname.split("/");
+
+        if (!gameSlug && !mapSlug) {
+            if (origin === "https://mapgenie.io") return undefined;
+
+            const game = await this.findGameFromDomain(origin);
+            if (game?.maps.length === 1) {
+                return game?.maps[0];
+            }
+        } else if (gameSlug && mapSlug) {
             return this.findMapFromSlug(gameSlug, mapSlug);
         }
     }
