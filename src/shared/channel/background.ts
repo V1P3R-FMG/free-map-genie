@@ -1,4 +1,4 @@
-import { getActiveTabId } from "@utils/chrome";
+import * as chromeUtils from "@utils/chrome";
 
 import { createChannel } from "./internal";
 import { decodeConnectionArgs, formatEndpointName, formatEndpointTargetName } from "./internal/connection-args";
@@ -20,6 +20,10 @@ export interface ActiveTab {
 
 const connMap: Map<string, CachedPortInfo> = new Map();
 let activeTab: ActiveTab | undefined;
+
+export function getActiveTab() {
+    return activeTab;
+}
 
 function postMessage(message: InternalMessage) {
     if (message.type === "inject:style") {
@@ -77,11 +81,9 @@ chrome.runtime.onConnect.addListener((port) => {
             isMessageFor(["extension", "content-script"], message) &&
             isMessageFrom(["popup", "offscreen", "background"], message)
         ) {
-            message.target.tabId ??= activeTab?.id ?? (await getActiveTabId());
+            message.target.tabId ??= (await chromeUtils.getActiveTabId()) ?? activeTab?.id;
             message.target.frameId ??= 0;
-        }
-
-        if (
+        } else if (
             isMessageFor(["extension", "content-script"], message) &&
             isMessageFrom(["extension", "content-script"], message)
         ) {
