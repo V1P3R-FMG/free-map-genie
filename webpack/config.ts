@@ -19,7 +19,7 @@ const { ProvidePlugin, DefinePlugin } = webpack;
 const __dirname = import.meta.dirname;
 
 export const PORT = process.env.PORT ? Number(process.env.PORT) : 8080;
-export const CACHE_MAX_AGE = process.env.PORT ? Number(process.env.PORT) : 30 * 60 * 1000;
+export const CACHE_MAX_AGE = process.env.CACHE_MAX_AGE ? Number(process.env.CACHE_MAX_AGE) : 5 * 60 * 1000;
 export const MAX_BACKUPS_COUNT = process.env.MAX_BACKUPS_COUNT ? Number(process.env.MAX_BACKUPS_COUNT) : 10;
 
 export interface Config {
