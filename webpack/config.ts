@@ -154,9 +154,7 @@ async function getWebpackConfig(buildInfo: BuildInfo): Promise<webpack.Configura
                 artifactsDir: path.dirname(buildInfo.out),
                 target: buildInfo.isChrome ? "chromium" : buildInfo.isMobile ? "firefox-android" : "firefox-desktop",
                 buildPackage: !buildInfo.watch && !buildInfo.isDev,
-                outputFilename: buildInfo.isDev
-                    ? buildInfo.name
-                    : buildInfo.name + (buildInfo.isChrome ? ".zip" : ".xpi"),
+                outputFilename: buildInfo.outFile,
                 runLint: false,
                 selfHosted: true,
                 overwriteDest: true,

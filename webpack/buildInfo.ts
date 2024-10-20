@@ -33,6 +33,7 @@ export interface PackageJsonInfo {
 export interface BuildInfo extends EnvInfo, PackageJsonInfo {
     name: string;
     out: string;
+    outFile: string;
 }
 
 export interface CopyInstructionToArgs {
@@ -86,9 +87,12 @@ export default function getBuildInfo(dist: string): BuildInfo {
     const envInfo = getEnvInfo();
     const name = `fmg-${envInfo.browser}`;
 
+    const outFile = envInfo.isDev ? name : name + (envInfo.isChrome ? ".zip" : ".xpi");
+
     return {
         name,
         out: path.resolve(dist, name),
+        outFile,
         ...envInfo,
         ...getPackageJsonInfo(),
     };
