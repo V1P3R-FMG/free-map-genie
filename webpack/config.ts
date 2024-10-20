@@ -3,7 +3,7 @@ import webpack from "webpack";
 import { FontAssetType, ASSET_TYPES } from "fantasticon";
 import "dotenv/config";
 
-import getBuildInfo from "./buildInfo.js";
+import getBuildInfo, { type BuildInfo } from "./buildInfo.js";
 import WebExtManifestPlugin from "./plugins/web-ext-manifest.js";
 import FantasticonPlugin from "./plugins/fantasticon.js";
 
@@ -22,8 +22,12 @@ export const PORT = process.env.PORT ? Number(process.env.PORT) : 8080;
 export const CACHE_MAX_AGE = process.env.PORT ? Number(process.env.PORT) : 30 * 60 * 1000;
 export const MAX_BACKUPS_COUNT = process.env.MAX_BACKUPS_COUNT ? Number(process.env.MAX_BACKUPS_COUNT) : 10;
 
-export default async function getConfig(): Promise<webpack.Configuration> {
-    const buildInfo = getBuildInfo(path.resolve(__dirname, "..", "build"));
+export interface Config {
+    buildInfo: BuildInfo;
+    webpackConfig: webpack.Configuration;
+}
+
+async function getWebpackConfig(buildInfo: BuildInfo): Promise<webpack.Configuration> {
     const { default: WebExtPlugin } = await import("web-ext-plugin");
 
     return {
@@ -129,6 +133,7 @@ export default async function getConfig(): Promise<webpack.Configuration> {
                 __PORT__: PORT,
                 __CACHE_MAX_AGE__: CACHE_MAX_AGE,
                 __MAX_BACKUPS_COUNT__: MAX_BACKUPS_COUNT,
+                __OVERRIDE_SERVER_URL__: JSON.stringify(process.env.OVERRIDE_SERVER_URL) ?? "undefined",
                 //console: "logging",
             }),
             new ProvidePlugin({
@@ -149,8 +154,12 @@ export default async function getConfig(): Promise<webpack.Configuration> {
                 tabs: 2,
             }),
             new WebExtPlugin({
-                artifactsDir: buildInfo.out,
-                target: buildInfo.isChrome ? "chromium" : "firefox-desktop",
+                adbHost: process.env.ADB_HOST,
+                adbPort: process.env.ADB_PORT,
+                adbDevice: process.env.ANDROID_DEVICE,
+                adbBin: process.env.ADB_BIN,
+                artifactsDir: path.dirname(buildInfo.out),
+                target: buildInfo.isChrome ? "chromium" : buildInfo.isMobile ? "firefox-android" : "firefox-desktop",
                 buildPackage: !buildInfo.watch && !buildInfo.isDev,
                 outputFilename: buildInfo.isDev
                     ? buildInfo.name
@@ -161,11 +170,13 @@ export default async function getConfig(): Promise<webpack.Configuration> {
                 devtools: true,
                 startUrl: process.env.START_URL ?? "https://mapgenie.io",
                 chromiumBinary: process.env.CHROME_BIN,
+                firefox: process.env.FIREFOX_BIN,
+                firefoxApk: process.env.FIREFOX_APK,
                 sourceDir: buildInfo.out,
                 args: buildInfo.isChrome
                     ? ["--auto-open-devtools-for-tabs", "--system-developer-mode", "--start-maximized"]
                     : [],
-                profileCreateIfMissing: true,
+                profileCreateIfMissing: false,
                 chromiumProfile: process.env.CHROMIUM_PROFILE,
                 firefoxProfile: process.env.FIREFOX_PROFILE,
                 keepProfileChanges: process.env.KEEP_CHANGES?.toLowerCase() in [1, "1", "true"],
@@ -186,5 +197,13 @@ export default async function getConfig(): Promise<webpack.Configuration> {
             aggregateTimeout: 300,
         },
         mode: buildInfo.mode,
+    };
+}
+
+export default async function getConfig(): Promise<Config> {
+    const buildInfo = getBuildInfo(path.resolve(__dirname, "..", "build"));
+    return {
+        buildInfo,
+        webpackConfig: await getWebpackConfig(buildInfo),
     };
 }

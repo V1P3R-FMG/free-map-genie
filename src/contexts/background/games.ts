@@ -1,6 +1,6 @@
 import CachedValue from "@shared/cached";
 
-const ORIGIN = __DEBUG__ ? `http://localhost:${__PORT__}` : "https://mapgenie.io";
+const ORIGIN = __DEBUG__ ? (__OVERRIDE_SERVER_URL__ ?? `http://localhost:${__PORT__}`) : "https://mapgenie.io";
 
 export interface Cache<T> {
     [id: string]: CachedValue<T>;

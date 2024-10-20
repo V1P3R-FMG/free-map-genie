@@ -21,6 +21,7 @@ export type Mode = "development" | "production";
 export interface EnvInfo {
     isChrome: boolean;
     isFirefox: boolean;
+    isMobile: boolean;
     isDev: boolean;
     browser: Browser;
     mode: Mode;
@@ -108,15 +109,19 @@ function generateKeys(keyDir: string): GeneratedKeys {
 function getEnvInfo(): EnvInfo {
     const isChrome = !!process.argv.find((arg) => arg === "chrome");
     const isFirefox = !!process.argv.find((arg) => arg === "firefox");
+    const isMobile = !!process.argv.find((arg) => arg === "mobile");
     const isDev = !!process.argv.find((arg) => arg === "dev");
     const watch = !!process.argv.find((arg) => arg === "--watch" || arg === "-w");
 
     if (!isChrome && !isFirefox) throw "No browser provided pls add `chrome` or `firefox`.";
     if (isChrome && isFirefox) throw "More than one browser provided, You can only bundle one at a time.";
 
+    if (isChrome && isMobile) throw "Chrome does not support mobile.";
+
     return {
         isChrome,
         isFirefox,
+        isMobile,
         isDev,
         browser: isChrome ? "chrome" : "firefox",
         mode: isDev ? "development" : "production",

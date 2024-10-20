@@ -27,13 +27,17 @@ async function webpackPromise(options: webpack.Configuration) {
 }
 
 async function build() {
-    const config = await getConfig();
+    const { buildInfo, webpackConfig } = await getConfig();
 
-    if (config.output?.path && fs.existsSync(config.output.path)) {
-        fs.rmSync(config.output.path, { recursive: true });
+    if (fs.existsSync(buildInfo.out)) {
+        fs.rmSync(buildInfo.out, { recursive: true });
     }
 
-    await webpackPromise(config);
+    process.on("SIGINT", () => process.exit(0));
+    process.on("SIGQUIT", () => process.exit(0));
+    process.on("SIGBREAK", () => process.exit(0));
+
+    await webpackPromise(webpackConfig);
 }
 
 build().catch(console.error);
