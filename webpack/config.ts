@@ -3,6 +3,7 @@ import webpack from "webpack";
 import { FontAssetType, ASSET_TYPES } from "fantasticon";
 import "dotenv/config";
 
+import * as env from "./env.js";
 import getBuildInfo, { type BuildInfo } from "./buildInfo.js";
 import WebExtManifestPlugin from "./plugins/web-ext-manifest.js";
 import FantasticonPlugin from "./plugins/fantasticon.js";
@@ -18,9 +19,9 @@ const { ProvidePlugin, DefinePlugin } = webpack;
 
 const __dirname = import.meta.dirname;
 
-export const PORT = process.env.PORT ? Number(process.env.PORT) : 8080;
-export const CACHE_MAX_AGE = process.env.CACHE_MAX_AGE ? Number(process.env.CACHE_MAX_AGE) : 5 * 60 * 1000;
-export const MAX_BACKUPS_COUNT = process.env.MAX_BACKUPS_COUNT ? Number(process.env.MAX_BACKUPS_COUNT) : 10;
+export const PORT = env.getNumber("PORT", 8080);
+export const CACHE_MAX_AGE = env.getNumber("CACHE_MAX_AGE", 5 * 60 * 1000);
+export const MAX_BACKUPS_COUNT = env.getNumber("MAX_BACKUPS_COUNT", 10);
 
 export interface Config {
     buildInfo: BuildInfo;
@@ -133,7 +134,7 @@ async function getWebpackConfig(buildInfo: BuildInfo): Promise<webpack.Configura
                 __PORT__: PORT,
                 __CACHE_MAX_AGE__: CACHE_MAX_AGE,
                 __MAX_BACKUPS_COUNT__: MAX_BACKUPS_COUNT,
-                __OVERRIDE_SERVER_URL__: JSON.stringify(process.env.OVERRIDE_SERVER_URL) ?? "undefined",
+                __OVERRIDE_SERVER_URL__: env.getJsonStringify("OVERRIDE_SERVER_URL", "undefined"),
                 //console: "logging",
             }),
             new ProvidePlugin({
@@ -147,10 +148,10 @@ async function getWebpackConfig(buildInfo: BuildInfo): Promise<webpack.Configura
                 tabs: 2,
             }),
             new WebExtPlugin({
-                adbHost: process.env.ADB_HOST,
-                adbPort: process.env.ADB_PORT,
-                adbDevice: process.env.ANDROID_DEVICE,
-                adbBin: process.env.ADB_BIN,
+                adbHost: env.getString("ADB_HOST"),
+                adbPort: env.getString("ADB_PORT"),
+                adbBin: env.getString("ADB_BIN"),
+                adbDevice: env.getString("ANDROID_DEVICE"),
                 artifactsDir: path.dirname(buildInfo.out),
                 target: buildInfo.isChrome ? "chromium" : buildInfo.isMobile ? "firefox-android" : "firefox-desktop",
                 buildPackage: !buildInfo.watch && !buildInfo.isDev,
@@ -159,18 +160,18 @@ async function getWebpackConfig(buildInfo: BuildInfo): Promise<webpack.Configura
                 selfHosted: true,
                 overwriteDest: true,
                 devtools: true,
-                startUrl: process.env.START_URL ?? "https://mapgenie.io",
-                chromiumBinary: process.env.CHROME_BIN,
-                firefox: process.env.FIREFOX_BIN,
-                firefoxApk: process.env.FIREFOX_APK,
+                startUrl: env.getString("START_URL", "https://mapgenie.io"),
+                chromiumBinary: env.getString("CHROME_BIN"),
+                firefox: env.getString("FIREFOX_BIN"),
+                firefoxApk: env.getString("FIREFOX_APK"),
                 sourceDir: buildInfo.out,
                 args: buildInfo.isChrome
                     ? ["--auto-open-devtools-for-tabs", "--system-developer-mode", "--start-maximized"]
                     : [],
                 profileCreateIfMissing: false,
-                chromiumProfile: process.env.CHROMIUM_PROFILE,
-                firefoxProfile: process.env.FIREFOX_PROFILE,
-                keepProfileChanges: process.env.KEEP_CHANGES?.toLowerCase() in [1, "1", "true"],
+                chromiumProfile: env.getString("CHROMIUM_PROFILE"),
+                firefoxProfile: env.getString("FIREFOX_PROFILE"),
+                keepProfileChanges: env.getString("KEEP_CHANGES", "0").toLowerCase() in [1, "1", "true"],
             }),
         ],
         optimization: {
