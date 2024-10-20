@@ -13,7 +13,6 @@ import AppVersion from "./app-version.vue";
 
 import channel from "./channel";
 import bus from "./bus";
-import { sendMessage } from "@shared/channel/popup";
 
 const themeProvider = ref<ComponentInstance<typeof ThemeProvider>>();
 
