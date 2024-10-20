@@ -36,11 +36,10 @@ win.onMessage(async (message) => {
     port.postMessage(message);
 });
 
-const offDocumentFocused = onDocumentFocusChanged((visible) => {
-    if (port.disconnected) {
-        offDocumentFocused();
-        return;
-    }
+onDocumentFocusChanged((visible) => {
+    // if (port.disconnected) return;
+    if (isIframeContext()) return;
+
     if (visible) chrome.runtime.sendMessage({ type: "focused" });
 });
 
