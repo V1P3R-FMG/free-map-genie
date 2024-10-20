@@ -14,6 +14,7 @@ import TerserPlugin from "terser-webpack-plugin";
 import MiniCssExtractPlugin from "mini-css-extract-plugin";
 import { TsconfigPathsPlugin } from "tsconfig-paths-webpack-plugin";
 import { VueLoaderPlugin } from "vue-loader";
+import AdbPlugin from "./plugins/adb.js";
 
 const { ProvidePlugin, DefinePlugin } = webpack;
 
@@ -28,7 +29,20 @@ export interface Config {
     webpackConfig: webpack.Configuration;
 }
 
-async function getWebpackConfig(buildInfo: BuildInfo): Promise<webpack.Configuration> {
+async function getWebpackConfig({
+    isChrome,
+    isFirefox,
+    isDev,
+    isMobile,
+    watch,
+    mode,
+    browser,
+    out,
+    outFile,
+    version,
+    homepage,
+    author,
+}: BuildInfo): Promise<webpack.Configuration> {
     const { default: WebExtPlugin } = await import("web-ext-plugin");
 
     return {
@@ -40,14 +54,12 @@ async function getWebpackConfig(buildInfo: BuildInfo): Promise<webpack.Configura
             "popup/index": "./src/popup/index.ts",
         },
         output: {
-            path: buildInfo.out,
+            path: out,
         },
         resolve: {
             extensions: [".ts", ".js", ".json", ".vue"],
             alias: {
-                vue$: buildInfo.isDev
-                    ? "vue/dist/vue.runtime.esm-browser.js"
-                    : "vue/dist/vue.runtime.esm-browser.prod.js",
+                vue$: isDev ? "vue/dist/vue.runtime.esm-browser.js" : "vue/dist/vue.runtime.esm-browser.prod.js",
             },
             plugins: [
                 new TsconfigPathsPlugin({
@@ -67,7 +79,7 @@ async function getWebpackConfig(buildInfo: BuildInfo): Promise<webpack.Configura
                         {
                             loader: "swc-loader",
                             options: {
-                                sourceMaps: buildInfo.isDev,
+                                sourceMaps: isDev,
                                 jsc: {
                                     parser: {
                                         syntax: "typescript",
@@ -115,7 +127,7 @@ async function getWebpackConfig(buildInfo: BuildInfo): Promise<webpack.Configura
                 template: "./src/popup/index.html",
             }),
             new HtmlPlugin({
-                chunks: buildInfo.browser === "firefox" ? ["background"] : [],
+                chunks: isFirefox ? ["background"] : [],
                 filename: "storage/background.html",
                 template: "./src/contexts/storage/background.html",
             }),
@@ -125,13 +137,15 @@ async function getWebpackConfig(buildInfo: BuildInfo): Promise<webpack.Configura
             new VueLoaderPlugin(),
             new CopyPlugin({ patterns: [{ context: "src", from: "assets", to: "assets" }] }),
             new DefinePlugin({
-                __BROWSER__: JSON.stringify(buildInfo.browser),
-                __VERSION__: JSON.stringify(buildInfo.version),
-                __HOMEPAGE__: JSON.stringify(buildInfo.homepage),
-                __AUTHOR__: JSON.stringify(buildInfo.author),
-                __DEBUG__: buildInfo.isDev,
-                __WATCH__: buildInfo.watch,
+                __BROWSER__: JSON.stringify(browser),
+                __VERSION__: JSON.stringify(version),
+                __HOMEPAGE__: JSON.stringify(homepage),
+                __AUTHOR__: JSON.stringify(author),
+                __IS_MOBILE__: isMobile,
+                __DEBUG__: isDev,
+                __WATCH__: watch,
                 __PORT__: PORT,
+                __HOSTNAME__: JSON.stringify(env.getString("IP", "localhost")),
                 __CACHE_MAX_AGE__: CACHE_MAX_AGE,
                 __MAX_BACKUPS_COUNT__: MAX_BACKUPS_COUNT,
                 __OVERRIDE_SERVER_URL__: env.getJsonStringify("OVERRIDE_SERVER_URL", "undefined"),
@@ -143,52 +157,60 @@ async function getWebpackConfig(buildInfo: BuildInfo): Promise<webpack.Configura
                 logging: [path.resolve(__dirname, "..", "src", "logging.ts"), "default"],
             }),
             new WebExtManifestPlugin({
-                files: ["./src/manifest.json", `./src/manifest.${buildInfo.browser}.json`],
+                files: ["./src/manifest.json", `./src/manifest.${browser}.json`],
                 fields: ["version", "author", "name"],
                 tabs: 2,
             }),
-            new WebExtPlugin({
-                adbHost: env.getString("ADB_HOST"),
-                adbPort: env.getString("ADB_PORT"),
-                adbBin: env.getString("ADB_BIN"),
-                adbDevice: env.getString("ANDROID_DEVICE"),
-                artifactsDir: path.dirname(buildInfo.out),
-                target: buildInfo.isChrome ? "chromium" : buildInfo.isMobile ? "firefox-android" : "firefox-desktop",
-                buildPackage: !buildInfo.watch && !buildInfo.isDev,
-                outputFilename: buildInfo.outFile,
-                runLint: false,
-                selfHosted: true,
-                overwriteDest: true,
-                devtools: true,
-                startUrl: env.getString("START_URL", "https://mapgenie.io"),
-                chromiumBinary: env.getString("CHROME_BIN"),
-                firefox: env.getString("FIREFOX_BIN"),
-                firefoxApk: env.getString("FIREFOX_APK"),
-                sourceDir: buildInfo.out,
-                args: buildInfo.isChrome
-                    ? ["--auto-open-devtools-for-tabs", "--system-developer-mode", "--start-maximized"]
-                    : [],
-                profileCreateIfMissing: false,
-                chromiumProfile: env.getString("CHROMIUM_PROFILE"),
-                firefoxProfile: env.getString("FIREFOX_PROFILE"),
-                keepProfileChanges: env.getString("KEEP_CHANGES", "0").toLowerCase() in [1, "1", "true"],
-            }),
+            isChrome && isMobile
+                ? new AdbPlugin({
+                      sourceDir: out,
+                      artifactsDir: path.dirname(out),
+                      outFilename: path.join(path.dirname(out), outFile),
+                      device: env.getString("ANDROID_DEVICE"),
+                      overwriteDest: true,
+                  })
+                : new WebExtPlugin({
+                      adbHost: env.getString("ADB_HOST"),
+                      adbPort: env.getString("ADB_PORT"),
+                      adbBin: env.getString("ADB_BIN"),
+                      adbDevice: env.getString("ANDROID_DEVICE"),
+                      artifactsDir: path.dirname(out),
+                      outputFilename: outFile,
+                      target: isChrome ? "chromium" : isMobile ? "firefox-android" : "firefox-desktop",
+                      buildPackage: !watch && !isDev,
+                      runLint: false,
+                      selfHosted: true,
+                      overwriteDest: true,
+                      devtools: true,
+                      startUrl: env.getString("START_URL", "https://mapgenie.io"),
+                      chromiumBinary: env.getString("CHROME_BIN"),
+                      firefox: env.getString("FIREFOX_BIN"),
+                      firefoxApk: env.getString("FIREFOX_APK"),
+                      sourceDir: out,
+                      args: isChrome
+                          ? ["--auto-open-devtools-for-tabs", "--system-developer-mode", "--start-maximized"]
+                          : [],
+                      profileCreateIfMissing: false,
+                      chromiumProfile: env.getString("CHROMIUM_PROFILE"),
+                      firefoxProfile: env.getString("FIREFOX_PROFILE"),
+                      keepProfileChanges: env.getString("KEEP_CHANGES", "0").toLowerCase() in [1, "1", "true"],
+                  }),
         ],
         optimization: {
             splitChunks: {
                 filename: "chunks/[name].js",
             },
-            minimize: !buildInfo.isDev,
+            minimize: !isDev,
             minimizer: [new TerserPlugin()],
         },
-        watch: buildInfo.watch,
-        devtool: buildInfo.isDev ? "inline-cheap-module-source-map" : false,
+        watch,
+        devtool: isDev ? "inline-cheap-module-source-map" : false,
         watchOptions: {
             ignored: "node_modules",
             poll: 1000,
             aggregateTimeout: 300,
         },
-        mode: buildInfo.mode,
+        mode,
     };
 }
 

@@ -4,7 +4,7 @@ type BooleanString = BooleanFalseString | BooleanFalseString;
 
 interface IProcessEnv {
     PORT?: string;
-    WS_PORT?: string;
+    IP?: string;
     CACHE_MAX_AGE?: string;
     MAX_BACKUPS_COUNT?: string;
     OVERRIDE_SERVER_URL?: string;

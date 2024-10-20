@@ -57,7 +57,7 @@ function getEnvInfo(): EnvInfo {
     if (!isChrome && !isFirefox) throw "No browser provided pls add `chrome` or `firefox`.";
     if (isChrome && isFirefox) throw "More than one browser provided, You can only bundle one at a time.";
 
-    if (isChrome && isMobile) throw "Chrome does not support mobile.";
+    // if (isChrome && isMobile) throw "Chrome does not support mobile.";
 
     return {
         isChrome,
@@ -87,7 +87,8 @@ export default function getBuildInfo(dist: string): BuildInfo {
     const envInfo = getEnvInfo();
     const name = `fmg-${envInfo.browser}`;
 
-    const outFile = envInfo.isDev ? name : name + (envInfo.isChrome ? ".zip" : ".xpi");
+    const outFile =
+        envInfo.isDev && !(envInfo.isChrome && envInfo.isMobile) ? name : name + (envInfo.isChrome ? ".zip" : ".xpi");
 
     return {
         name,
