@@ -20,6 +20,7 @@ type State = "connected" | "disconnected";
 
 const author = __AUTHOR__;
 const state = ref<State>("disconnected");
+const alert = ref<ComponentInstance<typeof AlertContainer>>();
 
 const themePreference = ref<ThemeName | "auto">("auto");
 const theme = ref<ThemeName | undefined>();
@@ -92,6 +93,11 @@ onMounted(async () => {
 });
 
 channel.getMapSettings().then(logging.debug);
+
+bus.$on("alert-info", (message) => alert.value?.alertInfo(message));
+bus.$on("alert-warn", (message) => alert.value?.alertWarn(message));
+bus.$on("alert-success", (message) => alert.value?.alertSuccess(message));
+bus.$on("alert-error", (message) => alert.value?.alertError(message));
 </script>
 
 <template>
@@ -101,7 +107,7 @@ channel.getMapSettings().then(logging.debug);
         ref="themeProvider"
         @changed="(name) => (theme = name)"
     >
-        <AlertContainer />
+        <AlertContainer ref="alert" />
         <div class="app-container">
             <div class="titlebar">
                 <div class="buttons">

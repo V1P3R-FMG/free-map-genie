@@ -1,6 +1,5 @@
 <script lang="ts" setup>
 import { ref } from "vue";
-import bus from "@popup/bus";
 
 import AlertMessage, { type AlertType } from "./alert-message.vue";
 let idCounter = 0;
@@ -19,10 +18,20 @@ function addAlert(type: AlertType, message: string, time: number = 5000) {
     const handle = window.setTimeout(remove, time);
 }
 
-bus.$on("alert-info", (message) => addAlert("info", message));
-bus.$on("alert-warn", (message) => addAlert("warn", message));
-bus.$on("alert-success", (message) => addAlert("success", message));
-bus.$on("alert-error", (message) => addAlert("error", message));
+defineExpose({
+    alertInfo(message: string) {
+        addAlert("info", message);
+    },
+    alertWarn(message: string) {
+        addAlert("warn", message);
+    },
+    alertSuccess(message: string) {
+        addAlert("success", message);
+    },
+    alertError(message: string) {
+        addAlert("error", message);
+    },
+});
 </script>
 
 <template>
