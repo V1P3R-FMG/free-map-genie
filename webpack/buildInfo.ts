@@ -1,9 +1,5 @@
 import path from "node:path";
 import fs from "node:fs";
-import crypto from "node:crypto";
-
-const HEX_MAP = "0123456789abcdef";
-const CHAR_MAP = "abcdefghijklmnop";
 
 export interface GeneratedKeys {
     appId: string;
