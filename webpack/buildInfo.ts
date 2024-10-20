@@ -35,10 +35,8 @@ export interface PackageJsonInfo {
 }
 
 export interface BuildInfo extends EnvInfo, PackageJsonInfo {
-    keys: GeneratedKeys;
     name: string;
     out: string;
-    updateUrl: string;
 }
 
 export interface CopyInstructionToArgs {
@@ -50,60 +48,6 @@ export interface CopyInstruction {
     from: string;
     context: string;
     to?: string | ((args: CopyInstructionToArgs) => string);
-}
-
-function generateKeys(keyDir: string): GeneratedKeys {
-    const privateKeyFilePath = path.resolve(keyDir, "key.pem");
-    const publicKeyFilePath = path.resolve(keyDir, "key.pub");
-    const appIdFilePath = path.resolve(keyDir, "appid");
-
-    let privateKeyData: string, publicKeyData: string, appIdData;
-    if (!fs.existsSync(privateKeyFilePath) || !fs.existsSync(publicKeyFilePath) || !fs.existsSync(appIdFilePath)) {
-        if (fs.existsSync(keyDir)) {
-            fs.rmSync(keyDir);
-        }
-
-        fs.mkdirSync(keyDir, { recursive: true });
-
-        const { privateKey, publicKey } = crypto.generateKeyPairSync("rsa", {
-            modulusLength: 2048,
-        });
-
-        const privateKeyBuf = privateKey.export({
-            type: "pkcs8",
-            format: "pem",
-        });
-        const publicKeyBuf = publicKey.export({ type: "spki", format: "der" });
-
-        privateKeyData = privateKeyBuf.toString("utf-8");
-        publicKeyData = publicKeyBuf.toString("base64");
-        appIdData = crypto
-            .createHash("sha256")
-            .update(publicKeyBuf)
-            .digest("hex")
-            .slice(0, 32)
-            .split("")
-            .map((c) => HEX_MAP.indexOf(c))
-            .map((i) => CHAR_MAP[i])
-            .join("");
-
-        fs.writeFileSync(privateKeyFilePath, privateKeyData, { flag: "w" });
-        fs.writeFileSync(publicKeyFilePath, publicKeyData, { flag: "w" });
-        fs.writeFileSync(appIdFilePath, appIdData, { flag: "w" });
-    } else {
-        privateKeyData = fs.readFileSync(privateKeyFilePath).toString("utf-8");
-        publicKeyData = fs.readFileSync(publicKeyFilePath).toString("utf-8");
-        appIdData = fs.readFileSync(appIdFilePath).toString("utf-8");
-    }
-
-    return {
-        appId: appIdData,
-        private: privateKeyData,
-        public: publicKeyData,
-        appIdFilePath,
-        privateKeyFilePath,
-        publicKeyFilePath,
-    };
 }
 
 function getEnvInfo(): EnvInfo {
@@ -149,9 +93,6 @@ export default function getBuildInfo(dist: string): BuildInfo {
     return {
         name,
         out: path.resolve(dist, name),
-        updateUrl: `http://127.0.0.1:5500/build/fmg-${envInfo.browser}.crx`,
-        // updateUrl: `${homepage}/releases/download/v${envInfo.version}/fmg-${envInfo.browser}-v${envInfo.version}.crx`,
-        keys: generateKeys(".keys"),
         ...envInfo,
         ...getPackageJsonInfo(),
     };
