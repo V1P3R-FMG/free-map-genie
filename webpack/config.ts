@@ -142,14 +142,7 @@ async function getWebpackConfig(buildInfo: BuildInfo): Promise<webpack.Configura
                 logging: [path.resolve(__dirname, "..", "src", "logging.ts"), "default"],
             }),
             new WebExtManifestPlugin({
-                files: [
-                    "./src/manifest.json",
-                    `./src/manifest.${buildInfo.browser}.json`,
-                    {
-                        key: buildInfo.keys.public,
-                        update_url: buildInfo.updateUrl,
-                    },
-                ],
+                files: ["./src/manifest.json", `./src/manifest.${buildInfo.browser}.json`],
                 fields: ["version", "author", "name"],
                 tabs: 2,
             }),
