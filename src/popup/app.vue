@@ -13,6 +13,7 @@ import AppVersion from "./app-version.vue";
 
 import channel from "./channel";
 import bus from "./bus";
+import { sendMessage } from "@shared/channel/popup";
 
 const themeProvider = ref<ComponentInstance<typeof ThemeProvider>>();
 
@@ -25,11 +26,19 @@ const themePreference = ref<ThemeName | "auto">("auto");
 const theme = ref<ThemeName | undefined>();
 
 function openHomepage() {
-    chrome.tabs.create({ url: __HOMEPAGE__ });
+    if (navigator.userAgent.includes("firefox") && navigator.userAgent.includes("android")) {
+        chrome.tabs.update({ url: __HOMEPAGE__ });
+    } else {
+        chrome.tabs.create({ url: __HOMEPAGE__ });
+    }
 }
 
 function openMapgenie() {
-    chrome.tabs.create({ url: "https://mapgenie.io" });
+    if (navigator.userAgent.includes("firefox") && navigator.userAgent.includes("android")) {
+        chrome.tabs.update({ url: "https://mapgenie.io" });
+    } else {
+        chrome.tabs.create({ url: "https://mapgenie.io" });
+    }
 }
 
 function close() {
