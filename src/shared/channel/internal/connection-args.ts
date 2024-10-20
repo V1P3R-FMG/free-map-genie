@@ -3,10 +3,6 @@ import type { ChannelContext, ConnectionArgs, ConnectionArgsWithEndpoint, Endpoi
 
 export function formatEndpointTargetName({ context, tabId, frameId }: EndpointNameArgs) {
     switch (context as ChannelContext) {
-        case "background":
-        case "popup":
-        case "offscreen":
-            return context;
         case "content-script":
             return formatEndpointName({ context: "extension", tabId, frameId });
         default:
