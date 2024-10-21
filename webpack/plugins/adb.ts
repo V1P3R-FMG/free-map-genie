@@ -4,7 +4,6 @@ import { execSync } from "child_process";
 import webpack from "webpack";
 import { validate } from "schema-utils";
 import { type WebSocket, WebSocketServer } from "ws";
-
 import webExt from "web-ext";
 
 type Schema = Parameters<typeof validate>[0];
@@ -94,7 +93,7 @@ export default class AdbPlugin {
     }
 
     public apply(compiler: webpack.Compiler) {
-        compiler.hooks.afterEmit.tapAsync("AdbPlugin", async () => {
+        compiler.hooks.afterEmit.tapPromise("AdbPlugin", async () => {
             await this.buildExtension();
             this.writeFile();
             this.notifyReload();
@@ -106,13 +105,16 @@ export default class AdbPlugin {
     }
 
     private async buildExtension() {
-        await webExt.cmd.build({
-            sourceDir: this.options.sourceDir,
-            artifactsDir: this.options.artifactsDir,
-            filename: path.basename(this.options.outFilename),
-            ignoreFiles: this.options.ignoreFiles,
-            overwriteDest: this.options.overwriteDest ?? false,
-        });
+        await webExt.cmd.build(
+            {
+                sourceDir: this.options.sourceDir,
+                artifactsDir: this.options.artifactsDir,
+                filename: path.basename(this.options.outFilename),
+                ignoreFiles: this.options.ignoreFiles,
+                overwriteDest: this.options.overwriteDest ?? false,
+            },
+            { shouldExitProgram: true }
+        );
     }
 
     private writeFile() {
