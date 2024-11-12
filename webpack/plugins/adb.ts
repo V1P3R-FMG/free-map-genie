@@ -1,10 +1,10 @@
 import path from "node:path";
 
-import { execSync } from "child_process";
 import webpack from "webpack";
 import { validate } from "schema-utils";
 import { type WebSocket, WebSocketServer } from "ws";
 import webExt from "web-ext";
+import { CommandBuilder } from "../cmd.js";
 
 type Schema = Parameters<typeof validate>[0];
 
@@ -12,6 +12,10 @@ const schema: Schema = {
     type: "object",
     required: ["sourceDir", "artifactsDir", "outFilename"],
     properties: {
+        apk: {
+            type: "string",
+            description: "Apk vendor name",
+        },
         sourceDir: {
             type: "string",
             description: "Source location of the extension.",
@@ -63,11 +67,13 @@ export interface AdbPluginOptions {
     device?: string;
     overwriteDest?: boolean;
     bin?: string;
+    apk?: string;
 }
 
 export interface AdbPluginOptionsWithDefaults extends AdbPluginOptions {
     verbose: boolean;
     targetPath: string;
+    apk: string;
 }
 
 export interface ShellLsCmdOptions {
@@ -86,7 +92,8 @@ export default class AdbPlugin {
         this.options = Object.assign(
             {
                 verbose: true,
-                targetPath: "/storage/self/primary/Download/" + path.basename(options.outFilename),
+                targetPath: this.downloadDirectory + path.basename(options.outFilename),
+                apk: "com.kiwibrowser.browser",
             },
             options
         );
@@ -95,9 +102,21 @@ export default class AdbPlugin {
     public apply(compiler: webpack.Compiler) {
         compiler.hooks.afterEmit.tapPromise("AdbPlugin", async () => {
             await this.buildExtension();
-            this.writeFile();
-            this.notifyReload();
+            this.pushFile(this.options.outFilename, this.options.targetPath);
+            this.updateFile();
         });
+    }
+
+    private get downloadDirectory() {
+        return "/storage/self/primary/Download/";
+    }
+
+    private get unpackedExtensionRootDirectory() {
+        return `/data/data/${this.options.apk}/app_chrome/Default/UnpackedExtensions/`;
+    }
+
+    private get updateFileBashFile() {
+        return path.join(__dirname, "update.sh");
     }
 
     private notifyReload() {
@@ -117,21 +136,107 @@ export default class AdbPlugin {
         );
     }
 
-    private writeFile() {
+    private adbCommand() {
+        return CommandBuilder.command(this.options.bin ?? "adb")
+            .startIf()
+            .args("-s", this.options.device)
+            .endIf(!!this.options.device);
+    }
+
+    private pushFile(src: string, dest: string) {
         try {
-            const cmdComponents = [this.options.bin ?? "adb"];
+            const result = this.adbCommand().arg("push").argString(src).argString(dest).execSyncUtf8();
 
-            if (this.options.device) {
-                cmdComponents.push("-s", this.options.device);
+            if (this.options.verbose) {
+                console.log("Pushed file:\n  ", result.trimEnd());
             }
-
-            cmdComponents.push("push", `"${this.options.outFilename}"`, `"${this.options.targetPath}"`);
-
-            const result = execSync(cmdComponents.join(" "));
-
-            if (this.options.verbose) console.log("command result:", result.toString("utf-8"));
         } catch (err) {
-            if (this.options.verbose) console.log("command result:", `${err}`);
+            console.error("Push file failed:", `${err}`);
         }
+    }
+
+    private cpFile(src: string, dest: string) {
+        try {
+            this.adbCommand().arg("shell").argString(`su -c 'cp -r "${src}" "${dest}"'`).execSync();
+
+            if (this.options.verbose) {
+                console.log("Copied File:", "\n  from:", src, "\n  to:", dest);
+            }
+        } catch (err) {
+            console.error("Copy file failed:", `${err}`);
+        }
+    }
+
+    private rmFile(src: string) {
+        try {
+            this.adbCommand().arg("shell").argString(`su -c 'rm -rf "${src}"'`).execSync();
+
+            if (this.options.verbose) {
+                console.log("Removed File:\n  ", src);
+            }
+        } catch (err) {
+            console.error("Copy file failed:", `${err}`);
+        }
+    }
+
+    private chownFile(src: string, user: string, group: string) {
+        try {
+            this.adbCommand().arg("shell").argString(`su -c 'chown -R ${user}:${group} ${src}'`);
+
+            if (this.options.verbose) {
+                console.log("Chowned File:\n  ", src);
+            }
+        } catch (err) {
+            console.error("Chown file failed:", `${err}`);
+        }
+    }
+
+    private getAllUnpackedExtensionDirectories() {
+        try {
+            return this.adbCommand()
+                .arg("shell")
+                .argString(`su -c 'ls "${this.unpackedExtensionRootDirectory}"'`)
+                .execSyncUtf8()
+                .split("\n")
+                .slice(0, -1)
+                .map((dir) => dir.trimEnd());
+        } catch (err) {
+            console.error("command result:", `${err}`);
+            return [];
+        }
+    }
+
+    private getCurrentUnpackedExtensionDirectory() {
+        const filename = path.basename(this.options.outFilename);
+        const directories = this.getAllUnpackedExtensionDirectories();
+        const matches = directories.filter((dir) => dir.startsWith(filename));
+
+        if (!matches.length) {
+            return null;
+        }
+
+        if (matches.length > 1) {
+            console.error("More than 1 valid unpacked extension directory found.");
+            return null;
+        }
+
+        return `${this.unpackedExtensionRootDirectory}${matches[0]}`;
+    }
+
+    private updateFile() {
+        const dir = this.getCurrentUnpackedExtensionDirectory();
+
+        if (!dir) {
+            console.log("Extension directory not found.");
+            return null;
+        }
+
+        const filename = path.basename(this.options.outFilename);
+        const tmpPath = `${this.downloadDirectory}${filename}-tmp`;
+
+        this.rmFile(tmpPath);
+        this.pushFile(`${this.options.sourceDir}`, tmpPath);
+        this.cpFile(`${tmpPath}/*`, `${dir}/`);
+        this.chownFile(`${dir}/`, "root", "everybody");
     }
 }
