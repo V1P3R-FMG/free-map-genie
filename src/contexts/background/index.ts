@@ -94,7 +94,7 @@ onMessage("games:find:map:from:url", ({ url }) => {
 });
 
 onMessage("reload:active:tab", async () => {
-    const tab = await chromeUtils.getActiveTab();
+    const tab = (await chromeUtils.getActiveTab()) ?? getActiveTab();
 
     if (!tab?.id) return false;
 
@@ -116,8 +116,8 @@ onMessage("get:page:type", async ({ url }) => {
     return getPageType(url);
 });
 
-onMessage("create:bookmark", () => {
-    const activeTab = getActiveTab();
+onMessage("create:bookmark", async () => {
+    const activeTab = (await chromeUtils.getActiveTab()) ?? getActiveTab();
     if (!activeTab?.url) throw "Active tab url not found.";
     return createBookmark(activeTab.url);
 });
