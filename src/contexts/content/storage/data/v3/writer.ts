@@ -25,13 +25,13 @@ export default class V3DataWriter extends BaseWriter<Readonly<V3DataLayout>, V3D
             data.latestUpdate,
         ] as const;
 
-        if (array.sumArray(dataLayout.map((arr) => (Array.isArray(arr) ? arr.length : 0))) === 0) {
+        const counts = dataLayout.map((arr) => (Array.isArray(arr) ? arr.length : 0));
+        if (array.sumArray(counts) === 0) {
             return null;
         }
 
         return dataLayout;
     }
-
     private writePreset(data: V3PresetData): V3PresetDataLayout {
         return [data.id, data.title, data.order, data.categories.values()];
     }
