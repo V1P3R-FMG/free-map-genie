@@ -133,4 +133,11 @@ if (__DEBUG__) {
     global.getActiveTab = () => activeTab;
 }
 
-export const { onMessage, sendMessage } = channel;
+const { onMessage, sendMessage, disconnect } = channel;
+
+const sendExtension = channel.bindSendMessage("extension");
+const sendContent = channel.bindSendMessage("content-script");
+const sendOffscreen = channel.bindSendMessage("offscreen");
+const sendPopup = channel.bindSendMessage("popup");
+
+export { onMessage, sendMessage, sendExtension, sendContent, sendOffscreen, sendPopup, disconnect };

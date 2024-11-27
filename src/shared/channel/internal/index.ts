@@ -8,6 +8,7 @@ import {
     isMessageFor,
     prettyMessage,
 } from "./message";
+
 import type {
     ChannelContext,
     ChannelDriver,
@@ -24,25 +25,43 @@ export interface TimeoutInfo {
     message?: string;
 }
 
-export interface Channel<C extends ChannelContext> {
-    sendMessage<RC extends Exclude<ChannelContext, C>, T extends ChannelEventNames<RC>>(
-        context: RC,
+export interface ChannelSendMessageBinded<C extends ChannelContext, RC extends Exclude<ChannelContext, C>> {
+    <T extends ChannelEventNames<RC>>(
         type: T,
-        data: ChannelEventData<RC, T> extends void ? any : ChannelEventData<RC, T>,
+        data: ChannelEventData<RC, T>,
         timeout?: number
     ): Promise<ChannelEventRet<RC, T>>;
+}
+
+export interface ChannelSendMessage<C extends ChannelContext> {
+    <RC extends Exclude<ChannelContext, C>, T extends ChannelEventNames<RC>>(
+        context: RC,
+        type: T,
+        data: ChannelEventData<RC, T>,
+        timeout?: number
+    ): Promise<ChannelEventRet<RC, T>>;
+}
+
+export interface Channel<C extends ChannelContext> {
+    sendMessage: ChannelSendMessage<C>;
+
+    bindSendMessage<RC extends Exclude<ChannelContext, C>>(context: RC): ChannelSendMessageBinded<C, RC>;
+
     onMessage<T extends ChannelEventNames<C>>(type: T, cb: MessageHandler<C, T>): void;
+
     handleMessage(message: any): void;
+
     isMessageForMe(message: InternalMessage): boolean;
+
     disconnect(): void;
 }
 
 type Handler = (data: any) => any;
 
-type ResponseHandler = {
+interface ResponseHandler {
     resolve: Handler;
     reject: Handler;
-};
+}
 
 function stringifyError(err: any) {
     if (err instanceof Error) {
@@ -164,9 +183,14 @@ export function createChannel<C extends ChannelContext>(context: C, driver: Chan
         driver.disconnect();
     }
 
+    function bindSendMessage<RC extends Exclude<ChannelContext, C>>(context: RC) {
+        return sendMessage.bind(null, context) as ChannelSendMessageBinded<C, RC>;
+    }
+
     driver.onMessage(handleMessage);
 
     return {
+        bindSendMessage,
         onMessage,
         sendMessage,
         handleMessage,

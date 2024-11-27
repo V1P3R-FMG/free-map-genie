@@ -52,4 +52,11 @@ setTimeout(() => {
     chrome.runtime.sendMessage({ type: "focused" });
 }, 500);
 
-export const { onMessage, sendMessage, disconnect } = channel;
+const { onMessage, sendMessage, disconnect } = channel;
+
+const sendContent = channel.bindSendMessage("content-script");
+const sendOffscreen = channel.bindSendMessage("offscreen");
+const sendBackground = channel.bindSendMessage("background");
+const sendPopup = channel.bindSendMessage("popup");
+
+export { onMessage, sendMessage, sendContent, sendOffscreen, sendPopup, sendBackground, disconnect };
