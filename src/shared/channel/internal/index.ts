@@ -18,6 +18,7 @@ import type {
     ChannelEventNames,
     MessageHandler,
     ChannelEventRet,
+    DriverState,
 } from "./types";
 
 export interface TimeoutInfo {
@@ -53,7 +54,9 @@ export interface Channel<C extends ChannelContext> {
 
     isMessageForMe(message: InternalMessage): boolean;
 
+    connect(): void;
     disconnect(): void;
+    state: DriverState;
 }
 
 type Handler = (data: any) => any;
@@ -179,10 +182,6 @@ export function createChannel<C extends ChannelContext>(context: C, driver: Chan
         return isMessageFor(context, message);
     }
 
-    function disconnect() {
-        driver.disconnect();
-    }
-
     function bindSendMessage<RC extends Exclude<ChannelContext, C>>(context: RC) {
         return sendMessage.bind(null, context) as ChannelSendMessageBinded<C, RC>;
     }
@@ -195,6 +194,10 @@ export function createChannel<C extends ChannelContext>(context: C, driver: Chan
         sendMessage,
         handleMessage,
         isMessageForMe,
-        disconnect,
+        connect: driver.connect,
+        disconnect: driver.disconnect,
+        get state() {
+            return driver.state;
+        },
     };
 }

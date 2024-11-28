@@ -36,10 +36,15 @@ function postMessage(message: InternalMessage) {
 }
 
 const channel = createChannel("background", {
-    onMessage: (cb) => chrome.runtime.onMessage.addListener(cb),
+    onMessage() {},
     postMessage,
-    disconnect: () => {},
-    disconnected: false,
+    connect() {
+        throw "Background is always connected";
+    },
+    disconnect() {
+        throw "Background can't be disconnected";
+    },
+    state: "connected",
 });
 
 chrome.runtime.onMessage.addListener((message, sender) => {
@@ -106,21 +111,15 @@ chrome.runtime.onConnect.addListener((port) => {
         postMessage(hopMessage(message, "background"));
     });
 
-    const added = Date.now();
-
     port.onDisconnect.addListener(() => {
         if (connMap.get(connArgs.endpointName)?.fingerprint === connArgs.fingerprint) {
             connMap.delete(connArgs.endpointName);
 
-            if (Date.now() - added <= 500) {
-                logging.debug(`Port removed ${connArgs.endpointName}#${connArgs.fingerprint}.`, port.name, port.sender);
-            }
+            logging.debug(`Port removed ${connArgs.endpointName}#${connArgs.fingerprint}.`, port.name, port.sender);
         }
     });
 
-    setTimeout(() => {
-        logging.debug(`Port added ${connArgs.endpointName}#${connArgs.fingerprint}.`, port.name, port.sender);
-    }, 500);
+    logging.debug(`Port added ${connArgs.endpointName}#${connArgs.fingerprint}.`, port.name, port.sender);
 });
 
 if (__DEBUG__) {
@@ -128,7 +127,7 @@ if (__DEBUG__) {
     global.getActiveTab = () => activeTab;
 }
 
-const { onMessage, sendMessage, disconnect } = channel;
+const { onMessage, sendMessage } = channel;
 
 const sendExtension = channel.bindSendMessage("extension");
 const sendContent = channel.bindSendMessage("content-script");
@@ -147,7 +146,6 @@ export default {
     sendContent,
     sendOffscreen,
     sendPopup,
-    disconnect,
     extension,
     content,
     offscreen,

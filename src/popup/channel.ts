@@ -5,6 +5,8 @@ import { waitFor } from "@utils/async";
 import { ThemeName } from "@ui/components/theme-provider.vue";
 import type { BookmarkData } from "@ui/components/bookmarks/bookmark-button.vue";
 
+channel.connect();
+
 class PopupChannel {
     public async waitForConnected(timeout: number = 10000) {
         return waitFor(

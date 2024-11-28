@@ -16,7 +16,21 @@ const fingerprint = createFingerprint();
 const win = createWindowChannelDriver(window);
 const port = createPortChannelDriver("extension", fingerprint);
 
-const channel = createChannel("extension", port);
+const channel = createChannel("extension", {
+    onMessage: port.onMessage,
+    postMessage: port.postMessage,
+    connect() {
+        win.connect();
+        port.connect();
+    },
+    disconnect() {
+        win.disconnect();
+        port.disconnect();
+    },
+    get state() {
+        return port.state;
+    },
+});
 
 port.onMessage((message) => {
     if (!isInternalMessage(message)) return;
@@ -39,14 +53,12 @@ win.onMessage(async (message) => {
 });
 
 onDocumentFocusChanged((visible) => {
-    // if (port.disconnected) return;
     if (isIframeContext()) return;
 
     if (visible) chrome.runtime.sendMessage({ type: "focused" });
 });
 
 setTimeout(() => {
-    if (port.disconnected) return;
     if (isIframeContext()) return;
     if (document.visibilityState === "hidden") return;
 
@@ -54,7 +66,7 @@ setTimeout(() => {
     chrome.runtime.sendMessage({ type: "focused" });
 }, 500);
 
-const { onMessage, sendMessage, disconnect } = channel;
+const { onMessage, sendMessage, connect, disconnect } = channel;
 
 const sendContent = channel.bindSendMessage("content-script");
 const sendOffscreen = channel.bindSendMessage("offscreen");
@@ -73,6 +85,7 @@ export default {
     sendOffscreen,
     sendPopup,
     sendBackground,
+    connect,
     disconnect,
     content,
     offscreen,

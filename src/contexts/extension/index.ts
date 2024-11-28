@@ -66,15 +66,16 @@ channel.onMessage("ping", () => {
 });
 
 async function main() {
-    console.log(await channel.background.gamesFindGame({ gameId: 20 }));
-
     if (isIframeContext()) {
-        channel.disconnect();
         return false;
     }
 
+    channel.connect();
+    console.log(await channel.background.gamesFindGame({ gameId: 20 }));
+
     const pageType = await channel.background.getPageType({ url: window.location.href });
     logging.debug("Page type", pageType);
+
     if (pageType === "unknown") {
         channel.disconnect();
         return false;

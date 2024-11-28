@@ -26,6 +26,8 @@ export type ChannelContext = "content-script" | "extension" | "popup" | "backgro
 
 export type MessageType = "message" | "reply" | "error";
 
+export type DriverState = "connected" | "disconnected";
+
 export interface MessageSender extends PortInfo {
     context: ChannelContext;
 }
@@ -52,8 +54,9 @@ export interface DriverOnMessageCallback {
 export interface ChannelDriver {
     postMessage(message: InternalMessage): void;
     onMessage(cb: DriverOnMessageCallback): void;
+    connect(): void;
     disconnect(): void;
-    disconnected: boolean;
+    state: DriverState;
 }
 
 export type Fingerprint = `uid::${string}`;

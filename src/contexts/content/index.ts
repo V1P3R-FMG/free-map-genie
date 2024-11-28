@@ -54,6 +54,8 @@ channel.onMessage("settings", async () => {
 });
 
 async function main() {
+    channel.connect();
+
     const pageType = await channel.background.getPageType({ url: window.location.href });
 
     logging.log("PageType:", pageType);

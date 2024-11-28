@@ -53,8 +53,8 @@ channel.onMessage("title", async ({ url }) => {
 });
 
 runContexts("mapgenie storage", async () => {
-    if (!isOffscreen) {
-        channel.disconnect();
-        return false;
+    if (isOffscreen) {
+        channel.connect();
     }
+    return isOffscreen;
 });

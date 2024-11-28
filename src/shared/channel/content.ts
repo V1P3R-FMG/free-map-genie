@@ -8,7 +8,7 @@ const win = createWindowChannelDriver(window);
 
 const channel = createChannel("content-script", win);
 
-const { onMessage, sendMessage, disconnect } = channel;
+const { onMessage, sendMessage, connect, disconnect } = channel;
 
 const sendExtension = channel.bindSendMessage("extension");
 const sendOffscreen = channel.bindSendMessage("offscreen");
@@ -27,6 +27,7 @@ export default {
     sendOffscreen,
     sendPopup,
     sendBackground,
+    connect,
     disconnect,
     extension,
     offscreen,

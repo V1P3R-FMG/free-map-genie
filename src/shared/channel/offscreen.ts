@@ -11,7 +11,7 @@ const port = createPortChannelDriver("offscreen", fingerprint);
 
 const channel = createChannel("offscreen", port);
 
-const { onMessage, sendMessage, disconnect } = channel;
+const { onMessage, sendMessage, connect, disconnect } = channel;
 
 const sendExtension = channel.bindSendMessage("extension");
 const sendContent = channel.bindSendMessage("content-script");
@@ -30,6 +30,7 @@ export default {
     sendContent,
     sendPopup,
     sendBackground,
+    connect,
     disconnect,
     extension,
     content,

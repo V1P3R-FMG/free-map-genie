@@ -1,17 +1,21 @@
 import { encodeConnectionArgs } from "../connection-args";
-import type { ChannelDriver, Fingerprint } from "../types";
+import type { ChannelDriver, DriverState, Fingerprint } from "../types";
 
 export type Listener = (message: any) => any;
 
 export default function createPortChannelDriver(name: string, fingerprint: Fingerprint) {
+    let state: DriverState = "disconnected";
     let port: chrome.runtime.Port;
-    let disconnected = false;
 
     const listeners: Set<Listener> = new Set();
 
-    const handleMessage = (message: any) => listeners.forEach((cb) => cb(message));
+    const handleMessage = (message: any) => {
+        listeners.forEach((cb) => cb(message));
+    };
 
     const connect = () => {
+        state = "connected";
+
         port = chrome.runtime.connect({
             name: encodeConnectionArgs({
                 context: name,
@@ -23,21 +27,27 @@ export default function createPortChannelDriver(name: string, fingerprint: Finge
         port.onDisconnect.addListener(connect);
     };
 
-    connect();
+    const disconnect = () => {
+        state = "disconnected";
+
+        listeners.clear();
+        port.onMessage.removeListener(handleMessage);
+        port.onDisconnect.removeListener(connect);
+    };
 
     return {
         onMessage(cb) {
             listeners.add(cb);
         },
         postMessage(message) {
+            if (state === "disconnected") throw "Not connected yet.";
+
             port.postMessage(message);
         },
-        disconnect() {
-            disconnected = true;
-            port.disconnect();
-        },
-        get disconnected() {
-            return disconnected;
+        connect,
+        disconnect,
+        get state() {
+            return state;
         },
     } satisfies ChannelDriver;
 }
