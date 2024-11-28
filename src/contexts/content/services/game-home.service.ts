@@ -1,5 +1,6 @@
+import channel from "@shared/channel/content";
+
 import gameHomePage from "@content/pages/game-home.page";
-import gamesChannel from "@content/channels/games.channel";
 
 class GameHomeService {
     public findFreeMapUrl() {
@@ -29,7 +30,7 @@ class GameHomeService {
     }
 
     public async getGameFromTitle() {
-        const games = await gamesChannel.getAll();
+        const games = await channel.background.getGames();
         return games.find((game) => game.meta_title === document.title);
     }
 

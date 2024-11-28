@@ -2,10 +2,12 @@ import { onDocumentFocusChanged } from "@shared/event";
 import { isIframeContext } from "@shared/context";
 
 import { createChannel } from "./internal";
+import { createTarget } from "./internal/target";
 import { createFingerprint } from "./internal/fingerprint";
+import { hasMessageHop, hopMessage, isInternalMessage, isMessageFor } from "./internal/message";
+
 import createWindowChannelDriver from "./internal/drivers/window";
 import createPortChannelDriver from "./internal/drivers/port";
-import { hasMessageHop, hopMessage, isInternalMessage, isMessageFor } from "./internal/message";
 
 export type * from "./internal/types";
 
@@ -59,4 +61,21 @@ const sendOffscreen = channel.bindSendMessage("offscreen");
 const sendBackground = channel.bindSendMessage("background");
 const sendPopup = channel.bindSendMessage("popup");
 
-export { onMessage, sendMessage, sendContent, sendOffscreen, sendPopup, sendBackground, disconnect };
+const content = createTarget(sendMessage, "content-script");
+const offscreen = createTarget(sendMessage, "offscreen");
+const background = createTarget(sendMessage, "background");
+const popup = createTarget(sendMessage, "popup");
+
+export default {
+    onMessage,
+    sendMessage,
+    sendContent,
+    sendOffscreen,
+    sendPopup,
+    sendBackground,
+    disconnect,
+    content,
+    offscreen,
+    background,
+    popup,
+};

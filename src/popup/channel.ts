@@ -1,6 +1,6 @@
 import bus from "@popup/bus";
 
-import { sendMessage } from "@shared/channel/popup";
+import channel from "@shared/channel/popup";
 import { waitFor } from "@utils/async";
 import { ThemeName } from "@ui/components/theme-provider.vue";
 import type { BookmarkData } from "@ui/components/bookmarks/bookmark-button.vue";
@@ -10,7 +10,7 @@ class PopupChannel {
         return waitFor(
             async (resolve) => {
                 try {
-                    await sendMessage("extension", "ping", {}, 500);
+                    await channel.extension.ping(null, 500);
                     resolve();
                 } catch {}
             },
@@ -25,7 +25,7 @@ class PopupChannel {
         return waitFor(
             async (resolve) => {
                 try {
-                    await sendMessage("offscreen", "ping", {}, 500);
+                    await channel.offscreen.ping(null, 500);
                     resolve();
                 } catch {}
             },
@@ -37,46 +37,46 @@ class PopupChannel {
     }
 
     async getLatestVersion(timeout?: number) {
-        return sendMessage("background", "latest:version", {}, timeout);
+        return channel.background.latestVersion(null, timeout);
     }
 
     async reloadActiveTab(timeout?: number) {
-        return sendMessage("background", "reload:active:tab", {}, timeout);
+        return channel.background.reloadActiveTab(null, timeout);
     }
 
     async getThemePreference(timeout?: number) {
-        const theme = await sendMessage("offscreen", "get", { key: "fmg:theme:v3" }, timeout);
-        return (theme as ThemeName | null) ?? "auto";
+        return channel.offscreen.get({ key: "fmg:theme:v3", dflt: "auto" }, timeout) as Promise<ThemeName>;
     }
 
     async setThemePreference(theme: ThemeName, timeout?: number) {
-        await sendMessage("offscreen", "set", { key: "fmg:theme:v3", value: theme }, timeout);
+        await channel.offscreen.set({ key: "fmg:theme:v3", value: theme }, timeout);
     }
 
     async reloadExtension(timeout?: number) {
-        return sendMessage("background", "reload:extension", {}, timeout);
+        return channel.background.reloadExtension(null, timeout);
     }
 
     async getMapSettings(timeout?: number) {
-        return sendMessage("content-script", "settings", {}, timeout);
+        return channel.content.settings(null, timeout);
     }
 
     async getBookmarks(timeout?: number): Promise<BookmarkData[]> {
         await this.waitForOffscreenConnected(timeout);
-        return JSON.parse((await sendMessage("offscreen", "get", { key: "fmg:bookmarks:v3" }, timeout)) ?? "[]");
+        const bookmarks = await channel.offscreen.get({ key: "fmg:bookmarks:v3" }, timeout);
+        return JSON.parse(bookmarks ?? "[]");
     }
 
     async setBookmarks(bookmarks: BookmarkData[], timeout?: number) {
-        return sendMessage("offscreen", "set", { key: "fmg:bookmarks:v3", value: JSON.stringify(bookmarks) }, timeout);
+        return channel.offscreen.set({ key: "fmg:bookmarks:v3", value: JSON.stringify(bookmarks) }, timeout);
     }
 
     async clearBookmarks(timeout?: number) {
-        return sendMessage("offscreen", "remove", { key: "fmg:bookmarks:v3" }, timeout);
+        return channel.offscreen.remove({ key: "fmg:bookmarks:v3" }, timeout);
     }
 
     async createBookmark(timeout?: number): Promise<BookmarkData | undefined> {
         try {
-            return sendMessage("background", "create:bookmark", {}, timeout);
+            return channel.background.createBookmark(null, timeout);
         } catch (error) {
             bus.$emit("alert-error", `${error}`);
         }

@@ -2,14 +2,14 @@ import getPageType from "./page";
 import Games from "./games";
 
 import type { BookmarkData } from "@ui/components/bookmarks/bookmark-button.vue";
-import { sendMessage } from "@shared/channel/background";
+import channel from "@shared/channel/background";
 
 function getAppleTouchIcon(gameSlug: string) {
     return `https://cdn.mapgenie.io/favicons/${gameSlug}/apple-touch-icon.png`;
 }
 
 async function getTitle(url: string) {
-    return sendMessage("offscreen", "title", { url });
+    return channel.offscreen.title({ url });
 }
 
 function getLocationUrl(url: string) {

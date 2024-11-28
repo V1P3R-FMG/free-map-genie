@@ -1,6 +1,5 @@
 import { $waitFor, type JQueryAsync } from "@utils/jquery";
-
-import userChannel from "@content/channels/user.channel";
+import channel from "@shared/channel/content";
 
 import userService from "@content/services/user.service";
 
@@ -26,7 +25,7 @@ class LoginPage {
             .attr("type", "button")
             .on("click", () => {
                 userService.enableMockUser(true);
-                userChannel.sendLogin();
+                channel.background.login();
             })
             .appendTo(buttonGroup);
     }

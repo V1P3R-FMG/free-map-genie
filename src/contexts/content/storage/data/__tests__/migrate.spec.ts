@@ -1,4 +1,4 @@
-jest.mock("../../../channels/games.channel");
+jest.mock("@shared/channel/content.ts");
 
 import DataManager, { type Backup } from "../index";
 

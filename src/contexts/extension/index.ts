@@ -1,16 +1,16 @@
 import runContexts from "@shared/run";
 import { injectExtensionScript, injectStyle } from "@shared/inject";
-import { onMessage, disconnect, ChannelEventDef } from "@shared/channel/extension";
 import { isIframeContext } from "@shared/context";
+import type { ChannelEventDef } from "@shared/channel/extension";
+import channel from "@shared/channel/extension";
 
 import AdBlocker from "./ads";
-import channel from "./channel";
 
 declare global {
     export interface Channels {
         extension: {
             "inject:style": ChannelEventDef<{ path: string }>;
-            "asset": ChannelEventDef<{ path: string }, string>;
+            "get:asset": ChannelEventDef<{ path: string }, string>;
             "login": ChannelEventDef;
             "ping": ChannelEventDef<void, "pong">;
         };
@@ -24,7 +24,7 @@ function getAsset(path: string) {
 }
 
 async function startAdBlocker() {
-    switch (await channel.getPageType()) {
+    switch (await channel.background.getPageType({ url: window.location.href })) {
         case "map":
             AdBlocker.start();
 
@@ -35,8 +35,8 @@ async function startAdBlocker() {
     }
 }
 
-onMessage("login", async () => {
-    const url = await channel.login();
+channel.onMessage("login", async () => {
+    const url = await channel.background.login();
 
     if (url) {
         window.location.href = url;
@@ -53,28 +53,30 @@ onMessage("login", async () => {
     window.location.href = "https://mapgenie.io";
 });
 
-onMessage("inject:style", async ({ path }) => {
+channel.onMessage("inject:style", async ({ path }) => {
     await injectStyle(chrome.runtime.getURL(path));
 });
 
-onMessage("asset", ({ path }) => {
+channel.onMessage("get:asset", ({ path }) => {
     return getAsset(path);
 });
 
-onMessage("ping", () => {
+channel.onMessage("ping", () => {
     return "pong" as const;
 });
 
 async function main() {
+    console.log(await channel.background.gamesFindGame({ gameId: 20 }));
+
     if (isIframeContext()) {
-        disconnect();
+        channel.disconnect();
         return false;
     }
 
-    const pageType = await channel.getPageType();
+    const pageType = await channel.background.getPageType({ url: window.location.href });
     logging.debug("Page type", pageType);
     if (pageType === "unknown") {
-        disconnect();
+        channel.disconnect();
         return false;
     }
 

@@ -1,10 +1,9 @@
 import * as async from "@utils/async";
+import channel from "@shared/channel/content";
 
 import Key from "@content/storage/key";
 
 import storageService from "@content/services/storage.service";
-
-import pageChannel from "@content/channels/page.channel";
 
 class UserService {
     public createMockUser(): MG.User {
@@ -20,7 +19,7 @@ class UserService {
     }
 
     public async getUser() {
-        switch (await pageChannel.getPageType()) {
+        switch (await channel.background.getPageType({ url: window.location.href })) {
             case "map":
                 await async.waitForCondition(() => window.user !== undefined);
                 return window.user;

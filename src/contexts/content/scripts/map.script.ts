@@ -1,3 +1,5 @@
+import channel from "@shared/channel/content";
+
 import userService from "@content/services/user.service";
 import mapService from "@content/services/map.service";
 import apiService from "@content/services/api.service";
@@ -10,7 +12,6 @@ import mapPage from "@content/pages/map.page";
 import Key from "@content/storage/key";
 
 import ui from "@content/ui/map.ui";
-import assetsChannel from "@content/channels/assets.channel";
 
 class MapScript implements PageScript {
     public async initScript() {
@@ -44,7 +45,7 @@ class MapScript implements PageScript {
 
         await mapPage.initButtons();
 
-        await assetsChannel.injectStyle("css/content/map.script.css");
+        await channel.extension.injectStyle({ path: "css/content/map.script.css" });
         await ui.attach();
 
         if (loggedIn) {

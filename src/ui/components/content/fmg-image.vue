@@ -1,7 +1,6 @@
 <script lang="ts" setup>
 import { onMounted, ref } from "vue";
-
-import assetsChannel from "@content/channels/assets.channel";
+import channel from "@shared/channel/content";
 
 const props = defineProps<{
     src: string;
@@ -10,7 +9,7 @@ const props = defineProps<{
 const fullSrc = ref<string>("");
 
 onMounted(async () => {
-    fullSrc.value = await assetsChannel.getAsset(props.src);
+    fullSrc.value = await channel.extension.getAsset({ path: props.src });
 });
 </script>
 

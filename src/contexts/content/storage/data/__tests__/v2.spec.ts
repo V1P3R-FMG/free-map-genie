@@ -1,4 +1,4 @@
-jest.mock("../../../channels/games.channel");
+jest.mock("@shared/channel/content.ts");
 
 import { loadStorageDriver, loadStorageData, type JsonFormat } from "../__utils__/data";
 

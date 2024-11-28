@@ -1,4 +1,5 @@
 import { createChannel } from "./internal";
+import { createTarget } from "./internal/target";
 import { createFingerprint } from "./internal/fingerprint";
 import createPortChannelDriver from "./internal/drivers/port";
 
@@ -17,4 +18,21 @@ const sendContent = channel.bindSendMessage("content-script");
 const sendOffscreen = channel.bindSendMessage("offscreen");
 const sendBackground = channel.bindSendMessage("background");
 
-export { onMessage, sendMessage, sendExtension, sendContent, sendOffscreen, sendBackground, disconnect };
+const extension = createTarget(sendMessage, "extension");
+const content = createTarget(sendMessage, "content-script");
+const offscreen = createTarget(sendMessage, "offscreen");
+const background = createTarget(sendMessage, "background");
+
+export default {
+    onMessage,
+    sendMessage,
+    sendExtension,
+    sendContent,
+    sendOffscreen,
+    sendBackground,
+    disconnect,
+    extension,
+    content,
+    offscreen,
+    background,
+};

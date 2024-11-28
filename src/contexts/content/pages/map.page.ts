@@ -1,6 +1,5 @@
 import { $waitFor } from "@utils/jquery";
-
-import userChannel from "@content/channels/user.channel";
+import channel from "@shared/channel/content";
 
 import userService from "@content/services/user.service";
 import mapService from "@content/services/map.service";
@@ -107,7 +106,7 @@ class MapPage {
 
     public async initLoginButton() {
         const btn = await this.loginButton;
-        btn.on("click", () => userChannel.sendStartLogin());
+        btn.on("click", () => channel.background.startLogin({ url: window.location.href }));
     }
 
     public async initLogoutButton() {

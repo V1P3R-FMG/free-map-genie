@@ -1,6 +1,7 @@
 import * as chromeUtils from "@utils/chrome";
 
 import { createChannel } from "./internal";
+import { createTarget } from "./internal/target";
 import { decodeConnectionArgs, formatEndpointName, formatEndpointTargetName } from "./internal/connection-args";
 import { hasMessageHop, hopMessage, isInternalMessage, isMessageFor, isMessageFrom } from "./internal/message";
 import type { Fingerprint, InternalMessage } from "./internal/types";
@@ -21,7 +22,7 @@ export interface ActiveTab {
 const connMap: Map<string, CachedPortInfo> = new Map();
 let activeTab: ActiveTab | undefined;
 
-export function getActiveTab() {
+function getActiveTab() {
     return activeTab;
 }
 
@@ -140,4 +141,22 @@ const sendContent = channel.bindSendMessage("content-script");
 const sendOffscreen = channel.bindSendMessage("offscreen");
 const sendPopup = channel.bindSendMessage("popup");
 
-export { onMessage, sendMessage, sendExtension, sendContent, sendOffscreen, sendPopup, disconnect };
+const extension = createTarget(sendMessage, "extension");
+const content = createTarget(sendMessage, "content-script");
+const offscreen = createTarget(sendMessage, "offscreen");
+const popup = createTarget(sendMessage, "popup");
+
+export default {
+    onMessage,
+    sendMessage,
+    sendExtension,
+    sendContent,
+    sendOffscreen,
+    sendPopup,
+    disconnect,
+    extension,
+    content,
+    offscreen,
+    popup,
+    getActiveTab,
+};

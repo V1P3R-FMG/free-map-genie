@@ -5,7 +5,8 @@ import Key from "./storage/key";
 import storageService from "./services/storage.service";
 import userService from "./services/user.service";
 import { V3SettingsData } from "./storage/data/v3";
-import { onMessage, sendMessage, type ChannelEventDef } from "@shared/channel/content";
+import channel from "@shared/channel/content";
+import type { ChannelEventDef } from "@shared/channel/content";
 
 declare global {
     export interface Channels {
@@ -43,7 +44,7 @@ async function getScript(pageType: MG.PageType): Promise<PageScript | null> {
     }
 }
 
-onMessage("settings", async () => {
+channel.onMessage("settings", async () => {
     if (await userService.isLoggedIn()) {
         const data = await storageService.load(Key.current);
         return data.settings;
@@ -53,7 +54,7 @@ onMessage("settings", async () => {
 });
 
 async function main() {
-    const pageType = await sendMessage("background", "get:page:type", { url: window.location.href });
+    const pageType = await channel.background.getPageType({ url: window.location.href });
 
     logging.log("PageType:", pageType);
 

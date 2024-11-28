@@ -1,5 +1,5 @@
 import Key from "@content/storage/key";
-import gamesChannel from "../channels/games.channel";
+import channel from "@shared/channel/content";
 
 class MapData {
     public readonly config: MG.MapConfig;
@@ -63,7 +63,7 @@ class GamesService {
     private readonly heatmaps: Record<string, Heatmaps> = {};
 
     public async getGame(gameId: number) {
-        return (this.game[gameId] ??= await gamesChannel.getGame(gameId));
+        return (this.game[gameId] ??= await channel.background.getGame({ gameId }));
     }
 
     public async mapData(gameId: number, mapId: number) {
@@ -74,7 +74,7 @@ class GamesService {
     }
 
     public async getHeatmaps(mapId: number) {
-        return (this.heatmaps[mapId] ??= new Heatmaps(await gamesChannel.getHeatmaps(mapId)));
+        return (this.heatmaps[mapId] ??= new Heatmaps(await channel.background.getHeatmaps({ mapId })));
     }
 
     public async mapConfig(gameId: number, mapId: number) {

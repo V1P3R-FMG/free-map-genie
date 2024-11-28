@@ -1,4 +1,4 @@
-jest.mock("@content/channels/games.channel");
+jest.mock("@shared/channel/content.ts");
 
 import GamesService from "@content/services/games.service";
 

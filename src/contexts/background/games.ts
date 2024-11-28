@@ -10,7 +10,7 @@ export class GamesService {
     private readonly games: CachedValue<MG.Api.Game[]> = this.fetch(`${ORIGIN}/api/v1/games`);
     private readonly gamesFull: Cache<MG.Api.GameFull> = {};
     private readonly mapsFull: Cache<MG.Api.MapFull> = {};
-    private readonly heatmaps: Cache<MG.Api.HeatmapGroup> = {};
+    private readonly heatmaps: Cache<MG.Api.HeatmapGroup[]> = {};
 
     private fetch<T>(url: string) {
         const k = /* @mangle */ "X-Api-Secret"; /* @/mangle */
