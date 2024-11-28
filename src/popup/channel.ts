@@ -39,7 +39,7 @@ class PopupChannel {
     }
 
     async getLatestVersion(timeout?: number) {
-        return channel.background.latestVersion(null, timeout);
+        return channel.background.getLatestVersion(null, timeout);
     }
 
     async reloadActiveTab(timeout?: number) {

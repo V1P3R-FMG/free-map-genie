@@ -1,7 +1,6 @@
 import runContexts from "@shared/run";
 import { injectExtensionScript, injectStyle } from "@shared/inject";
 import { isIframeContext } from "@shared/context";
-import type { ChannelEventDef } from "@shared/channel/extension";
 import channel from "@shared/channel/extension";
 
 import AdBlocker from "./ads";
@@ -9,10 +8,10 @@ import AdBlocker from "./ads";
 declare global {
     export interface Channels {
         extension: {
-            "inject:style": ChannelEventDef<{ path: string }>;
-            "get:asset": ChannelEventDef<{ path: string }, string>;
-            "login": ChannelEventDef;
-            "ping": ChannelEventDef<void, "pong">;
+            injectStyle(data: { path: string }): void;
+            getAsset(data: { path: string }): string;
+            login(): void;
+            ping(): "pong";
         };
     }
 }
@@ -53,11 +52,11 @@ channel.onMessage("login", async () => {
     window.location.href = "https://mapgenie.io";
 });
 
-channel.onMessage("inject:style", async ({ path }) => {
+channel.onMessage("injectStyle", async ({ path }) => {
     await injectStyle(chrome.runtime.getURL(path));
 });
 
-channel.onMessage("get:asset", ({ path }) => {
+channel.onMessage("getAsset", ({ path }) => {
     return getAsset(path);
 });
 

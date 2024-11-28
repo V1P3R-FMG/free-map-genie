@@ -112,7 +112,7 @@ export function createChannel<C extends ChannelContext>(context: C, driver: Chan
 
         return async
             .timeout(
-                new Promise((resolve, reject) => {
+                new Promise<any>((resolve, reject) => {
                     responseHandlers[message.messageId] = { resolve, reject };
                     driver.postMessage(message);
                 }),

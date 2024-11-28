@@ -1,9 +1,3 @@
-declare global {
-    export interface Channels {
-        [x: string]: ChannelEventMap;
-    }
-}
-
 export interface ConnectionArgs {
     context: string;
     fingerprint: Fingerprint;
@@ -64,10 +58,9 @@ export type MessageID = `uid::${string}`;
 
 export type EmptyEventArgs = Record<PropertyKey, never>;
 
-export type ChannelEventDef<Data extends object | void = void, Ret = void> = {
-    data: Data extends void ? EmptyEventArgs : Data;
-    ret: Ret;
-};
+export type ChannelEventDef<Data extends object | void = void, Ret = void> = (
+    data?: Data extends void ? EmptyEventArgs : Data
+) => Ret;
 
 export interface MessageHandler<C extends ChannelContext, T extends ChannelEventNames<C>> {
     (
@@ -80,14 +73,17 @@ export type ChannelEventNames<C extends ChannelContext> = keyof Channels[C];
 export type ChannelEvent<C extends ChannelContext, T extends ChannelEventNames<C>> = Channels[C][T];
 
 export type ChannelEventData<C extends ChannelContext, T extends ChannelEventNames<C>> =
-    ChannelEvent<C, T> extends ChannelEventDef<any, any> ? ChannelEvent<C, T>["data"] : any;
+    ChannelEvent<C, T> extends ChannelEventDef<any, any> ? Parameters<ChannelEvent<C, T>>[0] : any;
 
 export type ChannelEventRet<C extends ChannelContext, T extends ChannelEventNames<C>> =
-    ChannelEvent<C, T> extends ChannelEventDef<any, any> ? ChannelEvent<C, T>["ret"] : any;
+    ChannelEvent<C, T> extends ChannelEventDef<any, any> ? ReturnType<ChannelEvent<C, T>> : any;
 
 export interface ChannelEventMap {
-    [name: string]: {
-        data: object | void;
-        ret: any;
-    };
+    [name: string]: ChannelEventDef<any, any>;
+}
+
+declare global {
+    export interface Channels {
+        [x: string]: ChannelEventMap;
+    }
 }

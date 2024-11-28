@@ -1,18 +1,17 @@
 import channel from "@shared/channel/offscreen";
-import type { ChannelEventDef } from "@shared/channel/offscreen";
 import { isIframeContext } from "@shared/context";
 import runContexts from "@shared/run";
 
 declare global {
     export interface Channels {
         offscreen: {
-            has: ChannelEventDef<{ key: string }, boolean>;
-            get: ChannelEventDef<{ key: string; dflt?: string }, string | null>;
-            set: ChannelEventDef<{ key: string; value: string }>;
-            remove: ChannelEventDef<{ key: string }>;
-            keys: ChannelEventDef<void, string[]>;
-            ping: ChannelEventDef<void, "pong">;
-            title: ChannelEventDef<{ url: string }, string>;
+            has(data: { key: string }): boolean;
+            get(data: { key: string; dflt?: string }): string | null;
+            set(data: { key: string; value: string }): void;
+            remove(data: { key: string }): void;
+            keys(): string[];
+            ping(): "pong";
+            title(data: { url: string }): string;
         };
     }
 }

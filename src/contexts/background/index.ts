@@ -1,7 +1,6 @@
 import runContexts from "@shared/run";
 import * as chromeUtils from "@utils/chrome";
 import channel from "@shared/channel/background";
-import type { ChannelEventDef } from "@shared/channel/background";
 import type { BookmarkData } from "@ui/components/bookmarks/bookmark-button.vue";
 
 import installRules from "./rules";
@@ -14,34 +13,44 @@ import createBookmark from "./bookmarks";
 declare global {
     export interface Channels {
         background: {
-            "latest:version": ChannelEventDef<void, string>;
-            "start:login": ChannelEventDef<{ url: string }>;
-            "login": ChannelEventDef<void, string>;
-            "get:games": ChannelEventDef<void, MG.Api.Game[]>;
-            "get:game": ChannelEventDef<{ gameId: number }, MG.Api.GameFull>;
-            "get:map": ChannelEventDef<{ mapId: number }, MG.Api.MapFull>;
-            "get:heatmaps": ChannelEventDef<{ mapId: number }, MG.Api.HeatmapGroup[]>;
-            "games:find:game": ChannelEventDef<{ gameId: number }, MG.Api.Game | undefined>;
-            "games:find:map": ChannelEventDef<{ mapId: number; gameId: number }, MG.Api.Map | undefined>;
-            "games:find:game:from:slug": ChannelEventDef<{ gameSlug: string }, MG.Api.Game | undefined>;
-            "games:find:map:from:slug": ChannelEventDef<{ gameSlug: string; mapSlug: string }, MG.Api.Map | undefined>;
-            "games:find:game:from:domain": ChannelEventDef<{ domain: string }, MG.Api.Game | undefined>;
-            "games:find:game:from:url": ChannelEventDef<{ url: string }, MG.Api.Game | undefined>;
-            "games:find:map:from:url": ChannelEventDef<{ url: string }, MG.Api.Map | undefined>;
-            "reload:active:tab": ChannelEventDef<void, boolean>;
-            "reload:extension": ChannelEventDef;
-            "open:popup": ChannelEventDef;
-            "get:page:type": ChannelEventDef<{ url: string }, MG.PageType>;
-            "create:bookmark": ChannelEventDef<void, BookmarkData>;
+            getLatestVersion(): string;
+            startLogin(data: { url: string }): void;
+            login(): string;
+
+            getGames(): MG.Api.Game[];
+
+            getGame(data: { gameId: number }): MG.Api.GameFull;
+            getMap(data: { mapId: number }): MG.Api.MapFull;
+            getHeatmaps(data: { mapId: number }): MG.Api.HeatmapGroup[];
+
+            gamesFindGame(data: { gameId: number }): MG.Api.Game | void;
+
+            gamesFindMap(data: { mapId: number; gameId: number }): MG.Api.Map | void;
+
+            gamesFindGameFromSlug(data: { gameSlug: string }): MG.Api.Game | void;
+
+            gamesFindMapFromSlug(data: { gameSlug: string; mapSlug: string }): MG.Api.Map | void;
+
+            gamesFindGameFromDomain(data: { domain: string }): MG.Api.Game | void;
+
+            gamesFindGameFromUrl(data: { url: string }): MG.Api.Game | void;
+            gamesFindMapFromUrl(data: { url: string }): MG.Api.Map | void;
+
+            reloadActiveTab(): boolean;
+            reloadExtension(): void;
+
+            openPopup(): void;
+            getPageType(data: { url: string }): MG.PageType;
+            createBookmark(): BookmarkData;
         };
     }
 }
 
-channel.onMessage("latest:version", () => {
+channel.onMessage("getLatestVersion", () => {
     return fetchLatestVersion();
 });
 
-channel.onMessage("start:login", ({ url }) => {
+channel.onMessage("startLogin", ({ url }) => {
     return chrome.storage.session.set({ last_mg_url: url });
 });
 
@@ -50,51 +59,51 @@ channel.onMessage("login", async () => {
     return last_mg_url;
 });
 
-channel.onMessage("get:games", () => {
+channel.onMessage("getGames", () => {
     return Games.getGames();
 });
 
-channel.onMessage("get:game", ({ gameId }) => {
+channel.onMessage("getGame", ({ gameId }) => {
     return Games.getGame(gameId);
 });
 
-channel.onMessage("get:map", ({ mapId }) => {
+channel.onMessage("getMap", ({ mapId }) => {
     return Games.getMap(mapId);
 });
 
-channel.onMessage("get:heatmaps", ({ mapId }) => {
+channel.onMessage("getHeatmaps", ({ mapId }) => {
     return Games.getHeatmaps(mapId);
 });
 
-channel.onMessage("games:find:game", ({ gameId }) => {
+channel.onMessage("gamesFindGame", ({ gameId }) => {
     return Games.findGame(gameId);
 });
 
-channel.onMessage("games:find:map", ({ gameId, mapId }) => {
+channel.onMessage("gamesFindMap", ({ gameId, mapId }) => {
     return Games.findMap(gameId, mapId);
 });
 
-channel.onMessage("games:find:game:from:slug", ({ gameSlug }) => {
+channel.onMessage("gamesFindGameFromSlug", ({ gameSlug }) => {
     return Games.findGameFromSlug(gameSlug);
 });
 
-channel.onMessage("games:find:map:from:slug", ({ gameSlug, mapSlug }) => {
+channel.onMessage("gamesFindMapFromSlug", ({ gameSlug, mapSlug }) => {
     return Games.findMapFromSlug(gameSlug, mapSlug);
 });
 
-channel.onMessage("games:find:game:from:domain", ({ domain }) => {
+channel.onMessage("gamesFindGameFromDomain", ({ domain }) => {
     return Games.findGameFromDomain(domain);
 });
 
-channel.onMessage("games:find:game:from:url", ({ url }) => {
+channel.onMessage("gamesFindGameFromUrl", ({ url }) => {
     return Games.findGameFromUrl(url);
 });
 
-channel.onMessage("games:find:map:from:url", ({ url }) => {
+channel.onMessage("gamesFindMapFromUrl", ({ url }) => {
     return Games.findMapFromUrl(url);
 });
 
-channel.onMessage("reload:active:tab", async () => {
+channel.onMessage("reloadActiveTab", async () => {
     const tab = (await chromeUtils.getActiveTab()) ?? channel.getActiveTab();
 
     if (!tab?.id) return false;
@@ -104,20 +113,20 @@ channel.onMessage("reload:active:tab", async () => {
     return true;
 });
 
-channel.onMessage("reload:extension", () => {
+channel.onMessage("reloadExtension", () => {
     chrome.runtime.reload();
 });
 
-channel.onMessage("open:popup", async () => {
+channel.onMessage("openPopup", async () => {
     await chrome.action.openPopup();
 });
 
-channel.onMessage("get:page:type", async ({ url }) => {
+channel.onMessage("getPageType", async ({ url }) => {
     logging.debug("Getting page type", url, await getPageType(url));
     return getPageType(url);
 });
 
-channel.onMessage("create:bookmark", async () => {
+channel.onMessage("createBookmark", async () => {
     const activeTab = (await chromeUtils.getActiveTab()) ?? channel.getActiveTab();
     if (!activeTab?.url) throw "Active tab url not found.";
     return createBookmark(activeTab.url);

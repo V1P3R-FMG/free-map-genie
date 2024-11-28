@@ -6,12 +6,11 @@ import storageService from "./services/storage.service";
 import userService from "./services/user.service";
 import { V3SettingsData } from "./storage/data/v3";
 import channel from "@shared/channel/content";
-import type { ChannelEventDef } from "@shared/channel/content";
 
 declare global {
     export interface Channels {
         "content-script": {
-            settings: ChannelEventDef<void, V3SettingsData>;
+            settings(): V3SettingsData;
         };
     }
 }
