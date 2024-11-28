@@ -3,7 +3,7 @@ import * as chromeUtils from "@utils/chrome";
 import { createChannel } from "./internal";
 import { createTarget } from "./internal/target";
 import { decodeConnectionArgs, formatEndpointName, formatEndpointTargetName } from "./internal/connection-args";
-import { hasMessageHop, hopMessage, isInternalMessage, isMessageFor, isMessageFrom } from "./internal/message";
+import { hasMessageHop, hopMessage, isInternalMessage, isMessageOnTrace } from "./internal/message";
 import type { Fingerprint, InternalMessage } from "./internal/types";
 
 export type * from "./internal/types";
@@ -78,16 +78,10 @@ chrome.runtime.onConnect.addListener((port) => {
         message.sender.tabId ??= tabId;
         message.sender.frameId ??= frameId;
 
-        if (
-            isMessageFor(["extension", "content-script"], message) &&
-            isMessageFrom(["popup", "offscreen", "background"], message)
-        ) {
+        if (isMessageOnTrace(["popup", "offscreen", "background"], ["extension", "content-script"], message)) {
             message.target.tabId ??= (await chromeUtils.getActiveTabId()) ?? activeTab?.id;
             message.target.frameId ??= 0;
-        } else if (
-            isMessageFor(["extension", "content-script"], message) &&
-            isMessageFrom(["extension", "content-script"], message)
-        ) {
+        } else if (isMessageOnTrace(["extension", "content-script"], ["extension", "content-script"], message)) {
             message.target.tabId ??= tabId;
             message.target.frameId ??= frameId;
         }

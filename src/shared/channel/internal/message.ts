@@ -41,6 +41,14 @@ export function isMessageFrom(context: ChannelContext | ChannelContext[], messag
     return context.some((c) => message.sender.context === c);
 }
 
+export function isMessageOnTrace(
+    sender: ChannelContext | ChannelContext[],
+    target: ChannelContext | ChannelContext[],
+    message: InternalMessage
+) {
+    return isMessageFrom(sender, message) && isMessageFor(target, message);
+}
+
 export function createMessageId(): MessageID {
     return `${MESSAGE_ID_PREFIX}${uid(MESSAGE_ID_LENGTH)}`;
 }
