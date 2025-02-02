@@ -39,7 +39,7 @@
 
 > [!WARNING]
 > Data will be stored locally in your browser, This means if you clear your browser cache, Data will
-> be lost as well. You can use the [data page](https://github.com/V1P3R-FMG/docs/popup.md#data) to export data and import it back
+> be lost as well. You can use the [data tab](/docs/popup.md#data) to export data and import it back
 > later.
 
 <h1>PRO Feature Support</h1>
