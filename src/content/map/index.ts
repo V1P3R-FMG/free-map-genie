@@ -284,23 +284,36 @@ export class FMG_Map {
         this.mapManager.on("fmg-location", () => this.ui.update());
         this.mapManager.on("fmg-category", () => this.ui.update());
         this.mapManager.on("fmg-update", () => this.ui.update());
+
+        this.ui.on("selected", async (e) => {
+            const json = await e.detail.text();
+            await this.mapManager.import(json);
+        });
     }
 
     /**
      * Setup window listeners
      */
     private setupListeners(): void {
-        this.window.addEventListener("message", async (event) => {
+        this.window.addEventListener("message", async (e) => {
             try {
-                if (event.data.type === "fmg::export-data") {
-                    await this.mapManager.export();
-                } else if (event.data.type === "fmg::import-data") {
-                    await this.mapManager.import();
-                } else if (event.data.type === "fmg::clear-data") {
-                    if (confirm("Are you sure you want to clear all data?")) {
-                        await this.mapManager.storage.clear();
-                        await this.mapManager.reload();
+                switch (e.data.type) {
+                    case "fmg::export-data": {
+                        const id = e.data.id;
+                        const type = "fmg::export-data::response";
+                        const exportedData = await this.mapManager.export();
+                        this.window.postMessage({ type, id, exportedData });
+                        break;
                     }
+                    case "fmg::import-data":
+                        this.ui.importPopup.show();
+                        break;
+                    case "fmg::clear-data":
+                        if (confirm("Are you sure you want to clear all data?")) {
+                            await this.mapManager.storage.clear();
+                            await this.mapManager.reload();
+                        }
+                        break;
                 }
             } catch (e) {
                 logger.error("Failed to handle message", e);

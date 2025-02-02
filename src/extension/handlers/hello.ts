@@ -4,7 +4,7 @@
  * @param sendResponse the send response function
  * @returns a boolean that indicates if the sendResponse function will be called asynchronously.
  */
-export default function getInfo(_: any, sendResponse: (response: any) => void) {
+export default function getInfo(_shared: any, _data: any, sendResponse: (response: any) => void) {
     sendResponse("Hello from the extension!");
     return true;
 }
