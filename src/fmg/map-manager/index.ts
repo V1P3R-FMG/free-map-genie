@@ -290,8 +290,8 @@ export class FMG_MapManager {
     /**
      * Import data from a file.
      */
-    public async import() {
-        await FMG_ImportHelper.import(this.storage.driver, this.storage.keys);
+    public async import(json: string) {
+        await FMG_ImportHelper.import(this.storage.driver, this.storage.keys, json);
         await this.reload();
     }
 
@@ -299,6 +299,6 @@ export class FMG_MapManager {
      * Export data from a file.
      */
     public async export() {
-        await FMG_ExportHelper.export(this.storage.driver, this.storage.keys);
+        return FMG_ExportHelper.export(this.storage.driver, this.storage.keys);
     }
 }

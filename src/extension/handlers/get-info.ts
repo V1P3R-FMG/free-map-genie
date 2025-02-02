@@ -8,6 +8,7 @@ import { getPageType } from "@fmg/page";
  */
 export default function getInfo(
     shared: any,
+    _data: any, 
     sendResponse: (response: any) => void
 ) {
     getPageType(window).then(pageType => {
