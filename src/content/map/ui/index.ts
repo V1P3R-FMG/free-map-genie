@@ -1,6 +1,7 @@
-import { createApp } from "vue";
+import { createApp, DefineComponent } from "vue";
 import Progress from "./progress.vue";
 import MarkControls from "./mark-controls.vue";
+import ImportPopup from "./import-popup.vue";
 import type { FMG_MapManager } from "@fmg/map-manager";
 import { getElement } from "@shared/dom";
 
@@ -9,24 +10,47 @@ export class FMG_UI {
     private _totalProgress?: typeof Progress;
     private _trackedProgress?: typeof Progress;
     private _markControls?: typeof MarkControls;
+    private _importPopup?: typeof ImportPopup;
+
+    private et = new EventTarget();
 
     constructor(mapManager: FMG_MapManager) {
         this.mapManager = mapManager;
     }
 
+    public on(event: "selected", f: (e: CustomEvent<File>) => void): void;
+    public on(event: string, f: (...args: any) => any) {
+        this.et.addEventListener(event, f);
+    }
+
+    public off(event: "selected", f: (e: CustomEvent<File>) => void): void;
+    public off(event: string, f: (...args: any) => any) {
+        this.et.addEventListener(event, f);
+    }
+
+    public assertComponentExists<T>(component: T | undefined): T {
+        if (!component) throw new Error("UI not attached.");
+        return component;
+    }
+
     public get totalProgress(): typeof Progress {
-        if (!this._totalProgress) throw new Error("UI not attached.");
-        return this._totalProgress;
+        return this.assertComponentExists(this._totalProgress);
     }
 
     public get trackedProgress(): typeof Progress {
-        if (!this._trackedProgress) throw new Error("UI not attached.");
-        return this._trackedProgress;
+        return this.assertComponentExists(this._trackedProgress);
     }
 
     public get markControls(): typeof MarkControls {
-        if (!this._markControls) throw new Error("UI not attached.");
-        return this._markControls;
+        return this.assertComponentExists(this._markControls);
+    }
+
+    public get importPopup(): typeof ImportPopup {
+        return this.assertComponentExists(this._importPopup);
+    }
+
+    private getMap(): Promise<HTMLDivElement> {
+        return getElement("#map", this.mapManager.window, 5000);
     }
 
     private getPanel(): Promise<HTMLElement> {
@@ -106,12 +130,22 @@ export class FMG_UI {
         });
     }
 
+    private async attachImportPopupUI(): Promise<typeof ImportPopup> {
+        const map = await this.getMap();
+        return this.mount(this.createBeforeDiv(map), ImportPopup, {
+            onSelected: (file: File) => {
+                this.et.dispatchEvent(new CustomEvent("selected", { detail: file }));
+            }
+        });
+    }
+
     public async attach() {
         if (this.mapManager.window.user) {
             this._totalProgress = await this.attachTotalProgressUI();
             this._trackedProgress = await this.attachTrackedProgressUI();
         }
         this._markControls = await this.attachMarkControlsUI();
+        this._importPopup = await this.attachImportPopupUI();
     }
 
     public update() {

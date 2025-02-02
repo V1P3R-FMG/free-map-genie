@@ -5,7 +5,8 @@
  * @returns a boolean that indicates if the sendResponse function will be called asynchronously.
  */
 export default function addBookmark(
-    _: any,
+    _shared: any,
+    _data: any, 
     sendResponse: (response: any) => void
 ) {
     const $url = document.head.querySelector(

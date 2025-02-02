@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { ref } from "vue";
+
 import Theme from "../components/theme.vue";
 import IconButton from "@components/icon-button.vue";
 
@@ -12,7 +14,8 @@ import Data from "./data/data.vue";
 
 import Version from "./version.vue";
 
-import { ref } from "vue";
+import { FMG_ExportHelper, type ExportedData } from  "@fmg/storage/data/export";
+
 import { send } from "@shared/send";
 import {
     getDefaultData,
@@ -78,12 +81,15 @@ function openHomepage() {
     chrome.tabs.create({ url: __HOMEPAGE__ });
 }
 
-function importData() {
+async function importData() {
     send("import-data");
 }
 
-function exportData() {
-    send("export-data");
+async function exportData() {
+    const exportedData = await send("export-data") as ExportedData;
+    if (exportedData) {
+        await FMG_ExportHelper.saveFile(exportedData);
+    }
 }
 
 function clearData() {
