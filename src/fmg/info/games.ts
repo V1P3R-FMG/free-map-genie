@@ -1,35 +1,42 @@
-import corsProxy from "@shared/cors-proxy";
+import { fetch } from "@fmg/mg";
 
-export class FMG_Games {
-    private static instance?: FMG_Games;
+export default class FMG_GamesData {
+    private static data?: MG.API.Game[];
 
-    private data: MG.Game[];
+    public static async get(gameId: Id): Promise<MG.API.Game>;
+    public static async get(): Promise<MG.API.Game[]>;
+    public static async get(gameId?: Id): Promise<MG.API.Game[] | MG.API.Game> {
+        // Load data if its not defined
+        if (this.data == undefined)  await this.load();
 
-    private constructor() {
-        this.data = [];
+        if (!gameId) {
+            // If we did not specify a game id, return all games
+            return this.getGames();
+        } else {
+            // Else return the game with the given id
+            return this.getGame(gameId);
+        }
     }
 
-    public static async get(gameId: Id): Promise<MG.Game>;
-    public static async get(): Promise<MG.Game[]>;
-    public static async get(gameId?: Id): Promise<MG.Game[] | MG.Game> {
-        if (!FMG_Games.instance) {
-            FMG_Games.instance = new FMG_Games();
-            await FMG_Games.instance.load();
+    private static async getGames() {
+        if (!this.data) throw new Error("Failed to fetch games from mapgenie api.");
+        return this.data;
+    }
+
+    private static async getGame(gameId: Id) {
+        if (!this.data) throw new Error("Failed to fetch games from mapgenie api.");
+        const game = this.data
+            .find((game) => game.id == gameId);
+
+        if (!game) {
+            throw new Error(`Game with id ${gameId} not found`)
         }
-
-        // If we did not specify a game id, return all games
-        if (!gameId) return FMG_Games.instance.data;
-
-        // Else return the game with the given id
-        const game = FMG_Games.instance.data.find((game) => game.id == gameId);
-
-        if (!game) throw new Error(`Game with id ${gameId} not found`);
 
         return game;
     }
 
-    private async load() {
-        const res = await fetch(corsProxy("https://mapgenie.io/api/v1/games"));
+    private static async load() {
+        const res = await fetch("games");
         this.data = await res.json();
     }
 }

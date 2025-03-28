@@ -3427,6 +3427,16 @@ globby@^13.1.1:
     merge2 "^1.4.1"
     slash "^4.0.0"
 
+gnirts-loader@^1.0.8:
+  version "1.0.8"
+  resolved "https://registry.yarnpkg.com/gnirts-loader/-/gnirts-loader-1.0.8.tgz#f025cb844d41f7fe86c4630f5cce98c06b2b60c0"
+  integrity sha512-PGYvDm0THBVFT+qtOrN6XX8365jAwnpnXbDIM+YABbqoiHA4A82lXIukEMs9CDM40hWtstqcl126t2qxgEqnJg==
+
+gnirts@^1.1.8:
+  version "1.1.8"
+  resolved "https://registry.yarnpkg.com/gnirts/-/gnirts-1.1.8.tgz#13690c53a3be47406cb67cb0dc1af811bb2e7f19"
+  integrity sha512-ZRdV2yfu6SBzFF9Fpql8cvbhj+u1Wj2bKQUvQAC4A596M3tZknSm695cc683UFmRAD0U+BWHY6QAa9vqfdwSLw==
+
 got@^12.1.0:
   version "12.6.1"
   resolved "https://registry.yarnpkg.com/got/-/got-12.6.1.tgz#8869560d1383353204b5a9435f782df9c091f549"

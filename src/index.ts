@@ -9,6 +9,8 @@ declare global {
     const __AUTHOR__: string;
     const __HOMEPAGE__: string;
     const __CORS_PROXY__: string;
+    
+    const __GLOBAL_API_SECRET__: string;
 
     let logger: Logger;
 }

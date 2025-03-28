@@ -1,3 +1,3 @@
-export { FMG_Games } from "./games";
-export { FMG_Maps } from "./maps";
-export { FMG_MapData } from "./map-data";
+export { default as FMG_GamesData } from "./games";
+export { default as FMG_GameData } from "./game";
+export { default as FMG_MapData } from "./map";

@@ -24,6 +24,8 @@
         "dotenv": "^16.3.1",
         "eslint": "^8.46.0",
         "glob-loader": "^0.3.0",
+        "gnirts": "^1.1.8",
+        "gnirts-loader": "^1.0.8",
         "html-webpack-plugin": "^5.5.3",
         "ifdef-loader": "^2.3.2",
         "import-glob": "^1.5.0",

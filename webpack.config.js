@@ -139,6 +139,7 @@ export default (env) => {
                     exclude: /node_modules/,
                     use: [
                         "import-glob",
+                        "gnirts-loader",
                         {
                             loader: "ifdef-loader",
                             options: {
@@ -149,6 +150,7 @@ export default (env) => {
                                 FIREFOX: browser === "firefox"
                             }
                         },
+                        path.resolve("./webpack/loaders/inject-globals.js"),
                         {
                             loader: "swc-loader",
                             options: {
