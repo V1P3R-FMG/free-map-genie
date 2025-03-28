@@ -3,7 +3,7 @@ import { sleep, timeout, waitForCallback, waitForGlobals } from "@shared/async";
 
 import { FMG_ApiFilter } from "@fmg/filters/api-filter";
 import { FMG_StorageFilter } from "@fmg/filters/storage-filter";
-import { FMG_MapData } from "@fmg/info/map-data";
+import { FMG_MapData } from "@fmg/info";
 import { FMG_ExtensionData } from "@fmg/extension-data";
 import { FMG_MapManager } from "@fmg/map-manager";
 import { FMG_StorageDataMigrator } from "@fmg/storage/migration";
@@ -104,54 +104,30 @@ export class FMG_Map {
     }
 
     /**
-     * Fix tile_set
-     */
-    private fixTileset(tileSet: Omit<MG.TileSet, "pattern">, refTileSet: MG.TileSet): MG.TileSet {
-        const prefix = tileSet.path.replace("/images/tiles/", "");
-        const refPrefix = /[\w-_]+\/[\w-_]+\/[\w-_]+/.exec(refTileSet.path)?.[0];
-        const refSubfix = refPrefix
-            ? refTileSet.pattern
-                .replace(refPrefix, "")
-                .replace(/\.[\w]+/, `.${tileSet.extension ?? "png"}`)
-            : `{z}/{x}/{y}.${tileSet.extension ?? "png"}`;
-        return {
-            ...tileSet,
-            pattern: `${prefix}${refSubfix}`,
-        };
-    }
-
-    /**
      * Load map data, from url params.
      */
     private async loadMapData() {
         if (!this.map || !this.mapId) return;
+        if (!this.window.game) throw new Error("Game not found in window.");
         if (!this.window.mapData) throw new Error("Mapdata not loaded.");
 
-        const mapData = await FMG_MapData.get(this.mapId);
+        const map = await FMG_MapData.get(this.window.game.id, this.mapId);
 
         // Urls
-        this.window.mapUrl = mapData.url;
+        this.window.mapUrl = map.url;
 
         // Map Data
-        this.window.mapData.map = mapData.map;
-        this.window.mapData.groups = mapData.groups;
-        this.window.mapData.categories = mapData.categories;
-        this.window.mapData.locations = mapData.locations;
-        this.window.mapData.regions = mapData.regions;
-
-        // Map Settings
-        const ogMapConfig = this.window.mapData.mapConfig;
-        const refTileSet = ogMapConfig.tile_sets[0];
-        this.window.mapData.mapConfig = mapData.mapConfig;
-
-        this.window.mapData.mapConfig.tile_sets = 
-            this.window.mapData.mapConfig.tile_sets.map(set => this.fixTileset(set, refTileSet));
-
-        this.window.initialZoom = mapData.mapConfig.initial_zoom;
-        this.window.initiaPosition = {
-            lat: mapData.mapConfig.start_lat,
-            lng: mapData.mapConfig.start_lng
+        this.window.mapData = {
+            ...this.window.mapData,
+            ...map.mapData
         };
+
+        this.window.initialZoom = map.config.initial_zoom;
+        this.window.initiaPosition = {
+            lat: map.config.start_lat,
+            lng: map.config.start_lng
+        };
+
         return;
     }
 
