@@ -22,7 +22,6 @@ declare namespace MG {
             id: number;
             title: string;
             slug: string;
-            ign_slug?: string;
         }
 
         interface MapData {
@@ -35,6 +34,7 @@ declare namespace MG {
             mapConfig: MapConfig;
             regions: Region[];
             notes: Note[];
+            sharedNotes: DictById<MG.Note>;
         }
     }
 }

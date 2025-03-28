@@ -1,19 +1,30 @@
 declare namespace MG {
-    interface Game {
-        available_on_ign: boolean;
-        config: {
-            cdn_url: string;
-            tiles_base_url?: string;
-            url: string;
-        };
-        domain: string;
+    interface Group {
         id: number;
-        ign_slug: string;
-        image: string;
-        logo: string;
-        maps: MG.Info.Map[];
-        slug: string;
+        game_id: number;
         title: string;
+        order: number;
+        color: string;
+        expandable: boolean;
+        categories: Category[];
+    }
+
+    interface Category {
+        id: number;
+        group_id: number;
+        title: string;
+        icon: string;
+        template: unknown | null;
+        order: number;
+        has_heatmap: boolean;
+        features_enabled: boolean;
+        display_type: string;
+        ign_enabled: boolean;
+        ign_visible: boolean;
+        visible: boolean;
+        description: string | null;
+        info: string | null;
+        premium: boolean;
     }
 
     interface Location {
@@ -26,26 +37,10 @@ declare namespace MG {
         description: string | null;
         latitude: number;
         longitude: number;
-        features: unknown | null;
-        ign_marker_id: number | null;
-        ign_page_id: number | null;
-        media: Media[];
         tags: string[];
-    }
-
-    interface Category {
-        id: number;
-        group_id: number;
-        icon: string;
-        title: string;
-        order: number;
-        description: string | null;
-        info: string | null;
-        premium: boolean;
-        visible: boolean;
-        has_heatmap: boolean;
-        template: unknown | null;
-        locations?: Location[]; // Not all maps will define this. (e.g. GTA V)
+        media: Media[];
+        features: MG.Feature[] | null;
+        ign_page_id: number | null;
     }
 
     type PresetOrder = number[];
@@ -70,20 +65,33 @@ declare namespace MG {
         user_id: number;
     }
 
-    interface Group {
-        id: number;
-        title: string;
-        color: string;
-        game_id: number;
-        order: number;
-        categories: Category[];
-    }
-
     interface Route {}
 
     interface Suggestion {}
 
-    interface Region {}
+    interface Geometry {
+        type: string;
+        coordinates: [number, number][];
+    }
+
+    interface Feature {
+        type: "Feature";
+        id: Id;
+        geometry: Geometry;
+        properties: Record<string, any>;
+    }
+
+    interface Region {
+        id: number;
+        map_id: number;
+        parent_region_id: number | null;
+        title: string;
+        subtitle: string | null;
+        features: Feature[] | null;
+        center_x: string;
+        center_y: string;
+        order: number;
+    }
 
     interface Media {
         id: number;
