@@ -2,9 +2,8 @@
 |            |          env key         |   type    |                                               description                                                     |
 | ---------- | ------------------------ | --------- | ------------------------------------------------------------------------------------------------------------- |
 | `required` | **FONTS_PATH**           | *string*  |  path that resolves to the folder containing the downloaded font files used in `yarn update-font` command.    |
-| `optional` | **KEEP_PROFILE_CHANGES** | *boolean* |  save profile changes when using `yarn start-chrome` or `yarn start-firefox`.                                 |           
-| `required` | **CORS_PROXY**           | *string*  |  origin to use as proxy when doing web requests.                                                              |
-| `optional` | **CHROME_BIN**           | *string*  |  path to chromium executable to use a browser when using command `yarn start-chrome`.                         |                   
+| `optional` | **KEEP_PROFILE_CHANGES** | *boolean* |  save profile changes when using `yarn start-chrome` or `yarn start-firefox`.                                 |
+| `optional` | **CHROME_BIN**           | *string*  |  path to chromium executable to use a browser when using command `yarn start-chrome`.                         |  
 | `optional` | **FIREFOX_PROFILE**      | *string*  |  path to chrine profile to use.                                                                               |
 | `optional` | **FIREFOX_BIN**          | *string*  |  path to firefox executable to use a browser when using command `yarn start-firefox`.                         |                   
 | `optional` | **FIREFOX_PROFILE**      | *string*  |  path to firefox profile to use.                                                                              |
