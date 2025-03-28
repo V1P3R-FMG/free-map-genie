@@ -1,6 +1,6 @@
 import type { FMG_MapManager } from "@fmg/map-manager";
 import { FMG_Checkbox } from "./checkbox";
-import { FMG_Maps } from "@fmg/info";
+import { FMG_GameData } from "@fmg/info";
 
 export class FMG_CheckboxManager {
     public readonly window: Window;
@@ -35,8 +35,8 @@ export class FMG_CheckboxManager {
                 checkbox.mapId = id;
             } else {
                 const gameId = this.mapManager.storage.keys.keyData.gameId;
-                const maps = FMG_Maps.forGame(gameId);
-                const map = await maps.getMapForLocation(checkbox.locationId);
+                const game = await FMG_GameData.get(gameId);
+                const map = game.getMapForLocation(checkbox.locationId);
                 checkbox.mapId = map.map.id;
             }
         }

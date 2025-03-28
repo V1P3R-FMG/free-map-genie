@@ -1,4 +1,4 @@
-import { FMG_Maps } from "@fmg/info/maps";
+import { FMG_GameData } from "@fmg/info";
 import { FMG_Keys } from "@fmg/storage/keys";
 import { FMG_Drivers } from "../drivers";
 import { LegacyDataStorage, type LegacyResult } from "./legacy";
@@ -99,9 +99,9 @@ export class FMG_StorageDataMigrator {
         gameId: Id,
         gameData: LegacyResult
     ): Promise<MigrationResult | null> {
-        const maps = FMG_Maps.get(gameId);
+        const game = await FMG_GameData.get(gameId);
 
-        const locationsPerMap = await maps.filterLocations(
+        const locationsPerMap = game.filterLocations(
             gameData.global.locations ?? []
         );
 
