@@ -93,7 +93,7 @@ function parseLocation(category: MG.Category, location: MG.API.Location): MG.Loc
     }
 }
 
-type PartialMapData = Omit<MG.Info.MapData, "notes" | "sharedNotes">;
+type PartialMapData = Omit<MG.Info.MapData, "notes" | "sharedNotes" | "heatmapGroups" | "heatmapCategories">;
 
 function parseMapData(game: MG.API.GameFull, map: MG.API.MapFull): PartialMapData {
     const groups: MG.Group[] = [];

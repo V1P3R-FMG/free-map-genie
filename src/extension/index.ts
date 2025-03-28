@@ -1,5 +1,9 @@
+import { allowWindowMessaging } from "webext-bridge/content-script";
+
 import { getData } from "@shared/extension";
 import { initHandlers } from "./handlers";
+
+allowWindowMessaging("fmg");
 
 const shared = {
     attached: false
@@ -26,13 +30,18 @@ async function init() {
     const data = await getData();
     if (!data.settings.extension_enabled) return;
 
-    window.addEventListener("message", (event) => {
-        switch (event.data.type) {
+    window.addEventListener("message", async (message) => {
+        if (typeof message.data !== "object") return;
+
+        const { type } = message.data;
+
+        switch (type) {
             case "fmg:attached":
                 shared.attached = true;
                 break;
         }
     });
+
     window.sessionStorage.setItem("fmg:extension:data", JSON.stringify(data));
 
     injectLink(chrome.runtime.getURL("content.css"));

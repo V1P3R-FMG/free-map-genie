@@ -3,7 +3,7 @@ import { sleep, timeout, waitForCallback, waitForGlobals } from "@shared/async";
 
 import { FMG_ApiFilter } from "@fmg/filters/api-filter";
 import { FMG_StorageFilter } from "@fmg/filters/storage-filter";
-import { FMG_MapData } from "@fmg/info";
+import { FMG_HeatmapsData, FMG_MapData } from "@fmg/info";
 import { FMG_ExtensionData } from "@fmg/extension-data";
 import { FMG_MapManager } from "@fmg/map-manager";
 import { FMG_StorageDataMigrator } from "@fmg/storage/migration";
@@ -55,7 +55,7 @@ export class FMG_Map {
                         `Map(${this.map}) not found, valid maps: `,
                         this.window.mapData?.maps.map((map) => map.slug) || []
                     ), null)
-            : null;
+            : this.window.mapData?.map.id ?? null;
     }
 
     /*
@@ -107,19 +107,19 @@ export class FMG_Map {
      * Load map data, from url params.
      */
     private async loadMapData() {
-        if (!this.map || !this.mapId) return;
+        if (!this.mapId) return;
         if (!this.window.game) throw new Error("Game not found in window.");
         if (!this.window.mapData) throw new Error("Mapdata not loaded.");
 
         const map = await FMG_MapData.get(this.window.game.id, this.mapId);
-
+        
         // Urls
         this.window.mapUrl = map.url;
 
         // Map Data
         this.window.mapData = {
             ...this.window.mapData,
-            ...map.mapData
+            ...map.mapData,
         };
 
         this.window.initialZoom = map.config.initial_zoom;
@@ -127,6 +127,13 @@ export class FMG_Map {
             lat: map.config.start_lat,
             lng: map.config.start_lng
         };
+
+        if (this.window.mapData.heatmapGroups.length > 0) {
+            const heatmaps = await FMG_HeatmapsData.get(this.mapId);
+
+            this.window.mapData.heatmapGroups = heatmaps.groups;
+            this.window.mapData.heatmapCategories = heatmaps.categories;
+        }
 
         return;
     }

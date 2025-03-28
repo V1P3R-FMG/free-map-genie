@@ -1,4 +1,4 @@
-import { fetch } from "@fmg/mg";
+import { apiFetch } from "@fmg/mg";
 
 export default class FMG_GamesData {
     private static data?: MG.API.Game[];
@@ -36,7 +36,6 @@ export default class FMG_GamesData {
     }
 
     private static async load() {
-        const res = await fetch("games");
-        this.data = await res.json();
+        this.data = await apiFetch("games")
     }
 }
