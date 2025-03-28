@@ -1,4 +1,4 @@
-import { fetch } from "@fmg/mg";
+import { apiFetch } from "@fmg/mg";
 import FMG_MapData from "./map";
 
 export default class FMG_GameData {
@@ -19,8 +19,7 @@ export default class FMG_GameData {
     }
 
     private static async fetch(gameId: Id) {
-        const res = await fetch(`games/${gameId}/full`);
-        const data: MG.API.GameFull = await res.json();
+        const data = await apiFetch<MG.API.GameFull>(`games/${gameId}/full`);
         return new FMG_GameData(data);
     }
 

@@ -131,4 +131,38 @@ declare namespace MG {
         tiles_base_url: string;
         url: string;
     }
+
+    interface Point {
+        x: string;
+        y: string;
+    }
+
+    interface HeatmapCategory {
+        id: number;
+        group_id: number;
+        title: string;
+        icon: string;
+        info: unknown | null;
+        template: unknown | null;
+        order: number;
+        has_heatmap: boolean;
+        features_enabled: boolean;
+        display_type: string;
+        ign_enabled: boolean;
+        ign_visible: boolean;
+        visible: boolean;
+        description: string | null;
+        premium: boolean;
+        points: Point[];
+    }
+
+    interface HeatmapGroup {
+        id: number;
+        game_id: number;
+        title: string;
+        order: number;
+        color: string;
+        expandable: boolean;
+        heatmap_categories: HeatmapCategory[];
+    }
 }

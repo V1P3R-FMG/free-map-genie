@@ -1,8 +1,12 @@
+import { setNamespace } from "webext-bridge/window";
+
 import { getPageType } from "@fmg/page";
 import { FMG_Map } from "./map";
 import { FMG_Guide } from "./guide";
 import { FMG_MapSelector } from "./map-selector";
 import debounce from "@shared/debounce";
+
+setNamespace("fmg");
 
 function listenForRefocus(callback: () => void) {
     document.addEventListener("visibilitychange", debounce(() => {

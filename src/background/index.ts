@@ -1,4 +1,5 @@
 import { getData, setData } from "@shared/extension";
+import "./api";
 
 const RULES = [
     {

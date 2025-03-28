@@ -137,5 +137,14 @@ declare namespace MG {
             regions: Region[];
             groups: Group[];
         }
+
+        
+        interface HeatmapGroup extends Omit<MG.HeatmapGroup, "heatmap_categories"> {
+            categories: HeatmapCategory[];
+        }
+
+        interface HeatmapCategory extends MG.HeatmapCategory {}
+
+        type Heatmaps = HeatmapGroup[];
     }
 }

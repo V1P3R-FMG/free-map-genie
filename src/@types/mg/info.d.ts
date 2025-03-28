@@ -35,6 +35,8 @@ declare namespace MG {
             regions: Region[];
             notes: Note[];
             sharedNotes: DictById<MG.Note>;
+            heatmapGroups: MG.HeatmapGroup[];
+            heatmapCategories: DictById<MG.HeatmapCategory>;
         }
     }
 }

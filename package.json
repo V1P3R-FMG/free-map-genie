@@ -69,7 +69,8 @@
         "jquery": "^3.7.0",
         "proxy-observe": "^0.0.21",
         "tiny-uid": "^1.1.2",
-        "vue": "^3.3.4"
+        "vue": "^3.3.4",
+        "webext-bridge": "^6.0.1"
     },
     "packageManager": "yarn@1.22.22"
 }
