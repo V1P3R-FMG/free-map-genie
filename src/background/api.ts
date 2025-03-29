@@ -1,12 +1,10 @@
 import channel from "@shared/channel/background";
 
 declare global {
-    export interface Channels {
-        background: {
-            games(): MG.API.Game[];
-            game(data: { gameId: Id }): MG.API.GameFull;
-            heatmaps(data: { mapId: Id }): MG.API.Heatmaps;
-        };
+    interface BackgroundChannel {
+        games(): MG.API.Game[];
+        game(data: { gameId: Id }): MG.API.GameFull;
+        heatmaps(data: { mapId: Id }): MG.API.Heatmaps;
     }
 }
 
