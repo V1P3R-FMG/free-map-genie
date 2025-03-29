@@ -73,7 +73,7 @@ chrome.runtime.onConnect.addListener((port) => {
         message.sender.frameId ??= frameId;
 
         if (isMessageOnTrace(["popup", "offscreen", "background"], ["extension", "content-script"], message)) {
-            message.target.tabId ??= (await getActiveTab()).id;
+            message.target.tabId ??= (await getActiveTab())?.id;
             message.target.frameId ??= 0;
         } else if (isMessageOnTrace(["extension", "content-script"], ["extension", "content-script"], message)) {
             message.target.tabId ??= tabId;
