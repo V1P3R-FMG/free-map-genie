@@ -1,4 +1,4 @@
-import type { ChannelContext, ChannelEventData, ChannelEventRet, EmptyEventArgs } from "./types";
+import type { ChannelContext, ChannelEventData, ChannelEventRet, EmptyEventArgs, Channels } from "./types";
 
 import type { ChannelSendMessage } from ".";
 

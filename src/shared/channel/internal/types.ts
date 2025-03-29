@@ -83,7 +83,17 @@ export interface ChannelEventMap {
 }
 
 declare global {
-    export interface Channels {
-        [x: string]: ChannelEventMap;
-    }
+    export interface BackgroundChannel {}
+    export interface ExtensionChannel {}
+    export interface ContentChannel {}
+    export interface OffscreenChannel {}
+    export interface PopupChannel {}
+}
+
+export interface Channels {
+    "background": BackgroundChannel;
+    "extension": ExtensionChannel;
+    "content-script": ContentChannel;
+    "offscreen": OffscreenChannel;
+    "popup": PopupChannel;
 }
