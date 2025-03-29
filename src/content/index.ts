@@ -1,12 +1,10 @@
-import { setNamespace } from "webext-bridge/window";
+import channel from "@shared/channel/content";
 
 import { getPageType } from "@fmg/page";
 import { FMG_Map } from "./map";
 import { FMG_Guide } from "./guide";
 import { FMG_MapSelector } from "./map-selector";
 import debounce from "@shared/debounce";
-
-setNamespace("fmg");
 
 function listenForRefocus(callback: () => void) {
     document.addEventListener("visibilitychange", debounce(() => {
@@ -30,6 +28,8 @@ function isReduxStoreDefined(): boolean {
  * Itialize the content script
  */
 async function init() {
+    channel.connect();
+
     // Check if the page is a map or guide
     const type = await getPageType(window);
     if (type === "map") {

@@ -1,9 +1,7 @@
-import { allowWindowMessaging } from "webext-bridge/content-script";
+import channel from "@shared/channel/extension";
 
 import { getData } from "@shared/extension";
 import { initHandlers } from "./handlers";
-
-allowWindowMessaging("fmg");
 
 const shared = {
     attached: false
@@ -29,6 +27,8 @@ function injectLink(href: string): HTMLLinkElement {
 async function init() {
     const data = await getData();
     if (!data.settings.extension_enabled) return;
+
+    channel.connect();
 
     window.addEventListener("message", async (message) => {
         if (typeof message.data !== "object") return;

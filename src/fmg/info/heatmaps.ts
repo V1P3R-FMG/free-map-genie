@@ -1,4 +1,4 @@
-import { apiFetch } from "@fmg/mg";
+import channel from "@shared/channel/content";
 import FMG_MapData from "./map";
 
 function parseGroup(heatmaps: MG.API.HeatmapGroup): MG.HeatmapGroup {
@@ -33,7 +33,7 @@ export default class FMG_HeatmapsData {
     }
 
     private static async fetch(mapId: Id) {
-        const data = await apiFetch<MG.API.Heatmaps>(`maps/${mapId}/heatmaps`);
+        const data = await channel.background.heatmaps({ mapId });
         return new FMG_HeatmapsData(data);
     }
 }
