@@ -1,21 +1,20 @@
 declare namespace FMG {
     namespace Extension {
-        interface CheckboxOption {
-            type: "checkbox";
+        interface Option<T extends string = string, value = any> {
+            type: string;
             value: boolean;
             name: string;
             label: string;
             tooltip: string;
         }
 
-        type Option = CheckboxOption;
+        interface CheckboxOption extends Option<"checkbox", boolean> {}
 
         interface Settings {
             extension_enabled: boolean;
             presets_allways_enabled: boolean;
             mock_user: boolean;
             no_confirm_mark_unmark_all: boolean;
-            use_declarative_net_request: boolean;
         }
 
         interface BookmarkData {
@@ -25,10 +24,5 @@ declare namespace FMG {
         }
 
         type Bookmarks = BookmarkData[];
-
-        interface Data {
-            settings: Settings;
-            bookmarks: Bookmarks;
-        }
     }
 }
