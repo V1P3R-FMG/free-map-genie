@@ -19,4 +19,8 @@ type Prettify<T> = {
     [K in keyof T]: T[K];
 } & {};
 
+declare type PickMatching<T, V> = {
+    [K in keyof T as T[K] extends V ? K : never]: T[K];
+};
+
 declare module "*.vue";

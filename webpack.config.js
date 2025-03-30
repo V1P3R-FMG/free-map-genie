@@ -113,10 +113,11 @@ export default (env) => {
         mode,
         devtool: isDev ? "cheap-module-source-map" : undefined,
         entry: {
-            extension: "./src/extension/index.ts",
-            content: "./src/content/index.ts",
+            "extension": "./src/extension/index.ts",
+            "content": "./src/content/index.ts",
             "popup/index": "./src/popup/index.ts",
-            background: "./src/background/index.ts"
+            "background": "./src/background/index.ts",
+            "storage": "./src/storage/index.ts",
         },
         output: {
             path: dist
@@ -204,6 +205,18 @@ export default (env) => {
                 filename: "popup/index.html",
                 template: "./src/popup/index.html"
             }),
+
+            browser === "chrome"
+                ? new HtmlWebpackPlugin({
+                    chunks: [],
+                    filename: "storage.html",
+                    template: "./src/storage/index.html"
+                }) 
+                : new HtmlWebpackPlugin({
+                    chunks: ["background"],
+                    filename: "background.html",
+                    template: "./src/storage/index.html"
+                }),
 
             // Provide global modules
             new ProvidePlugin({
