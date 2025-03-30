@@ -13,14 +13,14 @@ export type ToggleEvent = (e: "toggle", value: boolean) => void;
 
 export type Events = ToggleEvent;
 
-const props = defineProps<Props>();
+defineProps<Props>();
 const emit = defineEmits<Events>();
 
 const toggled = ref(false);
 
 watch(
-    () => props.toggle,
-    () => emit("toggle", toggled.value = false)
+    toggled,
+    () => emit("toggle", toggled.value)
 );
 </script>
 
