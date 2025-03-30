@@ -72,6 +72,10 @@
 		<td>Unlimited Notes*</td>
 		<td align="center">✔️</td>
 	</tr>
+    <tr>
+		<td>Heatmaps</td>
+		<td align="center">✔️</td>
+	</tr>
 </table>
 
 > [!NOTE]
