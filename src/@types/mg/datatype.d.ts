@@ -71,7 +71,7 @@ declare namespace MG {
 
     interface Geometry {
         type: string;
-        coordinates: [number, number][];
+        coordinates: [number, number][][];
     }
 
     interface Feature {

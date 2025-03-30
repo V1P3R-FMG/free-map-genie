@@ -11,10 +11,10 @@ function parseMapInfo(map: MG.API.MapFull): MG.Info.Map {
 function parsePolygon(region: MG.API.Region): MG.Feature[] | null {
     if (!region.polygon) return null;
 
-    const coordinates = region.polygon.path
+    const polygon = region.polygon.path
         .map(({ lat, lng }) => [lat, lng].map(Number) as [number, number]);
 
-    coordinates.push(coordinates[0]);
+    polygon.push(polygon[0]);
 
     return [{
         type: "Feature",
@@ -24,7 +24,7 @@ function parsePolygon(region: MG.API.Region): MG.Feature[] | null {
         },
         geometry: {
             type: "Polygon",
-            coordinates
+            coordinates: [polygon]
         },
     }];
 }
