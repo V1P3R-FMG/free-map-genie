@@ -62,8 +62,8 @@ export class FMG_Store {
     public trackCategory(categoryId: Id, tracked: boolean): void {
         this.store.dispatch({
             type: tracked
-                ? "HIVE:USER:ADD_TRACKED_CATEGORY"
-                : "HIVE:USER:ADD_TRACKED_CATEGORY",
+                ? "MG:USER:ADD_TRACKED_CATEGORY"
+                : "MG:USER:ADD_TRACKED_CATEGORY",
             meta: {
                 categoryId
             }
@@ -91,7 +91,7 @@ export class FMG_Store {
      */
     public reorderPresets(ordering: number[]): void {
         this.store.dispatch({
-            type: "HIVE:USER:REORDER_PRESETS",
+            type: "MG:USER:REORDER_PRESETS",
             meta: {
                 presets: ordering
             }
@@ -103,7 +103,7 @@ export class FMG_Store {
      */
     public updateLocations(): void {
         this.store.dispatch({
-            type: "HIVE:USER:MARK_LOCATION",
+            type: "MG:USER:MARK_LOCATION",
             meta: { locationId: -1, found: false }
         });
     }
@@ -112,6 +112,6 @@ export class FMG_Store {
      * Force a category update.
      */
     public updateCategories(): void {
-        this.store.dispatch({ type: "HIVE:USER:UPDATE_CATEGORY_PROGRESS" });
+        this.store.dispatch({ type: "MG:USER:UPDATE_CATEGORY_PROGRESS" });
     }
 }

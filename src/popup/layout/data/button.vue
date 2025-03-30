@@ -4,11 +4,12 @@ import Icon from "@components/icon.vue";
 defineProps<{
     icon: string;
     text: string;
+    disabled?: boolean;
 }>();
 </script>
 
 <template>
-    <button class="button">
+    <button class="button" :disabled="disabled">
         <Icon :icon="icon" />
         <h4>{{ text }}</h4>
     </button>
@@ -26,8 +27,13 @@ defineProps<{
     border: 1px solid var(--border);
     text-align: center;
     transition: background-color 0.2s ease-in-out;
-    &:hover {
+
+    &:hover:not(:disabled) {
         border-color: var(--active);
+    }
+
+    &:disabled {
+        opacity: 0.5;
     }
 }
 
