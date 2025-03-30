@@ -6,8 +6,6 @@ import type { ConnectionArgsWithEndpoint, Fingerprint, InternalMessage } from ".
 
 export type * from "./internal/types";
 
-console.log("hello bak");
-
 export interface CachedPortInfo {
     port: chrome.runtime.Port;
     fingerprint: Fingerprint;
@@ -32,11 +30,10 @@ function postMessage(message: InternalMessage) {
 }
 
 function logPort(connArgs: ConnectionArgsWithEndpoint, port: chrome.runtime.Port, action: string) {
-    logger.log([
-        `${action} port ${connArgs.endpointName}#${connArgs.fingerprint}.`,
-        `name: ${port.name}`,
-        `sender: ${port.sender}`
-    ].join("\n"));
+    logger.groupCollapsed(`${action} port ${connArgs.endpointName}#${connArgs.fingerprint}.`);
+    logger.raw(`name: ${port.name}`);
+    logger.raw(`sender: ${port.sender}`);
+    logger.groupEnd();
 }
 
 const channel = createChannel("background", {
@@ -80,14 +77,14 @@ chrome.runtime.onConnect.addListener((port) => {
             message.target.frameId ??= frameId;
         }
 
+        logMessage(message);
+
         if (channel.isMessageForMe(message)) {
             channel.handleMessage(message);
             return;
         }
 
         if (hasMessageHop(message, "background")) return;
-
-        logMessage(message);
 
         postMessage(hopMessage(message, "background"));
     });

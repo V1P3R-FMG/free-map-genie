@@ -66,13 +66,14 @@ export function hasMessageHop(message: InternalMessage, context: ChannelContext)
 }
 
 export function logMessage(message: InternalMessage) {
-    logger.log([
+    logger.groupCollapsed(
         message.type
-            ? `[${message.messageType.toUpperCase()}] message#${message.messageId} [TYPE: ${message.type}]`
-            : `[${message.messageType.toUpperCase()}] message#${message.messageId}`,
-        `[${formatEndpointName(message.sender)} -> ${formatEndpointName(message.target)}]`,
-        message.data
-    ]);
+        ? `[${message.messageType.toUpperCase()}] message#${message.messageId} [TYPE: ${message.type}]`
+        : `[${message.messageType.toUpperCase()}] message#${message.messageId}`,
+    );
+    logger.raw(`[${formatEndpointName(message.sender)} -> ${formatEndpointName(message.target)}]`);
+    logger.raw(message.data);
+    logger.groupEnd();
 }
 
 export function createMessage(

@@ -128,7 +128,6 @@ export default (env) => {
                 vue$: isDev
                     ? "vue/dist/vue.runtime.esm-browser.js"
                     : "vue/dist/vue.runtime.esm-browser.prod.js",
-                logger: path.resolve("./src/fmg/logger.ts")
             },
             plugins: [new TsconfigPathsPlugin()]
         },
@@ -220,7 +219,7 @@ export default (env) => {
 
             // Provide global modules
             new ProvidePlugin({
-                logger: "logger"
+                logger: [path.resolve(import.meta.dirname, "src", "fmg", "logger.ts"), "default"]
             }),
 
             // Provide the global variables
