@@ -140,7 +140,6 @@ export class FMG_Map {
         this.window.mapData = {
             ...this.window.mapData,
             ...map.mapData,
-            regions: this.window.mapData.regions
         };
 
         this.window.initialZoom = map.config.initial_zoom;

@@ -8,40 +8,40 @@ function parseMapInfo(map: MG.API.MapFull): MG.Info.Map {
     };
 }
 
-function parsePolygon(region: MG.API.Region): MG.Feature[] | null {
-    if (!region.polygon) return null;
+// function parsePolygon(region: MG.API.Region): MG.Feature[] | null {
+//     if (!region.polygon) return null;
 
-    const polygon = region.polygon.path
-        .map(({ lat, lng }) => [lat, lng].map(Number) as [number, number]);
+//     const polygon = region.polygon.path
+//         .map(({ lat, lng }) => [lat, lng].map(Number) as [number, number]);
 
-    polygon.push(polygon[0]);
+//     polygon.push(polygon[0]);
 
-    return [{
-        type: "Feature",
-        id: region.id,
-        properties: {
-            id: region.id
-        },
-        geometry: {
-            type: "Polygon",
-            coordinates: [polygon]
-        },
-    }];
-}
+//     return [{
+//         type: "Feature",
+//         id: region.id,
+//         properties: {
+//             id: region.id
+//         },
+//         geometry: {
+//             type: "Polygon",
+//             coordinates: [polygon]
+//         },
+//     }];
+// }
 
-function parseRegion(region: MG.API.Region): MG.Region {
-    return {
-        id: region.id,
-        map_id: region.map_id,
-        title: region.title,
-        center_x: region.center_x,
-        center_y: region.center_y,
-        order: region.order,
-        subtitle: region.subtitle,
-        features: parsePolygon(region),
-        parent_region_id: region.parent_region_id,
-    };
-}
+// function parseRegion(region: MG.API.Region): MG.Region {
+//     return {
+//         id: region.id,
+//         map_id: region.map_id,
+//         title: region.title,
+//         center_x: region.center_x,
+//         center_y: region.center_y,
+//         order: region.order,
+//         subtitle: region.subtitle,
+//         features: parsePolygon(region),
+//         parent_region_id: region.parent_region_id,
+//     };
+// }
 
 function parseGroup(group: MG.API.Group, categories: MG.Category[]): MG.Group {
     return {
@@ -93,7 +93,7 @@ function parseLocation(category: MG.Category, location: MG.API.Location): MG.Loc
     }
 }
 
-type PartialMapData = Omit<MG.Info.MapData, "notes" | "sharedNotes" | "heatmapGroups" | "heatmapCategories">;
+type PartialMapData = Omit<MG.Info.MapData, "notes" | "sharedNotes" | "heatmapGroups" | "heatmapCategories" | "regions">;
 
 function parseMapData(game: MG.API.GameFull, map: MG.API.MapFull): PartialMapData {
     const groups: MG.Group[] = [];
@@ -120,7 +120,7 @@ function parseMapData(game: MG.API.GameFull, map: MG.API.MapFull): PartialMapDat
         map: parseMapInfo(map),
         maps: game.maps.map(parseMapInfo),
         mapConfig: map.config,
-        regions: map.regions.map(parseRegion),
+        // regions: map.regions.map(parseRegion),
         groups: groups,
         categories: categories,
         locations: locations,
