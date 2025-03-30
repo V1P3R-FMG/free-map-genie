@@ -6,6 +6,8 @@ import { FMG_Guide } from "./guide";
 import { FMG_MapSelector } from "./map-selector";
 import debounce from "@shared/debounce";
 
+channel.connect();
+
 function listenForRefocus(callback: () => void) {
     document.addEventListener("visibilitychange", debounce(() => {
         switch (document.visibilityState) {
@@ -28,36 +30,35 @@ function isReduxStoreDefined(): boolean {
  * Itialize the content script
  */
 async function init() {
-    channel.connect();
-
-    // Check if the page is a map or guide
+    // Run code for according to page type
     const type = await getPageType(window);
-    if (type === "map") {
-        const map = new FMG_Map(window);
-        await map.setup();
-        listenForRefocus(() => map.reload());
-        return true;
-    } else if (type === "guide") {
-        const guide = new FMG_Guide(window);
-        await guide.setup();
-        listenForRefocus(() => guide.reload());
-        return true;
-    } else if (type === "map-selector") {
-        await FMG_MapSelector.setup(window);
-        return true;
-    } else if (type === "unknown") {
-        logger.warn(`Page type ${type}, not attaching content script`);
-        return false;
+    logger.debug("pageType:", type);
+    switch (type) {
+        case "map":
+            const map = new FMG_Map(window);
+            await map.setup();
+            listenForRefocus(() => map.reload());
+            return true;
+        case "guide":
+            const guide = new FMG_Guide(window);
+            await guide.setup();
+            listenForRefocus(() => guide.reload());
+            return true;
+        case "map-selector":
+            await FMG_MapSelector.setup(window);
+            return true;
+        case "home":
+            return true;
+        case "unknown":
+            logger.warn(`Page type ${type}, not attaching content script`);
+            return false;
     }
-    return false;
 }
 
 init()
     .then((attached) => {
         if (attached) {
-            window.postMessage({
-                type: "fmg:attached"
-            });
+            channel.extension.attached();
             logger.log("content script init done");
         }
     })

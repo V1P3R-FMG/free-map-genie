@@ -134,6 +134,8 @@ async function removeBookmark(url: string) {
 }
 
 async function getInfo() {
+    info.value = await channel.extension.getInfo(void 0, 60000);
+
     let busy = false;
     setInterval(async () => {
         if (busy) return;

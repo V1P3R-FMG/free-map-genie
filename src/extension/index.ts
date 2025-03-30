@@ -6,6 +6,7 @@ declare global {
         hello(): string;
         getInfo(): { pageType: PageType, attached: boolean };
         addBookmark(): { url: string, favicon: string, title: string } | undefined;
+        attached(): void;
     }
 }
 
@@ -42,13 +43,19 @@ channel.onMessage("getInfo", async () => {
     };
 });
 
+channel.onMessage("attached", () => {
+    shared.attached = true;
+});
+
 channel.onMessage("addBookmark", () => {
     const $url = document.head.querySelector(
         "meta[property='og:url']"
     ) as HTMLMetaElement;
+
     const $icon = document.head.querySelector(
         "link[rel='apple-touch-icon']"
     ) as HTMLLinkElement;
+
     const $title = document.head.querySelector(
         "meta[property='og:title']"
     ) as HTMLMetaElement;
@@ -76,19 +83,7 @@ async function init() {
     if (!settings.extension_enabled) {
         channel.disconnect();
         return;
-    };
-
-    window.addEventListener("message", async (message) => {
-        if (typeof message.data !== "object") return;
-
-        const { type } = message.data;
-
-        switch (type) {
-            case "fmg:attached":
-                shared.attached = true;
-                break;
-        }
-    });
+    }
 
     injectLink(chrome.runtime.getURL("content.css"));
     injectScript(chrome.runtime.getURL("content.js"));
