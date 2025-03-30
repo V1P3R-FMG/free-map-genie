@@ -4,7 +4,6 @@ import {
     createMessage,
     createResponse,
     createErrorResponse,
-    isInternalMessage,
     isMessageFor,
     prettyMessage,
 } from "./message";
@@ -166,7 +165,6 @@ export function createChannel<C extends ChannelContext>(context: C, driver: Chan
     }
 
     async function handleMessage(message: InternalMessage) {
-        if (!isInternalMessage(message)) return;
         if (!isMessageForMe(message)) return;
 
         switch (message.messageType) {

@@ -1,3 +1,4 @@
+import { isInternalMessage } from "../message";
 import type { ChannelDriver, DriverOnMessageCallback, DriverState } from "../types";
 
 export default function createWindowChannelDriver(window: Window) {
@@ -5,6 +6,7 @@ export default function createWindowChannelDriver(window: Window) {
     const handlers: Set<DriverOnMessageCallback> = new Set();
 
     const handler = (message: MessageEvent) => {
+        if (!isInternalMessage(message.data)) return;
         handlers.forEach((h) => h(message.data));
     };
 
