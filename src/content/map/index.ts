@@ -14,6 +14,7 @@ import type { ExportedData } from "@fmg/storage/data/export";
 
 import { FMG_UI } from "./ui";
 import MapSwitcherPanel from "./map-panel";
+import AdsRemover from "@fmg/ads";
 
 declare global {
     export interface ContentChannel {
@@ -189,9 +190,11 @@ export class FMG_Map {
      * Cleanup pro updrade ads.
      */
     private cleanupProUpgradeAds() {
-        getElement("#button-upgrade", this.window, 5000).then(elem => elem.parentElement?.remove()).catch();
-        getElement("#nitro-floating-wrapper", this.window, 5000).then(elem => elem.remove()).catch();
-        getElement("#blobby-left", this.window, 5000).then(elem => elem.remove()).catch();
+        const adsRemover = new AdsRemover();
+        adsRemover.registerSelector("#button-upgrade", true);
+        adsRemover.registerSelector("#nitro-floating-wrapper");
+        adsRemover.registerSelector("#blobby-left");
+        adsRemover.removeElements();
     }
 
     /**
