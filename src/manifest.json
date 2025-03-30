@@ -18,7 +18,7 @@
         },
         {
             "js": ["storage.js"],
-            "matches": ["https://mapgenie.io/*"],
+            "matches": ["https://mapgenie.io/?fmg_storage=1"],
             "run_at": "document_start",
             "all_frames": true
         }
