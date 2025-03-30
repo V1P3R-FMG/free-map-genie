@@ -21,6 +21,7 @@ declare global {
         exportData(): ExportedData | undefined;
         importData(data: { json: string }): void;
         clearData(): void;
+        importMapgenieAccount(): void;
     }
 }
 
@@ -99,6 +100,11 @@ export class FMG_Map {
                 locationIds,
                 presets,
             } = this.mapManager.storage.data;
+
+            this.window.fmgMapgenieAccountData = {
+                locationIds: Object.keys(this.window.user.locations ?? {}).map(Number),
+                categoryIds: this.window.user.trackedCategoryIds ?? []
+            };
 
             this.window.user = {
                 ...this.window.user,
@@ -225,8 +231,7 @@ export class FMG_Map {
      * Attach ui
      */
     private async attachUI(): Promise<void> {
-        
-        
+        this.ui.attach();
         this.mapManager.on("fmg-location", () => this.ui.update());
         this.mapManager.on("fmg-category", () => this.ui.update());
         this.mapManager.on("fmg-update", () => this.ui.update());
@@ -250,6 +255,27 @@ export class FMG_Map {
                 await this.mapManager.storage.clear();
                 await this.mapManager.reload();
             }
+        });
+
+        channel.onMessage("importMapgenieAccount", async () => {
+            if (!this.window.fmgMapgenieAccountData) throw "No mapgenie account data found.";
+
+            if (!confirm("Trying to import mapgenie account data this will overide currently store data do you want to continue!")) return;
+            
+            this.mapManager.storage.autosave = false;
+
+            for (const id of this.window.fmgMapgenieAccountData.locationIds) {
+                this.mapManager.storage.data.locations[id] = true;
+            }
+
+            for (const id of this.window.fmgMapgenieAccountData.categoryIds) {
+                this.mapManager.storage.data.categories[id] = true;
+            }
+
+            this.mapManager.storage.autosave = true;
+            await this.mapManager.storage.save();
+
+            await this.reload();
         });
     }
 

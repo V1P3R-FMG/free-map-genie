@@ -112,7 +112,21 @@ async function exportData() {
 }
 
 async function clearData() {
-    await channel.content.clearData();
+    try {
+        await channel.content.clearData();
+    } catch (err) {
+        channel.content.toastrError({ message: String(err) });
+        closePopup()
+    }
+}
+
+async function importMapgenieAccount() {
+    try {
+        await channel.content.importMapgenieAccount();
+    } catch (err) {
+        channel.content.toastrError({ message: String(err) });
+        closePopup()
+    }
 }
 
 async function addBookmark() {
@@ -219,9 +233,11 @@ setState();
                 </Page>
                 <Page name="data" icon="database">
                     <Data
+                        :state="state"
                         @import="importData"
                         @export="exportData"
                         @clear="clearData"
+                        @import-mg-account="importMapgenieAccount"
                     />
                 </Page>
             </Frame>

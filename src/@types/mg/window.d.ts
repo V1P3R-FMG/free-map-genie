@@ -20,6 +20,11 @@ interface Window {
         lng: number;
     };
 
+    fmgMapgenieAccountData?: {
+        locationIds: number[];
+        categoryIds: number[];
+    };
+
     google?: {
         maps?: {
             Size: (x: number, y: number) => void;
