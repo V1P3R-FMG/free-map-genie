@@ -5,12 +5,6 @@
 </p>
 <hr>
 <ul>
-    <li><a href="#pinning">Pinning the browser action</a></li>
-    <ul>
-        <li><a href="#chrome-pinning">Chrome</a></li>
-        <li><a href="#firefox-pinning">Firefox</a></li>
-    </ul>
-    <li><a href="#using">Using the browser action</a></li>
     <ul>
         <li>
             <a href="#bookmarks">
@@ -40,38 +34,7 @@
 </ul>
 
 <hr>
-<h2 id="pinning">Pinning the browser action</h2>
-<h3 id="chrome-pinning">Chrome</h3>
-<ol>
-    <li>
-        <p>Press the <code>puzzle piece icon</code> on the top right balk.</p>
-        <p><img src="../assets/popup/chrome-extension-pin.png" /></p>
-    </li>
-    <li>
-        <p>Search for the <code>fmg</code> extension and press the <code>drawing pin</code> icon.</p>
-        <p><img src="../assets/popup/chrome-extension-select.png" /></p>
-    </li>
-    <li>
-        <p>The <code>drawing pin</code> should turn blue.</p>
-        <p><img src="../assets/popup/chrome-extension-pinned.png" /></p>
-    </li>
-</ol>
-<h3 id="firefox-pinning">Firefox</h3>
-<ol>
-    <li>
-        <p>Press the <code>puzzle piece icon</code> on the top right balk.</p>
-        <p><img src="../assets/popup/firefox-extension-pin.png" /></p>
-    </li>
-    <li>
-        <p>Search for the <code>fmg</code> extension and press the <code>gear</code> icon.</p>
-        <p><img src="../assets/popup/firefox-extension-select.png" /></p>
-    </li>
-    <li>
-        <p>Press <code>Pin to Toolbar</code>.</p>
-        <p><img src="../assets/popup/firefox-extension-setting-drop-down.png" /></p>
-    </li>
-</ol>
-<hr>
+
 <h2 id="using">Using the browser action</h2>
 <h3 id="bookmarks">
     <img src="../assets/popup/icons/bookmarks.png" style="transform: translateY(25%)"/>
@@ -114,6 +77,12 @@
         </tr>
     </thead>
     <tbody>
+        <tr>
+            <td>Enable Extension</td>
+            <td>
+                This will disable/enable the extension.
+            </td>
+        </tr>
         <tr>
             <td>Allways enable presets</td>
             <td>This setting will enable presets on every map.</td>
@@ -161,6 +130,11 @@ The info page can show some usfull information.
             <td>
                 Indicates what page type the extension thinks your currently on.
                 <code>map, guide, map-selector, homepage or unknown</code>.
+            </td>
+        </tr>
+        <td>User</td>
+            <td>
+                The id of the user the extension is currently using to load and save data.
             </td>
         </tr>
         <tr>
@@ -214,8 +188,15 @@ The info page can show some usfull information.
             <td>Export</td>
             <td>
                 This will clear all the data for the current map page.
-                Will ask for a confirmation first to make sure you don't accidently press
-                the clear button.
+                Will ask for a confirmation first to make sure you don't accidently clear data.
+            </td>
+        </tr>
+        <tr>
+            <td>Import Mapgenie account</td>
+            <td>
+                This will load data from your mapgenie account.
+                You must be logged in with your mapgenie account without mock user enabled!
+                Will ask for a confirmation first to make sure you don't accidently overwrite data.
             </td>
         </tr>
     </tbody>
