@@ -2,15 +2,19 @@
 import Control from "./components/control.vue";
 import ControlGroup from "./components/control-group.vue";
 import type { FMG_MapManager } from "@fmg/map-manager";
-import { FMG_ExtensionData } from "@fmg/extension-data";
+import channel from "@shared/channel/content";
 
 const { mapManager } = defineProps<{
     mapManager: FMG_MapManager;
 }>();
 
-const markAll = (found: boolean) => {
+const settings = channel.offscreen.getSettings();
+
+const markAll = async (found: boolean) => {
+    const { no_confirm_mark_unmark_all } = await settings;
+
     if (
-        !FMG_ExtensionData.settings.no_confirm_mark_unmark_all &&
+        !no_confirm_mark_unmark_all &&
         !confirm(`${found ? "Mark" : "Unmark"} all visible locations?`)
     ) {
         return;
@@ -19,8 +23,7 @@ const markAll = (found: boolean) => {
     mapManager.storage.data.autosave = false;
     mapManager.getCurrentCategories().forEach((category) => {
         if (category.visible) {
-            const locations =
-                category.locations ||
+            const locations = 
                 mapManager.store.getState().map.locationsByCategory[
                     category.id
                 ];
