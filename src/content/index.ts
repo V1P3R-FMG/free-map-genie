@@ -1,10 +1,23 @@
 import channel from "@shared/channel/content";
 
-import { getPageType } from "@fmg/page";
+import { getPageType, type PageType } from "@fmg/page";
 import { FMG_Map } from "./map";
 import { FMG_Guide } from "./guide";
 import { FMG_MapSelector } from "./map-selector";
 import debounce from "@shared/debounce";
+
+export interface State {
+    attached: boolean;
+    user: string;
+    type: PageType
+}
+
+declare global {
+    export interface ContentChannel {
+        toastrError(data: { message: string }): void;
+        getState(): State;
+    }
+}
 
 channel.connect();
 
@@ -26,6 +39,18 @@ function isReduxStoreDefined(): boolean {
     return !!window.store;
 }
 
+const state: State = {
+    attached: false,
+    user: "n/a",
+    type: "unknown"
+};
+
+function setState(newState: Partial<State>) {
+    Object.entries(newState).forEach(([k, v]) => {
+        state[k as keyof typeof newState] = v as never;
+    });
+}
+
 /**
  * Itialize the content script
  */
@@ -38,30 +63,55 @@ async function init() {
             const map = new FMG_Map(window);
             await map.setup();
             listenForRefocus(() => map.reload());
-            return true;
+
+            setState({
+                attached: true,
+                user: String(map.user),
+                type
+            });
+            break;
         case "guide":
             const guide = new FMG_Guide(window);
             await guide.setup();
             listenForRefocus(() => guide.reload());
-            return true;
+
+            setState({
+                attached: true,
+                user: String(guide.user),
+                type
+            });
+            break;
         case "map-selector":
             await FMG_MapSelector.setup(window);
-            return true;
+
+            setState({
+                attached: true,
+                type
+            });
+            break;
         case "home":
-            return true;
+            state.attached = true;
+
+            setState({
+                attached: true,
+                type
+            });
+            break;
         case "unknown":
             logger.warn(`Page type ${type}, not attaching content script`);
-            return false;
+            break;
     }
 }
 
+channel.onMessage("toastrError", ({ message }) => {
+    toastr.error(message);
+});
+
+channel.onMessage("getState", () => {
+    return state;
+});
+
 init()
-    .then((attached) => {
-        if (attached) {
-            channel.extension.attached();
-            logger.log("content script init done");
-        }
-    })
     .catch((err) => {
         window.postMessage({
             type: "fmg:error",

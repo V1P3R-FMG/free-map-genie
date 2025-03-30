@@ -47,6 +47,10 @@ export class FMG_Map {
         this.ui = new FMG_UI(this.mapManager);
     }
 
+    public get user(): number | null {
+        return this.window.user?.id ?? null;
+    }
+
     /**
      * Get map if map search param is provided.
      */

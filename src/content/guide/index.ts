@@ -24,6 +24,10 @@ export class FMG_Guide {
         this.checkboxManager = new FMG_CheckboxManager(window);
     }
 
+    public get user(): number | null {
+        return this.miniMap.window.user?.id ?? null;
+    }
+
     public get miniMap(): FMG_Map {
         if (!this._miniMap) throw new Error("Minimap not setup.");
         return this._miniMap;

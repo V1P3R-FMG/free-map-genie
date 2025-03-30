@@ -20,6 +20,7 @@ import { sleep } from "@shared/async";
 import channel from "@shared/channel/popup";
 import Options from "options.json";
 import { FMG_ImportHelper } from "@fmg/storage/data/import";
+import { State } from "@content/index";
 
 const author = __AUTHOR__;
 const version = __VERSION__ + (__DEBUG__ ? "-dev" : "");
@@ -30,7 +31,11 @@ const bookmarks = ref(bookmarksRaw);
 var settingsRaw:FMG.Extension.Settings = {} as any;
 const settings = ref(settingsRaw);
 
-const info = ref({});
+const state = ref<State>({
+    attached: false,
+    user: "n/a",
+    type: "unknown"
+});
 
 async function save() {
     logger.debug("Saving data", {
@@ -83,16 +88,26 @@ function openHomepage() {
 }
 
 async function importData() {
-    const importData = await FMG_ImportHelper.showFilePicker();
-    if (importData) {
-        await channel.content.importData({ json: importData });
+    try {
+        const importData = await FMG_ImportHelper.showFilePicker();
+        if (importData) {
+            await channel.content.importData({ json: importData });
+        }
+    } catch (err) {
+        channel.content.toastrError({ message: String(err) });
+        closePopup()
     }
 }
 
 async function exportData() {
-    const exportData = await channel.content.exportData();
-    if (exportData) {
-        await FMG_ExportHelper.saveFile(exportData);
+    try {
+        const exportData = await channel.content.exportData();
+        if (exportData) {
+            await FMG_ExportHelper.saveFile(exportData);
+        }
+    } catch (err) {
+        channel.content.toastrError({ message: String(err) });
+        closePopup()
     }
 }
 
@@ -133,15 +148,15 @@ async function removeBookmark(url: string) {
     await save();
 }
 
-async function getInfo() {
-    info.value = await channel.extension.getInfo(void 0, 60000);
+async function setState() {
+    state.value = await channel.content.getState(void 0, 60000);
 
     let busy = false;
     setInterval(async () => {
         if (busy) return;
         try {
             busy = true;
-            info.value = await channel.extension.getInfo(void 0, 60000);
+            state.value = await channel.content.getState(void 0, 60000);
         } catch (err) {
             logger.error("getInfo failed,", err as any);
         }
@@ -155,7 +170,7 @@ async function settingsChanged(name: string, value: any) {
 }
 
 load();
-getInfo();
+setState();
 </script>
 
 <template>
@@ -200,7 +215,7 @@ getInfo();
                     />
                 </Page>
                 <Page name="info" icon="doc">
-                    <Info :info="<any>info" />
+                    <Info :state="state" />
                 </Page>
                 <Page name="data" icon="database">
                     <Data
