@@ -39,8 +39,6 @@ export class FMG_Map {
     public readonly ui: FMG_UI;
 
     public window: Window;
-    private mapElement?: HTMLDivElement;
-    private appElement?: HTMLDivElement;
 
     constructor(window: Window, mapManager?: FMG_MapManager) {
         this.window = window;
@@ -201,9 +199,6 @@ export class FMG_Map {
      * Load the map script, and wait for the globals to be defined.
      */
     private async loadMapScript(): Promise<void> {
-        if (this.appElement) this.appElement.id = "app";
-        if (this.mapElement) this.mapElement.id = "map";
-
         const script = await getElement<HTMLScriptElement>(
             "script[src^='https://cdn.mapgenie.io/js/map.js?id=']",
             this.window
@@ -226,7 +221,8 @@ export class FMG_Map {
      * Attach ui
      */
     private async attachUI(): Promise<void> {
-        await this.ui.attach();
+        
+        
         this.mapManager.on("fmg-location", () => this.ui.update());
         this.mapManager.on("fmg-category", () => this.ui.update());
         this.mapManager.on("fmg-update", () => this.ui.update());
@@ -245,32 +241,13 @@ export class FMG_Map {
             this.mapManager.import(json);
         });
 
-        channel.onMessage("clearData", async () => {
+        channel.onMessage("clearData", async () => { 
             if (confirm("Are you sure you want to clear all data?")) {
                 await this.mapManager.storage.clear();
                 await this.mapManager.reload();
             }
         });
     }
-
-    // public async preSetup(): Promise<void> {             
-    //     const mapElement = await getElement<HTMLDivElement>("#map", this.window, 5000);
-    //     const appElement = mapElement.parentElement!;
-    //     mapElement.remove();
-    //     appElement.remove();
-        
-    //     this.appElement = appElement.cloneNode(true) as HTMLDivElement;
-    //     this.appElement.id = "_app";
-
-    //     this.mapElement = mapElement.cloneNode(true) as HTMLDivElement;
-    //     this.mapElement.id = "_map";
-
-    //     this.appElement.insertBefore(this.mapElement, this.appElement.firstChild);
-    //     this.window.document.body.appendChild(this.appElement);
-
-    //     const control = this.appElement.querySelector(".mapboxgl-control-container");
-    //     control?.remove();
-    // }
 
     /**
      * Reload and update map.
@@ -280,30 +257,10 @@ export class FMG_Map {
     }
 
     /**
-     * Check if we failed to load before map script.
-     * If so reload the page, but only if we didn't reload before.
-     */
-    public refreshCheck(): void {
-        if (this.window.store) {
-            if (!this.window.sessionStorage.getItem("fmg:map:reloaded")) {
-                this.window.sessionStorage.setItem("fmg:map:reloaded", "true");
-                this.window.location.reload();
-            } else {
-                this.window.sessionStorage.removeItem("fmg:map:reloaded");
-            }
-        } else {
-            this.window.sessionStorage.removeItem("fmg:map:reloaded");
-        }
-    }
-
-    /**
      * Setup
      */
     public async setup(): Promise<void> {
         const settings = await channel.offscreen.getSettings();
-
-        //this.refreshCheck();
-        // await this.preSetup();
 
         // #if DEBUG
         window.fmgMapManager = this.mapManager;
