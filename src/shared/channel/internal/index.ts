@@ -21,6 +21,8 @@ import type {
     DriverState,
 } from "./types";
 
+const TIMEOUT = 30000;
+
 export interface TimeoutInfo {
     time?: number;
     message?: string;
@@ -104,7 +106,7 @@ export function createChannel<C extends ChannelContext>(context: C, driver: Chan
         context: RC,
         type: T,
         data: ChannelEventData<RC, T>,
-        timeout: number = 10000
+        timeout: number = TIMEOUT
     ) {
         const target = { context };
 
