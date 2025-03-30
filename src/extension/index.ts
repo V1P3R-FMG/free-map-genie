@@ -1,13 +1,12 @@
-import { allowWindowMessaging } from "webext-bridge/content-script";
+import channel from "@shared/channel/extension";
+import { getPageType, PageType } from "@fmg/page";
 
-import { getData } from "@shared/extension";
-import { initHandlers } from "./handlers";
-
-allowWindowMessaging("fmg");
-
-const shared = {
-    attached: false
-};
+declare global {
+    export interface ExtensionChannel {
+        hello(): string;
+        addBookmark(): { url: string, favicon: string, title: string } | undefined;
+    }
+}
 
 function injectScript(src: string): HTMLScriptElement {
     const head = document.head || document.documentElement;
@@ -26,28 +25,50 @@ function injectLink(href: string): HTMLLinkElement {
     return link;
 }
 
+channel.onMessage("hello", () => {
+    return "Hello from the extension!";
+});
+
+channel.onMessage("addBookmark", () => {
+    const $url = document.head.querySelector(
+        "meta[property='og:url']"
+    ) as HTMLMetaElement;
+
+    const $icon = document.head.querySelector(
+        "link[rel='apple-touch-icon']"
+    ) as HTMLLinkElement;
+
+    const $title = document.head.querySelector(
+        "meta[property='og:title']"
+    ) as HTMLMetaElement;
+
+    if (!$url || !$icon || !$title) {
+        logger.warn("failed to add bookmark", {
+            url: $url,
+            icon: $icon,
+            title: $title
+        });
+        return;
+    }
+
+    const url = $url.content;
+    const favicon = $icon.href;
+    const title = $title.content
+
+    return { url, favicon, title };
+});
+
 async function init() {
-    const data = await getData();
-    if (!data.settings.extension_enabled) return;
+    channel.connect();
 
-    window.addEventListener("message", async (message) => {
-        if (typeof message.data !== "object") return;
-
-        const { type } = message.data;
-
-        switch (type) {
-            case "fmg:attached":
-                shared.attached = true;
-                break;
-        }
-    });
-
-    window.sessionStorage.setItem("fmg:extension:data", JSON.stringify(data));
+    const settings = await channel.offscreen.getSettings();
+    if (!settings.extension_enabled) {
+        channel.disconnect();
+        return;
+    }
 
     injectLink(chrome.runtime.getURL("content.css"));
     injectScript(chrome.runtime.getURL("content.js"));
-    
-    initHandlers(shared);
 }
 
 init()

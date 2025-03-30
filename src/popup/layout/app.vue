@@ -16,49 +16,55 @@ import Version from "./version.vue";
 
 import { FMG_ExportHelper, type ExportedData } from  "@fmg/storage/data/export";
 
-import { send } from "@shared/send";
-import {
-    getDefaultData,
-    getOptions,
-    setData,
-    getData
-} from "@shared/extension";
 import { sleep } from "@shared/async";
-
-chrome.storage.onChanged.addListener(async () => {
-    await sleep(50);
-    await load();
-});
+import channel from "@shared/channel/popup";
+import Options from "options.json";
+import { FMG_ImportHelper } from "@fmg/storage/data/import";
+import { State } from "@content/index";
 
 const author = __AUTHOR__;
 const version = __VERSION__ + (__DEBUG__ ? "-dev" : "");
 
 var bookmarksRaw: FMG.Extension.Bookmarks = [];
-const bookmarks = ref<FMG.Extension.Bookmarks>(bookmarksRaw);
+const bookmarks = ref(bookmarksRaw);
 
-const options = getOptions();
-var settingsRaw = getDefaultData();
-const settings = ref<FMG.Extension.Settings>(settingsRaw);
+var settingsRaw:FMG.Extension.Settings = {} as any;
+const settings = ref(settingsRaw);
 
-const info = ref({});
+const state = ref<State>({
+    attached: false,
+    user: "n/a",
+    type: "unknown"
+});
 
 async function save() {
     logger.debug("Saving data", {
         bookmarks: bookmarksRaw,
         settings: settingsRaw
     });
-    setData({
-        bookmarks: bookmarksRaw,
-        settings: settingsRaw
-    });
+
+    await Promise.all([
+        channel.offscreen.setBookmarks({ bookmarks: bookmarksRaw }),
+        channel.offscreen.setSettings({ settings: settingsRaw })
+    ]);
+}
+
+async function loadBookmarks() {
+    bookmarksRaw = await channel.offscreen.getBookmarks();
+    bookmarks.value = bookmarksRaw;
+}
+
+async function loadSettings() {
+    settingsRaw = await channel.offscreen.getSettings();
+    settings.value = settingsRaw;
 }
 
 async function load() {
-    const data = await getData();
-    bookmarksRaw = data.bookmarks;
-    settingsRaw = data.settings;
-    bookmarks.value = bookmarksRaw;
-    settings.value = settingsRaw;
+    await Promise.all([
+        loadBookmarks(),
+        loadSettings()
+    ]);
+    
     logger.debug("Loaded data", {
         bookmarks: bookmarksRaw,
         settings: settingsRaw
@@ -82,24 +88,38 @@ function openHomepage() {
 }
 
 async function importData() {
-    send("import-data");
-}
-
-async function exportData() {
-    const exportedData = await send("export-data") as ExportedData;
-    if (exportedData) {
-        await FMG_ExportHelper.saveFile(exportedData);
+    try {
+        const importData = await FMG_ImportHelper.showFilePicker();
+        if (importData) {
+            await channel.content.importData({ json: importData });
+        }
+    } catch (err) {
+        channel.content.toastrError({ message: String(err) });
+        closePopup()
     }
 }
 
-function clearData() {
-    send("clear-data");
+async function exportData() {
+    try {
+        const exportData = await channel.content.exportData();
+        if (exportData) {
+            await FMG_ExportHelper.saveFile(exportData);
+        }
+    } catch (err) {
+        channel.content.toastrError({ message: String(err) });
+        closePopup()
+    }
+}
+
+async function clearData() {
+    await channel.content.clearData();
 }
 
 async function addBookmark() {
     try {
-        const bookmark = await send("add-bookmark");
-        if (!bookmark.url || !bookmark.favicon || !bookmark.title) {
+        const bookmark = await channel.extension.addBookmark();
+
+        if (!bookmark || !bookmark.url || !bookmark.favicon || !bookmark.title) {
             logger.warn("Invalid bookmark", bookmark);
             return;
         }
@@ -128,15 +148,20 @@ async function removeBookmark(url: string) {
     await save();
 }
 
-async function getInfo() {
-    try {
-        info.value = await send("get-info", null, {
-            timeout: 5000,
-            retry: true
-        });
-    } catch (err) {
-        logger.error("getInfo failed,", err as any);
-    }
+async function setState() {
+    state.value = await channel.content.getState(void 0, 60000);
+
+    let busy = false;
+    setInterval(async () => {
+        if (busy) return;
+        try {
+            busy = true;
+            state.value = await channel.content.getState(void 0, 60000);
+        } catch (err) {
+            logger.error("getInfo failed,", err as any);
+        }
+        busy = false;
+    }, 1000);
 }
 
 async function settingsChanged(name: string, value: any) {
@@ -145,7 +170,7 @@ async function settingsChanged(name: string, value: any) {
 }
 
 load();
-getInfo();
+setState();
 </script>
 
 <template>
@@ -184,13 +209,13 @@ getInfo();
                 </Page>
                 <Page name="settings" icon="cog">
                     <Settings
-                        :options="options"
+                        :options="Options"
                         :settings="settings"
                         @change="settingsChanged"
                     />
                 </Page>
                 <Page name="info" icon="doc">
-                    <Info :info="<any>info" />
+                    <Info :state="state" />
                 </Page>
                 <Page name="data" icon="database">
                     <Data

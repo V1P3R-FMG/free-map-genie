@@ -11,7 +11,7 @@ declare global {
     
     const __GLOBAL_API_SECRET__: string;
 
-    let logger: Logger;
+    let logger: import("@fmg/logger").Logger;
 }
 
 export {};

@@ -1,10 +1,14 @@
-import { onMessage } from "webext-bridge/background";
+import channel from "@shared/channel/background";
 
-onMessage<{ path: string }>("fmg:api:fetch", async (message) => {
-    const {
-        data: { path }
-    } = message;
+declare global {
+    interface BackgroundChannel {
+        games(): MG.API.Game[];
+        game(data: { gameId: Id }): MG.API.GameFull;
+        heatmaps(data: { mapId: Id }): MG.API.Heatmaps;
+    }
+}
 
+async function apiFetch(path: string) {
     const secret = /* @mangle */ __GLOBAL_API_SECRET__; /* @/mangle */
 
     const urlWithoutStartingSlash = path.replace(/^\//, "");
@@ -17,4 +21,16 @@ onMessage<{ path: string }>("fmg:api:fetch", async (message) => {
     });
 
     return res.json();
+}
+
+channel.onMessage("games", () => {
+    return apiFetch("games");
+});
+
+channel.onMessage("game", ({ gameId }) => {
+    return apiFetch(`games/${gameId}/full`);
+});
+
+channel.onMessage("heatmaps", ({ mapId }) => {
+    return apiFetch(`maps/${mapId}/heatmaps`);
 });

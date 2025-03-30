@@ -1,4 +1,4 @@
-import { apiFetch } from "@fmg/mg";
+import channel from "@shared/channel/content";
 
 export default class FMG_GamesData {
     private static data?: MG.API.Game[];
@@ -36,6 +36,6 @@ export default class FMG_GamesData {
     }
 
     private static async load() {
-        this.data = await apiFetch("games")
+        this.data = await channel.background.games();
     }
 }

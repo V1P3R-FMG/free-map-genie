@@ -1,16 +1,28 @@
 import { getElement } from "@shared/dom";
-import { sleep, timeout, waitForCallback, waitForGlobals } from "@shared/async";
+import { timeout, waitForCallback, waitForGlobals } from "@shared/async";
+import channel from "@shared/channel/content";
 
 import { FMG_ApiFilter } from "@fmg/filters/api-filter";
 import { FMG_StorageFilter } from "@fmg/filters/storage-filter";
 import { FMG_HeatmapsData, FMG_MapData } from "@fmg/info";
-import { FMG_ExtensionData } from "@fmg/extension-data";
 import { FMG_MapManager } from "@fmg/map-manager";
 import { FMG_StorageDataMigrator } from "@fmg/storage/migration";
-import { FMG_UI } from "./ui";
 
 import setupApiFilter from "@/content/filters/api-filter";
 import setupStorageFilter from "@/content/filters/storage-filter";
+import type { ExportedData } from "@fmg/storage/data/export";
+
+import { FMG_UI } from "./ui";
+import MapSwitcherPanel from "./map-panel";
+import AdsRemover from "@fmg/ads";
+
+declare global {
+    export interface ContentChannel {
+        exportData(): ExportedData | undefined;
+        importData(data: { json: string }): void;
+        clearData(): void;
+    }
+}
 
 export const FmgMapInstalled = Symbol("FmgMapInstalled");
 
@@ -27,14 +39,16 @@ export class FMG_Map {
     public readonly ui: FMG_UI;
 
     public window: Window;
-    private mapElement?: HTMLDivElement;
-    private appElement?: HTMLDivElement;
 
     constructor(window: Window, mapManager?: FMG_MapManager) {
         this.window = window;
         this.mapManager = mapManager ?? new FMG_MapManager(window);
         this.url = new URL(window.location.href);
         this.ui = new FMG_UI(this.mapManager);
+    }
+
+    public get user(): number | null {
+        return this.window.user?.id ?? null;
     }
 
     /**
@@ -80,17 +94,26 @@ export class FMG_Map {
      */
     private loadUser() {
         if (this.window.user) {
-            this.window.user.trackedCategoryIds =
-                this.mapManager.storage.data.categoryIds;
-            this.window.user.suggestions = [];
-            this.window.user.hasPro = true;
-            this.window.user.locations = this.mapManager.storage.data.locations;
-            this.window.user.gameLocationsCount =
-                this.mapManager.storage.data.locationIds.length;
-            this.window.user.presets = this.mapManager.storage.data.presets;
+            const {
+                locations,
+                locationIds,
+                presets,
+            } = this.mapManager.storage.data;
+
+            this.window.user = {
+                ...this.window.user,
+                trackedCategoryIds: this.mapManager.storage.data.categoryIds,
+                suggestions: [],
+                hasPro: true,
+                locations,
+                gameLocationsCount: locationIds.length,
+                presets
+            };
         }
+
         if (this.window.mapData) {
-            this.window.mapData.notes = this.mapManager.storage.data.notes;
+            const { notes } = this.mapManager.storage.data;
+            this.window.mapData.notes = notes;
         }
     }
 
@@ -123,7 +146,7 @@ export class FMG_Map {
         };
 
         this.window.initialZoom = map.config.initial_zoom;
-        this.window.initiaPosition = {
+        this.window.initialPosition = {
             lat: map.config.start_lat,
             lng: map.config.start_lng
         };
@@ -141,44 +164,13 @@ export class FMG_Map {
     /**
      * Enable pro features
      */
-    private setupConfig() {
+    private setupConfig(settings: FMG.Extension.Settings) {
         // Set configurations enabled.
         if (this.window.config) {
-            if (FMG_ExtensionData.settings.presets_allways_enabled) {
+            if (settings.presets_allways_enabled) {
                 this.window.config.presetsEnabled = true;
             }
         }
-    }
-
-    /**
-     * Find the first free map url in the map switcher panel.
-     * @returns the first free map url
-     */
-    private getFreeMapUrl(): string | null {
-        let lockedMaps = 0;
-        for (const link of this.window.document.querySelectorAll<HTMLLinkElement>(
-            ".map-switcher-panel .map-link"
-        )) {
-            if (!link.href) continue;
-            else if (link.href.endsWith("/upgrade")) {
-                lockedMaps++;
-            } else if (!link.href.endsWith("/upgrade")) {
-                return link.href;
-            }
-        }
-        if (lockedMaps > 0) {
-            logger.warn(
-                "No free maps found could not unlock maps in map switcher panel"
-            );
-        }
-        return null;
-    }
-
-    /**
-     * Get the map name for a given link element.
-     */
-    private getMapName(link: HTMLLinkElement): string {
-        return link.innerText.replace(/\s?\[\w+\]/i, "").replace(" ", "-").toLowerCase();
     }
 
     /**
@@ -187,60 +179,30 @@ export class FMG_Map {
     private unlockMaps() {
         if (!this.window.document.querySelector(".map-switcher-panel")) return;
 
-        const freeMapUrl = this.getFreeMapUrl();
-        if (!freeMapUrl) return;
-        this.window.document
-            .querySelectorAll<HTMLLinkElement>(".map-switcher-panel .map-link")
-            .forEach((link) => {
-                const mapName = this.getMapName(link);
+        const panel = new MapSwitcherPanel();
 
-                // Fix selected when on a pro unlocked map
-                if (this.map) {
-                    if (mapName !== this.map) {
-                        link.classList.remove("selected");
-                    } else {
-                        link.classList.add("selected");
-                    }
-                }
+        if (this.map) {
+            panel.selectMap(this.map);
+        }
 
-                if (!link.href || !link.href.endsWith("/upgrade")) return;
-
-                // Fix name
-                // link.innerText = mapName;
-
-                // Fix href
-                const url = new URL(freeMapUrl);
-                url.searchParams.set("map", mapName);
-                link.setAttribute("href", url.toString());
-
-                // Remove style
-                link.removeAttribute("style");
-
-                // Remove unnecessary attributes
-                link.removeAttribute("target");
-                link.removeAttribute("data-toggle");
-                link.removeAttribute("title");
-                link.removeAttribute("data-original-title");
-                link.removeAttribute("data-placement");
-            });
+        panel.unlock();
     }
 
     /**
      * Cleanup pro updrade ads.
      */
     private cleanupProUpgradeAds() {
-        getElement("#button-upgrade", this.window, 5000).then(elem => elem.parentElement?.remove()).catch();
-        getElement("#nitro-floating-wrapper", this.window, 5000).then(elem => elem.remove()).catch();
-        getElement("#blobby-left", this.window, 5000).then(elem => elem.remove()).catch();
+        const adsRemover = new AdsRemover();
+        adsRemover.registerSelector("#button-upgrade", true);
+        adsRemover.registerSelector("#nitro-floating-wrapper");
+        adsRemover.registerSelector("#blobby-left");
+        adsRemover.removeElements();
     }
 
     /**
      * Load the map script, and wait for the globals to be defined.
      */
     private async loadMapScript(): Promise<void> {
-        if (this.appElement) this.appElement.id = "app";
-        if (this.mapElement) this.mapElement.id = "map";
-
         const script = await getElement<HTMLScriptElement>(
             "script[src^='https://cdn.mapgenie.io/js/map.js?id=']",
             this.window
@@ -253,9 +215,9 @@ export class FMG_Map {
         this.window.document.body.appendChild(newScript);
 
         return timeout(
-            //waitForGlobals(["axios", "store", "mapData", "game", "mapManager"], this.window),
             waitForGlobals(["mapManager"], this.window),
-            10000
+            10000,
+            "mapManager not found."
         );
     }
 
@@ -263,70 +225,32 @@ export class FMG_Map {
      * Attach ui
      */
     private async attachUI(): Promise<void> {
-        await this.ui.attach();
+        
+        
         this.mapManager.on("fmg-location", () => this.ui.update());
         this.mapManager.on("fmg-category", () => this.ui.update());
         this.mapManager.on("fmg-update", () => this.ui.update());
-
-        this.ui.on("selected", async (e) => {
-            const json = await e.detail.text();
-            await this.mapManager.import(json);
-        });
     }
 
     /**
      * Setup window listeners
      */
     private setupListeners(): void {
-        this.window.addEventListener("message", async (e) => {
-            try {
-                switch (e.data.type) {
-                    case "fmg::export-data": {
-                        const id = e.data.id;
-                        const type = "fmg::export-data::response";
-                        const exportedData = await this.mapManager.export();
-                        this.window.postMessage({ type, id, exportedData });
-                        break;
-                    }
-                    case "fmg::import-data":
-                        this.ui.importPopup.show();
-                        break;
-                    case "fmg::clear-data":
-                        if (confirm("Are you sure you want to clear all data?")) {
-                            await this.mapManager.storage.clear();
-                            await this.mapManager.reload();
-                        }
-                        break;
-                }
-            } catch (e) {
-                logger.error("Failed to handle message", e);
+
+        channel.onMessage("exportData", async () => {
+            return this.mapManager.export();
+        })
+
+        channel.onMessage("importData", ({ json }) => {
+            this.mapManager.import(json);
+        });
+
+        channel.onMessage("clearData", async () => { 
+            if (confirm("Are you sure you want to clear all data?")) {
+                await this.mapManager.storage.clear();
+                await this.mapManager.reload();
             }
         });
-    }
-
-    public async preSetup(): Promise<void> {
-        if (!FMG_ExtensionData.settings.use_declarative_net_request) {
-            logger.log("Using alternative block.");
-             
-            const mapElement = await getElement<HTMLDivElement>("#map", this.window, 5000);
-            const appElement = mapElement.parentElement!;
-            mapElement.remove();
-            appElement.remove();
-            
-            this.appElement = appElement.cloneNode(true) as HTMLDivElement;
-            this.appElement.id = "_app";
-
-            this.mapElement = mapElement.cloneNode(true) as HTMLDivElement;
-            this.mapElement.id = "_map";
-
-            this.appElement.insertBefore(this.mapElement, this.appElement.firstChild);
-            this.window.document.body.appendChild(this.appElement);
-
-            const control = this.appElement.querySelector(".mapboxgl-control-container");
-            control?.remove();
-        } else {
-            logger.log("Using declarative net requests.");
-        }
     }
 
     /**
@@ -337,28 +261,10 @@ export class FMG_Map {
     }
 
     /**
-     * Check if we failed to load before map script.
-     * If so reload the page, but only if we didn't reload before.
-     */
-    public refreshCheck(): void {
-        if (this.window.store) {
-            if (!this.window.sessionStorage.getItem("fmg:map:reloaded")) {
-                this.window.sessionStorage.setItem("fmg:map:reloaded", "true");
-                this.window.location.reload();
-            } else {
-                this.window.sessionStorage.removeItem("fmg:map:reloaded");
-            }
-        } else {
-            this.window.sessionStorage.removeItem("fmg:map:reloaded");
-        }
-    }
-
-    /**
      * Setup
      */
     public async setup(): Promise<void> {
-        //this.refreshCheck();
-        await this.preSetup();
+        const settings = await channel.offscreen.getSettings();
 
         // #if DEBUG
         window.fmgMapManager = this.mapManager;
@@ -367,12 +273,9 @@ export class FMG_Map {
         this.fixGoogleMaps();
 
         await timeout(waitForCallback(() => !!this.window.mapData), 5000, "Mapdata took to long to load.");
-        if (!FMG_ExtensionData.settings.use_declarative_net_request) {
-            await sleep(500);
-        }
 
         // Setup mock user if enabled
-        if (FMG_ExtensionData.settings.mock_user) {
+        if (settings.mock_user) {
             this.window.user = {
                 id: -1,
                 role: "user",
@@ -380,7 +283,7 @@ export class FMG_Map {
         }
 
         await this.loadMapData();
-        this.setupConfig();
+        this.setupConfig(settings);
 
         await FMG_StorageDataMigrator.migrateLegacyData(this.window);
         await this.mapManager.load();

@@ -1,4 +1,4 @@
-import { apiFetch } from "@fmg/mg";
+import channel from "@/shared/channel/content";
 import FMG_MapData from "./map";
 
 export default class FMG_GameData {
@@ -19,7 +19,7 @@ export default class FMG_GameData {
     }
 
     private static async fetch(gameId: Id) {
-        const data = await apiFetch<MG.API.GameFull>(`games/${gameId}/full`);
+        const data = await channel.background.game({ gameId });
         return new FMG_GameData(data);
     }
 

@@ -5,7 +5,7 @@ import { FMG_StorageDataMigrator } from "../migration";
 type ExportedJson = FMG.Storage.V1.ExportedJson | FMG.Storage.V2.ExportedJson;
 
 export class FMG_ImportHelper {
-    public static async showFilePicker(): Promise<File | undefined> {
+    public static async showFilePicker(): Promise<string | undefined> {
         const input = document.createElement("input");
         document.body.appendChild(input);
         input.style.display = "none";
@@ -14,9 +14,14 @@ export class FMG_ImportHelper {
         input.click();
 
         return new Promise((resolve) => {
-            input.onchange = () => {
+            input.onchange = async () => {
                 const file = input.files?.[0];
-                resolve(file);
+                if (file) {
+                    const text = await file?.text();
+                    resolve(text);
+                } else {
+                    resolve(void 0);
+                }
                 document.body.removeChild(input);
             };
         });

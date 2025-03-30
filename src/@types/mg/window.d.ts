@@ -15,7 +15,7 @@ interface Window {
     storageCdnUrl?: string;
 
     initialZoom?: number;
-    initiaPosition?: {
+    initialPosition?: {
         lat: number;
         lng: number;
     };

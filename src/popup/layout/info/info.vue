@@ -1,11 +1,9 @@
 <script lang="ts" setup>
 import Icon from "@components/icon.vue";
+import type { State } from "@/content";
 
 export interface Props {
-    info: {
-        pageType: "map" | "guide" | "home" | "unknown";
-        attached: boolean;
-    };
+    state: State;
 }
 
 defineProps<Props>();
@@ -15,14 +13,18 @@ defineProps<Props>();
     <div class="info">
         <div class="info-item">
             <h4>PageType</h4>
-            <span>{{ info.pageType || "unknown" }}</span>
+            <span>{{ state.type }}</span>
+        </div>
+        <div class="info-item">
+            <h4>User</h4>
+            <span>{{ state.user }}</span>
         </div>
         <div class="info-item">
             <h4>Attached</h4>
             <Icon
                 icon="cd"
                 size="14px"
-                :class="info.attached ? 'active' : 'inactive'"
+                :class="state.attached ? 'active' : 'inactive'"
             />
         </div>
     </div>

@@ -113,10 +113,11 @@ export default (env) => {
         mode,
         devtool: isDev ? "cheap-module-source-map" : undefined,
         entry: {
-            extension: "./src/extension/index.ts",
-            content: "./src/content/index.ts",
+            "extension": "./src/extension/index.ts",
+            "content": "./src/content/index.ts",
             "popup/index": "./src/popup/index.ts",
-            background: "./src/background/index.ts"
+            "background": "./src/background/index.ts",
+            "storage": "./src/storage/index.ts",
         },
         output: {
             path: dist
@@ -127,7 +128,6 @@ export default (env) => {
                 vue$: isDev
                     ? "vue/dist/vue.runtime.esm-browser.js"
                     : "vue/dist/vue.runtime.esm-browser.prod.js",
-                logger: path.resolve("./src/fmg/logger.ts")
             },
             plugins: [new TsconfigPathsPlugin()]
         },
@@ -205,9 +205,21 @@ export default (env) => {
                 template: "./src/popup/index.html"
             }),
 
+            browser === "chrome"
+                ? new HtmlWebpackPlugin({
+                    chunks: [],
+                    filename: "storage.html",
+                    template: "./src/storage/index.html"
+                }) 
+                : new HtmlWebpackPlugin({
+                    chunks: ["background"],
+                    filename: "background.html",
+                    template: "./src/storage/index.html"
+                }),
+
             // Provide global modules
             new ProvidePlugin({
-                logger: "logger"
+                logger: [path.resolve(import.meta.dirname, "src", "fmg", "logger.ts"), "default"]
             }),
 
             // Provide the global variables
