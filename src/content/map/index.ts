@@ -251,7 +251,7 @@ export class FMG_Map {
 
         return timeout(
             waitForGlobals(["mapManager"], this.window),
-            10000,
+            60000,
             "mapManager not found."
         );
     }

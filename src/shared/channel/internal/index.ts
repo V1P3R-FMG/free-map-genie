@@ -20,7 +20,7 @@ import type {
     DriverState,
 } from "./types";
 
-const TIMEOUT = 30000;
+const TIMEOUT = 60000;
 
 export interface TimeoutInfo {
     time?: number;

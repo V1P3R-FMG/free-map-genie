@@ -76,3 +76,21 @@ export function hasKeys<T extends object, K extends keyof T>(
 ): object is T & Record<K, T[K]> {
     return keys.every((key) => key in object);
 }
+
+/**
+ * Gets added and remove ids from a DicyById object
+ */
+export function getDiffForDicyById<T>(previous: DictById<T>, current: DictById<T>) {
+    const added = [];
+    const removed = [];
+
+    for (const id in previous) {
+        if (!(id in current)) removed.push(id);
+    }
+
+    for (const id in current) {
+        if (!(id in previous)) added.push(id);
+    }
+
+    return { added, removed };
+}

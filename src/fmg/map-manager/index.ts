@@ -5,6 +5,9 @@ import { FMG_Popup } from "./popup";
 
 import { FMG_ImportHelper } from "@fmg/storage/data/import";
 import { FMG_ExportHelper } from "@fmg/storage/data/export";
+import type { FMG_Data } from "@fmg/storage/proto/data";
+
+import { getDiffForDicyById } from "@shared/utils";
 
 export class FMG_MapManager {
     public window: Window;
@@ -120,11 +123,7 @@ export class FMG_MapManager {
      */
     public updatePresets() {
         if (this.storage.data.presets.length === 0) {
-            if (this.hasDemoPreset()) {
-                this.store.reorderPresets([-1]);
-            } else {
-                this.store.reorderPresets([]);
-            }
+            this.store.reorderPresets(this.defaultPresetsIds);
         } else {
             this.store.reorderPresets(this.storage.data.presetOrder);
         }
@@ -246,6 +245,30 @@ export class FMG_MapManager {
     }
 
     /**
+     * Track or untrack multiple categories.
+     * @param categoryId the locations to (un)track.
+     * @param track a boolean value true to track and false to untrack.
+     */
+    public trackCategory(categoryId: Id, tracked: boolean): void {
+        this.store.trackCategory(categoryId, tracked);
+    }
+
+    /**
+     * Track or untrack multiple categories.
+     * @param categoryIds the locations to (un)track.
+     * @param tracked either a object with id as keys and boolean as value or a single boolean value.
+     */
+    public trackCategories(categoryIds: Id[], tracked: boolean): void;
+    public trackCategories(categoryIds: Id[], tracked: Record<Id, boolean>): void;
+    public trackCategories(categoryIds: Id[], tracked: any) {
+        if (typeof tracked === "boolean") {
+            categoryIds.forEach(id => this.trackCategory(id, tracked));
+        } else {
+            categoryIds.forEach(id => this.trackCategory(id, tracked[id] ?? false));
+        }
+    }
+
+    /**
      * Attaches an event listener to the window.
      * @param event the event to listen for.
      * @param callback the callback to call when the event is fired.
@@ -288,25 +311,36 @@ export class FMG_MapManager {
      */
     public async reload() {
         // Store last state notes.
-        const lastNotes = this.storage.data.notes;
+        const previousData = this.storage.data;
 
         // Refetch storage data.
         await this.storage.load();
+        const currentData = this.storage.data;
 
-        // Get current app state.
-        const state = this.store.getState();
-
-        // Mark locations and track categories.
-        this.markLocationsFound(Object.keys(state.map.locationsById), this.storage.data.locations);
-        this.store.trackCategories(state.map.categoryIds, this.storage.data.categories);
+        // Mark locations
+        const diffLocations = getDiffForDicyById(previousData.locations, currentData.locations);
+        this.markLocationsFound(diffLocations.added, true);
+        this.markLocationsFound(diffLocations.removed, false);
+        
+        // track categories.
+        const diffCategories = getDiffForDicyById(previousData.categories, currentData.categories);
+        this.trackCategories(diffCategories.added, true);
+        this.trackCategories(diffCategories.removed, false);
 
         // Update notes, by removing previous notes and adding the current notes.        
-        lastNotes.forEach(note => this.removeNote(note));
-        this.storage.data.notes.forEach(note => this.addNote(note));
+        previousData.notes.forEach(note => this.removeNote(note));
+        currentData.notes.forEach(note => this.addNote(note));
 
         // Reload presets from storage
         this.updatePresets();
 
+        this.refresh();
+    }
+
+    /**
+     * Refresh ui data
+     */
+    public refresh() {
         // Force ui update for locations and categories
         this.store.updateLocations();
         this.store.updateCategories();
