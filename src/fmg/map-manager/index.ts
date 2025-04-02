@@ -10,9 +10,10 @@ export class FMG_MapManager {
     public window: Window;
     public popup?: FMG_Popup;
     
-    public _storage?: FMG_Storage;
+    private _storage?: FMG_Storage;
     private _store?: FMG_Store;
     private _autoPanPopup?: MG.MapManager["autoPanPopup"]; 
+    private _defaultPresetsIds?: number[];
 
     public constructor(window: Window) {
         this.window = window;
@@ -28,6 +29,20 @@ export class FMG_MapManager {
             );
         }
         return this._storage;
+    }
+
+    public get defaultPresetsIds() {
+        if (!this.window.mapData) {
+            throw new Error(`Failed to get defaultPresetIds, Mapdata not defined!`);
+        }
+
+        if (!this._defaultPresetsIds) {
+            this._defaultPresetsIds = this.window.mapData.presets
+                .filter((preset) => preset.is_demo_preset)
+                .map((preset) => preset.id);
+        }
+
+        return this._defaultPresetsIds;
     }
 
     /**
@@ -80,11 +95,24 @@ export class FMG_MapManager {
      * @returns true if its defined else false.
      */
     public hasDemoPreset(): boolean {
-        return (
-            this.window.mapData?.presets?.some(
-                (preset) => preset.is_demo_preset
-            ) ?? false
-        );
+        return !!this.defaultPresetsIds.length;
+    }
+
+    /**
+     * Get a default preset from id.
+     * @returns the default preset.
+     */
+    public getDefaultPreset(id: Id): MG.Preset {
+        if (!this.window.mapData) {
+            throw new Error(`Failed to get default preset with id ${id}, Mapdata not defined.`);
+        }
+        const preset = this.window.mapData.presets.find((preset) => preset.id == id);
+
+        if (!preset) {
+            throw new Error(`Default preset wit id ${id} not found.`);
+        }
+
+        return preset;
     }
 
     /**
