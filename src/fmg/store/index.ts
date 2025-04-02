@@ -71,21 +71,6 @@ export class FMG_Store {
     }
 
     /**
-     * Track or untrack multiple categories.
-     * @param categoryIds the locations to (un)track.
-     * @param tracked either a object with id as keys and boolean as value or a single boolean value.
-     */
-    public trackCategories(categoryIds: Id[], tracked: boolean): void;
-    public trackCategories(categoryIds: Id[], tracked: Record<Id, boolean>): void;
-    public trackCategories(categoryIds: Id[], tracked: any) {
-        if (typeof tracked === "boolean") {
-            categoryIds.forEach(id => this.trackCategory(id, tracked));
-        } else {
-            categoryIds.forEach(id => this.trackCategory(id, tracked[id] ?? false));
-        }
-    }
-
-    /**
      * Reorder the presets.
      * @param ordering the new ordering for the presets.
      */

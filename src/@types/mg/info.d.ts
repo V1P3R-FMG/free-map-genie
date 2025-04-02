@@ -37,6 +37,7 @@ declare namespace MG {
             sharedNotes: DictById<MG.Note>;
             heatmapGroups: MG.HeatmapGroup[];
             heatmapCategories: DictById<MG.HeatmapCategory>;
+            maxMarkedLocations: number;
         }
     }
 }

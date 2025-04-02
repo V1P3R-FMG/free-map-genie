@@ -97,7 +97,9 @@ export class FMG_Storage {
      */
     public async load(): Promise<void> {
         if (!this.window.user) return;
-        if (this.window && this.window.mapData && this.window.isMini) {
+        if (this.window.isMini) {
+            if (!this.window.mapData) throw new Error("Failed to load storage data, Mapdata is not defined.");
+
             await Promise.all(
                 this.window.mapData.maps.map(async (map) => {
                     const key = FMG_Keys.getV2Key({

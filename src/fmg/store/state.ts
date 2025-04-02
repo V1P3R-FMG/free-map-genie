@@ -23,19 +23,25 @@ export function extendState(
     mapManager: FMG_MapManager
 ): FMG_State {
     const storage = mapManager.storage;
+    
     state.user.foundLocations = storage.data.locations;
     state.user.foundLocationsCount = storage.data.locationIds.length;
     state.user.trackedCategories = storage.data.categoryIds;
     state.user.totalFoundLocationsCount = storage.data.locationIds.length;
-
+    
     if (storage.window.mapData) {
+        const defaultPresetIds = mapManager.defaultPresetsIds;
+
         const presetOrder =
-            storage.data.presetOrder.length === 0 && mapManager.hasDemoPreset()
-                ? [-1]
+            !storage.data.presetOrder.length && defaultPresetIds.length
+                ? defaultPresetIds
                 : storage.data.presetOrder;
+
         state.user.presets = presetOrder.map((id) => {
-            if (id > -1) return storage.data.presets.find((p) => p.id == id)!;
-            return storage.window.mapData!.presets.find((p) => p.is_demo_preset)!;
+            if (defaultPresetIds.includes(id)) {
+                return mapManager.getDefaultPreset(id);
+            }
+            return storage.data.presets.find((p) => p.id == id)!;
         });
     } else {
         logger.warn("mapData not found, could not set presets");

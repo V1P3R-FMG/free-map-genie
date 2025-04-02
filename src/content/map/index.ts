@@ -145,11 +145,40 @@ export class FMG_Map {
         // Urls
         this.window.mapUrl = map.url;
 
+        const ogMapData = this.window.mapData;
+        logger.debug("Original Mapdata: ", ogMapData);
+
         // Map Data
         this.window.mapData = {
-            ...this.window.mapData,
+            ...ogMapData,
             ...map.mapData,
+            maxMarkedLocations: Infinity
         };
+
+        // If we are not loading a pro map load some original data back
+        if (!this.map) {
+            this.window.mapData.mapConfig = ogMapData.mapConfig;
+        }
+
+        // Fix tilesets when neccesary
+        for (var tileset of this.window.mapData.mapConfig.tile_sets) {
+            if (tileset.pattern != undefined) continue;
+
+            const ogTileset = ogMapData.mapConfig.tile_sets.find(({ name }) => tileset.name === name);
+
+            if (!ogTileset) {
+                logger.warn(`Failed to fix tileset ${tileset.name}, no original tileset found.`);
+                continue;
+            }
+
+            if (ogTileset.pattern != undefined) {
+                tileset.pattern = ogTileset.pattern;
+            } else if (ogTileset.path != undefined) {
+                tileset.pattern = `${ogTileset.path}/{z}/{x}/{y}.jpg`;
+            } else {
+                logger.warn(`Failed to fix tileset ${tileset.name}, no pattern or path found on original tileset.`);
+            }
+        }
 
         this.window.initialZoom = map.config.initial_zoom;
         this.window.initialPosition = {
@@ -222,7 +251,7 @@ export class FMG_Map {
 
         return timeout(
             waitForGlobals(["mapManager"], this.window),
-            10000,
+            60000,
             "mapManager not found."
         );
     }
