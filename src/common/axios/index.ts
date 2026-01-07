@@ -3,6 +3,8 @@ import waitUntil from "async-wait-until";
 import type { Axios } from "axios";
 import type { Options } from "async-wait-until";
 
+export * from "./interceptor";
+
 export { default as axios } from "axios";
 
 export type { Axios } from "axios";
