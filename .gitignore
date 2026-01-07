@@ -9,10 +9,12 @@ lerna-debug.log*
 
 node_modules
 .output
+.icons
 stats.html
 stats-*.json
 .wxt
 web-ext.config.ts
+src/common/icons.ts
 
 # Editor directories and files
 .vscode/*

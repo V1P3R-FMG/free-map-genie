@@ -19,6 +19,17 @@ export default defineConfig({
     "import.meta.env.PKG_HOMEPAGE": JSON.stringify(homepage),
     "import.meta.env.PKG_AUTHOR": JSON.stringify(author),
   },
+  fantasticon: {
+    name: "fmg-icons",
+    fontTypes: ["ttf", "woff", "woff2"],
+    assetTypes: ["ts", "css"],
+    pathOptions: {
+      ts: "src/common/icons.ts",
+    },
+    fontsUrl: "/fonts",
+    prefix: "fmg-icon",
+    inputDir: "icons",
+  },
   webExt: {
     startUrls: ["https://mapgenie.io/"],
   },
