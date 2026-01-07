@@ -58,6 +58,7 @@ export default defineWxtModule({
     }
 
     wxt.hook("build:publicAssets", async (_wxt, assets) => {
+      console.log("Generating fantasticon assets...");
       try {
         const results = await generateFmgIconFont(outputDir, options);
 
@@ -78,13 +79,14 @@ export default defineWxtModule({
     });
 
     wxt.hook("prepare:publicPaths", async (_wxt, paths) => {
+      console.log("Preparing fantasticon public paths...");
       try {
-        const results = await generateFmgIconFont(outputDir, options);
+        const name = options?.name || "icons";
 
-        for (const { writePath } of results.writeResults) {
-          if (writePath.endsWith(".ts")) continue;
+        paths.push(`css/${name}.css`);
 
-          paths.push(getRelativePath(outputDir, writePath));
+        for (const type of options.fontTypes) {
+          paths.push(`fonts/${name}.${type}`);
         }
       } catch (err) {
         // Ignore
