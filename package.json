@@ -17,6 +17,7 @@
     "postinstall": "wxt prepare"
   },
   "dependencies": {
+    "async-wait-until": "^2.0.31",
     "axios": "^1.13.2",
     "axios-cache-interceptor": "^1.11.2",
     "jquery": "^3.7.1",
