@@ -1,0 +1,9 @@
+{
+  "compilerOptions": {
+    "noEmit": true
+  },
+  "references": [
+    { "path": "./tsconfig.wxt.json" },
+    { "path": "./tsconfig.node.json" }
+  ]
+}
