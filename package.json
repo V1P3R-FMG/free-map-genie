@@ -14,7 +14,8 @@
     "zip": "wxt zip",
     "zip:firefox": "wxt zip -b firefox",
     "compile": "tsc --noEmit",
-    "postinstall": "wxt prepare"
+    "postinstall": "wxt prepare",
+    "e2e": "playwright test"
   },
   "dependencies": {
     "async-wait-until": "^2.0.31",
@@ -28,6 +29,7 @@
     "react-dom": "^19.2.3"
   },
   "devDependencies": {
+    "@playwright/test": "^1.57.0",
     "@types/express": "^5.0.6",
     "@types/jquery": "^3.5.33",
     "@types/react": "^19.2.7",
