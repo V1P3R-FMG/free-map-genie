@@ -20,6 +20,9 @@
     "axios": "^1.13.2",
     "axios-cache-interceptor": "^1.11.2",
     "jquery": "^3.7.1",
+    "memoize": "^10.2.0",
+    "nanoid": "^5.1.6",
+    "p-memoize": "^8.0.0",
     "react": "^19.2.3",
     "react-dom": "^19.2.3"
   },
