@@ -4,20 +4,21 @@ import type { Axios, InternalAxiosRequestConfig } from "axios";
 
 export class AxiosInterceptor extends InterceptorRouter {
   private readonly axios: Axios;
-  private readonly interceptorHanlde: number;
+  private readonly interceptorHandle: number;
 
   public constructor(axios: Axios) {
     super();
 
     this.axios = axios;
-    this.interceptorHanlde = axios.interceptors.request.use(
+
+    this.interceptorHandle = axios.interceptors.request.use(
       //
       this.createInterceptor()
     );
   }
 
   public uninstall() {
-    this.axios.interceptors.request.eject(this.interceptorHanlde);
+    this.axios.interceptors.request.eject(this.interceptorHandle);
   }
 
   private createInterceptor() {
