@@ -17,14 +17,19 @@
     "postinstall": "wxt prepare"
   },
   "dependencies": {
+    "axios": "^1.13.2",
+    "axios-cache-interceptor": "^1.11.2",
     "jquery": "^3.7.1",
     "react": "^19.2.3",
     "react-dom": "^19.2.3"
   },
   "devDependencies": {
+    "@types/express": "^5.0.6",
     "@types/react": "^19.2.7",
     "@types/react-dom": "^19.2.3",
     "@wxt-dev/module-react": "^1.1.5",
+    "chalk": "^5.6.2",
+    "express": "^5.2.1",
     "fantasticon": "^1.2.3",
     "typescript": "^5.9.3",
     "wxt": "^0.20.6"

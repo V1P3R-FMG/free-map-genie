@@ -5,6 +5,8 @@ export default defineContentScript({
     console.log("version:", import.meta.env.PKG_VERSION);
     console.log("homepage:", import.meta.env.PKG_HOMEPAGE);
 
+    console.log("mapgenie api url:", import.meta.env.MAPGENIE_API_URL);
+
     console.log("Hello content.");
   },
 });
