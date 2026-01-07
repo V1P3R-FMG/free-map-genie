@@ -1,3 +1,5 @@
+import path from "node:path";
+
 import { defineConfig, type UserManifest } from "wxt";
 
 import { author, version, homepage } from "./package.json";
@@ -36,6 +38,12 @@ export default defineConfig({
   manifest: ({ browser, manifestVersion }) => {
     const manifest: UserManifest = {
       host_permissions: ["*://mapgenie.io/*"],
+      web_accessible_resources: [
+        {
+          matches: ["<all_urls>"],
+          resources: ["fonts/*", "css/*"],
+        },
+      ],
       permissions: [],
     };
 
