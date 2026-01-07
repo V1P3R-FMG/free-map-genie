@@ -1,4 +1,3 @@
-import { toUrl } from "../url";
 import { InterceptorRouter, type Method } from "./router";
 
 import type { Axios, InternalAxiosRequestConfig } from "axios";
@@ -28,7 +27,7 @@ export class AxiosInterceptor extends InterceptorRouter {
       }
 
       const method = config.method.toUpperCase() as Method;
-      const url = toUrl(config.url);
+      const url = new URL(config.url, window.location.origin);
       const data = config.data as any;
 
       const result = await this.intercept(method, url.pathname, data);
