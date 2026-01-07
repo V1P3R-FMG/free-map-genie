@@ -45,6 +45,7 @@ export default defineConfig({
         },
       ],
       permissions: [],
+      background_page: "background/page.html",
     };
 
     if (manifestVersion === 2) {
