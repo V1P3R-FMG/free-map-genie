@@ -28,6 +28,7 @@
   },
   "devDependencies": {
     "@types/express": "^5.0.6",
+    "@types/jquery": "^3.5.33",
     "@types/react": "^19.2.7",
     "@types/react-dom": "^19.2.3",
     "@wxt-dev/module-react": "^1.1.5",
