@@ -1,6 +1,10 @@
 export default defineContentScript({
-  matches: ['*://*.google.com/*'],
+  matches: ["<all_urls>"],
   main() {
-    console.log('Hello content.');
+    console.log("author:", import.meta.env.PKG_AUTHOR);
+    console.log("version:", import.meta.env.PKG_VERSION);
+    console.log("homepage:", import.meta.env.PKG_HOMEPAGE);
+
+    console.log("Hello content.");
   },
 });

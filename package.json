@@ -3,6 +3,8 @@
   "description": "Enhance mapgenie.io features.",
   "private": true,
   "version": "3.0.0",
+  "author": "V1P3R",
+  "homepage": "https://github.com/V1P3R-FMG/free-map-genie",
   "type": "module",
   "scripts": {
     "dev": "wxt",

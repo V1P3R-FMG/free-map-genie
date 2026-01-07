@@ -1,5 +1,7 @@
 import { defineConfig, type UserManifest } from "wxt";
 
+import { author, version, homepage } from "./package.json";
+
 // See https://wxt.dev/api/config.html
 export default defineConfig({
   manifestVersion: 3,
@@ -11,6 +13,11 @@ export default defineConfig({
       { name: "default", as: "React", from: "react" },
       { name: "default", as: "$", from: "jquery" },
     ],
+  },
+  define: {
+    "import.meta.env.PKG_VERSION": JSON.stringify(version),
+    "import.meta.env.PKG_HOMEPAGE": JSON.stringify(homepage),
+    "import.meta.env.PKG_AUTHOR": JSON.stringify(author),
   },
   webExt: {
     startUrls: ["https://mapgenie.io/"],
