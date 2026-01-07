@@ -19,6 +19,9 @@ export default defineContentScript({
     logger.log("memoizedCounter:", await test.memoizedCounter());
     logger.log("memoizedCounter:", await test.memoizedCounter());
 
+    await injectScript("/page.js");
+    await injectStyle("/css/fmg-icons.css");
+
     logger.log("Hello content.");
   },
 });
