@@ -9,5 +9,5 @@ export default defineBackground(async () => {
 
   await createOffscreenDocument();
 
-  console.log("Hello background!", { id: browser.runtime.id });
+  logger.log("Hello background!", { id: browser.runtime.id });
 });
