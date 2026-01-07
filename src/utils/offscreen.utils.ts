@@ -1,6 +1,6 @@
 import type { PublicPath, Browser } from "wxt/browser";
 
-export type PublicPathLike = PublicPath | (string & {});
+type PublicPathLike = PublicPath | (string & {});
 
 export class OffscreenUtils {
   public static async exists(url: PublicPathLike) {
