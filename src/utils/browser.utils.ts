@@ -1,4 +1,6 @@
-import type { Browser } from "wxt/browser";
+import type { Browser, PublicPath } from "wxt/browser";
+
+type PublicPathLike = PublicPath | (string & {});
 
 export class BrowserUtils {
   public static async getActiveTab(): Promise<Browser.tabs.Tab | undefined> {
@@ -14,3 +16,15 @@ export class BrowserUtils {
     return tab?.id;
   }
 }
+
+export const injectStyle = async (path: PublicPathLike) => {
+  return new Promise<void>((resolve, reject) => {
+    $("<link />", {
+      rel: "stylesheet",
+      href: browser.runtime.getURL(path),
+    })
+      .appendTo("head")
+      .on("load", () => resolve())
+      .on("error", (e: any) => reject(e));
+  });
+};
