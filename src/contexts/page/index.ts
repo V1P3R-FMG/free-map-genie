@@ -12,10 +12,12 @@ import {
 
 import testService from "@/services/test.service";
 import mapgenieService from "@/services/mapgenie.service";
+import backendService from "@/services/backend.service";
 
 export default defineUnlistedScript(async () => {
   const test = testService.use();
   const mapgenie = mapgenieService.use();
+  const backend = backendService.use();
 
   MapgenieAdBlocker.start();
 
@@ -55,6 +57,12 @@ export default defineUnlistedScript(async () => {
   const heatmaps = await mapgenie.fetchHeatmaps(1);
   logger.log("Fetching heatmaps for rdr2 via MapgenieService...");
   logger.log("Heatmaps:", heatmaps);
+
+  const data = await backend.getData({
+    gameId: 1,
+    userId: -1,
+  });
+  logger.log("Data from backend service:", data);
 
   logger.log("Hello page!");
 });
