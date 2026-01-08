@@ -28,10 +28,25 @@ export class DexieDatabase implements Database {
   public async close(): Promise<void> {}
 
   public async hasData(key: Key) {
-    return this.db.tables.some((table) => {
-      return this.selectByKey(table, key)
-        .count()
-        .then((count) => count > 0);
+    return new Promise<boolean>(async (resolve, reject) => {
+      try {
+        await Promise.any(
+          this.db.tables.map((table) =>
+            this.selectByKey(table, key)
+              .count()
+              .catch(reject)
+              .then((count) => {
+                if (!count) return;
+                if (count <= 0) {
+                  throw new Error();
+                }
+                resolve(true);
+              })
+          )
+        );
+      } catch {
+        resolve(false);
+      }
     });
   }
 
@@ -43,9 +58,17 @@ export class DexieDatabase implements Database {
       locationsIds.map((id) => [id.toString(), true])
     );
 
+    const presets = await this.getPresets(key);
+    const presetOrdering = await this.getPresetOrdering(key);
+
+    const notes = await this.getNotes(key);
+
     return {
       locations,
       trackedCategoryIds,
+      presets,
+      presetOrdering,
+      notes,
     };
   }
 
@@ -73,12 +96,14 @@ export class DexieDatabase implements Database {
       this.db.presetsOrdering,
       this.db.notes,
       async () => {
-        await this.meta(key).delete();
-        await this.locations(key).delete();
-        await this.trackedCategories(key).delete();
-        await this.presets(key).delete();
-        await this.presetsOrdering(key).delete();
-        await this.notes(key).delete();
+        await Promise.allSettled([
+          this.meta(key),
+          this.locations(key),
+          this.trackedCategories(key),
+          this.presets(key),
+          this.presetsOrdering(key),
+          this.notes(key),
+        ]);
       }
     );
   }
@@ -175,11 +200,8 @@ export class DexieDatabase implements Database {
     return this.db.trackedCategories.where("id").equals(categoryId).delete();
   }
 
-  public getNotesForMap(key: Key, mapId: number) {
-    return this.db.notes
-      .where("[map_id+user_id]")
-      .equals([mapId, key.userId])
-      .toArray();
+  public getNotes(key: Key) {
+    return this.notes(key).toArray();
   }
 
   public async addNote(key: Key, note: Omit<MG.Note, "id">) {
@@ -223,7 +245,7 @@ export class DexieDatabase implements Database {
   }
 
   public async getPresets(key: Key) {
-    return this.presets(key).toArray();
+    return this.presets(key).toArray() as Promise<MG.Preset[]>;
   }
 
   public async addPreset(
@@ -235,25 +257,18 @@ export class DexieDatabase implements Database {
       this.db.presets,
       this.db.presetsOrdering,
       async () => {
+        const order = ordering.length;
+
         const id = await this.db.presets.add({
           ...preset,
+          order,
           game_id: key.gameId,
           user_id: key.userId,
         });
 
-        await this.db.presetsOrdering.add({
-          id,
-          game_id: key.gameId,
-          user_id: key.userId,
-          order: ordering.length,
-        });
+        await this.setPresetOrder(key, id, order);
 
         await this.reorderPresets(key, [...ordering, id]);
-
-        return {
-          ...preset,
-          id,
-        };
       }
     );
   }
@@ -273,6 +288,24 @@ export class DexieDatabase implements Database {
           key,
           presets.map((p) => p.id!)
         );
+      }
+    );
+  }
+
+  private setPresetOrder(key: Key, presetId: number, order: number) {
+    return this.db.transaction(
+      "rw",
+      this.db.presets,
+      this.db.presetsOrdering,
+      async () => {
+        await this.db.presetsOrdering.put({
+          id: presetId,
+          game_id: key.gameId,
+          user_id: key.userId,
+          order,
+        });
+
+        await this.db.presets.where("id").equals(presetId).modify({ order });
       }
     );
   }

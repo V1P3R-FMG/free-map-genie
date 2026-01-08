@@ -29,10 +29,14 @@ export class LocalDatabase implements Database {
 
     const locationIds = new Set<number>();
     const trackedCategoryIds = new Set<number>();
+    const notes: MG.Note[] = [];
+    const presets: MG.Preset[] = [];
+    const presetOrdering: number[] = [];
 
     for (const mapData of Object.values(data)) {
       mapData.locationIds?.forEach((id) => locationIds.add(id));
       mapData.categoryIds?.forEach((id) => trackedCategoryIds.add(id));
+      mapData.notes?.forEach((note) => notes.push(note));
     }
 
     const locations = Object.fromEntries(
@@ -42,6 +46,9 @@ export class LocalDatabase implements Database {
     return {
       locations,
       trackedCategoryIds: Array.from(trackedCategoryIds),
+      presets,
+      presetOrdering,
+      notes,
     };
   }
 

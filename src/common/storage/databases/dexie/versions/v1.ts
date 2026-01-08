@@ -35,7 +35,7 @@ export type TrackedCategoriesTableV1 = Table<
 >;
 
 export type PresetsTableV1 = Table<
-  Omit<MG.Preset, "id" | "order"> & {
+  Omit<MG.Preset, "id"> & {
     id?: number;
     game_id: number;
     user_id: number;
