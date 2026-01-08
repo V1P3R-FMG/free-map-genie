@@ -11,9 +11,11 @@ import {
 } from "@/common/mapgenie";
 
 import testService from "@/services/test.service";
+import mapgenieService from "@/services/mapgenie.service";
 
 export default defineUnlistedScript(async () => {
   const test = testService.use();
+  const mapgenie = mapgenieService.use();
 
   MapgenieAdBlocker.start();
 
@@ -42,8 +44,17 @@ export default defineUnlistedScript(async () => {
     ]);
   });
 
+  const gamesA = await axios.get("/api/v1/games").then((res) => res.data);
   logger.log("Fetching games via axios...");
-  logger.log("Games:", await axios.get("/api/v1/games"));
+  logger.log("Games:", gamesA);
+
+  const gamesB = await mapgenie.fetchGames();
+  logger.log("Fetching games via MapgenieService...");
+  logger.log("Games:", gamesB);
+
+  const heatmaps = await mapgenie.fetchHeatmaps(1);
+  logger.log("Fetching heatmaps for rdr2 via MapgenieService...");
+  logger.log("Heatmaps:", heatmaps);
 
   logger.log("Hello page!");
 });
