@@ -28,7 +28,11 @@ export class DexieDatabase implements Database {
   public async close(): Promise<void> {}
 
   public async hasData(key: Key) {
-    return this.meta(key).count().then(Boolean);
+    return this.db.tables.some((table) => {
+      return this.selectByKey(table, key)
+        .count()
+        .then((count) => count > 0);
+    });
   }
 
   public async getData(key: Key): Promise<UserData> {
