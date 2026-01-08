@@ -11,7 +11,7 @@ test("Load map page and verify title", async ({
 
   const mapPage = new MapPage(page);
 
-  await mapPage.open("tarkov", "factory");
+  await mapPage.openTarkovFactoryMap();
 
   await mapPage.waitForAxios();
   await mapPage.waitForAxiosInterceptor();
