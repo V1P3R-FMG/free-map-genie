@@ -21,6 +21,7 @@
     "async-wait-until": "^2.0.31",
     "axios": "^1.13.2",
     "axios-cache-interceptor": "^1.11.2",
+    "dexie": "^4.2.1",
     "jquery": "^3.7.1",
     "memoize": "^10.2.0",
     "nanoid": "^5.1.6",

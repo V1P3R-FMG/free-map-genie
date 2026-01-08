@@ -1,4 +1,4 @@
-import Dexie, { type Table, type CollectionForTable } from "@/common/dexie";
+import Dexie, { type Table } from "dexie";
 
 import type { Key } from "../../key";
 import type { Database } from "../database";
@@ -6,6 +6,10 @@ import type { Stores } from "./stores";
 import type { UserData } from "../../format";
 
 import { nanoid } from "nanoid";
+
+type CollectionForTable<T extends Table<any, any, any>> = ReturnType<
+  T["toCollection"]
+>;
 
 // fmg@v3
 export class DexieDatabase implements Database {
