@@ -48,4 +48,8 @@ export class LocalDatabase implements Database {
   public async setData(key: Key, data: UserData): Promise<void> {
     throw new Error("Method not implemented.");
   }
+
+  public async removeData(key: Key): Promise<void> {
+    return this.versionManager.removeData(key);
+  }
 }

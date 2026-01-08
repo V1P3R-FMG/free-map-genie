@@ -1,4 +1,4 @@
-import Dexie, { type Table } from "dexie";
+import Dexie, { type Table, type CollectionForTable } from "dexie";
 
 import type { Key } from "../../key";
 import type { Database } from "../database";
@@ -6,10 +6,6 @@ import type { Stores } from "./stores";
 import type { UserData } from "../../format";
 
 import { nanoid } from "nanoid";
-
-type CollectionForTable<T extends Table<any, any, any>> = ReturnType<
-  T["toCollection"]
->;
 
 // fmg@v3
 export class DexieDatabase implements Database {
@@ -59,6 +55,26 @@ export class DexieDatabase implements Database {
 
         await this.setLocations(key, locationIds);
         await this.setTrackedCategories(key, data.trackedCategoryIds);
+      }
+    );
+  }
+
+  public async removeData(key: Key): Promise<void> {
+    await this.db.transaction(
+      "rw",
+      this.db.meta,
+      this.db.locations,
+      this.db.trackedCategories,
+      this.db.presets,
+      this.db.presetsOrdering,
+      this.db.notes,
+      async () => {
+        await this.meta(key).delete();
+        await this.locations(key).delete();
+        await this.trackedCategories(key).delete();
+        await this.presets(key).delete();
+        await this.presetsOrdering(key).delete();
+        await this.notes(key).delete();
       }
     );
   }

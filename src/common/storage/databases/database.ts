@@ -8,4 +8,5 @@ export interface Database {
   hasData(key: Key): Promise<boolean>;
   setData(key: Key, data: UserData): Promise<void>;
   getData(key: Key): Promise<UserData>;
+  removeData(key: Key): Promise<void>;
 }

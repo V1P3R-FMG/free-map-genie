@@ -35,6 +35,14 @@ export class VersionManager {
     return this.latest.hasData(key);
   }
 
+  public async removeData(key: Key) {
+    return this.latest.removeData(key);
+  }
+
+  public async setData(key: Key, data: any) {
+    return this.latest.setData(key, data);
+  }
+
   public async getData(key: Key) {
     let data;
 
