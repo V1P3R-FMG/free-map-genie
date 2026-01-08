@@ -38,6 +38,13 @@ export const loginAsMockedUser = () => {
 };
 
 export const makeUserPro = () => {
+  // We check for false specifically becuase undefined means its not the right page
+  // isPro is only on guide pages
+  if (window.isPro === false) {
+    window.isPro = true;
+  }
+
+  // window.user is only on map pages
   if (window.user) {
     window.user.hasPro = true;
   } else {

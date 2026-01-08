@@ -9,8 +9,16 @@ import { AxiosInterceptor } from "@/common/axios";
 export class Client {
   private readonly key: Key;
 
-  private readonly backend = backendService.use();
-  private readonly mapgenieApi = mapgenieService.use();
+  private static readonly backend = backendService.use();
+  private static readonly mapgenie = mapgenieService.use();
+
+  private get backend() {
+    return Client.backend;
+  }
+
+  private get mapgenie() {
+    return Client.mapgenie;
+  }
 
   private interceptor?: AxiosInterceptor;
 
@@ -24,6 +32,31 @@ export class Client {
 
   public static forGame(gameId: number) {
     return new Client(Key.fromWindowGame(gameId));
+  }
+
+  public static async forUrl(url: string) {
+    const games = await this.mapgenie.fetchGames();
+
+    const { hostname, pathname } = new URL(url);
+    const [_, slug] = pathname.split("/");
+
+    const filteredGames = games.filter((g) => g.domain === hostname);
+
+    if (filteredGames.length === 0) {
+      throw new Error("No game found for URL");
+    }
+
+    if (filteredGames.length === 1) {
+      const { id } = filteredGames[0];
+      return this.forGame(id);
+    }
+
+    const matchedGame = filteredGames.find((g) => g.slug === slug);
+    if (!matchedGame) {
+      throw new Error("No game found for URL");
+    }
+
+    return this.forGame(matchedGame.id);
   }
 
   public async installInterceptor() {
@@ -72,15 +105,15 @@ export class Client {
   }
 
   public async fetchGames() {
-    return this.mapgenieApi.fetchGames();
+    return this.mapgenie.fetchGames();
   }
 
   public async fetchGame(gameId: number) {
-    return this.mapgenieApi.fetchGame(gameId);
+    return this.mapgenie.fetchGame(gameId);
   }
 
   public async fetchHeatmaps(mapId: number) {
-    return this.mapgenieApi.fetchHeatmaps(mapId);
+    return this.mapgenie.fetchHeatmaps(mapId);
   }
 
   private async getDemoPresets(ordering: number[]) {
@@ -88,7 +121,7 @@ export class Client {
 
     // Fallback to fetching from API if not available in mapData
     if (!presets) {
-      const game = await this.mapgenieApi.fetchGame(this.key.gameId);
+      const game = await this.mapgenie.fetchGame(this.key.gameId);
       presets = game.default_presets;
     }
 

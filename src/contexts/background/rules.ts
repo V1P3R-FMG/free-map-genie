@@ -2,7 +2,7 @@ const addRulesViaDeclarativeNetRequest = async () => {
   logger.debug("Using declarativeNetRequest to handle mapgenie.io requests");
 
   await browser.declarativeNetRequest.updateDynamicRules({
-    removeRuleIds: [1, 2],
+    removeRuleIds: [1, 2, 3],
     addRules: [
       {
         id: 1,
@@ -32,6 +32,17 @@ const addRulesViaDeclarativeNetRequest = async () => {
         condition: {
           requestDomains: ["cdn.mapgenie.io"],
           urlFilter: "/js/map.js?id=*",
+          resourceTypes: ["script"],
+        },
+      },
+      // Block mapgenie.io tarkov 17 quest script
+      // We'll manually load it later after were done with the setup
+      {
+        id: 3,
+        action: { type: "block" },
+        condition: {
+          requestDomains: ["cdn.mapgenie.io"],
+          urlFilter: "/js/TarkovQuestToolWidget.js?id=*",
           resourceTypes: ["script"],
         },
       },

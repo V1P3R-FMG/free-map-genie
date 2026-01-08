@@ -2,6 +2,7 @@ interface Window {
   user?: MG.User;
   game?: MG.Game;
   mapData?: MG.MapData;
+  isPro?: boolean;
 
   config?: MG.Config;
   mapData?: MG.MapData;
