@@ -75,6 +75,14 @@ export class V2 implements Version<LocalV2Data, LocalV1Data> {
     await this.driver.setBulk(maps);
   }
 
+  public async removeData({ gameId, userId }: Key): Promise<void> {
+    const { maps } = await this.mapgenie.fetchGame(gameId);
+
+    const keys = maps.map((map) => this.generateKey(gameId, map.id, userId));
+
+    await this.driver.removeBulk(keys);
+  }
+
   public async upgrade(
     { gameId }: Key,
     legacyData: LocalV1Data

@@ -42,6 +42,11 @@ export class V1 implements Version<LocalV1Data, void> {
     return json ? JSON.parse(json) : {};
   }
 
+  public async removeData({ gameId, userId }: Key): Promise<void> {
+    const key = this.generateKey(gameId, userId);
+    await this.driver.remove(key);
+  }
+
   public async setData(
     { gameId, userId }: Key,
     data: LocalV1Data
