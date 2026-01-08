@@ -2,7 +2,7 @@ const addRulesViaDeclarativeNetRequest = async () => {
   logger.debug("Using declarativeNetRequest to handle mapgenie.io requests");
 
   await browser.declarativeNetRequest.updateDynamicRules({
-    removeRuleIds: [1],
+    removeRuleIds: [1, 2],
     addRules: [
       {
         id: 1,
