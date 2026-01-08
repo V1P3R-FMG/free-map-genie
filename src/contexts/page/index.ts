@@ -6,6 +6,7 @@ import {
   loginAsMockedUser,
   makeUserPro,
   activateBlockedMapgenieScript,
+  removeLocationsLimit,
 } from "@/common/mapgenie";
 
 import testService from "@/services/test.service";
@@ -15,6 +16,7 @@ export default defineUnlistedScript(async () => {
 
   loginAsMockedUser();
   makeUserPro();
+  removeLocationsLimit();
 
   await activateBlockedMapgenieScript("map");
 

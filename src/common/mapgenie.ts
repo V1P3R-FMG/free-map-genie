@@ -36,5 +36,17 @@ export const loginAsMockedUser = () => {
 export const makeUserPro = () => {
   if (window.user) {
     window.user.hasPro = true;
+  } else {
+    logger.warn("Failed to make user pro: user is not defined on window");
+  }
+};
+
+export const removeLocationsLimit = () => {
+  if (window.mapData) {
+    window.mapData.maxMarkedLocations = Infinity;
+  } else {
+    logger.warn(
+      "Failed to remove locations limit: mapData is not defined on window"
+    );
   }
 };
