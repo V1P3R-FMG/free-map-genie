@@ -33,10 +33,3 @@ export function applyMemoize<T extends (...args: any[]) => any>(
   }
   return f;
 }
-
-class B {
-  @Memoize()
-  foo(x: number) {
-    return x * 2;
-  }
-}
