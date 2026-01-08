@@ -1,11 +1,11 @@
-import { createLocationsById } from "@/common/mapgenie/mapData";
-import mapgenieApiService from "@/services/mapgenieApi.service";
+import { mapDataUtils } from "@/common/mapgenie";
+import mapgenieService from "@/services/mapgenie.service";
 
-import type { V1Data, V1GameData, V1MapData } from "../v1";
-import type { V2Data, V2MapData } from "../v2";
+import type { LocalV1Data, LocalV1GameData, LocalV1MapData } from "../v1";
+import type { LocalV2Data, LocalV2MapData } from "../v2";
 
 export class V1MigratorHelper {
-  private readonly mapgenieApi = mapgenieApiService.use();
+  private readonly mapgenieApi = mapgenieService.use();
   private readonly gameId: number;
 
   private _game?: MG.Api.GameFull;
@@ -26,8 +26,8 @@ export class V1MigratorHelper {
 
   private async migrateLocations(
     mapId: number,
-    legacyGameData: V1GameData,
-    data: V2MapData
+    legacyGameData: LocalV1GameData,
+    data: LocalV2MapData
   ) {
     const game = await this.getGame();
 
@@ -47,7 +47,10 @@ export class V1MigratorHelper {
     }
   }
 
-  private migrateCategories(legacyMapData: V1MapData, data: V2MapData) {
+  private migrateCategories(
+    legacyMapData: LocalV1MapData,
+    data: LocalV2MapData
+  ) {
     if (legacyMapData.visible_categories) {
       data.visibleCategoriesIds = this.migrateBooleanMapToArray(
         legacyMapData.visible_categories
@@ -55,7 +58,7 @@ export class V1MigratorHelper {
     }
   }
 
-  private migratePresets(legacyMapData: V1MapData, data: V2MapData) {
+  private migratePresets(legacyMapData: LocalV1MapData, data: LocalV2MapData) {
     if (legacyMapData.presets) {
       data.presets = Object.values(legacyMapData.presets);
     }
@@ -68,18 +71,18 @@ export class V1MigratorHelper {
     const map = game.maps.find((m) => m.id === mapId);
     if (!map) throw new Error("Map not found: " + mapId);
 
-    return createLocationsById(map);
+    return mapDataUtils.createLocationsById(map);
   }
 
   private async migrateMapData(
     mapId: number,
-    legacyData: V1Data,
-    data: V2Data
+    legacyData: LocalV1Data,
+    data: LocalV2Data
   ) {
     const v1MapData = legacyData.mapData?.[mapId] ?? {};
     const v1GameData = legacyData.sharedData ?? {};
 
-    const v2MapData: V2MapData = {};
+    const v2MapData: LocalV2MapData = {};
 
     await this.migrateLocations(mapId, v1GameData, v2MapData);
 
@@ -93,8 +96,8 @@ export class V1MigratorHelper {
     }
   }
 
-  public async migrate(legacyData: V1Data): Promise<V2Data> {
-    const data: V2Data = {};
+  public async migrate(legacyData: LocalV1Data): Promise<LocalV2Data> {
+    const data: LocalV2Data = {};
 
     for (const mapIdStr in legacyData.mapData) {
       const mapId = Number(mapIdStr);
