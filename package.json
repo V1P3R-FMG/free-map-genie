@@ -38,6 +38,7 @@
     "chalk": "^5.6.2",
     "express": "^5.2.1",
     "fantasticon": "^1.2.3",
+    "playwright-webextext": "^0.0.4",
     "typescript": "^5.9.3",
     "wxt": "^0.20.6"
   }
