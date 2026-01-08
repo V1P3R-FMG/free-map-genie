@@ -26,7 +26,9 @@ export class OffscreenService {
   }
 
   public async addIframe(url: string) {
-    const normalizedUrl = normalizeUrl(url);
+    const normalizedUrl = URL.canParse(url)
+      ? normalizeUrl(url)
+      : normalizeUrl(`https://${url}`);
 
     if (this._iframes.has(normalizedUrl)) return;
 
@@ -35,7 +37,10 @@ export class OffscreenService {
   }
 
   public removeIframe(url: string) {
-    const normalizedUrl = normalizeUrl(url);
+    const normalizedUrl = URL.canParse(url)
+      ? normalizeUrl(url)
+      : normalizeUrl(`https://${url}`);
+
     const iframe = this._iframes.get(normalizedUrl);
 
     if (!iframe) return;
