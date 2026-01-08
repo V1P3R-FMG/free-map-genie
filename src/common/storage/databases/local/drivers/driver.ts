@@ -7,4 +7,5 @@ export interface Driver {
   removeBulk(keys: string[]): Promise<void>;
   has(key: string): Promise<boolean>;
   hasBulk(keys: string[]): Promise<Record<string, boolean>>;
+  hasAny(keys: string[]): Promise<boolean>;
 }

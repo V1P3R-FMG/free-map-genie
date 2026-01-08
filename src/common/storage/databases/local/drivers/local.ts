@@ -49,4 +49,9 @@ export class LocalStorageDriver implements Driver {
     const storage = await this.getStorage();
     return storage.hasBulk(keys);
   }
+
+  public async hasAny(keys: string[]): Promise<boolean> {
+    const storage = await this.getStorage();
+    return storage.hasAny(keys);
+  }
 }

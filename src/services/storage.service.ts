@@ -49,6 +49,15 @@ export class StorageService {
     return result;
   }
 
+  public hasAny(keys: string[]) {
+    for (const key of keys) {
+      if (localStorage.getItem(key) !== null) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   public keys() {
     return Object.keys(localStorage);
   }
