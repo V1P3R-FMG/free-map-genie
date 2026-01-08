@@ -15,9 +15,29 @@ export class LocalStorageDriver implements Driver {
     return storage.get(key);
   }
 
+  public async getBulk(keys: string[]): Promise<Record<string, string | null>> {
+    const storage = await this.getStorage();
+    return storage.getBulk(keys);
+  }
+
   public async set(key: string, value: string): Promise<void> {
     const storage = await this.getStorage();
     return storage.set(key, value);
+  }
+
+  public async setBulk(map: Record<string, string>): Promise<void> {
+    const storage = await this.getStorage();
+    return storage.setBulk(map);
+  }
+
+  public async remove(key: string): Promise<void> {
+    const storage = await this.getStorage();
+    return storage.remove(key);
+  }
+
+  public async removeBulk(keys: string[]): Promise<void> {
+    const storage = await this.getStorage();
+    return storage.removeBulk(keys);
   }
 
   public async has(key: string): Promise<boolean> {
@@ -25,8 +45,8 @@ export class LocalStorageDriver implements Driver {
     return storage.has(key);
   }
 
-  public async remove(key: string): Promise<void> {
+  public async hasBulk(keys: string[]): Promise<Record<string, boolean>> {
     const storage = await this.getStorage();
-    return storage.remove(key);
+    return storage.hasBulk(keys);
   }
 }

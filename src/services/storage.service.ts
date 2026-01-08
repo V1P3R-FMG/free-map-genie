@@ -1,4 +1,3 @@
-import { normalizeUrl } from "@/common/url";
 import { createService } from "@/common/messaging";
 
 import offscreenService from "./offscreen.service";
@@ -10,16 +9,44 @@ export class StorageService {
     return localStorage.getItem(key);
   }
 
+  public getBulk(keys: string[]) {
+    const result: Record<string, string | null> = {};
+    for (const key of keys) {
+      result[key] = localStorage.getItem(key);
+    }
+    return result;
+  }
+
   public set(key: string, value: string) {
     return localStorage.setItem(key, value);
+  }
+
+  public setBulk(map: Record<string, string>) {
+    for (const [key, value] of Object.entries(map)) {
+      localStorage.setItem(key, value);
+    }
   }
 
   public remove(key: string) {
     return localStorage.removeItem(key);
   }
 
+  public removeBulk(keys: string[]) {
+    for (const key of keys) {
+      localStorage.removeItem(key);
+    }
+  }
+
   public has(key: string) {
     return localStorage.getItem(key) !== null;
+  }
+
+  public hasBulk(keys: string[]) {
+    const result: Record<string, boolean> = {};
+    for (const key of keys) {
+      result[key] = localStorage.getItem(key) !== null;
+    }
+    return result;
   }
 
   public keys() {
