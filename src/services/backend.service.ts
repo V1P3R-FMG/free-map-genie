@@ -23,6 +23,30 @@ class BackendService {
     }
   }
 
+  public async storageRequestPersist() {
+    const permission = await navigator.permissions.query({
+      name: "persistent-storage",
+    });
+
+    if (permission.state === "granted") {
+      return navigator.storage.persist();
+    } else {
+      console.warn(
+        "Persistent storage permission not granted:",
+        permission.state
+      );
+      return false;
+    }
+  }
+
+  public storageEstimate() {
+    return navigator.storage.estimate();
+  }
+
+  public isStoragePersisted() {
+    return navigator.storage.persisted();
+  }
+
   private getDomainDatabase(domain: string) {
     let database = this.domains.get(domain);
     if (!database) {
