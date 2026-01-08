@@ -269,6 +269,12 @@ export class DexieDatabase implements Database {
         await this.setPresetOrder(key, id, order);
 
         await this.reorderPresets(key, [...ordering, id]);
+
+        return {
+          ...preset,
+          id,
+          order,
+        };
       }
     );
   }
@@ -317,13 +323,29 @@ export class DexieDatabase implements Database {
   }
 
   public reorderPresets(key: Key, order: number[]) {
-    return this.db.presetsOrdering.bulkPut(
-      order.map((id, index) => ({
-        id,
-        game_id: key.gameId,
-        user_id: key.userId,
-        order: index,
-      }))
+    return this.db.transaction(
+      "rw",
+      this.db.presets,
+      this.db.presetsOrdering,
+      async () => {
+        await this.db.presetsOrdering.bulkPut(
+          order.map((id, index) => ({
+            id,
+            game_id: key.gameId,
+            user_id: key.userId,
+            order: index,
+          }))
+        );
+
+        await this.db.presets.bulkUpdate(
+          order.map((id, index) => ({
+            key: id,
+            changes: {
+              order: index,
+            },
+          }))
+        );
+      }
     );
   }
 }
