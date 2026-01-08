@@ -1,4 +1,4 @@
-import mapgenieApiService from "@/services/mapgenieApi.service";
+import mapgenieService from "@/services/mapgenie.service";
 
 import { Version } from "./version";
 import { Driver } from "../drivers/driver";
@@ -21,7 +21,7 @@ export interface LocalV2Data {
 }
 
 export class V2 implements Version<LocalV2Data, LocalV1Data> {
-  private readonly mapgenieApi = mapgenieApiService.use();
+  private readonly mapgenie = mapgenieService.use();
 
   public constructor(private readonly driver: Driver) {}
 
@@ -30,28 +30,30 @@ export class V2 implements Version<LocalV2Data, LocalV1Data> {
   }
 
   public async hasData({ gameId, userId }: Key): Promise<boolean> {
-    const game = await this.mapgenieApi.fetchGame(gameId);
-    for (const map of game.maps) {
-      const key = this.generateKey(gameId, map.id, userId);
-      if (await this.driver.has(key)) {
-        return true;
-      }
-    }
-    return false;
+    const { maps } = await this.mapgenie.fetchGame(gameId);
+
+    return this.driver.hasAny(
+      maps.map((map) => this.generateKey(gameId, map.id, userId))
+    );
   }
 
   public async getData({ gameId, userId }: Key): Promise<LocalV2Data> {
-    const game = await this.mapgenieApi.fetchGame(gameId);
+    const { maps } = await this.mapgenie.fetchGame(gameId);
 
     const data: LocalV2Data = {};
 
-    for (const map of game.maps) {
-      const key = this.generateKey(gameId, map.id, userId);
+    const keysMap = Object.fromEntries(
+      maps.map((map) => [this.generateKey(gameId, map.id, userId), map.id])
+    );
 
-      const json = await this.driver.get(key);
+    const storage = await this.driver.getBulk(Object.keys(keysMap));
+
+    for (const key in storage) {
+      const json = storage[key];
 
       if (json) {
-        data[map.id] = JSON.parse(json);
+        const mapId = keysMap[key];
+        data[mapId] = JSON.parse(json);
       }
     }
 
@@ -59,14 +61,18 @@ export class V2 implements Version<LocalV2Data, LocalV1Data> {
   }
 
   public async setData({ gameId, userId }: Key, data: LocalV2Data) {
+    const maps: Record<string, string> = {};
+
     for (const mapIdStr in data) {
       const mapId = Number(mapIdStr);
       const v2MapData = data[mapIdStr];
 
       const key = this.generateKey(gameId, mapId, userId);
 
-      await this.driver.set(key, JSON.stringify(v2MapData));
+      maps[key] = JSON.stringify(v2MapData);
     }
+
+    await this.driver.setBulk(maps);
   }
 
   public async upgrade(
