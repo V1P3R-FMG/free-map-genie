@@ -7,12 +7,15 @@ import {
   makeUserPro,
   activateBlockedMapgenieScript,
   removeLocationsLimit,
+  MapgenieAdBlocker,
 } from "@/common/mapgenie";
 
 import testService from "@/services/test.service";
 
 export default defineUnlistedScript(async () => {
   const test = testService.use();
+
+  MapgenieAdBlocker.start();
 
   loginAsMockedUser();
   makeUserPro();

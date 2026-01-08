@@ -1,5 +1,7 @@
 import { waitForBody } from "@/common/dom";
 
+export { default as MapgenieAdBlocker } from "./ads";
+
 /**
  * This function reloads a blocked mapgenie script.
  * The background script blocks certain mapgenie scripts from loading.
