@@ -14,4 +14,8 @@ export class Key {
     }
     throw new Error("No user in window");
   }
+
+  public toString() {
+    return `game_${this.gameId}::user_${this.userId}`;
+  }
 }

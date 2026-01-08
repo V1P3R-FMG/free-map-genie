@@ -49,17 +49,32 @@ export class VersionManager {
     for (const { from, to } of this.migrationPath) {
       // Check if data already exists in the 'to' version
       // If it does, skip migration
-      if (await to.hasData(key)) continue;
+      if (await to.hasData(key)) {
+        await from.removeData(key);
+        continue;
+      }
 
       data ??= await from.getData(key);
-      data = await to.upgrade(key, data);
+
+      try {
+        data = await to.upgrade(key, data);
+      } catch (err) {
+        // Upgrade failed, saved last known good data
+        await from.setData(key, data);
+
+        throw new Error(`Failed to upgrade data for key: ${key.toString()}`, {
+          cause: err,
+        });
+      }
+
+      await from.removeData(key);
     }
 
     if (data) {
       await this.latest.setData(key, data);
       return data;
-    } else {
-      return this.latest.getData(key);
     }
+
+    return this.latest.getData(key);
   }
 }
