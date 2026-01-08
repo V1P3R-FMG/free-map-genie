@@ -1,5 +1,5 @@
 const addRulesViaDeclarativeNetRequest = async () => {
-  logger.debug("Using declarativeNetRequest to modify headers for mapgenie.io");
+  logger.debug("Using declarativeNetRequest to handle mapgenie.io requests");
 
   await browser.declarativeNetRequest.updateDynamicRules({
     removeRuleIds: [1],
@@ -24,12 +24,23 @@ const addRulesViaDeclarativeNetRequest = async () => {
           resourceTypes: ["sub_frame"],
         },
       },
+      // Block mapgenie.io map script
+      // We'll manually load it later after were done with the setup
+      {
+        id: 2,
+        action: { type: "block" },
+        condition: {
+          requestDomains: ["cdn.mapgenie.io"],
+          urlFilter: "/js/map.js?id=*",
+          resourceTypes: ["script"],
+        },
+      },
     ],
   });
 };
 
 const addRulesViaWebRequest = () => {
-  logger.debug("Using webRequest to modify headers for mapgenie.io");
+  logger.debug("Using webRequest to handle mapgenie.io requests");
 
   const headersToRemove = ["X-Frame-Options", "Frame-Options"];
 
@@ -44,6 +55,14 @@ const addRulesViaWebRequest = () => {
       urls: ["*://mapgenie.io/"],
     },
     ["blocking", "responseHeaders"]
+  );
+
+  browser.webRequest.onBeforeRequest.addListener(
+    () => ({ cancel: true }),
+    {
+      urls: ["*://cdn.mapgenie.io/js/map.js?id=*"],
+    },
+    ["blocking"]
   );
 };
 

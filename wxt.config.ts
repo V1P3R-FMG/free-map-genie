@@ -39,7 +39,7 @@ export default defineConfig({
   },
   manifest: ({ browser, manifestVersion }) => {
     const manifest: UserManifest = {
-      host_permissions: ["*://mapgenie.io/*"],
+      host_permissions: ["*://mapgenie.io/*", "*://cdn.mapgenie.io/*"],
       web_accessible_resources: [
         {
           matches: ["<all_urls>"],
