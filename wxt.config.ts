@@ -60,6 +60,14 @@ export default defineConfig({
       manifest.permissions!.push("offscreen");
     }
 
+    if (browser === "firefox") {
+      manifest.browser_specific_settings = {
+        gecko: {
+          id: "fmg@viper.net",
+        },
+      };
+    }
+
     return manifest;
   },
 });
