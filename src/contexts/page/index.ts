@@ -1,7 +1,6 @@
 import "@/common/messaging/contexts/window";
 
-import { waitForAxios } from "@/common/axios";
-import { AxiosInterceptor } from "@/common/axios";
+import { Client } from "@/common/client";
 import {
   loginAsMockedUser,
   makeUserPro,
@@ -10,59 +9,32 @@ import {
   MapgenieAdBlocker,
 } from "@/common/mapgenie";
 
-import testService from "@/services/test.service";
-import mapgenieService from "@/services/mapgenie.service";
-import backendService from "@/services/backend.service";
-
 export default defineUnlistedScript(async () => {
-  const test = testService.use();
-  const mapgenie = mapgenieService.use();
-  const backend = backendService.use();
-
   MapgenieAdBlocker.start();
 
-  loginAsMockedUser();
-  makeUserPro();
-  removeLocationsLimit();
+  if (window.mapData) {
+    loginAsMockedUser();
+    makeUserPro();
+    removeLocationsLimit();
 
-  await activateBlockedMapgenieScript("map");
+    const client = Client.forMap();
+    // await client.storageRequestPersist();
+    await client.migrate();
 
-  logger.log("counter:", await test.counter());
-  logger.log("counter:", await test.counter());
+    if (window.user && window.mapData) {
+      logger.debug("Loading migrated data into page context");
+      const data = await client.getData();
 
-  logger.log("memoizedCounter:", await test.memoizedCounter());
-  logger.log("memoizedCounter:", await test.memoizedCounter());
+      window.user.locations = data.locations;
+      window.user.trackedCategoryIds = data.trackedCategoryIds;
 
-  const axios = await waitForAxios();
-  const interceptor = new AxiosInterceptor(axios);
+      window.mapData.notes = data.notes;
+      window.mapData.presets = data.presets;
+    }
 
-  interceptor.get("/api/v1/games", (ctx) => {
-    logger.debug("Intercepted GET /api/v1/games");
-    ctx.block([
-      {
-        id: 1,
-        name: "Mocked Game",
-      },
-    ]);
-  });
+    await activateBlockedMapgenieScript("map");
+    await client.installInterceptor();
+  }
 
-  const gamesA = await axios.get("/api/v1/games").then((res) => res.data);
-  logger.log("Fetching games via axios...");
-  logger.log("Games:", gamesA);
-
-  const gamesB = await mapgenie.fetchGames();
-  logger.log("Fetching games via MapgenieService...");
-  logger.log("Games:", gamesB);
-
-  const heatmaps = await mapgenie.fetchHeatmaps(1);
-  logger.log("Fetching heatmaps for rdr2 via MapgenieService...");
-  logger.log("Heatmaps:", heatmaps);
-
-  const data = await backend.getData({
-    gameId: 1,
-    userId: -1,
-  });
-  logger.log("Data from backend service:", data);
-
-  logger.log("Hello page!");
+  logger.log("Page script initialized.");
 });
