@@ -5,8 +5,6 @@ import http from "node:http";
 
 import { setupCache } from "axios-cache-interceptor";
 
-import h from "./h";
-
 import type { Wxt } from "wxt";
 
 const PREFIX = chalk.yellow("[MapGenie Dev Server]");
@@ -22,7 +20,6 @@ declare global {
 const mapgenieApi = setupCache(
   axios.create({
     baseURL: "https://www.mapgenie.io",
-    headers: h,
   }),
   {
     interpretHeader: false,
@@ -37,19 +34,33 @@ export default function setupServer(
 ) {
   const app = express();
 
-  app.use((_req, res, next) => {
-    res.sendJson = (json) => {
-      res.setHeader("Content-Type", "application/json");
-      res.status(200);
-      res.send(json);
-    };
-    next();
-  });
-
   app.use("/api/v1", async (req, res) => {
     wxt.logger.log(PREFIX, chalk.blue(req.method), req.originalUrl);
-    const { data } = await mapgenieApi.get(req.originalUrl);
-    res.sendJson(data);
+
+    const headers = { ...req.headers };
+    delete headers.host;
+
+    try {
+      const { data } = await mapgenieApi.get(req.originalUrl, {
+        headers: headers,
+      });
+
+      res.setHeader("Content-Type", "application/json");
+      res.status(200);
+      res.send(data);
+    } catch (error) {
+      let status = 500;
+      let data = "";
+
+      wxt.logger.error(PREFIX, chalk.redBright(String(error)));
+
+      if (error instanceof axios.AxiosError) {
+        status = error.response?.status || 500;
+        data = error.response?.data || "";
+      }
+
+      res.status(500).send(new String(error));
+    }
   });
 
   const server = http.createServer(app);
