@@ -29,6 +29,7 @@ const testService = createService({
     return new TestService();
   },
   namespace: "TestService",
+  heartbeatTimeout: 60000,
 });
 
 export namespace testService {

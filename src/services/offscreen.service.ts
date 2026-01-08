@@ -49,7 +49,7 @@ const offscreenService = createService({
   context() {
     return new OffscreenService();
   },
-  heartbeatTimeout: 10_000,
+  heartbeatTimeout: 60000,
   namespace: "OffscreenService",
 });
 

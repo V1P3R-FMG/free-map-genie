@@ -48,7 +48,7 @@ const mapgenieService = createService({
   context() {
     return new MapgenieService();
   },
-  heartbeatTimeout: 10000,
+  heartbeatTimeout: 60000,
   namespace: "MapgenieService",
 });
 
