@@ -29,7 +29,12 @@ export default class PortAdapter extends Adapter {
     );
 
     // Reconnect on disconnect
-    this.port.onDisconnect.addListener(() => this.connect());
+    this.port.onDisconnect.addListener(() => {
+      // Supress possible errors from lastError
+      const _ = browser.runtime.lastError;
+
+      this.connect();
+    });
   }
 
   private handleMessage(message: any) {
