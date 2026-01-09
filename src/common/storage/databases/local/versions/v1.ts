@@ -1,6 +1,8 @@
 import { Version } from "./version";
-import { Driver } from "../drivers/driver";
-import { Key } from "../../../key";
+import { V1MigratorHelper } from "./helpers/v1MigratorHelper";
+
+import type { Driver } from "../drivers/driver";
+import type { Key } from "../../../key";
 
 export interface LocalV1GameData {
   locations?: Record<string, boolean>;
@@ -23,7 +25,7 @@ export interface LocalV1Data {
   settings?: Record<string, LocalV1MapSettings>;
 }
 
-export class V1 implements Version<LocalV1Data, void> {
+export class V1 implements Version<LocalV1Data> {
   public constructor(private readonly driver: Driver) {}
 
   private generateKey(gameId: number, userId: number): string {
@@ -56,7 +58,8 @@ export class V1 implements Version<LocalV1Data, void> {
     await this.driver.set(key, JSON.stringify(data));
   }
 
-  public upgrade({}: Key, _data: void): LocalV1Data {
-    throw new Error("No previous version to upgrade from");
+  public upgrade({}: Key, data: LocalV1Data) {
+    const migrator = new V1MigratorHelper();
+    return migrator.migrate(data);
   }
 }

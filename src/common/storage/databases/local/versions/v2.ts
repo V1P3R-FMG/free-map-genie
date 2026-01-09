@@ -1,11 +1,8 @@
-import mapgenieService from "@/services/mapgenie.service";
-
 import { Version } from "./version";
-import { Driver } from "../drivers/driver";
-import { Key } from "../../../key";
-import { V1MigratorHelper } from "./helpers/v1MigratorHelper";
+import { V2MigratorHelper } from "./helpers/v2MigratorHelper";
 
-import type { LocalV1Data } from "./v1";
+import type { Driver } from "../drivers/driver";
+import type { Key } from "../../../key";
 
 export interface LocalV2MapData {
   locationIds?: number[];
@@ -20,40 +17,50 @@ export interface LocalV2Data {
   [mapId: string]: LocalV2MapData;
 }
 
-export class V2 implements Version<LocalV2Data, LocalV1Data> {
-  private readonly mapgenie = mapgenieService.use();
-
+export class V2 implements Version<LocalV2Data> {
   public constructor(private readonly driver: Driver) {}
 
   private generateKey(gameId: number, mapId: number, userId: number): string {
     return `fmg:game_${gameId}:map_${mapId}:user_${userId}`;
   }
 
-  public async hasData({ gameId, userId }: Key): Promise<boolean> {
-    const keys = await this.driver.keys();
-
-    return keys.some(
-      (key) =>
-        key.startsWith(`fmg:game_${gameId}`) && key.endsWith(`:user_${userId}`)
+  private isKeyForKey(key: string, { gameId, userId }: Key): boolean {
+    return (
+      key.startsWith(`fmg:game_${gameId}`) && key.endsWith(`:user_${userId}`)
     );
   }
 
-  public async getData({ gameId, userId }: Key): Promise<LocalV2Data> {
-    const { maps } = await this.mapgenie.fetchGame(gameId);
+  private filterKeysByKey(key: Key, keys: string[]): string[] {
+    return keys.filter((k) => this.isKeyForKey(k, key));
+  }
+
+  private extractMapIdFromKey(key: string): number {
+    const match = key.match(/:map_(\d+):user_/);
+    if (!match) {
+      throw new Error(`Invalid key format: ${key}`);
+    }
+    return Number(match[1]);
+  }
+
+  public async hasData(key: Key): Promise<boolean> {
+    const keys = await this.driver.keys();
+
+    return keys.some((k) => this.isKeyForKey(k, key));
+  }
+
+  public async getData(key: Key): Promise<LocalV2Data> {
+    const keys = await this.driver.keys();
+    const filteredKeys = this.filterKeysByKey(key, keys);
 
     const data: LocalV2Data = {};
 
-    const keysMap = Object.fromEntries(
-      maps.map((map) => [this.generateKey(gameId, map.id, userId), map.id])
-    );
+    const storage = await this.driver.getBulk(filteredKeys);
 
-    const storage = await this.driver.getBulk(Object.keys(keysMap));
-
-    for (const key in storage) {
+    for (const key of filteredKeys) {
       const json = storage[key];
 
       if (json) {
-        const mapId = keysMap[key];
+        const mapId = this.extractMapIdFromKey(key);
         data[mapId] = JSON.parse(json);
       }
     }
@@ -77,18 +84,13 @@ export class V2 implements Version<LocalV2Data, LocalV1Data> {
   }
 
   public async removeData({ gameId, userId }: Key): Promise<void> {
-    const { maps } = await this.mapgenie.fetchGame(gameId);
-
-    const keys = maps.map((map) => this.generateKey(gameId, map.id, userId));
-
-    await this.driver.removeBulk(keys);
+    const keys = await this.driver.keys();
+    const filteredKeys = this.filterKeysByKey({ gameId, userId }, keys);
+    await this.driver.removeBulk(filteredKeys);
   }
 
-  public async upgrade(
-    { gameId }: Key,
-    legacyData: LocalV1Data
-  ): Promise<LocalV2Data> {
-    const migrator = new V1MigratorHelper(gameId);
+  public async upgrade({}: Key, legacyData: LocalV2Data) {
+    const migrator = new V2MigratorHelper();
     return migrator.migrate(legacyData);
   }
 }

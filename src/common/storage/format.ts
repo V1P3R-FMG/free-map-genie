@@ -5,3 +5,13 @@ export interface UserData {
   presetOrdering: number[];
   notes: MG.Note[];
 }
+
+export function createEmptyUserData(): UserData {
+  return {
+    locations: {},
+    trackedCategoryIds: [],
+    presets: [],
+    presetOrdering: [],
+    notes: [],
+  };
+}

@@ -1,5 +1,7 @@
 import { LocalStorageDriver } from "./drivers/local";
-import { VersionManager } from "./versions";
+import { V1 } from "./versions/v1";
+import { V2 } from "./versions/v2";
+import { createEmptyUserData } from "../../format";
 
 import type { Database } from "../database";
 import type { Driver } from "./drivers/driver";
@@ -10,53 +12,40 @@ import type { UserData } from "../../format";
 // fmg@v1 - fmg@v2
 export class LocalDatabase implements Database {
   private readonly driver: Driver;
-  private readonly versionManager: VersionManager;
+  private readonly v1: V1;
+  private readonly v2: V2;
 
   public constructor(domain: string) {
     this.driver = new LocalStorageDriver(domain);
-    this.versionManager = new VersionManager(this.driver);
+    this.v1 = new V1(this.driver);
+    this.v2 = new V2(this.driver);
   }
 
   public async open(): Promise<void> {}
   public async close(): Promise<void> {}
 
   public async hasData(key: Key): Promise<boolean> {
-    return this.versionManager.hasData(key);
+    if (await this.v2.hasData(key)) return true;
+    return this.v1.hasData(key);
   }
 
   public async getData(key: Key) {
-    const data = await this.versionManager.getData(key);
-
-    const locationIds = new Set<number>();
-    const trackedCategoryIds = new Set<number>();
-    const notes: MG.Note[] = [];
-    const presets: MG.Preset[] = [];
-    const presetOrdering: number[] = [];
-
-    for (const mapData of Object.values(data)) {
-      mapData.locationIds?.forEach((id) => locationIds.add(id));
-      mapData.categoryIds?.forEach((id) => trackedCategoryIds.add(id));
-      mapData.notes?.forEach((note) => notes.push(note));
+    if (await this.v2.hasData(key)) {
+      const data = await this.v2.getData(key);
+      return this.v2.upgrade(key, data);
     }
-
-    const locations = Object.fromEntries(
-      Array.from(locationIds).map((id) => [id.toString(), true])
-    );
-
-    return {
-      locations,
-      trackedCategoryIds: Array.from(trackedCategoryIds),
-      presets,
-      presetOrdering,
-      notes,
-    };
+    if (await this.v1.hasData(key)) {
+      const data = await this.v1.getData(key);
+      return this.v1.upgrade(key, data);
+    }
+    return createEmptyUserData();
   }
 
   public async setData(key: Key, data: UserData): Promise<void> {
-    throw new Error("Method not implemented.");
+    throw new Error("LocalDatabase.setData is not supported");
   }
 
   public async removeData(key: Key): Promise<void> {
-    return this.versionManager.removeData(key);
+    await Promise.all([this.v1.removeData(key), this.v2.removeData(key)]);
   }
 }
