@@ -25,6 +25,7 @@ FMG (Free Map Genie) is a browser extension that enhances the [Mapgenie.io](http
 | **tarkov quest tool** | ✔️       |
 | **pro maps**          | 🚧       |
 | **heatmaps**          | 🚧       |
+| **guides**            | 🚧       |
 
 ## 🚀 What's New in V3 for developers
 
