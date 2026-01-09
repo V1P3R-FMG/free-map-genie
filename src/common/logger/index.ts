@@ -157,7 +157,7 @@ export class Logger {
     return this.createLogCallback("error", "error");
   }
   get debug() {
-    return this.createLogCallback("debug", "log");
+    return this.createLogCallback("debug", "debug");
   }
   get groupCollapsed() {
     return this.createLogCallback("debug", "groupCollapsed");
