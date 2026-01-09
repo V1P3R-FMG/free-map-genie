@@ -35,15 +35,21 @@ export default function setupServer(
   const app = express();
 
   app.use("/api/v1", async (req, res) => {
-    wxt.logger.log(PREFIX, chalk.blue(req.method), req.originalUrl);
-
     const headers = { ...req.headers };
     delete headers.host;
 
     try {
-      const { data } = await mapgenieApi.get(req.originalUrl, {
+      const { data, cached } = await mapgenieApi.get(req.originalUrl, {
         headers: headers,
       });
+
+      const cachedText = cached ? chalk.green("Yes") : chalk.red("No");
+      wxt.logger.log(
+        PREFIX,
+        chalk.blue(req.method),
+        req.originalUrl,
+        `Cached: ${cachedText}`
+      );
 
       res.setHeader("Content-Type", "application/json");
       res.status(200);
@@ -52,14 +58,19 @@ export default function setupServer(
       let status = 500;
       let data = "";
 
-      wxt.logger.error(PREFIX, chalk.redBright(String(error)));
-
       if (error instanceof axios.AxiosError) {
         status = error.response?.status || 500;
         data = error.response?.data || "";
       }
 
-      res.status(500).send(new String(error));
+      wxt.logger.error(
+        PREFIX,
+        chalk.blue(req.method),
+        req.originalUrl,
+        chalk.redBright(data ?? String(error))
+      );
+
+      res.status(500).send(data ?? new String(error));
     }
   });
 
