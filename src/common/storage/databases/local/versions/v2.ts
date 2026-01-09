@@ -30,10 +30,11 @@ export class V2 implements Version<LocalV2Data, LocalV1Data> {
   }
 
   public async hasData({ gameId, userId }: Key): Promise<boolean> {
-    const { maps } = await this.mapgenie.fetchGame(gameId);
+    const keys = await this.driver.keys();
 
-    return this.driver.hasAny(
-      maps.map((map) => this.generateKey(gameId, map.id, userId))
+    return keys.some(
+      (key) =>
+        key.startsWith(`fmg:game_${gameId}`) && key.endsWith(`:user_${userId}`)
     );
   }
 

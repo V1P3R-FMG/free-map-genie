@@ -1,4 +1,4 @@
-import storageService from "@/services/storage.service";
+import storageService from "../../../../../services/storage.service";
 import type { Driver } from "./driver";
 
 export class LocalStorageDriver implements Driver {
@@ -53,5 +53,10 @@ export class LocalStorageDriver implements Driver {
   public async hasAny(keys: string[]): Promise<boolean> {
     const storage = await this.getStorage();
     return storage.hasAny(keys);
+  }
+
+  public async keys(): Promise<string[]> {
+    const storage = await this.getStorage();
+    return storage.keys();
   }
 }

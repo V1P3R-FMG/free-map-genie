@@ -8,4 +8,5 @@ export interface Driver {
   has(key: string): Promise<boolean>;
   hasBulk(keys: string[]): Promise<Record<string, boolean>>;
   hasAny(keys: string[]): Promise<boolean>;
+  keys(): Promise<string[]>;
 }
