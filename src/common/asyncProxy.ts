@@ -15,7 +15,7 @@ export function createAsyncProxy<T extends object>(
 
   return new Proxy({} as Record<string, () => Promise<any>>, {
     get: (self, prop: any) => {
-      self[prop] ??= async (...args: any[]) => {
+      return (self[prop] ??= async (...args: any[]) => {
         const target = await targetPromise;
         const member = Reflect.get(target, prop);
 
@@ -23,7 +23,7 @@ export function createAsyncProxy<T extends object>(
           return member.apply(target, args);
         }
         return member;
-      };
+      });
     },
   }) as AsyncProxy<T>;
 }
