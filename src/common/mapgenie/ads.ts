@@ -1,50 +1,76 @@
 import waitUntil from "async-wait-until";
 
+type AdBlockerElement = JQuery | HTMLElement | string | null;
+
 export default class MapgenieAdBlocker {
-  public static readonly REMOVE_CHECK_INTERVAL = 500;
-  public static readonly TIMEOUT: number = 10000;
+  private static readonly REMOVE_CHECK_INTERVAL = 500;
+  private static readonly TIMEOUT: number = 10000;
 
   public static lastAdRemovedAt: number = Date.now();
   public static handle: number | null = null;
   public static autoStop: boolean = true;
 
-  private static removeElements(elements: JQuery | JQuery[]): boolean {
-    elements = Array.isArray(elements) ? elements : [elements];
-    return elements.reduce((acc, el) => acc + el.remove().length, 0) > 0;
+  private static removeElement(element: AdBlockerElement): boolean {
+    if (!element) return false;
+
+    if (element instanceof HTMLElement) {
+      element.remove();
+      return true;
+    }
+
+    if (typeof element === "string") {
+      return $(element).remove().length > 0;
+    }
+
+    return element.remove().length > 0;
+  }
+
+  private static removeElements(elements: AdBlockerElement[]): boolean;
+  private static removeElements(...elements: AdBlockerElement[]): boolean;
+  private static removeElements(
+    ...elements: AdBlockerElement[] | AdBlockerElement[][]
+  ): boolean {
+    return elements.reduce((acc, el) => {
+      if (Array.isArray(el)) {
+        return acc || this.removeElements.apply(this, el);
+      }
+      return acc || this.removeElement(el);
+    }, false);
   }
 
   private static removeIframeAds() {
-    return this.removeElements($('iframe[name^="ifrm_"]'));
+    return this.removeElements('iframe[name^="ifrm_"]');
   }
 
   private static removeGoogleAds() {
-    return this.removeElements([
-      $('iframe[name*="goog"]'),
-      $('div[id^="google_ads_iframe_"]'),
-      $('iframe[src*="safeframe.googlesyndication"]'),
-    ]);
+    return this.removeElements(
+      'iframe[name*="goog"]',
+      'div[class^="adsbygoogle"]',
+      'div[id^="google_ads_iframe_"]',
+      'iframe[src*="safeframe.googlesyndication"]'
+    );
   }
 
   private static removeNitroAds() {
-    return this.removeElements($("#nitro-floating-wrapper"));
+    return this.removeElements("#nitro-floating-wrapper");
   }
 
   private static removeBodyAds() {
     return this.removeElements(
-      $('html > iframe[sandbox="allow-scripts allow-same-origin"]')
+      'html > iframe[sandbox="allow-scripts allow-same-origin"]'
     );
   }
 
   private static removeUpgradeProAd() {
-    return this.removeElements($("#blobby-left"));
+    return this.removeElements("#blobby-left");
   }
 
   private static removeBlueKai() {
-    return this.removeElements($('iframe[name="__bkframe"]'));
+    return this.removeElements('iframe[name="__bkframe"]');
   }
 
   private static removePrivacyPopupElement() {
-    return this.removeElements($("#onetrust-consent-sdk"));
+    return this.removeElements("#onetrust-consent-sdk");
   }
 
   private static removeAds() {
@@ -77,7 +103,13 @@ export default class MapgenieAdBlocker {
     }
   }
 
-  public static start() {
+  private static stop() {
+    if (!this.handle) return;
+    window.clearInterval(this.handle);
+    this.handle = null;
+  }
+
+  public static remove() {
     if (this.handle != null) return;
     this.handle = window.setInterval(
       () => this.tick(),
@@ -85,15 +117,15 @@ export default class MapgenieAdBlocker {
     );
   }
 
-  public static stop() {
-    if (!this.handle) return;
-    window.clearInterval(this.handle);
-    this.handle = null;
+  public static cancel() {
+    this.stop();
   }
 
+  /**
+   * Removes the privacy popup element in development mode.
+   */
   public static async removePrivacyPopup() {
-    if (!import.meta.env.DEV)
-      throw "This should be removed for release builds.";
+    if (!import.meta.env.DEV) return;
 
     await waitUntil(() => !!this.removePrivacyPopupElement());
   }
