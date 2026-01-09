@@ -1,7 +1,11 @@
 export type AsyncProxy<T extends object> = {
   [P in keyof T]: T[P] extends (...args: infer A) => infer R
-    ? (...args: A) => Promise<R>
-    : () => Promise<T[P]>;
+    ? R extends Promise<any>
+      ? (...args: A) => R
+      : (...args: A) => Promise<R>
+    : T[P] extends Promise<any>
+    ? T[P]
+    : Promise<T[P]>;
 };
 
 export function createAsyncProxy<T extends object>(
@@ -9,20 +13,17 @@ export function createAsyncProxy<T extends object>(
 ): AsyncProxy<T> {
   const targetPromise = factory();
 
-  return new Proxy(
-    {},
-    {
-      get: (_, prop: any) => {
-        return async (...args: any[]) => {
-          const target = await targetPromise;
-          const member = Reflect.get(target, prop);
+  return new Proxy({} as Record<string, () => Promise<any>>, {
+    get: (self, prop: any) => {
+      self[prop] ??= async (...args: any[]) => {
+        const target = await targetPromise;
+        const member = Reflect.get(target, prop);
 
-          if (typeof member === "function") {
-            return member.apply(target, args);
-          }
-          return member;
-        };
-      },
-    }
-  ) as AsyncProxy<T>;
+        if (typeof member === "function") {
+          return member.apply(target, args);
+        }
+        return member;
+      };
+    },
+  }) as AsyncProxy<T>;
 }
