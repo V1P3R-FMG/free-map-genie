@@ -2,21 +2,13 @@ import path from "node:path";
 import fs from "node:fs";
 
 import { addViteConfig, defineWxtModule } from "wxt/modules";
-import { normalizePath } from "vite";
 
 import setupServer from "./server";
-import as from "./as";
+import define from "./defines";
 
 export default defineWxtModule({
   setup(wxt) {
-    wxt.hooks.hook("config:resolved", (wxt) => {
-      wxt.config.imports.imports ??= [];
-      wxt.config.imports.imports.push({
-        name: "default",
-        as,
-        from: normalizePath(path.resolve(__dirname, "h.ts")),
-      });
-    });
+    addViteConfig(wxt, () => ({ define }));
 
     const mapgenieDevPort = process.env.MAPGENIE_DEV_PORT ?? 3001;
     const mapgenieDevHost = process.env.MAPGENIE_DEV_HOST ?? "localhost";
