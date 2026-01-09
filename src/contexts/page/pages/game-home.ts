@@ -1,11 +1,15 @@
 import { Page } from "./page";
 
 export class GameHomePage extends Page {
-  public async start() {
+  public start() {
     // No-op
   }
 
-  public async canStart() {
+  public canStart() {
     return true;
+  }
+
+  public restore() {
+    // No-op
   }
 }

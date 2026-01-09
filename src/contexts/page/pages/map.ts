@@ -42,12 +42,14 @@ export class MapPage extends Page {
   public async canStart() {
     // We can only start if user and mapData are present
     if (!window.user || !window.mapData) {
-      await activateBlockedMapgenieScript("map");
-
       logger.warn("User not logged in, FMG will not work");
 
       return false;
     }
     return true;
+  }
+
+  public async restore() {
+    await activateBlockedMapgenieScript("map");
   }
 }

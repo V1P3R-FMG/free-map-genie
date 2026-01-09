@@ -40,6 +40,8 @@ export default defineUnlistedScript(async () => {
 
   if (await page.canStart()) {
     await page.start();
+  } else {
+    await page.restore();
   }
 
   logger.log("Page script initialized.");

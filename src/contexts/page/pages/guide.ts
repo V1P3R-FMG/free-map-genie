@@ -41,17 +41,19 @@ export class GuidePage extends Page {
     await this.client.installInterceptor();
   }
 
-  public async canStart() {
+  public canStart() {
     // We can only start if user and mapData are present
     if (!window.user) {
-      if (this.isTarkovQuest17Page()) {
-        await activateBlockedMapgenieScript("TarkovQuestToolWidget");
-      }
-
       logger.warn("User not logged in, FMG will not work");
 
       return false;
     }
     return true;
+  }
+
+  public async restore() {
+    if (this.isTarkovQuest17Page()) {
+      await activateBlockedMapgenieScript("TarkovQuestToolWidget");
+    }
   }
 }

@@ -1,11 +1,15 @@
 import { Page } from "./page";
 
 export class HomePage extends Page {
-  public async start() {
+  public start() {
     // Currently, nothing to do on the home page
   }
 
-  public async canStart() {
+  public canStart() {
     return true;
+  }
+
+  public restore() {
+    // No-op
   }
 }
