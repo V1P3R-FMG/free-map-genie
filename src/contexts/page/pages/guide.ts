@@ -2,6 +2,7 @@ import { Page } from "./page";
 import { Client } from "@/common/client";
 import { createAsyncProxy, type AsyncProxy } from "@/common/asyncProxy";
 import { activateBlockedMapgenieScript, makeUserPro } from "@/common/mapgenie";
+import { waitForAxios } from "@/common/axios";
 
 export class GuidePage extends Page {
   private _client?: AsyncProxy<Client>;
@@ -23,10 +24,23 @@ export class GuidePage extends Page {
     return window.location.pathname === "/tarkov/guides/quests-17";
   }
 
+  private async createClient() {
+    if (this.isTarkovQuest17Page()) {
+      return Client.forGame(20);
+    }
+
+    const axios = await waitForAxios();
+    const gameId = axios.defaults.headers.common["X-Game-ID"];
+
+    if (gameId) {
+      return Client.forGame(Number(gameId));
+    }
+
+    return Client.forUrl(window.location.href);
+  }
+
   private get client() {
-    return (this._client ??= createAsyncProxy(() =>
-      Client.forUrl(window.location.href)
-    ));
+    return (this._client ??= createAsyncProxy(() => this.createClient()));
   }
 
   public async start() {
