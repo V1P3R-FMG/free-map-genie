@@ -11,6 +11,7 @@ export class GuidePage extends Page {
       throw new Error("User or mapData is not available");
     }
 
+    await this.client.migrate();
     const data = await this.client.getData();
 
     logger.debug("Loaded user data for guide page", data);

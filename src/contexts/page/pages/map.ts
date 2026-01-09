@@ -14,6 +14,7 @@ export class MapPage extends Page {
       throw new Error("User or mapData is not available");
     }
 
+    await this.client.migrate();
     const data = await this.client.getData();
 
     window.user.locations = data.locations;
