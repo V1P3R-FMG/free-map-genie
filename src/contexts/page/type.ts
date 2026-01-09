@@ -10,7 +10,7 @@ export type PageType =
 
 const isHomePage = () => {
   return (
-    window.location.host !== "mapgenie.io" && window.location.pathname === "/"
+    window.location.host === "mapgenie.io" && window.location.pathname === "/"
   );
 };
 
