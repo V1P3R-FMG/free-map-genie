@@ -18,6 +18,11 @@ export default defineConfig({
       { name: "default", as: "$", from: "jquery" },
     ],
   },
+  vite: () => ({
+    build: {
+      minify: "terser",
+    },
+  }),
   define: {
     "import.meta.env.PKG_VERSION": JSON.stringify(version),
     "import.meta.env.PKG_HOMEPAGE": JSON.stringify(homepage),
