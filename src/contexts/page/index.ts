@@ -29,7 +29,10 @@ export default defineUnlistedScript(async () => {
   const page = await getPage();
   if (!page) return;
 
-  MapgenieAdBlocker.start();
+  logger.debug("Initializing page script for", page.constructor.name);
+
+  MapgenieAdBlocker.remove();
+  MapgenieAdBlocker.removePrivacyPopup();
 
   if (!window.user) {
     loginAsMockedUser();
