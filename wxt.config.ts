@@ -39,9 +39,6 @@ export default defineConfig({
     prefix: "fmg-icon",
     inputDir: "icons",
   },
-  webExt: {
-    startUrls: ["https://mapgenie.io/"],
-  },
   manifest: ({ browser, manifestVersion }) => {
     const manifest: UserManifest = {
       host_permissions: ["*://mapgenie.io/*", "*://cdn.mapgenie.io/*"],
