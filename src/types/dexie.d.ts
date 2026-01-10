@@ -8,7 +8,6 @@ module "dexie" {
   export interface Dexie {
     transaction<U>(
       mode: TransactionMode,
-      table0: string | Table,
       table1: string | Table,
       table2: string | Table,
       table3: string | Table,

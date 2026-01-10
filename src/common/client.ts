@@ -141,7 +141,11 @@ export class Client {
       "/api/v1/user/locations/:id",
       async (ctx) => {
         logger.debug("Blocking location mark request", ctx.params);
-        await this.backend.putLocation(this.key, Number(ctx.params.id));
+        await this.backend.markLocationFound(
+          this.key,
+          Number(ctx.params.id),
+          true
+        );
         ctx.block();
       }
     );
@@ -150,7 +154,11 @@ export class Client {
       "/api/v1/user/locations/:id",
       async (ctx) => {
         logger.debug("Blocking location unmark request", ctx.params);
-        await this.backend.deleteLocation(Number(ctx.params.id));
+        await this.backend.markLocationFound(
+          this.key,
+          Number(ctx.params.id),
+          false
+        );
         ctx.block();
       }
     );
@@ -159,7 +167,7 @@ export class Client {
       "/api/v1/user/categories",
       async (ctx) => {
         logger.debug("Blocking category track request", ctx.postData);
-        await this.backend.putTrackedCategory(this.key, ctx.postData.category);
+        await this.backend.trackCategory(this.key, ctx.postData.category, true);
         ctx.block();
       }
     );
@@ -168,7 +176,11 @@ export class Client {
       "/api/v1/user/categories/:id",
       async (ctx) => {
         logger.debug("Blocking category untrack request", ctx.params);
-        await this.backend.deleteTrackedCategory(Number(ctx.params.id));
+        await this.backend.trackCategory(
+          this.key,
+          Number(ctx.params.id),
+          false
+        );
         ctx.block();
       }
     );

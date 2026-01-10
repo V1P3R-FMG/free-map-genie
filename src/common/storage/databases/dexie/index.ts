@@ -1,11 +1,12 @@
-import Dexie, { type Table, type CollectionForTable } from "dexie";
+import Dexie, { type Table, type CollectionForTable, Collection } from "dexie";
+import { nanoid } from "nanoid";
+import async from "@/common/async";
 
 import type { Key } from "../../key";
 import type { Database } from "../database";
 import type { Stores } from "./stores";
+import type { IdIndex } from "./indexes";
 import type { UserData } from "../../format";
-
-import { nanoid } from "nanoid";
 
 // fmg@v3
 export class DexieDatabase implements Database {
@@ -15,7 +16,6 @@ export class DexieDatabase implements Database {
     this.db = new Dexie("fmg:database") as Dexie & Stores;
 
     this.db.version(1).stores({
-      meta: "[map_id+user_id], [game_id+user_id]",
       locations: "id, [game_id+user_id]",
       trackedCategories: "id, [game_id+user_id]",
       presets: "++id, [game_id+user_id]",
@@ -28,40 +28,25 @@ export class DexieDatabase implements Database {
   public async close(): Promise<void> {}
 
   public async hasData(key: Key) {
-    return new Promise<boolean>(async (resolve, reject) => {
-      try {
-        await Promise.any(
-          this.db.tables.map((table) =>
-            this.selectByKey(table, key)
-              .count()
-              .catch(reject)
-              .then((count) => {
-                if (!count) return;
-                if (count <= 0) {
-                  throw new Error();
-                }
-                resolve(true);
-              })
-          )
-        );
-      } catch {
-        resolve(false);
-      }
-    });
+    return async.some(
+      this.db.tables.map((table) =>
+        this.selectByKey(table, key)
+          .count()
+          .then((count) => count > 0)
+      )
+    );
   }
 
   public async getData(key: Key): Promise<UserData> {
     const locationsIds = await this.locations(key).primaryKeys();
     const trackedCategoryIds = await this.trackedCategories(key).primaryKeys();
+    const presets = await this.presets(key).toArray();
+    const presetOrdering = await this.getPresetOrdering(key);
+    const notes = await this.notes(key).toArray();
 
     const locations = Object.fromEntries(
       locationsIds.map((id) => [id.toString(), true])
     );
-
-    const presets = await this.getPresets(key);
-    const presetOrdering = await this.getPresetOrdering(key);
-
-    const notes = await this.getNotes(key);
 
     return {
       locations,
@@ -82,6 +67,9 @@ export class DexieDatabase implements Database {
 
         await this.setLocations(key, locationIds);
         await this.setTrackedCategories(key, data.trackedCategoryIds);
+        await this.setPresets(key, data.presets);
+        await this.reorderPresets(key, data.presetOrdering);
+        await this.setNotes(key, data.notes);
       }
     );
   }
@@ -89,7 +77,6 @@ export class DexieDatabase implements Database {
   public async removeData(key: Key): Promise<void> {
     await this.db.transaction(
       "rw",
-      this.db.meta,
       this.db.locations,
       this.db.trackedCategories,
       this.db.presets,
@@ -97,12 +84,11 @@ export class DexieDatabase implements Database {
       this.db.notes,
       async () => {
         await Promise.allSettled([
-          this.meta(key),
-          this.locations(key),
-          this.trackedCategories(key),
-          this.presets(key),
-          this.presetsOrdering(key),
-          this.notes(key),
+          this.locations(key).delete(),
+          this.trackedCategories(key).delete(),
+          this.presets(key).delete(),
+          this.presetsOrdering(key).delete(),
+          this.notes(key).delete(),
         ]);
       }
     );
@@ -118,39 +104,30 @@ export class DexieDatabase implements Database {
       .equals(this.keyIndex(key)) as CollectionForTable<T>;
   }
 
-  private meta(key: Key) {
-    return this.selectByKey(this.db.meta, key);
-  }
-
   private locations(key: Key) {
     return this.selectByKey(this.db.locations, key);
   }
 
-  public trackedCategories(key: Key) {
+  private trackedCategories(key: Key) {
     return this.selectByKey(this.db.trackedCategories, key);
   }
 
-  public presets(key: Key) {
-    return this.selectByKey(this.db.presets, key);
+  private presets(key: Key) {
+    return this.selectByKey(this.db.presets, key) as Collection<
+      MG.Preset,
+      IdIndex
+    >;
   }
 
-  public presetsOrdering(key: Key) {
+  private presetsOrdering(key: Key) {
     return this.selectByKey(this.db.presetsOrdering, key);
   }
 
-  public notes(key: Key) {
+  private notes(key: Key) {
     return this.selectByKey(this.db.notes, key);
   }
 
-  public async getLastUpdate(key: Key, mapId: number) {
-    return this.db.meta
-      .where("[map_id+user_id]")
-      .equals([mapId, key.userId])
-      .first()
-      .then((meta) => meta?.last_updated ?? 0);
-  }
-
-  public setLocations(key: Key, locationIds: number[]) {
+  private setLocations(key: Key, locationIds: number[]) {
     return this.db.transaction("rw", this.db.locations, async () => {
       await this.locations(key).delete();
       await this.db.locations.bulkAdd(
@@ -163,7 +140,7 @@ export class DexieDatabase implements Database {
     });
   }
 
-  public addLocation(key: Key, locationId: number) {
+  public putLocation(key: Key, locationId: number) {
     return this.db.locations.put({
       game_id: key.gameId,
       user_id: key.userId,
@@ -175,7 +152,7 @@ export class DexieDatabase implements Database {
     return this.db.locations.where("id").equals(locationId).delete();
   }
 
-  public setTrackedCategories(key: Key, categoryIds: number[]) {
+  private setTrackedCategories(key: Key, categoryIds: number[]) {
     return this.db.transaction("rw", this.db.trackedCategories, async () => {
       await this.trackedCategories(key).delete();
       await this.db.trackedCategories.bulkAdd(
@@ -188,7 +165,7 @@ export class DexieDatabase implements Database {
     });
   }
 
-  public addTrackedCategory(key: Key, categoryId: number) {
+  public putTrackedCategory(key: Key, categoryId: number) {
     return this.db.trackedCategories.put({
       game_id: key.gameId,
       user_id: key.userId,
@@ -200,24 +177,33 @@ export class DexieDatabase implements Database {
     return this.db.trackedCategories.where("id").equals(categoryId).delete();
   }
 
-  public getNotes(key: Key) {
-    return this.notes(key).toArray();
+  private setNotes(key: Key, notes: MG.Note[]) {
+    return this.db.transaction("rw", this.db.notes, async () => {
+      await this.notes(key).delete();
+      await this.db.notes.bulkAdd(
+        notes.map((note) => ({
+          ...note,
+          game_id: key.gameId,
+          user_id: key.userId,
+        }))
+      );
+    });
   }
 
-  public async addNote(key: Key, note: Omit<MG.Note, "id">) {
+  public async addNote(key: Key, note: Omit<MG.Note, "id">): Promise<MG.Note> {
     const id = nanoid(6);
 
-    await this.db.notes.add({
-      ...note,
-      game_id: key.gameId,
-      user_id: key.userId,
-      id,
-    });
-
-    return {
-      id,
-      ...note,
-    } as MG.Note;
+    return this.db.notes
+      .add({
+        ...note,
+        game_id: key.gameId,
+        user_id: key.userId,
+        id,
+      })
+      .then(([_userId, id]) => ({
+        ...note,
+        id,
+      }));
   }
 
   public deleteNote(key: Key, noteId: string) {
@@ -234,24 +220,28 @@ export class DexieDatabase implements Database {
       .modify(updates);
   }
 
-  public putPresets(key: Key, presets: MG.Preset[]) {
-    return this.db.presets.bulkPut(
-      presets.map((preset) => ({
-        ...preset,
-        game_id: key.gameId,
-        user_id: key.userId,
-      }))
+  public async setPresets(key: Key, presents: MG.Preset[]) {
+    return this.db.transaction(
+      "rw",
+      this.db.presets,
+      this.db.presetsOrdering,
+      async () => {
+        await this.presets(key).delete();
+        await this.db.presets.bulkAdd(
+          presents.map((preset) => ({
+            ...preset,
+            game_id: key.gameId,
+            user_id: key.userId,
+          }))
+        );
+      }
     );
-  }
-
-  public async getPresets(key: Key) {
-    return this.presets(key).toArray() as Promise<MG.Preset[]>;
   }
 
   public async addPreset(
     key: Key,
     { ordering, ...preset }: MG.Api.PresetPostData
-  ) {
+  ): Promise<MG.Preset> {
     return this.db.transaction(
       "rw",
       this.db.presets,
@@ -266,7 +256,12 @@ export class DexieDatabase implements Database {
           user_id: key.userId,
         });
 
-        await this.setPresetOrder(key, id, order);
+        await this.db.presetsOrdering.put({
+          id,
+          game_id: key.gameId,
+          user_id: key.userId,
+          order,
+        });
 
         await this.reorderPresets(key, [...ordering, id]);
 
@@ -287,63 +282,62 @@ export class DexieDatabase implements Database {
       async () => {
         await this.db.presets.where("id").equals(presetId).delete();
         await this.db.presetsOrdering.where("id").equals(presetId).delete();
-
-        const presets = await this.presetsOrdering(key).sortBy("order");
-
-        await this.reorderPresets(
-          key,
-          presets.map((p) => p.id!)
-        );
+        await this.updatePresetOrdering(key);
       }
     );
   }
 
-  private setPresetOrder(key: Key, presetId: number, order: number) {
-    return this.db.transaction(
-      "rw",
-      this.db.presets,
-      this.db.presetsOrdering,
-      async () => {
-        await this.db.presetsOrdering.put({
-          id: presetId,
-          game_id: key.gameId,
-          user_id: key.userId,
-          order,
-        });
-
-        await this.db.presets.where("id").equals(presetId).modify({ order });
-      }
-    );
-  }
-
-  public async getPresetOrdering(key: Key) {
+  private async getPresetOrdering(key: Key) {
     return this.presetsOrdering(key)
       .sortBy("order")
       .then((ordering) => ordering.map((o) => o.id));
   }
 
-  public reorderPresets(key: Key, order: number[]) {
+  private async setPresetOrdering(key: Key, ordering: number[]) {
+    return this.db.transaction("rw", this.db.presetsOrdering, async () => {
+      await this.presetsOrdering(key).delete();
+      await this.db.presetsOrdering.bulkAdd(
+        ordering.map((id, index) => ({
+          id,
+          game_id: key.gameId,
+          user_id: key.userId,
+          order: index,
+        }))
+      );
+    });
+  }
+
+  public reorderPresets(key: Key, ordering: number[]) {
     return this.db.transaction(
       "rw",
       this.db.presets,
       this.db.presetsOrdering,
       async () => {
-        await this.db.presetsOrdering.bulkPut(
-          order.map((id, index) => ({
-            id,
-            game_id: key.gameId,
-            user_id: key.userId,
-            order: index,
-          }))
-        );
+        await this.setPresetOrdering(key, ordering);
 
         await this.db.presets.bulkUpdate(
-          order.map((id, index) => ({
+          ordering.map((id, index) => ({
             key: id,
             changes: {
               order: index,
             },
           }))
+        );
+      }
+    );
+  }
+
+  private updatePresetOrdering(key: Key) {
+    return this.db.transaction(
+      "rw",
+      this.db.presets,
+      this.db.presetsOrdering,
+      async () => {
+        const presets = await this.presetsOrdering(key).sortBy("order");
+
+        await this.reorderPresets(
+          key,
+          presets.map((p) => p.id!)
         );
       }
     );

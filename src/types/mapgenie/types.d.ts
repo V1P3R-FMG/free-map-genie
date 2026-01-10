@@ -212,7 +212,7 @@ declare namespace MG {
   }
 
   declare interface Note {
-    id: string; // 11 chars
+    id: string;
     title: string;
     description: string;
     color: Nullable<Color>;

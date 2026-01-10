@@ -1,5 +1,4 @@
 import type {
-  MetaTableV1,
   LocationsTableV1,
   TrackedCategoriesTableV1,
   NotesTableV1,
@@ -13,5 +12,4 @@ export type Stores = {
   notes: NotesTableV1;
   presets: PresetsTableV1;
   presetsOrdering: PresetsOrderingTableV1;
-  meta: MetaTableV1;
 };
