@@ -20,24 +20,12 @@ export default defineConfig({
 
   projects: [
     {
-      testDir: "e2e",
-      name: "build chrome extension",
-      testMatch: /build.chrome\.ts/,
-    },
-    {
-      testDir: "e2e",
-      name: "build firefox extension",
-      testMatch: /build.firefox\.ts/,
-    },
-    {
       name: "chromium",
       use: { ...devices["Desktop Chrome"] },
-      dependencies: ["build chrome extension"],
     },
     {
       name: "firefox",
       use: { ...devices["Desktop Firefox"] },
-      dependencies: ["build firefox extension"],
     },
   ],
 });
