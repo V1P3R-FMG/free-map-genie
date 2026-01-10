@@ -18,6 +18,15 @@ export default defineConfig({
       { name: "default", as: "$", from: "jquery" },
     ],
   },
+  hooks: {
+    "entrypoints:resolved": (wxt, entrypoints) => {
+      if (wxt.config.browser !== "firefox") return;
+      const idx = entrypoints.findIndex((ep) => ep.name === "offscreen");
+      if (idx !== -1) {
+        entrypoints.splice(idx, 1);
+      }
+    },
+  },
   vite: () => ({
     build: {
       minify: "terser",

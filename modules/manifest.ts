@@ -1,8 +1,6 @@
 import path from "node:path";
 import { defineWxtModule } from "wxt/modules";
 
-import type { Wxt } from "wxt";
-
 export default defineWxtModule({
   setup(wxt) {
     const generateEntrypointName = (file: string) => {
