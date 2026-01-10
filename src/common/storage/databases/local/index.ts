@@ -1,7 +1,8 @@
-import { LocalStorageDriver } from "./drivers/local";
 import { V1 } from "./versions/v1";
 import { V2 } from "./versions/v2";
 import { createEmptyUserData } from "../../format";
+import { LocalStorageDriver } from "./drivers/local";
+import { RemoteLocalStorageDriver } from "./drivers/local.remote";
 
 import type { Database } from "../database";
 import type { Driver } from "./drivers/driver";
@@ -16,9 +17,22 @@ export class LocalDatabase implements Database {
   private readonly v2: V2;
 
   public constructor(domain: string) {
-    this.driver = new LocalStorageDriver(domain);
+    this.driver = this.getDriverForDomain(domain);
     this.v1 = new V1(this.driver);
     this.v2 = new V2(this.driver);
+  }
+
+  private getDriverForDomain(domain: string): Driver {
+    const url = URL.canParse(domain)
+      ? new URL(domain)
+      : new URL("https://" + domain);
+    if (url.host === location.host) {
+      // For same-domain, use local driver
+      return new LocalStorageDriver();
+    } else {
+      // For cross-domain, use remote driver
+      return new RemoteLocalStorageDriver(url.host);
+    }
   }
 
   public async open(): Promise<void> {}

@@ -1,53 +1,60 @@
-import storageService from "@/services/storage.service";
-import { createAsyncProxy } from "@/common/asyncProxy";
-
 import type { Driver } from "./driver";
-import type { AsyncProxy } from "@/common/asyncProxy";
 
 export class LocalStorageDriver implements Driver {
-  private storage: AsyncProxy<storageService.Instance>;
-
-  public constructor(domain: string) {
-    this.storage = createAsyncProxy(() => storageService.use(domain));
-  }
-
   public async get(key: string): Promise<string | null> {
-    return this.storage.get(key);
+    return localStorage.getItem(key);
   }
 
   public async getBulk(keys: string[]): Promise<Record<string, string | null>> {
-    return this.storage.getBulk(keys);
+    const result: Record<string, string | null> = {};
+    for (const key of keys) {
+      result[key] = localStorage.getItem(key);
+    }
+    return result;
   }
 
   public async set(key: string, value: string): Promise<void> {
-    return this.storage.set(key, value);
+    localStorage.setItem(key, value);
   }
 
   public async setBulk(map: Record<string, string>): Promise<void> {
-    return this.storage.setBulk(map);
+    for (const [key, value] of Object.entries(map)) {
+      localStorage.setItem(key, value);
+    }
   }
 
   public async remove(key: string): Promise<void> {
-    return this.storage.remove(key);
+    localStorage.removeItem(key);
   }
 
   public async removeBulk(keys: string[]): Promise<void> {
-    return this.storage.removeBulk(keys);
+    for (const key of keys) {
+      localStorage.removeItem(key);
+    }
   }
 
   public async has(key: string): Promise<boolean> {
-    return this.storage.has(key);
+    return localStorage.getItem(key) !== null;
   }
 
   public async hasBulk(keys: string[]): Promise<Record<string, boolean>> {
-    return this.storage.hasBulk(keys);
+    const result: Record<string, boolean> = {};
+    for (const key of keys) {
+      result[key] = localStorage.getItem(key) !== null;
+    }
+    return result;
   }
 
   public async hasAny(keys: string[]): Promise<boolean> {
-    return this.storage.hasAny(keys);
+    for (const key of keys) {
+      if (localStorage.getItem(key) !== null) {
+        return true;
+      }
+    }
+    return false;
   }
 
   public async keys(): Promise<string[]> {
-    return this.storage.keys();
+    return Object.keys(localStorage);
   }
 }
