@@ -259,7 +259,7 @@ declare namespace MG {
     mapConfig: MapConfig;
     maps: Map[];
     maxMarkedLocations: number;
-    notes: unknown[];
+    notes: Note[];
     presets: Preset[];
     proCategoryLocationCounts: RecordById<number> | [];
     routes: Route[];
