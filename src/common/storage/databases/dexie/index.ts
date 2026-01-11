@@ -62,6 +62,9 @@ export class DexieDatabase implements Database {
       "rw",
       this.db.locations,
       this.db.trackedCategories,
+      this.db.presets,
+      this.db.presetsOrdering,
+      this.db.notes,
       async () => {
         const locationIds = Object.keys(data.locations).map(Number);
 
