@@ -14,7 +14,7 @@ export const login = async (
   browser: Browser,
   { email, password }: Credentials
 ) => {
-  return globalCache.get("auth-cookies", { ttl: "1 hour" }, async () => {
+  return globalCache.get("auth-cookies", { ttl: "1 day" }, async () => {
     const page = await browser.newPage();
     const loginPage = new LoginPage(page);
 
