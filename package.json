@@ -44,6 +44,7 @@
     "dotenv": "^17.2.3",
     "express": "^5.2.1",
     "fantasticon": "^1.2.3",
+    "playwright-network-cache": "^0.2.2",
     "playwright-webextext": "^0.0.4",
     "terser": "^5.44.1",
     "typescript": "^5.9.3",

@@ -2,6 +2,7 @@ import path from "node:path";
 import fs from "node:fs";
 import { test as base, type BrowserContext } from "@playwright/test";
 import { fullLists, PlaywrightBlocker } from "@ghostery/adblocker-playwright";
+import { CacheRoute } from "playwright-network-cache";
 
 import { launchChromium, launchFirefox, loadStorageState } from ".";
 import { findFreeTcpPort, getFirefoxContextInfo } from "./firefox";
@@ -75,6 +76,19 @@ export const test = base.extend<ExtensionFixtures>({
   ],
   page: async ({ blocker, page }, use) => {
     await blocker.enableBlockingInPage(page);
+
+    const cacheRoute = new CacheRoute(page, {
+      baseDir: path.resolve("playwright/.cache/network"),
+      ttlMinutes: 60 * 24,
+      match: (req) => !req.url().match(/^(chrome|moz)-extension:/),
+    });
+
+    await cacheRoute.GET("**/*.{png,jpg,jpeg,webp,gif}*");
+    await cacheRoute.GET("**/*.{css,js,json}*");
+    await cacheRoute.GET("**/*.{woff2,woff,tff}*");
+    await cacheRoute.GET("https://mapgenie.io/**");
+    await cacheRoute.GET("https://rrd2maps.com/**");
+
     await use(page);
   },
   storageState: async ({ storageState, browser }, use, testInfo) => {
