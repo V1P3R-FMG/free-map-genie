@@ -1,8 +1,6 @@
-import { createService } from "@/common/messaging";
+import { createService, type ProxiedObject } from "@/common/messaging";
 
 import offscreenService from "./offscreen.service";
-
-import type { ProxiedObject } from "@/common/messaging";
 
 export class StorageService {
   public get(key: string) {
