@@ -1,7 +1,9 @@
+import dotenv from "dotenv";
+
 import { globalCache } from "../globalCache";
 import { LoginPage } from "../pages/login";
 
-import type { Browser, BrowserContext } from "@playwright/test";
+import type { Browser } from "@playwright/test";
 
 export interface Credentials {
   email: string;
@@ -29,15 +31,21 @@ export const login = async (
   });
 };
 
-export const loadCookies = async (context: BrowserContext) => {
-  const cookies = await login(context.browser(), {
-    email: process.env.MG_EMAIL!,
-    password: process.env.MG_PASSWORD!,
-  });
+export const getCredentials = (): Credentials => {
+  const config = dotenv.config();
 
-  if (!cookies) return;
+  if (config.error) {
+    throw config.error;
+  }
 
-  console.log("Loading auth cookies into browser context...");
+  const email = process.env.MG_EMAIL ?? config.parsed?.MG_EMAIL;
+  const password = process.env.MG_PASSWORD ?? config.parsed?.MG_PASSWORD;
 
-  await context.addCookies(cookies);
+  if (!email || !password) {
+    throw new Error(
+      "MG_EMAIL and MG_PASSWORD environment variables are required"
+    );
+  }
+
+  return { email, password };
 };

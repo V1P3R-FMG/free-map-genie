@@ -4,7 +4,7 @@ import { test as base, type BrowserContext } from "@playwright/test";
 
 import { launchChromium, launchFirefox, loadStorageState } from "./helpers";
 import { findFreeTcpPort, getFirefoxContextInfo } from "./helpers/firefox";
-import { login } from "./helpers/auth";
+import { getCredentials, login } from "./helpers/auth";
 
 export interface ExtensionFixtures {
   context: BrowserContext;
@@ -38,10 +38,8 @@ export const test = base.extend<ExtensionFixtures>({
   storageState: async ({ storageState, browser }, use, testInfo) => {
     if (testInfo.tags.includes("@no-auth")) return use(storageState);
 
-    const cookies = await login(browser, {
-      email: "simpleForm@authenticationtest.com",
-      password: "pa$$w0rd",
-    });
+    const credentials = getCredentials();
+    const cookies = await login(browser, credentials);
 
     await use({
       cookies,
