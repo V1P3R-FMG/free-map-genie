@@ -127,8 +127,9 @@ export class Client {
 
     //Invert IDs to avoid conflicts with local saved presets
     presets.forEach((preset) => {
+      const order = ordering.indexOf(preset.id);
       preset.id = -preset.id;
-      preset.order = ordering.indexOf(preset.id) || 0;
+      preset.order = order !== -1 ? order : 0;
     });
 
     return presets;
