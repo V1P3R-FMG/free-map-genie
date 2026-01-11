@@ -32,6 +32,7 @@
     "react-dom": "^19.2.3"
   },
   "devDependencies": {
+    "@global-cache/playwright": "^0.4.0",
     "@playwright/test": "^1.57.0",
     "@types/express": "^5.0.6",
     "@types/jquery": "^3.5.33",
@@ -39,6 +40,7 @@
     "@types/react-dom": "^19.2.3",
     "@wxt-dev/module-react": "^1.1.5",
     "chalk": "^5.6.2",
+    "dotenv": "^17.2.3",
     "express": "^5.2.1",
     "fantasticon": "^1.2.3",
     "playwright-webextext": "^0.0.4",

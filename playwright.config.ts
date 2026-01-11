@@ -1,7 +1,10 @@
 import { defineConfig, devices } from "@playwright/test";
+import { globalCache } from "@global-cache/playwright";
 
-export default defineConfig({
-  testDir: "e2e/tests",
+const config = defineConfig({
+  testDir: "e2e",
+
+  workers: 1,
 
   // Fail the build on CI if you accidentally left test.only in the source code.
   forbidOnly: !!process.env.CI,
@@ -11,7 +14,7 @@ export default defineConfig({
 
   // Opt out of parallel tests on CI.
 
-  reporter: "html",
+  reporter: "list",
 
   use: {
     // Collect trace when retrying the failed test.
@@ -20,12 +23,24 @@ export default defineConfig({
 
   projects: [
     {
+      name: "setup",
+      testMatch: /.*\.setup\.ts/,
+    },
+    {
       name: "chromium",
-      use: { ...devices["Desktop Chrome"] },
+      use: {
+        ...devices["Desktop Chrome"],
+      },
+      dependencies: ["setup"],
     },
     {
       name: "firefox",
-      use: { ...devices["Desktop Firefox"] },
+      use: {
+        ...devices["Desktop Firefox"],
+      },
+      dependencies: ["setup"],
     },
   ],
 });
+
+export default globalCache.wrap(config);

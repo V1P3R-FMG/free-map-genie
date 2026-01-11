@@ -1,8 +1,10 @@
 {
   "compilerOptions": {
+    "module": "es2020",
     "composite": true,
     "noEmit": false,
-    "esModuleInterop": true
+    "esModuleInterop": true,
+    "moduleResolution": "bundler"
   },
-  "include": ["e2e", "src/types"]
+  "include": ["e2e", "src"]
 }

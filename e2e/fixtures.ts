@@ -1,17 +1,12 @@
-import { test as base, type BrowserContext } from "@playwright/test";
-import { withExtension } from "playwright-webextext";
-import {
-  findFreeTcpPort,
-  getFirefoxContextInfo,
-  resolveFirefoxExtensionInfo,
-  setFirefoxExtensionInfo,
-} from "./helpers";
-
 import path from "node:path";
-import os from "node:os";
-import fs from "node:fs/promises";
+import fs from "node:fs";
+import { test as base, type BrowserContext } from "@playwright/test";
 
-interface ExtensionFixtures {
+import { launchChromium, launchFirefox, loadStorageState } from "./helpers";
+import { findFreeTcpPort, getFirefoxContextInfo } from "./helpers/firefox";
+import { login } from "./helpers/auth";
+
+export interface ExtensionFixtures {
   context: BrowserContext;
   extensionId: string;
   extensionPath: string;
@@ -23,8 +18,7 @@ export const test = base.extend<ExtensionFixtures>({
   firefoxDebugPort: [
     async ({ browserName }, use) => {
       if (browserName !== "firefox") {
-        await use(null);
-        return;
+        return use(null);
       }
       const port = await findFreeTcpPort();
       await use(port);
@@ -41,50 +35,43 @@ export const test = base.extend<ExtensionFixtures>({
     },
     { option: true },
   ],
+  storageState: async ({ storageState, browser }, use, testInfo) => {
+    if (testInfo.tags.includes("@no-auth")) return use(storageState);
+
+    const cookies = await login(browser, {
+      email: "simpleForm@authenticationtest.com",
+      password: "pa$$w0rd",
+    });
+
+    await use({
+      cookies,
+      origins: [],
+    });
+  },
   context: async (
-    { playwright, browserName, extensionPath, firefoxDebugPort, headless },
+    { browserName, extensionPath, firefoxDebugPort, headless, storageState },
     use
   ) => {
-    const browserType = withExtension(playwright[browserName], extensionPath);
+    const [context, userDataDir] =
+      browserName === "firefox"
+        ? await launchFirefox({
+            headless,
+            extensionPath,
+            firefoxDebugPort,
+          })
+        : await launchChromium({
+            headless,
+            extensionPath,
+          });
 
-    if (browserName === "chromium") {
-      const context = await browserType.launchPersistentContext("", {
-        headless,
-        channel: "chromium",
-      });
-      try {
-        await use(context);
-      } finally {
-        await context.close();
-      }
-    } else {
-      if (!firefoxDebugPort) {
-        throw new Error("Firefox debugging port not initialized");
-      }
+    await loadStorageState(context, storageState);
 
-      const userDataDir = await fs.mkdtemp(path.join(os.tmpdir(), "fmg-"));
-
-      const context = await browserType.launchPersistentContext(userDataDir, {
-        headless,
-        args: ["--start-debugger-server", String(firefoxDebugPort)],
-        firefoxUserPrefs: {
-          "xpinstall.signatures.required": false,
-          "extensions.installDistroAddons": false,
-          "extensions.manifestV3.enabled": true,
-        },
-      });
-
-      const info = await resolveFirefoxExtensionInfo(
-        extensionPath,
-        firefoxDebugPort
-      );
-      setFirefoxExtensionInfo(context, info);
-
-      try {
-        await use(context);
-      } finally {
-        await context.close();
-        await fs.rm(userDataDir, {
+    try {
+      await use(context);
+    } finally {
+      await context.close();
+      if (userDataDir) {
+        await fs.promises.rm(userDataDir, {
           recursive: true,
           force: true,
         });
@@ -119,4 +106,5 @@ export const test = base.extend<ExtensionFixtures>({
     }
   },
 });
+
 export const expect = test.expect;
