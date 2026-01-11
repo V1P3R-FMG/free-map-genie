@@ -30,12 +30,19 @@ export const isExtensionUrl = (url: string) => {
   return EXTENSION_PROTOCOLS.some((protocol) => url.startsWith(protocol));
 };
 
-export const launchChromium = async ({ headless }: LaunchOptions) => {
-  const browserType = withExtension(chromium, "");
+export const launchChromium = async ({
+  headless,
+  extensionPath,
+}: LaunchOptions) => {
+  const browserType = withExtension(chromium, extensionPath);
 
   const context = await browserType.launchPersistentContext("", {
     headless,
     channel: "chromium",
+    args: [
+      `--disable-extensions-except=${extensionPath}`,
+      `--load-extension=${extensionPath}`,
+    ],
   });
 
   return [context, ""] as const;
