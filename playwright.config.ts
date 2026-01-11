@@ -1,7 +1,11 @@
 import { defineConfig, devices } from "@playwright/test";
-import { globalCache } from "@global-cache/playwright";
+import { globalCache } from "@vitalets/global-cache";
 
-const config = defineConfig({
+globalCache.defineConfig({
+  basePath: "playwright/.cache/global-cache",
+});
+
+export default defineConfig({
   testDir: "e2e",
 
   workers: 1,
@@ -15,6 +19,8 @@ const config = defineConfig({
   // Opt out of parallel tests on CI.
 
   reporter: "list",
+  globalSetup: [globalCache.setup],
+  globalTeardown: [globalCache.teardown],
 
   use: {
     // Collect trace when retrying the failed test.
@@ -42,5 +48,3 @@ const config = defineConfig({
     },
   ],
 });
-
-export default globalCache.wrap(config);

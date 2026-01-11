@@ -1,7 +1,7 @@
 import {
   globalCache as genericGlobalCache,
   type GlobalCache,
-} from "@global-cache/playwright";
+} from "@vitalets/global-cache";
 
 import type { Cookie } from "@playwright/test";
 
