@@ -48,37 +48,28 @@ export default defineConfig({
     prefix: "fmg-icon",
     inputDir: "icons",
   },
-  manifest: ({ browser, manifestVersion }) => {
-    const manifest: UserManifest = {
-      host_permissions: ["*://mapgenie.io/*", "*://cdn.mapgenie.io/*"],
-      web_accessible_resources: [
-        {
-          matches: ["<all_urls>"],
-          resources: ["page.js", "fonts/*", "css/*"],
-        },
-      ],
-      permissions: [],
-      background_page: "background/page.html",
-    };
-
-    if (manifestVersion === 2) {
-      manifest.permissions!.push("webRequest", "webRequestBlocking");
-    } else {
-      manifest.permissions!.push("declarativeNetRequest");
-    }
-
-    if (browser === "chrome") {
-      manifest.permissions!.push("offscreen");
-    }
-
-    if (browser === "firefox") {
-      manifest.browser_specific_settings = {
-        gecko: {
-          id: "fmg@viper.net",
-        },
-      };
-    }
-
-    return manifest;
-  },
+  manifest: ({ browser, manifestVersion }) => ({
+    host_permissions: ["*://mapgenie.io/*", "*://cdn.mapgenie.io/*"],
+    web_accessible_resources: [
+      {
+        matches: ["<all_urls>"],
+        resources: ["page.js", "fonts/*", "css/*"],
+      },
+    ],
+    permissions:
+      browser === "chrome"
+        ? ["declarativeNetRequest", "offscreen"]
+        : manifestVersion === 2
+        ? ["webRequest", "webRequestBlocking"]
+        : ["declarativeNetRequest"],
+    background_page: "background/page.html",
+    browser_specific_settings:
+      browser === "chrome"
+        ? undefined
+        : {
+            gecko: {
+              id: "fmg@viper.net",
+            },
+          },
+  }),
 });
