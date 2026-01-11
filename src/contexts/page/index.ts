@@ -1,6 +1,6 @@
 import "@/common/messaging/contexts/window";
 
-import { loginAsMockedUser, MapgenieAdBlocker } from "@/common/mapgenie";
+import { MapgenieAdBlocker } from "@/common/mapgenie";
 
 import { getPageType } from "./type";
 import { HomePage } from "./pages/home";
@@ -33,10 +33,6 @@ export default defineUnlistedScript(async () => {
 
   MapgenieAdBlocker.remove();
   MapgenieAdBlocker.removePrivacyPopup();
-
-  if (!window.user) {
-    loginAsMockedUser();
-  }
 
   if (await page.canStart()) {
     await page.start();
