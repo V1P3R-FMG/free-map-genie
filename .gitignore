@@ -17,8 +17,6 @@ web-ext.config.ts
 src/common/icons.ts
 playwright/
 playwright-report/
-test-results/
-.global-cache/
 
 # Editor directories and files
 .vscode/*

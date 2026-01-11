@@ -7,6 +7,7 @@ globalCache.defineConfig({
 
 export default defineConfig({
   testDir: "e2e",
+  outputDir: "playwright/test-results/",
 
   workers: 1,
 
