@@ -1,0 +1,59 @@
+{
+  "fmg:game_20:map_67:user_0": {
+    "locationIds": [30108, 30109, 30173, 49116, 54354, 75408, 425604],
+    "categoryIds": [941, 961, 4740],
+    "notes": [
+      {
+        "map_id": 67,
+        "title": "Test",
+        "description": "This is test note",
+        "color": "ffcd00",
+        "latitude": 0.41130877404793864,
+        "longitude": -1.1296323558980248,
+        "category": null,
+        "id": "q2CgAbhwij",
+        "user_id": 0
+      }
+    ]
+  },
+  "fmg:game_20:map_68:user_0": {
+    "locationIds": [
+      25075, 25076, 25079, 25082, 292853, 292873, 292875, 397662, 403859,
+      410427, 410431
+    ],
+    "categoryIds": [942, 959, 969]
+  },
+  "fmg:game_20:map_72:user_0": {
+    "locationIds": [26329, 26343, 27946, 35949, 323745, 424622, 424623],
+    "categoryIds": [954],
+    "presetOrder": [169694, 0],
+    "presets": [
+      {
+        "id": 0,
+        "title": "Test",
+        "categories": [941, 942, 943, 944],
+        "order": 1
+      }
+    ]
+  },
+  "fmg:game_20:map_74:user_0": {
+    "locationIds": [
+      31543, 31544, 31545, 31546, 31547, 31548, 31549, 31550, 31552, 31553,
+      31554, 31555, 31556, 31564, 31901, 267637, 267648, 401795, 401796
+    ],
+    "notes": [
+      {
+        "map_id": 74,
+        "title": "Test",
+        "description": "This is a test note",
+        "color": null,
+        "latitude": 0.73921805126362,
+        "longitude": -0.94111233931322,
+        "category": null,
+        "id": "t1M51mX8vd",
+        "user_id": 0
+      }
+    ],
+    "categoryIds": [952]
+  }
+}

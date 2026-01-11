@@ -1,21 +1,42 @@
 import { AxiosPage } from "./axios";
 
+import type { Page } from "@playwright/test";
+
+type GotoOptions = Parameters<Page["goto"]>[1];
+
 export class MapPage extends AxiosPage {
-  public async open(url: string) {
-    await this.page.goto(url);
+  public async gotoTarkovFactoryMap(options?: GotoOptions) {
+    await this.page.goto("https://mapgenie.io/tarkov/maps/factory", options);
   }
 
-  public async openMap(gameSlug: string, mapSlug: string) {
-    await this.page.goto(
-      "https://mapgenie.io/" + gameSlug + "/maps/" + mapSlug
-    );
+  public async gotoRedDeadRedemption2Map(options?: GotoOptions) {
+    await this.page.goto("https://rdr2map.com/", options);
   }
 
-  public async openTarkovFactoryMap() {
-    await this.openMap("tarkov", "factory");
+  public async waitForUser() {
+    return this.page.waitForFunction("!!window.user");
   }
 
-  public async openRedDeadRedemption2Map() {
-    await this.open("https://rdr2map.com/");
+  public async getGameId() {
+    return this.page.evaluate(() => window.game!.id);
+  }
+
+  public async getUserId() {
+    return this.page.evaluate(() => window.user!.id);
+  }
+
+  public async forceUserId(userId: number) {
+    // Override user ID to always be 0 for consistent testing
+    await this.page.addInitScript((id) => {
+      const user = { id };
+
+      Object.defineProperty(window, "user", {
+        get: () => user,
+        set: (newUser) => {
+          Object.assign(user, { ...newUser, id });
+        },
+        configurable: true,
+      });
+    }, userId);
   }
 }

@@ -2,6 +2,7 @@ import { BasePage } from "./base";
 
 import type { Page } from "@playwright/test";
 import type { AxiosResponse } from "axios";
+import type { UserData } from "@src/common/storage";
 
 export class AxiosClient {
   constructor(private readonly page: Page) {}
@@ -20,10 +21,7 @@ export class AxiosClient {
   public async post<T>(url: string, data?: any): Promise<AxiosResponse<T>> {
     return this.page.evaluate(
       ({ url, data }) => window.axios!.post(url, data),
-      {
-        url,
-        data,
-      }
+      { url, data }
     );
   }
 
@@ -41,12 +39,27 @@ export class AxiosPage extends BasePage {
   }
 
   public async waitForAxios() {
-    return this.page.waitForFunction("!!window.axios");
+    return this.page.waitForFunction("!!window.axios", undefined, {
+      timeout: 5000,
+    });
   }
 
   public async waitForAxiosInterceptor() {
     return this.page.waitForFunction(
-      "!!window.axios.interceptors.request.handlers.length"
+      "!!window.axios?.interceptors.request.handlers.length",
+      undefined,
+      { timeout: 5000 }
     );
+  }
+
+  public async getUserData(): Promise<Partial<UserData>> {
+    return this.page.evaluate(() => {
+      const { locations, trackedCategoryIds } = window.user ?? {};
+      const { notes, presets } = window.mapData ?? {};
+
+      const presetOrdering = presets?.map((preset) => preset.id);
+
+      return { locations, trackedCategoryIds, notes, presets, presetOrdering };
+    });
   }
 }

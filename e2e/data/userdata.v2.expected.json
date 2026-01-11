@@ -1,0 +1,88 @@
+{
+  "20:0": {
+    "locations": {
+      "25075": true,
+      "25076": true,
+      "25079": true,
+      "25082": true,
+      "26329": true,
+      "26343": true,
+      "27946": true,
+      "30108": true,
+      "30109": true,
+      "30173": true,
+      "31543": true,
+      "31544": true,
+      "31545": true,
+      "31546": true,
+      "31547": true,
+      "31548": true,
+      "31549": true,
+      "31550": true,
+      "31552": true,
+      "31553": true,
+      "31554": true,
+      "31555": true,
+      "31556": true,
+      "31564": true,
+      "31901": true,
+      "35949": true,
+      "49116": true,
+      "54354": true,
+      "75408": true,
+      "267637": true,
+      "267648": true,
+      "292853": true,
+      "292873": true,
+      "292875": true,
+      "323745": true,
+      "397662": true,
+      "401795": true,
+      "401796": true,
+      "403859": true,
+      "410427": true,
+      "410431": true,
+      "424622": true,
+      "424623": true,
+      "425604": true
+    },
+    "trackedCategoryIds": [941, 942, 952, 954, 959, 961, 969, 4740],
+    "notes": [
+      {
+        "title": "Test",
+        "description": "This is test note",
+        "color": "ffcd00",
+        "latitude": 0.41130877404793864,
+        "longitude": -1.1296323558980248,
+        "category": null,
+        "id": "q2CgAbhwij",
+        "map_id": 67,
+        "user_id": 0,
+        "game_id": 20
+      },
+      {
+        "title": "Test",
+        "description": "This is a test note",
+        "color": null,
+        "latitude": 0.73921805126362,
+        "longitude": -0.94111233931322,
+        "category": null,
+        "id": "t1M51mX8vd",
+        "map_id": 74,
+        "user_id": 0,
+        "game_id": 20
+      }
+    ],
+    "presetOrdering": [-169694],
+    "presets": [
+      {
+        "id": -169694,
+        "title": "Extracts + PMC Spawns",
+        "categories": [953, 954],
+        "game_id": 20,
+        "order": 0,
+        "is_demo_preset": true
+      }
+    ]
+  }
+}

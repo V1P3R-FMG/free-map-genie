@@ -6,13 +6,39 @@ import { launchChromium, launchFirefox, loadStorageState } from "./helpers";
 import { findFreeTcpPort, getFirefoxContextInfo } from "./helpers/firefox";
 import { getCredentials, login } from "./helpers/auth";
 
+import type { UserData } from "@src/common/storage";
+
+export interface LocalStorageEntry {
+  name: string;
+  value: string;
+}
+
 export interface ExtensionFixtures {
   context: BrowserContext;
   extensionId: string;
   extensionPath: string;
   extensionBaseUrl: string;
   firefoxDebugPort: number | null;
+  v1StorageData: LocalStorageEntry[];
+  v2StorageData: LocalStorageEntry[];
+  v1StorageUserDataExpected: Record<string, UserData>;
+  v2StorageUserDataExpected: Record<string, UserData>;
 }
+
+const readData = async <T>(filename: string) => {
+  const data = await fs.promises.readFile(
+    new URL(path.join("data", filename), import.meta.url),
+    "utf-8"
+  );
+  return JSON.parse(data) as T;
+};
+
+const toLocalStorageFormat = (data: Record<string, any>) => {
+  return Object.entries(data).map(([name, value]) => ({
+    name,
+    value: JSON.stringify(value),
+  }));
+};
 
 export const test = base.extend<ExtensionFixtures>({
   firefoxDebugPort: [
@@ -102,6 +128,26 @@ export const test = base.extend<ExtensionFixtures>({
       );
       await use(baseUrl);
     }
+  },
+  v1StorageData: async ({}, use) => {
+    const data = await readData<Record<string, any>>("storage.v1.json");
+    await use(toLocalStorageFormat(data));
+  },
+  v2StorageData: async ({}, use) => {
+    const data = await readData<Record<string, any>>("storage.v2.json");
+    await use(toLocalStorageFormat(data));
+  },
+  v1StorageUserDataExpected: async ({}, use) => {
+    const data = await readData<Record<string, UserData>>(
+      "userData.v1.expected.json"
+    );
+    await use(data);
+  },
+  v2StorageUserDataExpected: async ({}, use) => {
+    const data = await readData<Record<string, UserData>>(
+      "userData.v2.expected.json"
+    );
+    await use(data);
   },
 });
 

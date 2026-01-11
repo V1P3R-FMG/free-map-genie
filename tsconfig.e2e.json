@@ -4,7 +4,11 @@
     "composite": true,
     "noEmit": false,
     "esModuleInterop": true,
-    "moduleResolution": "bundler"
+    "moduleResolution": "bundler",
+    "baseUrl": ".",
+    "paths": {
+      "@src/*": ["./src/*"]
+    }
   },
   "include": ["e2e", "src"]
 }
