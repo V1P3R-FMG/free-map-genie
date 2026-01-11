@@ -14,6 +14,8 @@ export interface LocalStorageEntry {
   value: string;
 }
 
+export type Version = "v1" | "v2";
+
 export interface ExtensionFixtures {
   blocker: PlaywrightBlocker;
   context: BrowserContext;
@@ -23,8 +25,10 @@ export interface ExtensionFixtures {
   firefoxDebugPort: number | null;
   v1StorageData: LocalStorageEntry[];
   v2StorageData: LocalStorageEntry[];
+  storageData: Record<Version, LocalStorageEntry[]>;
   v1StorageUserDataExpected: Record<string, UserData>;
   v2StorageUserDataExpected: Record<string, UserData>;
+  storageUserDataExpected: Record<Version, Record<string, UserData>>;
 }
 
 const readData = async <T>(filename: string) => {
@@ -100,7 +104,7 @@ export const test = base.extend<ExtensionFixtures>({
             extensionPath,
           });
 
-    const blocker = await loadStorageState(context, storageState);
+    await loadStorageState(context, storageState);
 
     try {
       await use(context);
@@ -149,6 +153,12 @@ export const test = base.extend<ExtensionFixtures>({
     const data = await readData<Record<string, any>>("storage.v2.json");
     await use(toLocalStorageFormat(data));
   },
+  storageData: async ({ v1StorageData, v2StorageData }, use) => {
+    await use({
+      v1: v1StorageData,
+      v2: v2StorageData,
+    });
+  },
   v1StorageUserDataExpected: async ({}, use) => {
     const data = await readData<Record<string, UserData>>(
       "userData.v1.expected.json"
@@ -160,6 +170,15 @@ export const test = base.extend<ExtensionFixtures>({
       "userData.v2.expected.json"
     );
     await use(data);
+  },
+  storageUserDataExpected: async (
+    { v1StorageUserDataExpected, v2StorageUserDataExpected },
+    use
+  ) => {
+    await use({
+      v1: v1StorageUserDataExpected,
+      v2: v2StorageUserDataExpected,
+    });
   },
 });
 

@@ -4,12 +4,9 @@ import { test } from "../fixtures";
 import { MapPage } from "../pages/map";
 import { resolveStorageState } from "../helpers";
 
-test.beforeEach(async ({ page }) => {
-  const mapPage = new MapPage(page);
-  await mapPage.forceUserId(0);
-});
+import type { Page } from "@playwright/test";
 
-["v1", "v2"].forEach((version) => {
+(["v1", "v2"] as const).forEach((version) => {
   test.describe(`Data migration from fmg@${version}`, () => {
     test.use({
       storageState: async (
@@ -37,15 +34,12 @@ test.beforeEach(async ({ page }) => {
 
     test("It should migrate data correctly", async ({
       page,
-      v1StorageUserDataExpected,
-      v2StorageUserDataExpected,
+      storageData,
+      storageUserDataExpected,
     }) => {
-      const versionsExpected = {
-        v1: v1StorageUserDataExpected,
-        v2: v2StorageUserDataExpected,
-      };
-
       const mapPage = new MapPage(page);
+
+      await mapPage.forceUserId(0);
 
       await mapPage.gotoTarkovFactoryMap({ timeout: 0 });
       await mapPage.waitForAxiosInterceptor();
@@ -55,7 +49,7 @@ test.beforeEach(async ({ page }) => {
       const gameId = await mapPage.getGameId();
       const userId = await mapPage.getUserId();
 
-      const expected = versionsExpected[version][`${gameId}:${userId}`];
+      const expected = storageUserDataExpected[version][`${gameId}:${userId}`];
 
       // Sanity checks
       expect(userId).toEqual(0);
@@ -63,6 +57,19 @@ test.beforeEach(async ({ page }) => {
 
       // Verify migrated data
       expect(userData).toEqual(expected);
+
+      // Verify that old keys are removed
+      const keys = storageData[version].map((item) => item.name);
+
+      const data = await page.evaluate((keys) => {
+        return Object.fromEntries(
+          keys.map((key) => [key, localStorage.getItem(key)])
+        );
+      }, keys);
+
+      for (const key of keys) {
+        expect(data[key]).toBeNull();
+      }
     });
   });
 });
