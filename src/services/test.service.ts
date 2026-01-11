@@ -22,8 +22,6 @@ export class TestService {
   }
 }
 
-console.log("TestService initialized.", new TestService());
-
 const testService = createService({
   context() {
     return new TestService();
