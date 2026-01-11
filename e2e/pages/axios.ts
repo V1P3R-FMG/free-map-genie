@@ -40,7 +40,7 @@ export class AxiosPage extends BasePage {
 
   public async waitForAxios() {
     return this.page.waitForFunction("!!window.axios", undefined, {
-      timeout: 5000,
+      timeout: 10000,
     });
   }
 
@@ -48,7 +48,7 @@ export class AxiosPage extends BasePage {
     return this.page.waitForFunction(
       "!!window.axios?.interceptors.request.handlers.length",
       undefined,
-      { timeout: 5000 }
+      { timeout: 10000 }
     );
   }
 

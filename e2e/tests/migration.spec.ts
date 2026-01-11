@@ -47,7 +47,7 @@ test.beforeEach(async ({ page }) => {
 
       const mapPage = new MapPage(page);
 
-      await mapPage.gotoTarkovFactoryMap({ timeout: 0, waitUntil: "commit" });
+      await mapPage.gotoTarkovFactoryMap({ timeout: 0 });
       await mapPage.waitForAxiosInterceptor();
 
       const userData = await mapPage.getUserData();

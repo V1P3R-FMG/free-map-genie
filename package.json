@@ -32,6 +32,7 @@
     "react-dom": "^19.2.3"
   },
   "devDependencies": {
+    "@ghostery/adblocker-playwright": "^2.13.3",
     "@global-cache/playwright": "^0.4.0",
     "@playwright/test": "^1.57.0",
     "@types/express": "^5.0.6",

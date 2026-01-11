@@ -1,6 +1,7 @@
 import path from "node:path";
 import fs from "node:fs";
 import { test as base, type BrowserContext } from "@playwright/test";
+import { fullLists, PlaywrightBlocker } from "@ghostery/adblocker-playwright";
 
 import { launchChromium, launchFirefox, loadStorageState } from "./helpers";
 import { findFreeTcpPort, getFirefoxContextInfo } from "./helpers/firefox";
@@ -14,6 +15,7 @@ export interface LocalStorageEntry {
 }
 
 export interface ExtensionFixtures {
+  blocker: PlaywrightBlocker;
   context: BrowserContext;
   extensionId: string;
   extensionPath: string;
@@ -41,6 +43,12 @@ const toLocalStorageFormat = (data: Record<string, any>) => {
 };
 
 export const test = base.extend<ExtensionFixtures>({
+  blocker: async ({}, use) => {
+    const blocker = await PlaywrightBlocker.fromLists(fetch, fullLists, {
+      enableCompression: true,
+    });
+    await use(blocker);
+  },
   firefoxDebugPort: [
     async ({ browserName }, use) => {
       if (browserName !== "firefox") {
@@ -61,6 +69,10 @@ export const test = base.extend<ExtensionFixtures>({
     },
     { option: true },
   ],
+  page: async ({ blocker, page }, use) => {
+    await blocker.enableBlockingInPage(page);
+    await use(page);
+  },
   storageState: async ({ storageState, browser }, use, testInfo) => {
     if (testInfo.tags.includes("@no-auth")) return use(storageState);
 
@@ -88,7 +100,7 @@ export const test = base.extend<ExtensionFixtures>({
             extensionPath,
           });
 
-    await loadStorageState(context, storageState);
+    const blocker = await loadStorageState(context, storageState);
 
     try {
       await use(context);
