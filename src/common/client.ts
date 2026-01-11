@@ -5,6 +5,7 @@ import backendService from "@/services/backend.service";
 import mapgenieService from "@/services/mapgenie.service";
 
 import { AxiosInterceptor } from "@/common/axios";
+import { post } from "jquery";
 
 export class Client {
   private readonly key: Key;
@@ -141,7 +142,7 @@ export class Client {
     this.interceptor.put<{ id: string }>(
       "/api/v1/user/locations/:id",
       async (ctx) => {
-        logger.debug("Blocking location mark request", ctx.params);
+        logger.debug("Intercepted location mark request", ctx);
         await this.backend.markLocationFound(
           this.key,
           Number(ctx.params.id),
@@ -154,7 +155,7 @@ export class Client {
     this.interceptor.delete<{ id: string }>(
       "/api/v1/user/locations/:id",
       async (ctx) => {
-        logger.debug("Blocking location unmark request", ctx.params);
+        logger.debug("Intercepted location unmark request", ctx);
         await this.backend.markLocationFound(
           this.key,
           Number(ctx.params.id),
@@ -167,7 +168,7 @@ export class Client {
     this.interceptor.post<{}, { category: number }>(
       "/api/v1/user/categories",
       async (ctx) => {
-        logger.debug("Blocking category track request", ctx.postData);
+        logger.debug("Intercepted category track request", ctx);
         await this.backend.trackCategory(this.key, ctx.postData.category, true);
         ctx.block();
       }
@@ -176,7 +177,7 @@ export class Client {
     this.interceptor.delete<{ id: string }>(
       "/api/v1/user/categories/:id",
       async (ctx) => {
-        logger.debug("Blocking category untrack request", ctx.params);
+        logger.debug("Intercepted category untrack request", ctx);
         await this.backend.trackCategory(
           this.key,
           Number(ctx.params.id),
@@ -189,7 +190,7 @@ export class Client {
     this.interceptor.post<{}, MG.Api.NotePostData>(
       "/api/v1/user/notes",
       async (ctx) => {
-        logger.debug("Blocking note create request", ctx.postData);
+        logger.debug("Intercepted note create request", ctx);
         const note = await this.backend.addNote(this.key, ctx.postData);
         ctx.block(note);
       }
@@ -198,7 +199,7 @@ export class Client {
     this.interceptor.put<{ id: string }, Partial<MG.Note>>(
       "/api/v1/user/notes/:id",
       async (ctx) => {
-        logger.debug("Blocking note update request", ctx.params, ctx.postData);
+        logger.debug("Intercepted note update request", ctx);
         await this.backend.updateNote(this.key, ctx.params.id, ctx.postData);
         ctx.block();
       }
@@ -207,7 +208,7 @@ export class Client {
     this.interceptor.delete<{ id: string }>(
       "/api/v1/user/notes/:id",
       async (ctx) => {
-        logger.debug("Blocking note delete request", ctx.params);
+        logger.debug("Intercepted note delete request", ctx);
         await this.backend.deleteNote(this.key, ctx.params.id);
         ctx.block();
       }
@@ -216,7 +217,7 @@ export class Client {
     this.interceptor.post<{}, MG.Api.PresetPostData>(
       "/api/v1/user/presets",
       async (ctx) => {
-        logger.debug("Blocking preset create request", ctx.postData);
+        logger.debug("Intercepted preset create request", ctx);
         const preset = await this.backend.addPreset(this.key, ctx.postData);
         ctx.block(preset);
       }
@@ -225,11 +226,7 @@ export class Client {
     this.interceptor.delete<{ id: string }>(
       "/api/v1/user/presets/:id",
       async (ctx) => {
-        logger.debug(
-          "Blocking preset delete request",
-          ctx.params,
-          ctx.postData
-        );
+        logger.debug("Intercepted preset delete request", ctx);
         await this.backend.deletePreset(this.key, Number(ctx.params.id));
         ctx.block();
       }
@@ -238,7 +235,7 @@ export class Client {
     this.interceptor.post<{}, { ordering: number[] }>(
       "/api/v1/user/presets/reorder",
       async (ctx) => {
-        logger.debug("Blocking preset reorder request", ctx.postData);
+        logger.debug("Intercepted preset reorder request", ctx);
         await this.backend.reorderPresets(this.key, ctx.postData.ordering);
         ctx.block();
       }
