@@ -1,6 +1,6 @@
 import { expect } from "@playwright/test";
 
-import { test } from "../fixtures";
+import { test } from "../helpers/fixtures";
 import { MapPage } from "../pages/map";
 import { resolveStorageState } from "../helpers";
 

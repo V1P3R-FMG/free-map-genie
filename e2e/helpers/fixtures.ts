@@ -3,9 +3,9 @@ import fs from "node:fs";
 import { test as base, type BrowserContext } from "@playwright/test";
 import { fullLists, PlaywrightBlocker } from "@ghostery/adblocker-playwright";
 
-import { launchChromium, launchFirefox, loadStorageState } from "./helpers";
-import { findFreeTcpPort, getFirefoxContextInfo } from "./helpers/firefox";
-import { getCredentials, login } from "./helpers/auth";
+import { launchChromium, launchFirefox, loadStorageState } from ".";
+import { findFreeTcpPort, getFirefoxContextInfo } from "./firefox";
+import { getCredentials, login } from "./auth";
 
 import type { UserData } from "@src/common/storage";
 
@@ -33,7 +33,7 @@ export interface ExtensionFixtures {
 
 const readData = async <T>(filename: string) => {
   const data = await fs.promises.readFile(
-    new URL(path.join("data", filename), import.meta.url),
+    new URL(path.join("../data", filename), import.meta.url),
     "utf-8"
   );
   return JSON.parse(data) as T;
