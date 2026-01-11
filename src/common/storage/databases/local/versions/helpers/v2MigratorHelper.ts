@@ -20,16 +20,28 @@ export class V2MigratorHelper {
     return Array.from(categories);
   }
 
+  private migrateNotes(legacyData: LocalV2Data) {
+    const notes: MG.Note[] = [];
+
+    for (const mapId in legacyData) {
+      const mapData = legacyData[mapId];
+      mapData.notes?.forEach((note) => notes.push(note));
+    }
+
+    return notes;
+  }
+
   public async migrate(legacyData: LocalV2Data): Promise<UserData> {
     const locations = this.migrateLocations(legacyData);
     const trackedCategoryIds = this.migrateCategories(legacyData);
+    const notes = this.migrateNotes(legacyData);
 
     return {
       locations,
       trackedCategoryIds,
       presets: [],
       presetOrdering: [],
-      notes: [],
+      notes,
     };
   }
 }
