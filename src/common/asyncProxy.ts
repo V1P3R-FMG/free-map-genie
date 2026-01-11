@@ -8,6 +8,12 @@ export type AsyncProxy<T extends object> = {
     : Promise<T[P]>;
 };
 
+/**
+ * Creates an asynchronous proxy for an object.
+ * The members of the target object are accessed asynchronously.
+ * Useful for creating async objects at class initialization time.
+ * @param factory A function that returns a promise resolving to the target object.
+ */
 export function createAsyncProxy<T extends object>(
   factory: () => Promise<T>
 ): AsyncProxy<T> {
