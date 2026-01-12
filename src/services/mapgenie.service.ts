@@ -3,6 +3,10 @@ import { setupCache } from "axios-cache-interceptor";
 
 import { createService, Memoize, type ProxiedObject } from "@/common/messaging";
 
+declare global {
+  var $headers: Record<string, string>;
+}
+
 class MapgenieService {
   private readonly axios = setupCache(
     axios.create({
@@ -11,7 +15,6 @@ class MapgenieService {
     }),
     {
       interpretHeader: false,
-      ttl: 1000 * 60, // 1 minute
     }
   );
 
@@ -22,7 +25,7 @@ class MapgenieService {
   }
 
   @Memoize()
-  public async fetchGame(gameId: number) {
+  public async fetchGame(gameId: number | string) {
     const { data } = await this.axios.get<MG.Api.GameFull>(
       `/games/${gameId}/full`
     );
@@ -30,7 +33,15 @@ class MapgenieService {
   }
 
   @Memoize()
-  public async fetchHeatmaps(mapId: number) {
+  public async fetchMap(mapId: number | string) {
+    const { data } = await this.axios.get<MG.Api.MapFull>(
+      `/maps/${mapId}/full`
+    );
+    return data;
+  }
+
+  @Memoize()
+  public async fetchHeatmaps(mapId: number | string) {
     const { data } = await this.axios.get<MG.Api.HeatmapGroup[]>(
       `/maps/${mapId}/heatmaps`
     );
@@ -38,9 +49,18 @@ class MapgenieService {
   }
 
   @Memoize()
-  public async getDomainForGame(gameId: number): Promise<string> {
+  public async getDomainForGame(gameId: number | string): Promise<string> {
     const game = await this.fetchGame(gameId);
     return game.domain;
+  }
+
+  public async fetchGameBySlug(slug: string) {
+    const games = await this.fetchGames();
+    const game = games.find((g) => g.slug === slug);
+    if (!game) {
+      throw new Error(`Game with slug "${slug}" not found`);
+    }
+    return this.fetchGame(game.id);
   }
 }
 

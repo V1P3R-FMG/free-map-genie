@@ -109,11 +109,15 @@ export class Client {
     return this.mapgenie.fetchGames();
   }
 
-  public async fetchGame(gameId: number) {
+  public async fetchGame(gameId: number | string) {
     return this.mapgenie.fetchGame(gameId);
   }
 
-  public async fetchHeatmaps(mapId: number) {
+  public async fetchMap(mapId: number | string) {
+    return this.mapgenie.fetchMap(mapId);
+  }
+
+  public async fetchHeatmaps(mapId: number | string) {
     return this.mapgenie.fetchHeatmaps(mapId);
   }
 

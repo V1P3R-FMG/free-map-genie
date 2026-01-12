@@ -55,7 +55,7 @@ declare namespace MG.Api {
 
   declare type MapFullTileSet = Omit<TileSet, "pattern">;
 
-  declare interface MapFullMapConfig extends MG.MapConfig {
+  declare interface MapFullMapConfig extends MapConfig {
     tile_sets: MapFullTileSet[];
   }
 
@@ -63,8 +63,8 @@ declare namespace MG.Api {
     config: MapFullMapConfig;
     url: string;
     game: Game;
-    groups: MG.GroupFull[];
-    regions: MG.Region[];
+    groups: GroupFull[];
+    regions: Region[];
   }
 
   declare interface Game extends IGNMeta, MetaAll {
@@ -94,7 +94,15 @@ declare namespace MG.Api {
 
   declare interface GameFull extends Game {
     maps: MapFullForGame[];
-    default_presets: MG.Preset[];
+    default_presets: Preset[];
+  }
+
+  declare interface GroupFull extends Group {
+    categories: CategoryFull[];
+  }
+
+  declare interface CategoryFull extends Category {
+    locations: Location[];
   }
 
   declare interface HeatmapGroup {
@@ -107,9 +115,9 @@ declare namespace MG.Api {
     expandable: boolean;
   }
 
-  declare type NotePostData = Omit<MG.Note, "id">;
+  declare type NotePostData = Omit<Note, "id">;
 
-  declare type PresetPostData = Omit<MG.Preset, "id" | "order"> & {
+  declare type PresetPostData = Omit<Preset, "id" | "order"> & {
     ordering: number[];
   };
 }

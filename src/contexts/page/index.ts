@@ -2,15 +2,13 @@ import "@/common/messaging/contexts/window";
 
 import { MapgenieAdBlocker } from "@/common/mapgenie";
 
-import { getPageType } from "./type";
+import { getPageType, type PageType } from "./type";
 import { HomePage } from "./pages/home";
 import { GameHomePage } from "./pages/game-home";
 import { MapPage } from "./pages/map";
 import { GuidePage } from "./pages/guide";
 
-const getPage = async () => {
-  const pageType = await getPageType();
-
+const getPage = async (pageType: PageType) => {
   switch (pageType) {
     case "home":
       return new HomePage();
@@ -26,10 +24,11 @@ const getPage = async () => {
 };
 
 export default defineUnlistedScript(async () => {
-  const page = await getPage();
+  const pageType = await getPageType();
+  const page = await getPage(pageType);
   if (!page) return;
 
-  logger.debug("Initializing page script for", page.constructor.name);
+  logger.log("Initializing page script for", pageType);
 
   MapgenieAdBlocker.remove();
   MapgenieAdBlocker.removePrivacyPopup();

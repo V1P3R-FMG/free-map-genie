@@ -23,8 +23,8 @@ FMG (Free Map Genie) is a browser extension that enhances the [Mapgenie.io](http
 | **presets**           | ✔️       |
 | **notes**             | ✔️       |
 | **tarkov quest tool** | ✔️       |
-| **pro maps**          | 🚧       |
-| **heatmaps**          | 🚧       |
+| **pro maps**          | ✔️       |
+| **heatmaps**          | ✔️       |
 | **guides**            | 🚧       |
 
 ## 🚀 What's New in V3 for developers
