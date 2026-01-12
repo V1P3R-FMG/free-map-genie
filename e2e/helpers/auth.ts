@@ -25,7 +25,7 @@ export const login = async (
     await loginPage.passwordInput.fill(password);
     await loginPage.submitButton.click();
 
-    await loginPage.waitForMapPage();
+    await page.reload();
 
     return loginPage.cookies();
   });
