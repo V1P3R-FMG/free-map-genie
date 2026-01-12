@@ -1,6 +1,10 @@
 import path from "node:path";
 import fs from "node:fs";
-import { test as base, type BrowserContext } from "@playwright/test";
+import {
+  test as base,
+  StorageState,
+  type BrowserContext,
+} from "@playwright/test";
 import { fullLists, PlaywrightBlocker } from "@ghostery/adblocker-playwright";
 import { CacheRoute } from "playwright-network-cache";
 
@@ -10,9 +14,9 @@ import { getCredentials, login } from "./auth";
 
 import type { UserData } from "@src/common/storage";
 
-export interface LocalStorageEntry {
-  name: string;
-  value: string;
+interface ExpectedUserData {
+  removedKeys: string[];
+  userData: UserData;
 }
 
 export type Version = "v1" | "v2";
@@ -24,12 +28,12 @@ export interface ExtensionFixtures {
   extensionPath: string;
   extensionBaseUrl: string;
   firefoxDebugPort: number | null;
-  v1StorageData: LocalStorageEntry[];
-  v2StorageData: LocalStorageEntry[];
-  storageData: Record<Version, LocalStorageEntry[]>;
-  v1StorageUserDataExpected: Record<string, UserData>;
-  v2StorageUserDataExpected: Record<string, UserData>;
-  storageUserDataExpected: Record<Version, Record<string, UserData>>;
+  v1StorageData: Exclude<StorageState, string>;
+  v2StorageData: Exclude<StorageState, string>;
+  storageData: Record<Version, Exclude<StorageState, string>>;
+  v1StorageUserDataExpected: Record<string, ExpectedUserData>;
+  v2StorageUserDataExpected: Record<string, ExpectedUserData>;
+  storageUserDataExpected: Record<Version, Record<string, ExpectedUserData>>;
 }
 
 const readData = async <T>(filename: string) => {
@@ -38,13 +42,6 @@ const readData = async <T>(filename: string) => {
     "utf-8"
   );
   return JSON.parse(data) as T;
-};
-
-const toLocalStorageFormat = (data: Record<string, any>) => {
-  return Object.entries(data).map(([name, value]) => ({
-    name,
-    value: JSON.stringify(value),
-  }));
 };
 
 export const test = base.extend<ExtensionFixtures>({
@@ -87,7 +84,7 @@ export const test = base.extend<ExtensionFixtures>({
     await cacheRoute.GET("**/*.{css,js,json}*");
     await cacheRoute.GET("**/*.{woff2,woff,tff}*");
     await cacheRoute.GET("https://mapgenie.io/**");
-    await cacheRoute.GET("https://rrd2maps.com/**");
+    await cacheRoute.GET("https://rdr2map.com/**");
 
     await use(page);
   },
@@ -160,12 +157,16 @@ export const test = base.extend<ExtensionFixtures>({
     }
   },
   v1StorageData: async ({}, use) => {
-    const data = await readData<Record<string, any>>("storage.v1.json");
-    await use(toLocalStorageFormat(data));
+    const data = await readData<Exclude<StorageState, string>>(
+      "storage.v1.json"
+    );
+    await use(data);
   },
   v2StorageData: async ({}, use) => {
-    const data = await readData<Record<string, any>>("storage.v2.json");
-    await use(toLocalStorageFormat(data));
+    const data = await readData<Exclude<StorageState, string>>(
+      "storage.v2.json"
+    );
+    await use(data);
   },
   storageData: async ({ v1StorageData, v2StorageData }, use) => {
     await use({
@@ -174,13 +175,13 @@ export const test = base.extend<ExtensionFixtures>({
     });
   },
   v1StorageUserDataExpected: async ({}, use) => {
-    const data = await readData<Record<string, UserData>>(
+    const data = await readData<Record<string, ExpectedUserData>>(
       "userData.v1.expected.json"
     );
     await use(data);
   },
   v2StorageUserDataExpected: async ({}, use) => {
-    const data = await readData<Record<string, UserData>>(
+    const data = await readData<Record<string, ExpectedUserData>>(
       "userData.v2.expected.json"
     );
     await use(data);

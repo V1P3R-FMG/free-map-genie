@@ -1,58 +1,23 @@
 {
-  "mg:game_20:user_0:v5": {
-    "sharedData": {
-      "locations": {
-        "25075": true,
-        "25076": true,
-        "25079": true,
-        "25082": true,
-        "26329": true,
-        "26343": true,
-        "27946": true,
-        "30108": true,
-        "30109": true,
-        "30173": true,
-        "31543": true,
-        "31544": true,
-        "31545": true,
-        "31546": true,
-        "31547": true,
-        "31548": true,
-        "31549": true,
-        "31550": true,
-        "31552": true,
-        "31553": true,
-        "31554": true,
-        "31555": true,
-        "31556": true,
-        "31564": true,
-        "31901": true,
-        "35949": true,
-        "49116": true,
-        "54354": true,
-        "75408": true,
-        "267637": true,
-        "267648": true,
-        "292853": true,
-        "292873": true,
-        "292875": true,
-        "323745": true,
-        "397662": true,
-        "401795": true,
-        "401796": true,
-        "403859": true,
-        "410427": true,
-        "410431": true,
-        "424622": true,
-        "424623": true,
-        "425604": true
-      }
+  "cookies": [],
+  "origins": [
+    {
+      "origin": "https://mapgenie.io",
+      "localStorage": [
+        {
+          "name": "mg:game_20:user_0:v5",
+          "value": "{\"sharedData\":{\"locations\":{\"25075\":true,\"25076\":true,\"25079\":true,\"25082\":true,\"26329\":true,\"26343\":true,\"27946\":true,\"30108\":true,\"30109\":true,\"30173\":true,\"31543\":true,\"31544\":true,\"31545\":true,\"31546\":true,\"31547\":true,\"31548\":true,\"31549\":true,\"31550\":true,\"31552\":true,\"31553\":true,\"31554\":true,\"31555\":true,\"31556\":true,\"31564\":true,\"31901\":true,\"35949\":true,\"49116\":true,\"54354\":true,\"75408\":true,\"267637\":true,\"267648\":true,\"292853\":true,\"292873\":true,\"292875\":true,\"323745\":true,\"397662\":true,\"401795\":true,\"401796\":true,\"403859\":true,\"410427\":true,\"410431\":true,\"424622\":true,\"424623\":true,\"425604\":true}},\"mapData\":{\"67\":{\"categories\":{\"941\":true,\"961\":true,\"4740\":true}},\"68\":{\"categories\":{\"942\":true,\"959\":true,\"969\":true}},\"72\":{\"categories\":{\"941\":true,\"954\":true,\"961\":true}},\"74\":{\"categories\":{\"952\":true}}}}"
+        }
+      ]
     },
-    "mapData": {
-      "67": { "categories": { "941": true, "961": true, "4740": true } },
-      "68": { "categories": { "942": true, "959": true, "969": true } },
-      "72": { "categories": { "954": true, "941": true, "961": true } },
-      "74": { "categories": { "952": true } }
+    {
+      "origin": "https://rdr2map.com",
+      "localStorage": [
+        {
+          "name": "mg:game_1:user_0:v5",
+          "value": "{\"sharedData\":{\"locations\":{\"173\":true,\"353\":true,\"851\":true,\"2322\":true,\"17335\":true,\"17982\":true,\"20501\":true,\"20502\":true,\"20504\":true,\"20766\":true,\"25551\":true,\"30346\":true,\"59928\":true,\"60777\":true,\"63701\":true,\"475929\":true}},\"mapData\":{\"1\":{\"categories\":{\"14\":true,\"36\":true,\"555\":true,\"558\":true}}}}"
+        }
+      ]
     }
-  }
+  ]
 }

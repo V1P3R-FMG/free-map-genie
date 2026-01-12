@@ -2,74 +2,66 @@ import { expect } from "@playwright/test";
 
 import { test } from "../helpers/fixtures";
 import { MapPage } from "../pages/map";
-import { resolveStorageState } from "../helpers";
+import { extendStorageState } from "../helpers";
 
-import type { Page } from "@playwright/test";
+const VERSIONS = ["v1", "v2"] as const;
+const DOMAINS = ["mapgenie.io", "rdr2map.com"] as const;
 
-(["v1", "v2"] as const).forEach((version) => {
-  test.describe(`Data migration from fmg@${version}`, () => {
-    test.use({
-      storageState: async (
-        { storageState, v1StorageData, v2StorageData },
-        use
-      ) => {
-        const { cookies } = await resolveStorageState(storageState);
+VERSIONS.forEach((version) => {
+  DOMAINS.forEach((domain) => {
+    test.describe(`Data migration from for ${domain}`, () => {
+      test.use({
+        storageState: async ({ storageState, storageData }, use) => {
+          const extendedStorageState = await extendStorageState(
+            storageState,
+            storageData[version]
+          );
+          await use(extendedStorageState);
+        },
+      });
 
-        const versions = {
-          v1: v1StorageData,
-          v2: v2StorageData,
-        };
+      test(`It should migrate @${version} data correctly`, async ({
+        page,
+        storageUserDataExpected,
+      }) => {
+        const mapPage = new MapPage(page);
 
-        await use({
-          cookies,
-          origins: [
-            {
-              origin: "https://mapgenie.io",
-              localStorage: versions[version] ?? [],
-            },
-          ],
-        });
-      },
-    });
+        await mapPage.forceUserId(0);
 
-    test("It should migrate data correctly", async ({
-      page,
-      storageData,
-      storageUserDataExpected,
-    }) => {
-      const mapPage = new MapPage(page);
+        await mapPage.gotoTarkovFactoryMap({ timeout: 0 });
+        await mapPage.waitForAxiosInterceptor();
 
-      await mapPage.forceUserId(0);
+        const userData = await mapPage.getUserData();
 
-      await mapPage.gotoTarkovFactoryMap({ timeout: 0 });
-      await mapPage.waitForAxiosInterceptor();
+        const gameId = await mapPage.getGameId();
+        const userId = await mapPage.getUserId();
 
-      const userData = await mapPage.getUserData();
+        const { removedKeys, userData: expected } =
+          storageUserDataExpected[version][`${gameId}:${userId}`] || {};
 
-      const gameId = await mapPage.getGameId();
-      const userId = await mapPage.getUserId();
+        // Sanity checks
+        expect(userId).toEqual(0);
+        expect(expected).toBeDefined();
+        expect(removedKeys).toBeDefined();
 
-      const expected = storageUserDataExpected[version][`${gameId}:${userId}`];
+        // Verify migrated data
+        expect(userData).toEqual(expected);
 
-      // Sanity checks
-      expect(userId).toEqual(0);
-      expect(expected).toBeDefined();
+        // Verify that old keys are removed
 
-      // Verify migrated data
-      expect(userData).toEqual(expected);
+        const data = await page.evaluate((keys) => {
+          return Object.fromEntries(
+            keys.map((key) => [key, localStorage.getItem(key)])
+          );
+        }, removedKeys);
 
-      // Verify that old keys are removed
-      const keys = storageData[version].map((item) => item.name);
-
-      const data = await page.evaluate((keys) => {
-        return Object.fromEntries(
-          keys.map((key) => [key, localStorage.getItem(key)])
-        );
-      }, keys);
-
-      for (const key of keys) {
-        expect(data[key]).toBeNull();
-      }
+        for (const [key, value] of Object.entries(data)) {
+          expect(
+            value,
+            `Expected localStorage key "${key}" to be removed`
+          ).toBeNull();
+        }
+      });
     });
   });
 });

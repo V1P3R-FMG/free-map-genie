@@ -19,7 +19,17 @@ export const login = async (
     const loginPage = new LoginPage(page);
 
     await loginPage.clearCookies();
-    await loginPage.gotoLoginPage();
+
+    // mapgenie.io
+    await loginPage.gotoMapgenieLoginPage();
+
+    await loginPage.emailInput.fill(email);
+    await loginPage.passwordInput.fill(password);
+    await loginPage.submitButton.click();
+
+    // rdr2map.com
+
+    await loginPage.gotoRdr2mapLoginPage();
 
     await loginPage.emailInput.fill(email);
     await loginPage.passwordInput.fill(password);

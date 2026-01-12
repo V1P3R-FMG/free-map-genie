@@ -9,8 +9,8 @@ export class LoginPage {
     await this.page.context().clearCookies();
   }
 
-  public async gotoLoginPage() {
-    await this.page.goto("https://mapgenie.io/tarkov/maps/factory");
+  private async gotoLoginPage(url: string) {
+    await this.page.goto(url);
 
     const visible = await this.privacyAcceptButton.isVisible();
     if (visible) {
@@ -23,6 +23,14 @@ export class LoginPage {
     ]);
 
     this.loginPage = newPage;
+  }
+
+  public async gotoMapgenieLoginPage() {
+    await this.gotoLoginPage("https://mapgenie.io/tarkov/maps/factory");
+  }
+
+  public async gotoRdr2mapLoginPage() {
+    await this.gotoLoginPage("https://rdr2map.com/");
   }
 
   public async waitForMapPage() {

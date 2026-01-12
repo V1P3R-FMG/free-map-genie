@@ -75,22 +75,24 @@ export const launchFirefox = async ({
   return [context, userDataDir] as const;
 };
 
-export const resolveStorageState = async (storageState: StorageState) => {
+export const resolveStorageState = async <S extends Partial<StorageState>>(
+  storageState: S
+) => {
   if (typeof storageState === "string") {
     const data = await fs.promises.readFile(storageState, "utf-8");
     return JSON.parse(data) as Exclude<StorageState, string>;
   } else {
-    return storageState as Exclude<StorageState, string>;
+    return storageState as Exclude<S, string>;
   }
 };
 
-export const loadStorageState = async (
+export const loadStorageState = async <S extends Partial<StorageState>>(
   context: BrowserContext,
-  storageState: StorageState
+  storageState: S
 ) => {
   const resolvedState = await resolveStorageState(storageState);
 
-  if (resolvedState) {
+  if (resolvedState.cookies) {
     await context.addCookies(resolvedState.cookies);
   }
 
@@ -106,4 +108,38 @@ export const loadStorageState = async (
       }
     }, resolvedState.origins);
   }
+};
+
+export const extendStorageState = async (
+  storageState: StorageState,
+  additionalState: Partial<StorageState>
+): Promise<StorageState> => {
+  const resolvedState = await resolveStorageState(storageState);
+  const resolvedAdditionalState = await resolveStorageState(additionalState);
+
+  const filteredCookies = resolvedAdditionalState.cookies
+    ? resolvedAdditionalState.cookies.filter((additionalCookie) => {
+        return !resolvedState.cookies?.some(
+          (cookie) =>
+            cookie.name === additionalCookie.name &&
+            cookie.domain === additionalCookie.domain
+        );
+      })
+    : [];
+
+  const filteredOrigins = resolvedAdditionalState.origins
+    ? resolvedAdditionalState.origins.filter((additionalOrigin) => {
+        return !resolvedState.origins?.some(
+          (origin) => origin.origin === additionalOrigin.origin
+        );
+      })
+    : [];
+
+  const additionalCookies = resolvedState.cookies ?? [];
+  const additionalOrigins = resolvedState.origins ?? [];
+
+  return {
+    cookies: [...filteredCookies, ...additionalCookies],
+    origins: [...filteredOrigins, ...additionalOrigins],
+  };
 };
