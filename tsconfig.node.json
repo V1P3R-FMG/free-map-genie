@@ -10,5 +10,5 @@
     "esModuleInterop": true,
     "resolveJsonModule": true
   },
-  "include": ["modules", "*.ts", "*.js"]
+  "include": ["modules", "*.ts", "*.js", "env.d.ts"]
 }
