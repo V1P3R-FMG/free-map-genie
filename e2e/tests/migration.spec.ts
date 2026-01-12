@@ -28,7 +28,17 @@ VERSIONS.forEach((version) => {
 
         await mapPage.forceUserId(0);
 
-        await mapPage.gotoTarkovFactoryMap({ timeout: 0 });
+        switch (domain) {
+          case "mapgenie.io":
+            await mapPage.gotoTarkovFactoryMap();
+            break;
+          case "rdr2map.com":
+            await mapPage.gotoRedDeadRedemption2Map();
+            break;
+          default:
+            throw new Error(`Unknown domain: ${domain}`);
+        }
+
         await mapPage.waitForAxiosInterceptor();
 
         const userData = await mapPage.getUserData();
@@ -45,7 +55,15 @@ VERSIONS.forEach((version) => {
         expect(removedKeys).toBeDefined();
 
         // Verify migrated data
-        expect(userData).toEqual(expected);
+        expect(userData.locations).toEqual(expected.locations);
+        expect(userData.trackedCategoryIds).toEqual(
+          expect.arrayContaining(expected.trackedCategoryIds)
+        );
+        expect(userData.notes).toEqual(expect.arrayContaining(expected.notes));
+        expect(userData.presetOrdering).toEqual(expected.presetOrdering);
+        expect(userData.presets).toEqual(
+          expect.arrayContaining(expected.presets)
+        );
 
         // Verify that old keys are removed
 

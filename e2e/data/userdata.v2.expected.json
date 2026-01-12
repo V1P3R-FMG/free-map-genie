@@ -92,5 +92,57 @@
         }
       ]
     }
+  },
+  "1:0": {
+    "removedKeys": ["fmg:game_1:map_1:user_0"],
+    "userData": {
+      "locations": {
+        "173": true,
+        "353": true,
+        "851": true,
+        "2322": true,
+        "17335": true,
+        "17982": true,
+        "20501": true,
+        "20502": true,
+        "20504": true,
+        "20766": true,
+        "25551": true,
+        "30346": true,
+        "59928": true,
+        "60777": true,
+        "63701": true,
+        "475929": true
+      },
+      "trackedCategoryIds": [14, 36, 555, 558],
+      "notes": [
+        {
+          "map_id": 1,
+          "title": "Test",
+          "description": "This is a test note",
+          "color": null,
+          "latitude": -22.08740721395627,
+          "longitude": 69.7566482994963,
+          "category": null,
+          "id": "pQyHqFsKOK",
+          "user_id": 0,
+          "game_id": 1
+        },
+        {
+          "map_id": 1,
+          "title": "Test",
+          "description": "This is a test note",
+          "color": "b66f8d",
+          "latitude": 47.148116427221424,
+          "longitude": 119.63240861168714,
+          "category": null,
+          "id": "bdJ6csQevV",
+          "user_id": 0,
+          "game_id": 1
+        }
+      ],
+      "presetOrdering": [],
+      "presets": []
+    }
   }
 }
