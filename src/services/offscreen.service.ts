@@ -1,5 +1,4 @@
 import { createService } from "@/common/messaging";
-import { normalizeUrl } from "@/common/url";
 import { waitForBody } from "@/common/dom";
 
 import type { ProxiedObject } from "@/common/messaging";
@@ -27,26 +26,28 @@ export class OffscreenService {
 
   public async addIframe(url: string) {
     const normalizedUrl = URL.canParse(url)
-      ? normalizeUrl(url)
-      : normalizeUrl(`https://${url}`);
+      ? new URL(url)
+      : new URL(`https://${url}`);
+    const normalizedUrlStr = normalizedUrl.toString();
 
-    if (this._iframes.has(normalizedUrl)) return;
+    if (this._iframes.has(normalizedUrlStr)) return;
 
-    const iframe = await this.createIframe(normalizedUrl);
-    this._iframes.set(normalizedUrl, iframe);
+    const iframe = await this.createIframe(normalizedUrlStr);
+    this._iframes.set(normalizedUrlStr, iframe);
   }
 
   public removeIframe(url: string) {
     const normalizedUrl = URL.canParse(url)
-      ? normalizeUrl(url)
-      : normalizeUrl(`https://${url}`);
+      ? new URL(url)
+      : new URL(`https://${url}`);
+    const normalizedUrlStr = normalizedUrl.toString();
 
-    const iframe = this._iframes.get(normalizedUrl);
+    const iframe = this._iframes.get(normalizedUrlStr);
 
     if (!iframe) return;
 
     iframe.remove();
-    this._iframes.delete(normalizedUrl);
+    this._iframes.delete(normalizedUrlStr);
   }
 }
 
