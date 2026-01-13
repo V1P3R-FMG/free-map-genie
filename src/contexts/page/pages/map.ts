@@ -9,18 +9,28 @@ export class MapPage extends Page {
   private _mapId?: number;
 
   private async loadUserData() {
-    if (!window.user || !window.mapData) {
-      throw new Error("User or mapData is not available");
-    }
-
     await this.client.migrate();
     const data = await this.client.getData();
 
-    window.user.locations = data.locations;
-    window.user.trackedCategoryIds = data.trackedCategoryIds;
+    const locationsById = Object.fromEntries(
+      window.mapData!.locations.map((loc) => [loc.id, loc])
+    );
 
-    window.mapData.notes = data.notes;
-    window.mapData.presets = data.presets;
+    const filteredLocations = Object.fromEntries(
+      Object.keys(data.locations)
+        .filter((id) => !!locationsById[id])
+        .map((id) => [id, true])
+    );
+
+    const filteredNotes = data.notes.filter(
+      (note) => note.map_id === window.mapData!.map.id
+    );
+
+    window.user!.locations = filteredLocations;
+    window.user!.trackedCategoryIds = data.trackedCategoryIds;
+
+    window.mapData!.notes = filteredNotes;
+    window.mapData!.presets = data.presets;
   }
 
   private async unlockMapSelector() {
