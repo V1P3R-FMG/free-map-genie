@@ -18,8 +18,6 @@ export class GuidePage extends Page {
     await this.client.migrate();
     const data = await this.client.getData();
 
-    logger.debug("Loaded user data for guide page", data);
-
     window.foundLocations = data.locations;
 
     if (this.isTarkovQuest17Page()) {
