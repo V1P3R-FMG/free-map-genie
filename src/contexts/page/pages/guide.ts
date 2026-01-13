@@ -108,10 +108,6 @@ export class GuidePage extends Page {
     // Make sure the guide script checkboxes are unchecked
     $<HTMLInputElement>(".check").each((_, el) => {
       el.checked = false;
-
-      el.onchange = () => {
-        console.log("changed", el.dataset.locationId, el.checked);
-      };
     });
   }
 
