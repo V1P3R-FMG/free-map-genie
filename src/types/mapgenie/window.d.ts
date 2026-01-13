@@ -1,11 +1,9 @@
 interface Window {
+  // map
   user?: MG.User;
   game?: MG.Game;
   mapData?: MG.MapData;
-  isPro?: boolean;
-
   config?: MG.Config;
-  mapData?: MG.MapData;
 
   mapUrl?: string;
   baseUrl?: string;
@@ -16,13 +14,15 @@ interface Window {
   initialZoom?: Int;
   initialPosition?: MG.Position;
 
-  google?: MG.Google;
-
   store?: MG.Store;
   mapManager?: MG.MapManager;
   map?: MG.MapboxglMap;
 
-  axios?: import("axios").Axios;
+  // guide
+  isPro?: boolean;
+  foundLocations?: Record<number, boolean>;
+  mapElement?: HTMLIFrameElement;
 
-  locations?: Record<number, boolean>;
+  // libraries
+  axios?: import("axios").Axios;
 }

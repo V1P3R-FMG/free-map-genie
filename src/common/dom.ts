@@ -1,35 +1,55 @@
-export const waitForBody = () => {
-  return new Promise<HTMLElement>((resolve) => {
-    if (document.body) {
-      resolve(document.body);
-      return;
-    }
+export interface WaitForElementOptions {
+  subtree?: boolean;
+  timeout?: number;
+}
+
+export const waitForElement = <T extends HTMLElement>(
+  parent: HTMLElement | Document,
+  selector: string,
+  { subtree = false, timeout = 10000 }: WaitForElementOptions = {}
+): Promise<T> => {
+  return new Promise<T>((resolve, reject) => {
+    const el = parent.querySelector<T>(selector);
+    if (el) return resolve(el);
 
     const observer = new MutationObserver(() => {
-      if (document.body) {
+      const el = parent.querySelector<T>(selector);
+      if (el) {
         observer.disconnect();
-        resolve(document.body);
+        resolve(el);
       }
     });
 
-    observer.observe(document.documentElement, { childList: true });
+    observer.observe(parent, {
+      childList: true,
+      subtree,
+    });
+
+    if (timeout && timeout > 0) {
+      setTimeout(() => {
+        observer.disconnect();
+        reject(new Error(`waitForElement timeout: ${selector}`));
+      }, timeout);
+    }
   });
 };
 
+export const waitForBody = () => {
+  return waitForElement<HTMLBodyElement>(document.documentElement, "body");
+};
+
 export const waitForHead = () => {
-  return new Promise<HTMLElement>((resolve) => {
-    if (document.head) {
-      resolve(document.head);
-      return;
+  return waitForElement<HTMLHeadElement>(document.documentElement, "head");
+};
+
+export const waitForDocumentLoaded = () => {
+  return new Promise<void>((resolve) => {
+    if (
+      document.readyState === "complete" ||
+      document.readyState === "interactive"
+    ) {
+      return resolve();
     }
-
-    const observer = new MutationObserver(() => {
-      if (document.head) {
-        observer.disconnect();
-        resolve(document.head);
-      }
-    });
-
-    observer.observe(document.documentElement, { childList: true });
+    document.addEventListener("DOMContentLoaded", () => resolve());
   });
 };

@@ -1,11 +1,14 @@
 import { Page } from "./page";
 import { Client } from "@/common/client";
 import { createAsyncProxy, type AsyncProxy } from "@/common/asyncProxy";
-import { activateBlockedMapgenieScript, makeUserPro } from "@/common/mapgenie";
+import { activateBlockedMapgenieScript, loginAsUser } from "@/common/mapgenie";
 import { waitForAxios } from "@/common/axios";
+import { waitForProperty } from "@/common/object";
+import { waitForDocumentLoaded, waitForElement } from "@/common/dom";
 
 export class GuidePage extends Page {
   private _client?: AsyncProxy<Client>;
+  private _userId?: number;
 
   private async loadUserData() {
     if (!window.user) {
@@ -17,7 +20,11 @@ export class GuidePage extends Page {
 
     logger.debug("Loaded user data for guide page", data);
 
-    window.user!.locations = data.locations;
+    window.foundLocations = data.locations;
+
+    if (this.isTarkovQuest17Page()) {
+      window.user.locations = data.locations;
+    }
   }
 
   private isTarkovQuest17Page() {
@@ -43,22 +50,78 @@ export class GuidePage extends Page {
     return (this._client ??= createAsyncProxy(() => this.createClient()));
   }
 
+  private async setupUser() {
+    const userId = await this.getUserId();
+
+    loginAsUser(userId!);
+
+    // Mark user as pro to unlock all features in the guide
+    window.isPro = true;
+
+    if (this.isTarkovQuest17Page()) {
+      window.user!.hasPro = true;
+    }
+  }
+
+  private async getUserId() {
+    if (this._userId !== undefined) {
+      return this._userId;
+    }
+
+    if (this.isTarkovQuest17Page()) {
+      await waitForProperty(window, "config");
+      return window.user?.id;
+    }
+
+    const mapElement = await waitForElement<HTMLIFrameElement>(
+      document,
+      "#sticky-map iframe"
+    );
+    const mapWindow = await waitForProperty(mapElement, "contentWindow");
+    await waitForProperty(mapWindow!, "mapData");
+
+    return mapWindow?.user?.id;
+  }
+
+  private async activateGuideScript() {
+    const activateGuideScript = await waitForProperty(
+      window,
+      "__fmgActivateGuideScript"
+    );
+    activateGuideScript?.();
+  }
+
+  private resetCheckboxes() {
+    // Make sure the guide script checkboxes are unchecked
+    $<HTMLInputElement>(".check").each((_, el) => {
+      el.checked = false;
+    });
+  }
+
   public async start() {
+    await this.setupUser();
+
     await this.client.storageRequestPersist();
 
-    makeUserPro();
-
     await this.loadUserData();
+
+    await waitForDocumentLoaded();
+    this.resetCheckboxes();
+
+    await this.activateGuideScript();
 
     if (this.isTarkovQuest17Page()) {
       await activateBlockedMapgenieScript("TarkovQuestToolWidget");
     }
+
     await this.client.installInterceptor();
   }
 
-  public canStart() {
-    // We can only start if user and mapData are present
-    if (!window.user) {
+  public async canStart() {
+    const userId = await this.getUserId();
+
+    // We can only start if user is logged in
+    if (userId === undefined) {
       logger.warn("User not logged in, FMG will not work");
 
       return false;

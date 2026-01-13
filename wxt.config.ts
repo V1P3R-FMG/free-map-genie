@@ -44,7 +44,7 @@ export default defineConfig({
     web_accessible_resources: [
       {
         matches: ["<all_urls>"],
-        resources: ["page.js", "fonts/*", "css/*"],
+        resources: ["page.js", "tablesort.js", "fonts/*", "css/*"],
       },
     ],
     permissions:

@@ -2,10 +2,10 @@ import { Page } from "./page";
 import { Client } from "@/common/client";
 import {
   activateBlockedMapgenieScript,
-  makeUserPro,
   removeLocationsLimit,
 } from "@/common/mapgenie";
 import { mapDataUtils } from "@/common/mapgenie";
+import { waitForProperty } from "@/common/object";
 
 export class MapPage extends Page {
   private _client?: Client;
@@ -138,10 +138,13 @@ export class MapPage extends Page {
     return (this._client ??= Client.forMap());
   }
 
+  private async setupUser() {
+    window.user!.hasPro = true;
+  }
+
   public async start() {
     await this.client.storageRequestPersist();
 
-    makeUserPro();
     removeLocationsLimit();
     this.unlockMapSelector();
 
@@ -154,8 +157,10 @@ export class MapPage extends Page {
   }
 
   public async canStart() {
-    // We can only start if user, game and mapData are present
-    if (!window.user || !window.mapData || !window.game) {
+    await waitForProperty(window, "mapData");
+
+    // We can only start if user is logged in
+    if (window.user === undefined) {
       logger.warn("User not logged in, FMG will not work");
 
       return false;

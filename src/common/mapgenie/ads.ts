@@ -65,6 +65,10 @@ export default class MapgenieAdBlocker {
     return this.removeElements("#blobby-left");
   }
 
+  private static removeUpgradeProButton() {
+    return this.removeElements("#button-upgrade");
+  }
+
   private static removeBlueKai() {
     return this.removeElements('iframe[name="__bkframe"]');
   }
@@ -76,6 +80,7 @@ export default class MapgenieAdBlocker {
   private static removeAds() {
     return [
       this.removeUpgradeProAd(),
+      this.removeUpgradeProButton(),
       this.removeIframeAds(),
       this.removeGoogleAds(),
       this.removeNitroAds(),
@@ -127,6 +132,10 @@ export default class MapgenieAdBlocker {
   public static async removePrivacyPopup() {
     if (!import.meta.env.DEV) return;
 
-    await waitUntil(() => !!this.removePrivacyPopupElement());
+    try {
+      await waitUntil(() => !!this.removePrivacyPopupElement());
+    } catch {
+      // Ignore timeout
+    }
   }
 }

@@ -26,30 +26,15 @@ export const activateBlockedMapgenieScript = async (name: string) => {
   $(`<script/>`, { src }).appendTo("body");
 };
 
-export const loginAsMockedUser = () => {
+export const loginAsUser = (id: number) => {
   window.user = {
-    id: -1,
+    id,
     hasPro: false,
     locations: {},
     trackedCategoryIds: [],
     role: "user",
     suggestions: [],
   };
-};
-
-export const makeUserPro = () => {
-  // We check for false specifically becuase undefined means its not the right page
-  // isPro is only on guide pages
-  if (window.isPro === false) {
-    window.isPro = true;
-  }
-
-  // window.user is only on map pages
-  if (window.user) {
-    window.user.hasPro = true;
-  } else {
-    logger.warn("Failed to make user pro: user is not defined on window");
-  }
 };
 
 export const removeLocationsLimit = () => {
