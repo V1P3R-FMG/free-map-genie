@@ -53,17 +53,17 @@ const addRulesViaDeclarativeNetRequest = async () => {
 const addRulesViaWebRequest = () => {
   logger.debug("Using webRequest to handle mapgenie.io requests");
 
-  const headersToRemove = ["X-Frame-Options", "Frame-Options"];
+  const headersToRemove = ["x-frame-options", "frame-options"];
 
   browser.webRequest.onHeadersReceived.addListener(
     (e) => {
       const filteredHeaders = e.responseHeaders?.filter(
-        ({ name }) => !headersToRemove.includes(name)
+        ({ name }) => !headersToRemove.includes(name.toLowerCase())
       );
       return { responseHeaders: filteredHeaders };
     },
     {
-      urls: ["*://mapgenie.io/"],
+      urls: ["*://mapgenie.io/*"],
     },
     ["blocking", "responseHeaders"]
   );
@@ -71,7 +71,10 @@ const addRulesViaWebRequest = () => {
   browser.webRequest.onBeforeRequest.addListener(
     () => ({ cancel: true }),
     {
-      urls: ["*://cdn.mapgenie.io/js/map.js?id=*"],
+      urls: [
+        "*://cdn.mapgenie.io/js/map.js?id=*",
+        "*://cdn.mapgenie.io/js/TarkovQuestToolWidget.js?id=*",
+      ],
     },
     ["blocking"]
   );
@@ -82,5 +85,6 @@ export async function addRules() {
     await addRulesViaDeclarativeNetRequest();
   } else {
     addRulesViaWebRequest();
+    await new Promise((resolve) => setTimeout(resolve, 1000));
   }
 }
