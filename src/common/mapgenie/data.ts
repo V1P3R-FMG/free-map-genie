@@ -40,6 +40,12 @@ export const loadMapData = (map: MG.Api.MapFullForGame) => {
   window.mapData.categories = categories;
   window.mapData.mapConfig = map.config;
   window.mapData.regions = map.regions;
+
+  window.initialZoom = map.config.initial_zoom;
+  window.initialPosition = {
+    lat: map.config.start_lat,
+    lng: map.config.start_lng,
+  };
 };
 
 const getHeatmapGroups = (heatmapGroups: MG.Api.HeatmapGroup[]) => {
