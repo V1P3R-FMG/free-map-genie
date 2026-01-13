@@ -22,6 +22,9 @@ export default class PortAdapter extends Adapter {
   private connect() {
     this.port?.disconnect();
 
+    // Supress possible errors from lastError
+    const _ = browser.runtime.lastError;
+
     this.port = browser.runtime.connect({ name: this.id });
 
     this.port.onMessage.addListener((message: any) =>
@@ -51,6 +54,9 @@ export default class PortAdapter extends Adapter {
 
   public sendMessage(message: any) {
     this.port?.postMessage(message);
+
+    // Supress possible errors from lastError
+    const _ = browser.runtime.lastError;
   }
 
   public disconnect() {
