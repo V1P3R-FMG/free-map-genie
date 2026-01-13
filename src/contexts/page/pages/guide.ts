@@ -1,7 +1,7 @@
 import { Page } from "./page";
 import { Client } from "@/common/client";
 import { createAsyncProxy, type AsyncProxy } from "@/common/asyncProxy";
-import { activateBlockedMapgenieScript, loginAsUser } from "@/common/mapgenie";
+import { activateBlockedMapgenieScript } from "@/common/mapgenie";
 import { waitForAxios } from "@/common/axios";
 import { waitForProperty } from "@/common/object";
 import { waitForDocumentLoaded, waitForElement } from "@/common/dom";
@@ -50,10 +50,27 @@ export class GuidePage extends Page {
     return (this._client ??= createAsyncProxy(() => this.createClient()));
   }
 
+  private async getMapWindow() {
+    const mapElement = await waitForElement<HTMLIFrameElement>(
+      document,
+      "#sticky-map iframe"
+    );
+    const mapWindow = await waitForProperty(mapElement, "contentWindow");
+    await waitForProperty(mapWindow!, "mapData");
+    return mapWindow;
+  }
+
   private async setupUser() {
     const userId = await this.getUserId();
 
-    loginAsUser(userId!);
+    window.user = {
+      id: userId!,
+      hasPro: false,
+      locations: {},
+      trackedCategoryIds: [],
+      role: "user",
+      suggestions: [],
+    };
 
     // Mark user as pro to unlock all features in the guide
     window.isPro = true;
@@ -73,13 +90,7 @@ export class GuidePage extends Page {
       return window.user?.id;
     }
 
-    const mapElement = await waitForElement<HTMLIFrameElement>(
-      document,
-      "#sticky-map iframe"
-    );
-    const mapWindow = await waitForProperty(mapElement, "contentWindow");
-    await waitForProperty(mapWindow!, "mapData");
-
+    const mapWindow = await this.getMapWindow();
     return mapWindow?.user?.id;
   }
 
@@ -91,10 +102,37 @@ export class GuidePage extends Page {
     activateGuideScript?.();
   }
 
-  private resetCheckboxes() {
+  private async resetCheckboxes() {
+    await waitForDocumentLoaded();
+
     // Make sure the guide script checkboxes are unchecked
     $<HTMLInputElement>(".check").each((_, el) => {
       el.checked = false;
+
+      el.onchange = () => {
+        console.log("changed", el.dataset.locationId, el.checked);
+      };
+    });
+  }
+
+  private async setupEventListeners() {
+    if (this.isTarkovQuest17Page()) {
+      return;
+    }
+
+    const mapWindow = await this.getMapWindow();
+    mapWindow?.addEventListener("locationMarked", (e) => {
+      const { detail } = e as CustomEvent<Client.LocationEvent>;
+
+      const $checkbox = $<HTMLInputElement>(
+        `.check[data-location-id="${detail.locationId}"]`
+      );
+
+      if ($checkbox.length === 0) {
+        return;
+      }
+
+      $checkbox.prop("checked", detail.found);
     });
   }
 
@@ -105,8 +143,9 @@ export class GuidePage extends Page {
 
     await this.loadUserData();
 
-    await waitForDocumentLoaded();
-    this.resetCheckboxes();
+    await this.resetCheckboxes();
+
+    await this.setupEventListeners();
 
     await this.activateGuideScript();
 

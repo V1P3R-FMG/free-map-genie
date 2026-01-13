@@ -1,9 +1,6 @@
 import { Page } from "./page";
 import { Client } from "@/common/client";
-import {
-  activateBlockedMapgenieScript,
-  removeLocationsLimit,
-} from "@/common/mapgenie";
+import { activateBlockedMapgenieScript } from "@/common/mapgenie";
 import { mapDataUtils } from "@/common/mapgenie";
 import { waitForProperty } from "@/common/object";
 
@@ -140,13 +137,27 @@ export class MapPage extends Page {
 
   private async setupUser() {
     window.user!.hasPro = true;
+
+    window.mapData!.maxMarkedLocations = Infinity;
+  }
+
+  private setupEventListeners() {
+    this.client.on("locationMarked", (e) => {
+      // Forward to guide page
+      window.dispatchEvent(
+        new CustomEvent<Client.LocationEvent>("locationMarked", {
+          detail: e.detail,
+        })
+      );
+    });
   }
 
   public async start() {
-    await this.client.storageRequestPersist();
-
-    removeLocationsLimit();
+    this.setupUser();
     this.unlockMapSelector();
+    this.setupEventListeners();
+
+    await this.client.storageRequestPersist();
 
     await this.loadMapData();
     await this.loadHeatmaps();

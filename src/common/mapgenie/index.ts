@@ -25,24 +25,3 @@ export const activateBlockedMapgenieScript = async (name: string) => {
 
   $(`<script/>`, { src }).appendTo("body");
 };
-
-export const loginAsUser = (id: number) => {
-  window.user = {
-    id,
-    hasPro: false,
-    locations: {},
-    trackedCategoryIds: [],
-    role: "user",
-    suggestions: [],
-  };
-};
-
-export const removeLocationsLimit = () => {
-  if (window.mapData) {
-    window.mapData.maxMarkedLocations = Infinity;
-  } else {
-    logger.warn(
-      "Failed to remove locations limit: mapData is not defined on window"
-    );
-  }
-};

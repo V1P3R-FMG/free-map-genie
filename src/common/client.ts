@@ -1,13 +1,12 @@
 import { waitForAxios } from "@/common/axios";
 import { Key } from "@/common/storage";
+import { AxiosInterceptor } from "@/common/axios";
 
 import backendService from "@/services/backend.service";
 import mapgenieService from "@/services/mapgenie.service";
 
-import { AxiosInterceptor } from "@/common/axios";
-import { post } from "jquery";
-
 export class Client {
+  private readonly et: EventTarget = new EventTarget();
   private readonly key: Key;
 
   private static readonly backend = backendService.use();
@@ -140,6 +139,20 @@ export class Client {
     return presets;
   }
 
+  public on<K extends keyof Client.EventMap>(
+    event: K,
+    listener: (e: CustomEvent<Client.EventMap[K]>) => void
+  ) {
+    this.et.addEventListener(event, listener as EventListener);
+  }
+
+  public off<K extends keyof Client.EventMap>(
+    event: K,
+    listener: (e: CustomEvent<Client.EventMap[K]>) => void
+  ) {
+    this.et.removeEventListener(event, listener as EventListener);
+  }
+
   private registerHandlers() {
     if (!this.interceptor) return;
 
@@ -151,6 +164,14 @@ export class Client {
           this.key,
           Number(ctx.params.id),
           true
+        );
+        this.et.dispatchEvent(
+          new CustomEvent<Client.LocationEvent>("locationMarked", {
+            detail: {
+              locationId: Number(ctx.params.id),
+              found: true,
+            },
+          })
         );
         ctx.block();
       }
@@ -164,6 +185,14 @@ export class Client {
           this.key,
           Number(ctx.params.id),
           false
+        );
+        this.et.dispatchEvent(
+          new CustomEvent<Client.LocationEvent>("locationMarked", {
+            detail: {
+              locationId: Number(ctx.params.id),
+              found: false,
+            },
+          })
         );
         ctx.block();
       }
@@ -244,5 +273,16 @@ export class Client {
         ctx.block();
       }
     );
+  }
+}
+
+export namespace Client {
+  export interface LocationEvent {
+    locationId: number;
+    found: boolean;
+  }
+
+  export interface EventMap {
+    locationMarked: LocationEvent;
   }
 }
