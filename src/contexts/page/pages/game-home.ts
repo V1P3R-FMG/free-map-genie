@@ -29,6 +29,9 @@ export class GameHomePage extends Page {
 
     const [_, slug] = location.pathname.split("/");
     const game = await this.mapgenie.fetchGameBySlug(slug);
+    const mapsByTitle = Object.fromEntries(
+      game.maps.map((m) => [m.title.trim(), m])
+    );
 
     links.forEach(({ $link, isPro }) => {
       if (!isPro) return;
@@ -38,7 +41,7 @@ export class GameHomePage extends Page {
         .replace(/\[(WIP|PRO)\]/, "")
         .trim();
 
-      const map = game.maps.find((m) => m.title.trim() === name);
+      const map = mapsByTitle[name];
 
       if (!map) {
         logger.warn(`Could not find game data for ${name}`);
