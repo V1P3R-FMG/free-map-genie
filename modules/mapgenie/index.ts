@@ -1,3 +1,5 @@
+/// <reference types="../../src/types/mapgenie/api.d.ts" />
+
 import path from "node:path";
 import fs from "node:fs";
 
@@ -5,10 +7,52 @@ import { addViteConfig, defineWxtModule } from "wxt/modules";
 
 import setupServer from "./server";
 import define from "./defines";
+import manifest from "../manifest";
+
+const fetchDomains = async () => {
+  const res = await fetch("https://mapgenie.io/api/v1/games");
+  const data = await res.json();
+  const games = data as MG.Api.Game[];
+
+  return Array.from(new Set<string>(games.map((game) => game.domain)));
+};
+
+const replaceAllUrls = (arr: string[], domains: string[]) => {
+  const idx = arr.findIndex((url) => url === "<all_urls>") ?? -1;
+  if (idx === -1) return;
+  arr.splice(idx, 1);
+  arr.push(...domains.map((d) => `*://${d}/*`));
+};
 
 export default defineWxtModule({
   setup(wxt) {
+    let domains: string[] | null = null;
+
+    // Add custom defines
     addViteConfig(wxt, () => ({ define }));
+
+    wxt.hook("entrypoints:resolved", async (wxt, entrypoints) => {
+      if (wxt.config.mode === "development") return;
+
+      domains ??= await fetchDomains();
+
+      for (const ep of entrypoints) {
+        if ("matches" in ep.options) {
+          replaceAllUrls(ep.options.matches, domains!);
+        }
+      }
+    });
+
+    wxt.hook("build:manifestGenerated", async (wxt, manifest) => {
+      if (wxt.config.mode === "development") return;
+
+      domains ??= await fetchDomains();
+
+      for (const resource of manifest.web_accessible_resources) {
+        if (typeof resource === "string") continue;
+        replaceAllUrls(resource.matches, domains!);
+      }
+    });
 
     const mapgenieDevPort = process.env.MAPGENIE_DEV_PORT ?? 3001;
     const mapgenieDevHost = process.env.MAPGENIE_DEV_HOST ?? "localhost";
@@ -17,6 +61,7 @@ export default defineWxtModule({
 
     const mapgenieApiUrl = mapgenieDevOrigin + "/api/v1";
 
+    // Define MAPGENIE_API_URL based on environment
     addViteConfig(wxt, (env) => {
       return {
         define: {
@@ -28,10 +73,12 @@ export default defineWxtModule({
       };
     });
 
+    // Setup dev server proxy for MapGenie
     wxt.hook("server:created", (wxt) => {
       setupServer(wxt, Number(mapgenieDevPort), mapgenieDevHost);
     });
 
+    // Add MapGenie types
     wxt.hook("prepare:types", (wxt, types) => {
       types.push({
         path: "mapgenie.d.ts",
