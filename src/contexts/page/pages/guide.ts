@@ -3,15 +3,29 @@ import { Client } from "@/common/client";
 import { createAsyncProxy, type AsyncProxy } from "@/common/asyncProxy";
 import { activateBlockedMapgenieScript } from "@/common/mapgenie";
 import { waitForProperty } from "@/common/object";
-import { waitForDocumentLoaded, waitForElement } from "@/common/dom";
+import { waitForElement } from "@/common/dom";
 
 import * as async from "@/common/async";
 
 export class GuidePage extends Page {
   private readonly isTarkovQuest17Page =
     window.location.pathname === "/tarkov/guides/quests-17";
+
   private _client?: AsyncProxy<Client>;
   private _userId?: number;
+
+  private get client() {
+    return (this._client ??= createAsyncProxy(() => this.createClient()));
+  }
+
+  private isExtendedState(state: any): state is MG.Guide.ExtendedState {
+    return (
+      state &&
+      "foundLocationsByMap" in state &&
+      "foundLocationsByCategory" in state &&
+      "foundLocationsByRegion" in state
+    );
+  }
 
   private async loadUserData() {
     if (!window.user) {
@@ -24,34 +38,37 @@ export class GuidePage extends Page {
     window.foundLocations = data.locations;
     window.user.locations = data.locations;
 
-    await async.waitUntil(() => this.tryGetState() !== undefined);
-    state!.foundLocations = data.locations;
+    const state = await this.waitForState();
 
-    // Reset found locations by map/category/region
+    // Update state found locations
+    state.foundLocations = data.locations;
+
+    // Reset found locations by map/category/region if we have them
     // We later repopulate these in fixState
-    if ("foundLocationsByMap" in state!) {
-      Object.values(state!.foundLocationsByMap).forEach((locations) => {
+    if (this.isExtendedState(state)) {
+      Object.values(state.foundLocationsByMap).forEach((locations) => {
         locations.length = 0;
       });
-    }
-    if ("foundLocationsByCategory" in state!) {
-      Object.values(state!.foundLocationsByCategory).forEach((locations) => {
+
+      Object.values(state.foundLocationsByCategory).forEach((locations) => {
         locations.length = 0;
       });
-    }
-    if ("foundLocationsByRegion" in state!) {
-      Object.values(state!.foundLocationsByRegion).forEach((locations) => {
+
+      Object.values(state.foundLocationsByRegion).forEach((locations) => {
         locations.length = 0;
       });
     }
   }
 
-  private tryGetState() {
-    try {
-      return state;
-    } catch {
-      return undefined;
-    }
+  private async waitForState() {
+    await async.waitUntil(() => {
+      try {
+        return state !== undefined;
+      } catch {
+        return false;
+      }
+    });
+    return state!;
   }
 
   private async createClient() {
@@ -60,6 +77,7 @@ export class GuidePage extends Page {
     }
 
     try {
+      // Try to get the game ID from axios headers
       const axios = await waitForProperty(window, "axios");
       const gameId = axios!.defaults.headers.common["X-Game-ID"];
 
@@ -68,11 +86,8 @@ export class GuidePage extends Page {
       }
     } catch {}
 
+    // Fallback to URL-based client
     return Client.forUrl(window.location.href);
-  }
-
-  private get client() {
-    return (this._client ??= createAsyncProxy(() => this.createClient()));
   }
 
   private async getMapWindow() {
@@ -88,6 +103,8 @@ export class GuidePage extends Page {
   private async setupUser() {
     const userId = await this.getUserId();
 
+    // Client requires a user to object to function properly
+    // So we create a dummy user
     window.user = {
       id: userId!,
       hasPro: false,
@@ -155,20 +172,19 @@ export class GuidePage extends Page {
     const isFound = window.foundLocations![locationId] ?? false;
     if (!isFound) return;
 
-    if (mapId && "foundLocationsByMap" in state!) {
-      state!.foundLocationsByMap[mapId].push(locationId);
+    if (!this.isExtendedState(state)) {
+      return;
     }
-    if (categoryId && "foundLocationsByCategory" in state!) {
-      state!.foundLocationsByCategory[categoryId].push(locationId);
-    }
-    if (regionId && "foundLocationsByRegion" in state!) {
-      state!.foundLocationsByRegion[regionId].push(locationId);
+
+    state.foundLocationsByMap[mapId].push(locationId);
+    state.foundLocationsByCategory[categoryId].push(locationId);
+
+    if (regionId) {
+      state.foundLocationsByRegion[regionId].push(locationId);
     }
   }
 
   private async fixCheckboxes() {
-    await waitForDocumentLoaded();
-
     // Make sure the guide script checkboxes are unchecked
     $<HTMLInputElement>(".check").each((_, checkbox) => {
       this.fixCheckbox(checkbox);
@@ -198,9 +214,11 @@ export class GuidePage extends Page {
       }
     }
 
-    if (window.markLocationFound) {
-      updateFoundLocationsCount!();
-    }
+    // Update overall found locations count
+    // Ignore errors as function may not exist on some guides
+    try {
+      updateFoundLocationsCount?.();
+    } catch {}
   }
 
   private markLocationFound(locationId: number, found: boolean) {
@@ -215,22 +233,15 @@ export class GuidePage extends Page {
       return;
     }
 
+    $checkbox.prop("checked", found);
+
     // If the guide has its own markLocationFound function, use it
     if (markLocationFound) {
       markLocationFound({ target: $checkbox.get(0)! }, locationId, found);
-      return;
+    } else {
+      // Otherwise, just update the state
+      state!.foundLocations[locationId] = found;
     }
-
-    // Update the checkbox and state ourselves
-    if (state) {
-      state.foundLocations[locationId] = found;
-      $checkbox.prop("checked", found);
-      return;
-    }
-
-    logger.warn(
-      `Could not update checkbox state for location ID ${locationId}`
-    );
   }
 
   private async setupEventListeners() {
@@ -255,8 +266,10 @@ export class GuidePage extends Page {
     await this.fixCheckboxes();
     this.updateCounts();
 
+    // Setup event listeners from the map window
     await this.setupEventListeners();
 
+    // Activate blocked Mapgenie scripts
     if (this.isTarkovQuest17Page) {
       await activateBlockedMapgenieScript("TarkovQuestToolWidget");
     }
@@ -277,6 +290,7 @@ export class GuidePage extends Page {
   }
 
   public async restore() {
+    // Activate blocked Mapgenie scripts
     if (this.isTarkovQuest17Page) {
       await activateBlockedMapgenieScript("TarkovQuestToolWidget");
     }
