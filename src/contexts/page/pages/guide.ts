@@ -2,11 +2,14 @@ import { Page } from "./page";
 import { Client } from "@/common/client";
 import { createAsyncProxy, type AsyncProxy } from "@/common/asyncProxy";
 import { activateBlockedMapgenieScript } from "@/common/mapgenie";
-import { waitForAxios } from "@/common/axios";
 import { waitForProperty } from "@/common/object";
 import { waitForDocumentLoaded, waitForElement } from "@/common/dom";
 
+import * as async from "@/common/async";
+
 export class GuidePage extends Page {
+  private readonly isTarkovQuest17Page =
+    window.location.pathname === "/tarkov/guides/quests-17";
   private _client?: AsyncProxy<Client>;
   private _userId?: number;
 
@@ -19,27 +22,51 @@ export class GuidePage extends Page {
     const data = await this.client.getData();
 
     window.foundLocations = data.locations;
+    window.user.locations = data.locations;
 
-    if (this.isTarkovQuest17Page()) {
-      window.user.locations = data.locations;
+    await async.waitUntil(() => this.tryGetState() !== undefined);
+    state!.foundLocations = data.locations;
+
+    // Reset found locations by map/category/region
+    // We later repopulate these in fixState
+    if ("foundLocationsByMap" in state!) {
+      Object.values(state!.foundLocationsByMap).forEach((locations) => {
+        locations.length = 0;
+      });
+    }
+    if ("foundLocationsByCategory" in state!) {
+      Object.values(state!.foundLocationsByCategory).forEach((locations) => {
+        locations.length = 0;
+      });
+    }
+    if ("foundLocationsByRegion" in state!) {
+      Object.values(state!.foundLocationsByRegion).forEach((locations) => {
+        locations.length = 0;
+      });
     }
   }
 
-  private isTarkovQuest17Page() {
-    return window.location.pathname === "/tarkov/guides/quests-17";
+  private tryGetState() {
+    try {
+      return state;
+    } catch {
+      return undefined;
+    }
   }
 
   private async createClient() {
-    if (this.isTarkovQuest17Page()) {
+    if (this.isTarkovQuest17Page) {
       return Client.forGame(20);
     }
 
-    const axios = await waitForAxios();
-    const gameId = axios.defaults.headers.common["X-Game-ID"];
+    try {
+      const axios = await waitForProperty(window, "axios");
+      const gameId = axios!.defaults.headers.common["X-Game-ID"];
 
-    if (gameId) {
-      return Client.forGame(Number(gameId));
-    }
+      if (gameId) {
+        return Client.forGame(Number(gameId));
+      }
+    } catch {}
 
     return Client.forUrl(window.location.href);
   }
@@ -72,10 +99,7 @@ export class GuidePage extends Page {
 
     // Mark user as pro to unlock all features in the guide
     window.isPro = true;
-
-    if (this.isTarkovQuest17Page()) {
-      window.user!.hasPro = true;
-    }
+    window.user!.hasPro = true;
   }
 
   private async getUserId() {
@@ -83,7 +107,7 @@ export class GuidePage extends Page {
       return this._userId;
     }
 
-    if (this.isTarkovQuest17Page()) {
+    if (this.isTarkovQuest17Page) {
       await waitForProperty(window, "config");
       return window.user?.id;
     }
@@ -92,41 +116,133 @@ export class GuidePage extends Page {
     return mapWindow?.user?.id;
   }
 
-  private async activateGuideScript() {
-    const activateGuideScript = await waitForProperty(
-      window,
-      "__fmgActivateGuideScript"
-    );
-    activateGuideScript?.();
+  private fixCheckbox(checkbox: HTMLInputElement) {
+    const $this = $(checkbox);
+
+    const locationId = $this.data("location-id");
+
+    if (!locationId) {
+      logger.warn("Checkbox has no data-location-id attribute");
+      return;
+    }
+
+    const isFound = window.foundLocations![locationId] ?? false;
+
+    // Update the checkbox state
+    $this.prop("checked", isFound);
+
+    // Update the checklist item row state if applicable
+    const $td = $this.parent();
+    const $tr = $td?.parent();
+
+    if ($tr && $tr.is(".checklist-item")) {
+      $tr.toggleClass("found", isFound);
+    }
   }
 
-  private async resetCheckboxes() {
+  private async fixState(checkbox: HTMLInputElement) {
+    const $this = $(checkbox);
+    const locationId = $this.data("location-id");
+    const mapId = $this.data("map-id");
+    const categoryId = $this.data("category-id");
+    const regionId = $this.data("region-id");
+
+    if (!locationId) {
+      logger.warn("Checkbox has no data-location-id attribute");
+      return;
+    }
+
+    const isFound = window.foundLocations![locationId] ?? false;
+    if (!isFound) return;
+
+    if (mapId && "foundLocationsByMap" in state!) {
+      state!.foundLocationsByMap[mapId].push(locationId);
+    }
+    if (categoryId && "foundLocationsByCategory" in state!) {
+      state!.foundLocationsByCategory[categoryId].push(locationId);
+    }
+    if (regionId && "foundLocationsByRegion" in state!) {
+      state!.foundLocationsByRegion[regionId].push(locationId);
+    }
+  }
+
+  private async fixCheckboxes() {
     await waitForDocumentLoaded();
 
     // Make sure the guide script checkboxes are unchecked
-    $<HTMLInputElement>(".check").each((_, el) => {
-      el.checked = false;
+    $<HTMLInputElement>(".check").each((_, checkbox) => {
+      this.fixCheckbox(checkbox);
+      this.fixState(checkbox);
     });
   }
 
+  private updateCounts() {
+    if (window.mapsById) {
+      var mapIds = Object.keys(window.mapsById);
+      for (var i = mapIds.length - 1; i >= 0; --i) {
+        updateMapCount!(mapIds[i]);
+      }
+    }
+
+    if (window.categoriesById) {
+      var categoryIds = Object.keys(window.categoriesById);
+      for (var i = categoryIds.length - 1; i >= 0; --i) {
+        updateCategoryCount!(categoryIds[i]);
+      }
+    }
+
+    if (window.regionsById) {
+      var regionIds = Object.keys(window.regionsById);
+      for (var i = regionIds.length - 1; i >= 0; --i) {
+        updateRegionCount!(regionIds[i]);
+      }
+    }
+
+    if (window.markLocationFound) {
+      updateFoundLocationsCount!();
+    }
+  }
+
+  private markLocationFound(locationId: number, found: boolean) {
+    const $checkbox = $<HTMLInputElement>(
+      `.check[data-location-id="${locationId}"]`
+    );
+
+    if ($checkbox.length === 0) {
+      logger.warn(
+        `No checkbox found for location ID ${locationId} to update its state`
+      );
+      return;
+    }
+
+    // If the guide has its own markLocationFound function, use it
+    if (markLocationFound) {
+      markLocationFound({ target: $checkbox.get(0)! }, locationId, found);
+      return;
+    }
+
+    // Update the checkbox and state ourselves
+    if (state) {
+      state.foundLocations[locationId] = found;
+      $checkbox.prop("checked", found);
+      return;
+    }
+
+    logger.warn(
+      `Could not update checkbox state for location ID ${locationId}`
+    );
+  }
+
   private async setupEventListeners() {
-    if (this.isTarkovQuest17Page()) {
+    if (this.isTarkovQuest17Page) {
       return;
     }
 
     const mapWindow = await this.getMapWindow();
     mapWindow?.addEventListener("locationMarked", (e) => {
-      const { detail } = e as CustomEvent<Client.LocationEvent>;
+      const { locationId, found } = e.detail;
 
-      const $checkbox = $<HTMLInputElement>(
-        `.check[data-location-id="${detail.locationId}"]`
-      );
-
-      if ($checkbox.length === 0) {
-        return;
-      }
-
-      $checkbox.prop("checked", detail.found);
+      this.markLocationFound(locationId, found);
     });
   }
 
@@ -136,14 +252,12 @@ export class GuidePage extends Page {
     await this.client.storageRequestPersist();
 
     await this.loadUserData();
-
-    await this.resetCheckboxes();
+    await this.fixCheckboxes();
+    this.updateCounts();
 
     await this.setupEventListeners();
 
-    await this.activateGuideScript();
-
-    if (this.isTarkovQuest17Page()) {
+    if (this.isTarkovQuest17Page) {
       await activateBlockedMapgenieScript("TarkovQuestToolWidget");
     }
 
@@ -163,7 +277,7 @@ export class GuidePage extends Page {
   }
 
   public async restore() {
-    if (this.isTarkovQuest17Page()) {
+    if (this.isTarkovQuest17Page) {
       await activateBlockedMapgenieScript("TarkovQuestToolWidget");
     }
   }

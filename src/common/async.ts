@@ -1,3 +1,5 @@
+import waitUntil from "async-wait-until";
+
 export const some = async (promises: Promise<boolean>[]): Promise<boolean> => {
   return new Promise<boolean>(async (resolve, reject) => {
     try {
@@ -17,4 +19,6 @@ export const some = async (promises: Promise<boolean>[]): Promise<boolean> => {
   });
 };
 
-export default { some };
+export { waitUntil };
+
+export default { some, waitUntil };

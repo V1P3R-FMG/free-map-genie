@@ -181,7 +181,7 @@ export class MapPage extends Page {
     await waitForProperty(window, "mapData");
 
     // We can only start if user is logged in
-    if (window.user === undefined) {
+    if (!window.user) {
       logger.warn("User not logged in, FMG will not work");
 
       return false;

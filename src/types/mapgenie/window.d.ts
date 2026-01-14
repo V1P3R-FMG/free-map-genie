@@ -1,3 +1,9 @@
+interface EventLike {
+  target: HTMLElement;
+}
+
+type Id = string | number;
+
 interface Window {
   // map
   user?: MG.User;
@@ -20,9 +26,17 @@ interface Window {
 
   // guide
   isPro?: boolean;
-  foundLocations?: Record<number, boolean>;
+  foundLocations?: Record<Id, boolean>;
   mapElement?: HTMLIFrameElement;
+  // new world guide
+  mapsById?: Record<Id, MG.Map>;
+  categoriesById?: Record<Id, MG.Category>;
+  regionsById?: Record<Id, MG.Region>;
 
   // libraries
   axios?: import("axios").Axios;
+}
+
+interface WindowEventMap {
+  locationMarked: CustomEvent<Client.LocationEvent>;
 }

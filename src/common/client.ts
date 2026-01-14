@@ -1,6 +1,6 @@
-import { waitForAxios } from "@/common/axios";
 import { Key } from "@/common/storage";
 import { AxiosInterceptor } from "@/common/axios";
+import { waitForProperty } from "./object";
 
 import backendService from "@/services/backend.service";
 import mapgenieService from "@/services/mapgenie.service";
@@ -61,8 +61,8 @@ export class Client {
 
   public async installInterceptor() {
     if (this.interceptor) return;
-    const axios = await waitForAxios();
-    this.interceptor = new AxiosInterceptor(axios);
+    const axios = await waitForProperty(window, "axios");
+    this.interceptor = new AxiosInterceptor(axios!);
     this.registerHandlers();
   }
 
