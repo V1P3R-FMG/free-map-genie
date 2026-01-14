@@ -1,8 +1,11 @@
 import "@/common/messaging/contexts/window";
 
-import { MapgenieAdBlocker } from "@/common/mapgenie";
+import {
+  MapgenieAdBlocker,
+  getPageType,
+  type PageType,
+} from "@/common/mapgenie";
 
-import { getPageType, type PageType } from "./type";
 import { HomePage } from "./pages/home";
 import { GameHomePage } from "./pages/game-home";
 import { MapPage } from "./pages/map";

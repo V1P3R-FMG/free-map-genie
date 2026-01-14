@@ -1,4 +1,4 @@
-import { waitForBody, waitForHead } from "@/common/dom";
+import { waitForBody } from "@/common/dom";
 
 export type PageType =
   | "home"
