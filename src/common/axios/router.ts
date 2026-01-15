@@ -50,13 +50,6 @@ type MethodRegistrars = {
 export class InterceptorRouter implements MethodRegistrars {
   private readonly routes: Routes = {};
 
-  public get!: MethodRegistrar;
-  public post!: MethodRegistrar;
-  public put!: MethodRegistrar;
-  public delete!: MethodRegistrar;
-  public head!: MethodRegistrar;
-  public any!: MethodRegistrar;
-
   private register(
     method: MethodWithAny,
     path: string,
@@ -124,17 +117,46 @@ export class InterceptorRouter implements MethodRegistrars {
 
     return state.result;
   }
-}
 
-// Dynamically create method registrars
-[...METHODS, "ANY"].forEach((method) => {
-  Object.defineProperty(InterceptorRouter.prototype, method.toLowerCase(), {
-    value: function (
-      this: InterceptorRouter,
-      path: string,
-      handler: Handler<any, any>
-    ): void {
-      this["register"](method as MethodWithAny, path, handler);
-    },
-  });
-});
+  public get<P extends ParamsData, T = void>(
+    path: string,
+    handler: Handler<P, T>
+  ) {
+    this.register("GET", path, handler);
+  }
+
+  public put<P extends ParamsData, T = void>(
+    path: string,
+    handler: Handler<P, T>
+  ) {
+    this.register("PUT", path, handler);
+  }
+
+  public post<P extends ParamsData, T = void>(
+    path: string,
+    handler: Handler<P, T>
+  ) {
+    this.register("POST", path, handler);
+  }
+
+  public delete<P extends ParamsData, T = void>(
+    path: string,
+    handler: Handler<P, T>
+  ) {
+    this.register("DELETE", path, handler);
+  }
+
+  public head<P extends ParamsData, T = void>(
+    path: string,
+    handler: Handler<P, T>
+  ) {
+    this.register("HEAD", path, handler);
+  }
+
+  public any<P extends ParamsData, T = void>(
+    path: string,
+    handler: Handler<P, T>
+  ) {
+    this.register("ANY", path, handler);
+  }
+}
