@@ -10,6 +10,16 @@ export const store = configureStore({
     app: appReducer,
     services: servicesReducer,
   },
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({
+      serializableCheck: {
+        ignoredPaths: [
+          "services.page",
+          "services.backend",
+          "services.background",
+        ],
+      },
+    }),
 });
 
 export type RootState = ReturnType<typeof store.getState>;
