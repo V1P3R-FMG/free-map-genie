@@ -5,54 +5,82 @@ import mapgenieService from "./mapgenie.service";
 
 import type { Bookmark } from "@/common/bookmark";
 
+type PartialBookmark = {
+  title: string | null;
+  url: string | null;
+  preview: string | null;
+  icon?: string | null;
+};
+
+const validateBookmark: (
+  bookmark: PartialBookmark
+) => asserts bookmark is Omit<Bookmark, "pageType"> = (bookmark) => {
+  const missing = Object.entries(bookmark)
+    .map(([name, element]) => (element ? name : null))
+    .filter((name) => name === null)
+    .join(", ");
+
+  if (missing) {
+    logger.error(
+      "Missing required meta tags for bookmark creation, missing: " + missing,
+      window.location.href
+    );
+
+    throw new Error(
+      "Missing required meta tags for bookmark creation, missing: " + missing
+    );
+  }
+};
+
 export class PageService {
   private readonly mapgenie = mapgenieService.use();
 
   public async createBookmark(): Promise<Bookmark> {
-    const ogUrl = document.head.querySelector<HTMLMetaElement>(
+    const urlMeta = document.head.querySelector<HTMLMetaElement>(
       "meta[property='og:url']"
     );
 
-    const icon = document.head.querySelector<HTMLLinkElement>(
+    const iconLink = document.head.querySelector<HTMLLinkElement>(
       "link[rel='apple-touch-icon']"
     );
 
-    const ogTitle = document.head.querySelector<HTMLMetaElement>(
+    const titleMeta = document.head.querySelector<HTMLMetaElement>(
       "meta[property='og:title']"
     );
 
-    const ogImage = document.head.querySelector<HTMLMetaElement>(
+    const imageMeta = document.head.querySelector<HTMLMetaElement>(
       "meta[property='og:image']"
     );
 
-    const missing = Object.entries({
-      url: ogUrl,
-      image: ogImage,
-      title: ogTitle,
-      icon: icon,
-    })
-      .map(([name, element]) => (element ? name : null))
-      .filter((name) => name !== null)
-      .join(", ");
+    let url = urlMeta?.content || null;
+    let preview = imageMeta?.content || null;
+    let title = titleMeta?.content || null;
+    let icon = iconLink?.href || null;
 
-    if (missing.length > 0) {
-      logger.error(
-        "Missing required meta tags for bookmark creation, missing: " + missing,
-        window.location.href
-      );
+    const params = new URLSearchParams(window.location.search);
+    const fmgMapId = params.get("fmgMapId");
 
-      throw new Error(
-        "Missing required meta tags for bookmark creation, missing: " + missing
-      );
+    const mapId = fmgMapId ?? window.mapData?.map.id;
+
+    // Fetch map data if mapId is available
+    if (mapId) {
+      const map = await this.mapgenie.fetchMap(mapId);
+      preview = map.image;
+      title = map.title;
     }
+
+    // Append fmgMapId to URL if present
+    if (fmgMapId) {
+      url = `${url}?fmgMapId=${fmgMapId}`;
+    }
+
+    const bookmark = { url, preview, title, icon };
+    validateBookmark(bookmark);
 
     const pageType = await getPageType();
 
     return {
-      url: ogUrl!.content,
-      title: ogTitle!.content,
-      preview: ogImage!.content,
-      icon: icon!.href,
+      ...bookmark,
       pageType: pageType,
     };
   }
