@@ -6,6 +6,8 @@ import {
   type PageType,
 } from "@/common/mapgenie";
 
+import pageService from "@/services/page.service";
+
 import { HomePage } from "./pages/home";
 import { GameHomePage } from "./pages/game-home";
 import { MapPage } from "./pages/map";
@@ -30,6 +32,11 @@ export default defineUnlistedScript(async () => {
   const pageType = await getPageType();
   const page = await getPage(pageType);
   if (!page) return;
+
+  const params = new URLSearchParams(window.location.search);
+  if (params.has("fmgBackend")) return;
+
+  pageService.provide();
 
   logger.log("Initializing page script for", pageType);
 
