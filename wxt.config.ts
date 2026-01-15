@@ -1,4 +1,4 @@
-import { defineConfig, type UserManifest } from "wxt";
+import { defineConfig } from "wxt";
 
 import { author, version, homepage } from "./package.json";
 
@@ -10,15 +10,18 @@ export default defineConfig({
   modules: ["@wxt-dev/module-react"],
   imports: {
     imports: [
-      {
-        name: "logger",
-        from: "@/common/logger",
-      },
+      { name: "logger", from: "@/common/logger" },
+      { name: "default", as: "clsx", from: "clsx" },
       { name: "default", as: "React", from: "react" },
       { name: "default", as: "$", from: "jquery" },
     ],
   },
   vite: () => ({
+    css: {
+      modules: {
+        localsConvention: "camelCase",
+      },
+    },
     build: {
       minify: "terser",
     },
@@ -37,6 +40,7 @@ export default defineConfig({
     },
     fontsUrl: "/fonts",
     prefix: "fmg-icon",
+    normalize: true,
     inputDir: "icons",
   },
   manifest: ({ browser, manifestVersion }) => ({

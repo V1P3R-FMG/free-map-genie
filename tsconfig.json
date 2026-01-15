@@ -3,7 +3,6 @@
     "noEmit": true
   },
   "references": [
-    { "path": "./tsconfig.wxt.json" },
     { "path": "./tsconfig.node.json" },
     { "path": "./tsconfig.e2e.json" }
   ]
