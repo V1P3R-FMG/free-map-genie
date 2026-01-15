@@ -22,6 +22,9 @@ export default defineConfig({
         localsConvention: "camelCase",
       },
     },
+    esbuild: {
+      target: "es2020",
+    },
     build: {
       minify: "terser",
     },
