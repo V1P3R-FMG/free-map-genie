@@ -1,0 +1,58 @@
+import { FontIcon } from "@/components/FontIcon";
+
+import style from "./Header.module.scss";
+
+export const Header = () => {
+  const reload = () => {
+    browser.runtime.reload();
+  };
+
+  const openLogoLink = async (e: React.MouseEvent) => {
+    if (e.button === 1 || (e.button === 0 && e.ctrlKey)) {
+      await browser.tabs.create({ url: "https://mapgenie.io" });
+      window.close();
+    } else if (e.button === 0) {
+      await browser.tabs.update({ url: "https://mapgenie.io" });
+      window.close();
+    }
+  };
+
+  const close = () => {
+    window.close();
+  };
+
+  return (
+    <div className={style.header}>
+      <div className={style.left}>
+        <FontIcon
+          className={style.btn}
+          size="1.2rem"
+          icon="reload"
+          onClick={reload}
+        />
+        <FontIcon
+          className={style.btn}
+          size="1.2rem"
+          icon="g"
+          onClick={openLogoLink}
+          auxClick={openLogoLink}
+        />
+      </div>
+      <div className={style.center}>
+        <div className={style.title}>
+          <span className={style.bold}>Map</span>
+          <span className={style.light}>Genie</span>
+          <sup className={style.pro}>PRO</sup>
+        </div>
+      </div>
+      <div className={style.right}>
+        <FontIcon
+          className={style.btn}
+          size="1.2rem"
+          icon="cross"
+          onClick={close}
+        />
+      </div>
+    </div>
+  );
+};

@@ -1,0 +1,39 @@
+.footer {
+  display: grid;
+  grid-template-columns: 1fr 2fr 1fr;
+  align-items: center;
+
+  margin: 0 0.5rem;
+  -webkit-user-select: none;
+  user-select: none;
+  padding: 5px;
+
+  border-top: 1px solid var(--border);
+
+  color: var(--color-light);
+  font-size: 0.8rem;
+  font-weight: lighter;
+
+  .author {
+    cursor: pointer;
+  }
+
+  .left,
+  .right,
+  .center {
+    display: flex;
+    gap: 5px;
+  }
+
+  .left {
+    justify-self: flex-start;
+  }
+
+  .right {
+    justify-self: flex-end;
+  }
+
+  .center {
+    justify-self: center;
+  }
+}

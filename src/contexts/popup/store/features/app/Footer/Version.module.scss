@@ -1,0 +1,25 @@
+.version {
+  text-align: end;
+
+  .warning {
+    position: relative;
+    color: var(--yellow);
+    cursor: pointer;
+
+    &:hover::after {
+      content: attr(data-message);
+      position: absolute;
+      bottom: 100%;
+      right: 100%;
+      text-align: right;
+      color: var(--color);
+      background-color: var(--item);
+      border: 1px solid var(--border);
+      border-radius: 5px;
+      padding: 5px;
+      translate: transform(-50%, 0);
+      font-size: 0.8rem;
+      width: max-content;
+    }
+  }
+}
