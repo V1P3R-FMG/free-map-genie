@@ -4,8 +4,8 @@
   font-weight: 400;
 
   color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+  color: var(--color);
+  background-color: var(--background);
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -24,7 +24,7 @@
   --color-light: #7e7e7e;
 
   --background: #181818;
-  --tab-background: #2b2b2b;
+  --background-darker: #121212;
   --border: #929292;
 
   --active: #e17171;
@@ -40,17 +40,17 @@
   --yellow: #f7c923;
 }
 
-@media (prefers-color-scheme: light) {
+/* @media (prefers-color-scheme: light) {
   :root {
     --color: #242424;
     --color-light: #7e7e7e;
 
     --background: #f5f5f5;
-    --tab-background: #e0e0e0;
+    --background-darker: #e0e0e0;
     --border: #6b6b6b;
 
     --active: #d14c4c;
-    --item: #ffffff;
+    --item: #e2e2e2;
 
     --checkbox: #dcdcdc;
     --checkbox-text: #242424;
@@ -61,4 +61,4 @@
     --green: #188038;
     --yellow: #f9ab00;
   }
-}
+} */
