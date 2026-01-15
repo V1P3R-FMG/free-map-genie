@@ -54,7 +54,8 @@ class MapgenieService {
     return game.domain;
   }
 
-  public async fetchGameBySlug(slug: string) {
+  @Memoize()
+  public async fetchGameBySlug(slug: string): Promise<MG.Api.GameFull> {
     const games = await this.fetchGames();
     const game = games.find((g) => g.slug === slug);
     if (!game) {
@@ -62,12 +63,16 @@ class MapgenieService {
     }
     return this.fetchGame(game.id);
   }
+
+  @Memoize()
+  public async getMapImage(mapId: number | string): Promise<string | null> {
+    const map = await this.fetchMap(mapId);
+    return map.image;
+  }
 }
 
 const mapgenieService = createService({
-  context() {
-    return new MapgenieService();
-  },
+  context: MapgenieService,
   heartbeatTimeout: 60000,
   namespace: "MapgenieService",
 });

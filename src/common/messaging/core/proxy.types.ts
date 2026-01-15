@@ -9,20 +9,26 @@ export type PromisifyFunction<T extends (...args: any[]) => any> = T extends (
     : (...args: A) => Promise<R>
   : never;
 
-export interface ProxyOptions<T extends Record<string, any>>
-  extends MessengerOptions {
-  context: () => T;
+export type Context = { new (...args: any[]): Record<string, any> };
+
+export interface ProxyOptions<T extends Context> extends MessengerOptions {
+  context: T;
 }
 
-export type ProxiedObject<S extends Record<string, any>> = {
-  [K in keyof S]: S[K] extends (...args: any[]) => any
-    ? PromisifyFunction<S[K]>
+export type ProxiedObject<T extends Record<string, any>> = {
+  [K in keyof T]: T[K] extends (...args: any[]) => any
+    ? PromisifyFunction<T[K]>
     : never;
 };
 
-export type ProxyObject<T extends Record<string, any>> = {
-  provide: (adapter: Adapter) => T;
-  use: (adapter: Adapter) => ProxiedObject<T>;
+export type ProxyInstance<T extends Context> = ProxiedObject<InstanceType<T>>;
+
+export type ProxyObject<T extends Context> = {
+  provide: (
+    adapter: Adapter,
+    ...args: ConstructorParameters<T>
+  ) => InstanceType<T>;
+  use: (adapter: Adapter) => ProxyInstance<T>;
 };
 
 export type ProxyTarget<T extends ProxyObject<any>> = ReturnType<T["provide"]>;

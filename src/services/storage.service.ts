@@ -73,9 +73,7 @@ const createProxyForDomain = (domain: string) => {
   const namespace = `StorageService::[${url.host}]`;
 
   return createService({
-    context() {
-      return new StorageService();
-    },
+    context: StorageService,
     namespace,
     heartbeatTimeout: 60000,
   });

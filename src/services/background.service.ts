@@ -18,9 +18,7 @@ class BackgroundService {
 }
 
 const backgroundService = createService({
-  context() {
-    return new BackgroundService();
-  },
+  context: BackgroundService,
   heartbeatTimeout: 60000,
   namespace: "BackgroundService",
 });

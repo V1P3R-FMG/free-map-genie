@@ -4,9 +4,7 @@ import { createService, type ProxiedObject } from "@/common/messaging";
 class BackendService extends Storage {}
 
 const backendService = createService({
-  context() {
-    return new BackendService();
-  },
+  context: BackendService,
   heartbeatTimeout: 60000,
   namespace: "BackendService",
 });

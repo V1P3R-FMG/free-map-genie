@@ -4,15 +4,23 @@ import { MessengerOptions } from "./messengers/base";
 import { getMemoizeOptions, applyMemoize } from "./memoize";
 
 import type { Adapter } from "./adapter";
-import type { ProxiedObject, ProxyObject, ProxyOptions } from "./proxy.types";
+import type {
+  Context,
+  ProxyInstance,
+  ProxiedObject,
+  ProxyObject,
+  ProxyOptions,
+} from "./proxy.types";
 
 export * from "./proxy.types";
 
-const createProvider = <T extends Record<string, any>>(
-  target: T,
+const createProvider = <T extends Context, A extends ConstructorParameters<T>>(
+  context: T,
   adapter: Adapter,
-  options: Required<MessengerOptions>
+  options: Required<MessengerOptions>,
+  args: A
 ) => {
+  const target = new context(...args);
   const messenger = new ProviderMessenger(adapter, options);
 
   messenger.onMessage(async (message) => {
@@ -44,8 +52,8 @@ const createProvider = <T extends Record<string, any>>(
   return target;
 };
 
-const createUser = <T extends Record<string, any>>(
-  target: T,
+const createUser = <T extends Context>(
+  context: T,
   adapter: Adapter,
   options: Required<MessengerOptions>
 ) => {
@@ -72,10 +80,10 @@ const createUser = <T extends Record<string, any>>(
     }) as unknown as ProxiedObject<U>;
   };
 
-  return createProxy<T>(target, []);
+  return createProxy<T>(context.prototype, []);
 };
 
-export const createProxy = <T extends Record<string, any>>({
+export const createProxy = <T extends Context>({
   context,
   ...options
 }: ProxyOptions<T>) => {
@@ -88,11 +96,16 @@ export const createProxy = <T extends Record<string, any>>({
   };
 
   return {
-    provide(adapter: Adapter) {
-      return createProvider(context(), adapter, fullOptions);
+    provide(adapter: Adapter, ...args: ConstructorParameters<T>) {
+      return createProvider(
+        context,
+        adapter,
+        fullOptions,
+        args
+      ) as InstanceType<T>;
     },
     use(adapter: Adapter) {
-      return createUser(context(), adapter, fullOptions);
+      return createUser(context, adapter, fullOptions) as ProxyInstance<T>;
     },
   } satisfies ProxyObject<T>;
 };

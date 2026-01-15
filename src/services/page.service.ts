@@ -1,9 +1,13 @@
-import { createService, type ProxiedObject } from "@/common/messaging";
+import { createService, type ProxyInstance } from "@/common/messaging";
 import { getPageType } from "@/common/mapgenie";
+
+import mapgenieService from "./mapgenie.service";
 
 import type { Bookmark } from "@/common/bookmark";
 
 export class PageService {
+  private readonly mapgenie = mapgenieService.use();
+
   public async createBookmark(): Promise<Bookmark> {
     const ogUrl = document.head.querySelector<HTMLMetaElement>(
       "meta[property='og:url']"
@@ -59,15 +63,13 @@ export class PageService {
 }
 
 const pageService = createService({
-  context() {
-    return new PageService();
-  },
+  context: PageService,
   namespace: "PageService",
   heartbeatTimeout: 60000,
 });
 
 namespace pageService {
-  export type Instance = ProxiedObject<PageService>;
+  export type Instance = ProxyInstance<typeof PageService>;
 }
 
 export default pageService;

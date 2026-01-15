@@ -23,9 +23,7 @@ export class TestService {
 }
 
 const testService = createService({
-  context() {
-    return new TestService();
-  },
+  context: TestService,
   namespace: "TestService",
   heartbeatTimeout: 60000,
 });

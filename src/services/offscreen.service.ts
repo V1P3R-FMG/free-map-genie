@@ -52,9 +52,7 @@ export class OffscreenService {
 }
 
 const offscreenService = createService({
-  context() {
-    return new OffscreenService();
-  },
+  context: OffscreenService,
   heartbeatTimeout: 60000,
   namespace: "OffscreenService",
 });
