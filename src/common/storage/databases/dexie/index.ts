@@ -1,7 +1,9 @@
 import Dexie, { type Table, type CollectionForTable, Collection } from "dexie";
 import { nanoid } from "nanoid";
+
 import async from "@/common/async";
 
+import type { Bookmark } from "@/common/bookmark";
 import type { Key } from "../../key";
 import type { Database } from "../database";
 import type { Stores } from "./stores";
@@ -21,6 +23,7 @@ export class DexieDatabase implements Database {
       presets: "++id, [game_id+user_id]",
       presetsOrdering: "id, order, [game_id+user_id]",
       notes: "[id+user_id], [map_id+user_id], [game_id+user_id]",
+      bookmarks: "url",
     });
   }
 
@@ -344,5 +347,17 @@ export class DexieDatabase implements Database {
         );
       }
     );
+  }
+
+  public getBookmarks() {
+    return this.db.bookmarks.toArray();
+  }
+
+  public addBookmark(bookmark: Bookmark) {
+    return this.db.bookmarks.add(bookmark);
+  }
+
+  public deleteBookmark(url: string) {
+    return this.db.bookmarks.where("url").equals(url).delete();
   }
 }

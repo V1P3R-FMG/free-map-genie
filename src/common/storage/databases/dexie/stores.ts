@@ -4,6 +4,7 @@ import type {
   NotesTableV1,
   PresetsTableV1,
   PresetsOrderingTableV1,
+  BookmarksTableV1,
 } from "./versions/v1";
 
 export type Stores = {
@@ -12,4 +13,5 @@ export type Stores = {
   notes: NotesTableV1;
   presets: PresetsTableV1;
   presetsOrdering: PresetsOrderingTableV1;
+  bookmarks: BookmarksTableV1;
 };

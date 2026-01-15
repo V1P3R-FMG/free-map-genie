@@ -1,6 +1,8 @@
 import { Key } from "./key";
 import { DexieDatabase, LocalDatabase } from "./databases";
 
+import type { Bookmark } from "@/common/bookmark";
+
 export type { UserData } from "./format";
 export { Key } from "./key";
 
@@ -93,5 +95,17 @@ export class Storage {
 
   public isStoragePersisted() {
     return navigator.storage.persisted();
+  }
+
+  public getBookmarks() {
+    return this.dexie.getBookmarks();
+  }
+
+  public addBookmark(bookmark: Bookmark) {
+    return this.dexie.addBookmark(bookmark);
+  }
+
+  public deleteBookmark(url: string) {
+    return this.dexie.deleteBookmark(url);
   }
 }

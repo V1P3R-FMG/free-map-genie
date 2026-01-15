@@ -1,10 +1,12 @@
+import type { Bookmark } from "@/common/bookmark";
+import type { Table } from "dexie";
+
 import type {
   IdIndex,
   GameUserIndex,
   MapUserIndex,
   UserNoteIndex,
 } from "../indexes";
-import type { Table } from "dexie";
 
 export type MetaTableV1 = Table<
   {
@@ -61,10 +63,4 @@ export type NotesTableV1 = Table<
   UserNoteIndex
 >;
 
-export type BookmarksTableV1 = Table<
-  {
-    url: string;
-    title: string;
-  },
-  GameUserIndex
->;
+export type BookmarksTableV1 = Table<Bookmark, string>;
