@@ -6,4 +6,5 @@ export interface Bookmark {
   preview: string;
   icon?: string;
   pageType: PageType;
+  createdAt: number;
 }

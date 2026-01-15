@@ -23,7 +23,7 @@ export class DexieDatabase implements Database {
       presets: "++id, [game_id+user_id]",
       presetsOrdering: "id, order, [game_id+user_id]",
       notes: "[id+user_id], [map_id+user_id], [game_id+user_id]",
-      bookmarks: "url, title",
+      bookmarks: "url, title, createdAt",
     });
   }
 
@@ -350,7 +350,7 @@ export class DexieDatabase implements Database {
   }
 
   public getBookmarks() {
-    return this.db.bookmarks.toArray();
+    return this.db.bookmarks.orderBy("createdAt").toArray();
   }
 
   public addBookmark(bookmark: Bookmark) {

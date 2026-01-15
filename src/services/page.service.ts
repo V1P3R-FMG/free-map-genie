@@ -14,7 +14,9 @@ type PartialBookmark = {
 
 const validateBookmark: (
   bookmark: PartialBookmark
-) => asserts bookmark is Omit<Bookmark, "pageType"> = (bookmark) => {
+) => asserts bookmark is Omit<Bookmark, "pageType" | "createdAt"> = (
+  bookmark
+) => {
   const missing = Object.entries(bookmark)
     .map(([name, element]) => (element ? name : null))
     .filter((name) => name === null)
@@ -82,6 +84,7 @@ export class PageService {
     return {
       ...bookmark,
       pageType: pageType,
+      createdAt: Date.now(),
     };
   }
 
