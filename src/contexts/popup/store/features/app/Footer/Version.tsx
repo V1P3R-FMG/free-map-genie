@@ -1,6 +1,5 @@
 import { useAppSelector, useAppDispatch } from "@/contexts/popup/hooks";
 import {
-  selectAppVersion,
   selectAppLatestVersion,
   selectAppDisplayVersion,
   selectAppNeedsUpdate,
@@ -14,7 +13,6 @@ import style from "./Version.module.scss";
 export const Version = () => {
   const dispatch = useAppDispatch();
 
-  const version = useAppSelector(selectAppVersion);
   const latest = useAppSelector(selectAppLatestVersion);
   const needsUpdate = useAppSelector(selectAppNeedsUpdate);
 
