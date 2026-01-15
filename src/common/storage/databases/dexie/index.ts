@@ -23,7 +23,7 @@ export class DexieDatabase implements Database {
       presets: "++id, [game_id+user_id]",
       presetsOrdering: "id, order, [game_id+user_id]",
       notes: "[id+user_id], [map_id+user_id], [game_id+user_id]",
-      bookmarks: "url",
+      bookmarks: "url, title",
     });
   }
 
