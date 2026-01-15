@@ -1,8 +1,5 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 
-import pageService from "@/services/page.service";
-import backendService from "@/services/backend.service";
-
 import type { Bookmark as BookmarkInfo } from "@/common/bookmark";
 import type { RootState } from "@/contexts/popup/store";
 
@@ -10,10 +7,12 @@ export { BookmarkInfo };
 
 export interface BookmarksState {
   list: BookmarkInfo[];
+  title: Record<string, number>;
 }
 
 const initialState: BookmarksState = {
   list: [],
+  title: {},
 };
 
 export const addBookmarkAsync = createAsyncThunk<BookmarkInfo, void>(
@@ -50,7 +49,20 @@ export const loadBookmarksAsync = createAsyncThunk<BookmarkInfo[], void>(
 export const bookmarksSlice = createSlice({
   name: "bookmarks",
   initialState,
-  reducers: {},
+  reducers: {
+    removeBookmarkTitle(state, action: { payload: string }) {
+      if (state.title[action.payload]) {
+        const result = (state.title[action.payload] -= 1);
+        if (result <= 0) {
+          delete state.title[action.payload];
+        }
+      }
+    },
+    setBookmarkTitle(state, action: { payload: string }) {
+      state.title[action.payload] ??= 0;
+      state.title[action.payload] += 1;
+    },
+  },
   extraReducers: (builder) => {
     builder.addCase(addBookmarkAsync.fulfilled, (state, action) => {
       state.list.push(action.payload);
@@ -66,8 +78,10 @@ export const bookmarksSlice = createSlice({
   },
 });
 
-export const {} = bookmarksSlice.actions;
+export const { removeBookmarkTitle, setBookmarkTitle } = bookmarksSlice.actions;
 
 export const selectBookmarks = (state: RootState) => state.bookmarks.list;
+export const selectBookmarkTitle = (state: RootState) =>
+  Object.keys(state.bookmarks.title)[0] || "";
 
 export default bookmarksSlice.reducer;

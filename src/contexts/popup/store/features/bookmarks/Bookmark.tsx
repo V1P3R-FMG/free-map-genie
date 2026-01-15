@@ -1,19 +1,45 @@
+import { useAppDispatch } from "@/contexts/popup/hooks";
+import {
+  removeBookmarkAsync,
+  setBookmarkTitle,
+  removeBookmarkTitle,
+} from "./bookmarksSlice";
+
 import style from "./Bookmarks.module.scss";
 
 import type { BookmarkInfo } from "./bookmarksSlice";
 
 export const Bookmark = ({ bookmark }: Bookmark.Props) => {
-  const { title, preview, icon } = bookmark;
+  const dispatch = useAppDispatch();
+
+  const { title, preview, icon, url } = bookmark;
 
   const onClick = async (e: React.MouseEvent) => {
     e.preventDefault();
+
     if (e.button === 1 || (e.button === 0 && e.ctrlKey)) {
-      await browser.tabs.create({ url: bookmark.url });
+      await browser.tabs.create({ url });
       window.close();
     } else if (e.button === 0) {
-      await browser.tabs.update({ url: bookmark.url });
+      await browser.tabs.update({ url });
       window.close();
     }
+  };
+
+  const onRemove = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    dispatch(removeBookmarkAsync(url));
+  };
+
+  const onMouseOver = () => {
+    dispatch(setBookmarkTitle(title));
+  };
+
+  const onMouseOut = () => {
+    setTimeout(() => {
+      dispatch(removeBookmarkTitle(title));
+    }, 100);
   };
 
   // Prevent default context menu on bookmark items
@@ -36,13 +62,15 @@ export const Bookmark = ({ bookmark }: Bookmark.Props) => {
       className={style.bookmarkContainer}
       onClick={onClick}
       onAuxClick={onClick}
-      href={bookmark.url}
+      href={url}
+      onMouseOver={onMouseOver}
+      onMouseOut={onMouseOut}
     >
       <img
         className={style.bookmarkPreview}
         src={preview}
         alt={title}
-        title={title}
+        // title={title}
       />
       {icon && (
         <img className={style.bookmarkIcon} src={icon} alt="Bookmark icon" />
