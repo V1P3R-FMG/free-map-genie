@@ -1,10 +1,14 @@
 .version {
-  text-align: end;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 0.2rem;
 
   .warning {
     position: relative;
     color: var(--yellow);
     cursor: pointer;
+    transform: translateY(0.1rem);
 
     &:hover::after {
       content: attr(data-message);

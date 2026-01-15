@@ -2,6 +2,7 @@ import { useAppSelector, useAppDispatch } from "@/contexts/popup/hooks";
 import {
   selectAppLatestVersion,
   selectAppDisplayVersion,
+  selectAppHomepage,
   selectAppNeedsUpdate,
   fetchLatestVersionAsync,
 } from "../appSlice";
@@ -13,13 +14,15 @@ import style from "./Version.module.scss";
 export const Version = () => {
   const dispatch = useAppDispatch();
 
+  const displayVersion = useAppSelector(selectAppDisplayVersion);
   const latest = useAppSelector(selectAppLatestVersion);
   const needsUpdate = useAppSelector(selectAppNeedsUpdate);
+  const homepage = useAppSelector(selectAppHomepage);
 
-  const displayVersion = useAppSelector(selectAppDisplayVersion);
-
-  const onVersionClick = () => {
-    logger.debug("Version click");
+  const onVersionClick = async () => {
+    await browser.tabs.create({
+      url: homepage + "/releases",
+    });
   };
 
   React.useEffect(() => {
