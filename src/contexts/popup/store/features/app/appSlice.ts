@@ -1,11 +1,13 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { compareVersions } from "@/common/version";
+import { compareVersions, displayVersion } from "@/common/version";
 
 import type { RootState } from "@/contexts/popup/store";
 
 export interface AppState {
   version: string;
   latest: string;
+  displayVersion: string;
+  isDevBuild: boolean;
   needsUpdate: boolean;
   author: string;
   homepage: string;
@@ -15,6 +17,11 @@ export interface AppState {
 const initialState: AppState = {
   version: import.meta.env.PKG_VERSION,
   latest: import.meta.env.PKG_VERSION,
+  displayVersion: displayVersion(
+    import.meta.env.PKG_VERSION,
+    import.meta.env.DEV
+  ),
+  isDevBuild: import.meta.env.DEV,
   needsUpdate: false,
   author: import.meta.env.PKG_AUTHOR,
   homepage: import.meta.env.PKG_HOMEPAGE,
@@ -75,6 +82,9 @@ export const {} = appSlice.actions;
 
 export const selectAppVersion = (state: RootState) => state.app.version;
 export const selectAppLatestVersion = (state: RootState) => state.app.latest;
+export const selectAppDisplayVersion = (state: RootState) =>
+  state.app.displayVersion;
+export const selectAppIsDevBuild = (state: RootState) => state.app.isDevBuild;
 export const selectAppNeedsUpdate = (state: RootState) => state.app.needsUpdate;
 export const selectAppAuthor = (state: RootState) => state.app.author;
 export const selectAppHomepage = (state: RootState) => state.app.homepage;

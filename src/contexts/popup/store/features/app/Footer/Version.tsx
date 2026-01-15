@@ -2,6 +2,7 @@ import { useAppSelector, useAppDispatch } from "@/contexts/popup/hooks";
 import {
   selectAppVersion,
   selectAppLatestVersion,
+  selectAppDisplayVersion,
   selectAppNeedsUpdate,
   fetchLatestVersionAsync,
 } from "../appSlice";
@@ -16,6 +17,8 @@ export const Version = () => {
   const version = useAppSelector(selectAppVersion);
   const latest = useAppSelector(selectAppLatestVersion);
   const needsUpdate = useAppSelector(selectAppNeedsUpdate);
+
+  const displayVersion = useAppSelector(selectAppDisplayVersion);
 
   const onVersionClick = () => {
     logger.debug("Version click");
@@ -36,7 +39,7 @@ export const Version = () => {
           <FontIcon icon="attention" size="0.8rem" />
         </span>
       ) : undefined}
-      <span>v{version}</span>
+      <span>v{displayVersion}</span>
     </div>
   );
 };

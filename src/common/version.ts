@@ -10,3 +10,7 @@ export const compareVersions = (a: string, b: string): number => {
   }
   return 0;
 };
+
+export const displayVersion = (version: string, dev?: boolean): string => {
+  return dev ? `${version}-dev` : version;
+};
