@@ -80,6 +80,14 @@ export default defineWxtModule({
     wxt.hook("prepare:publicPaths", async (_wxt, paths) => {
       const name = options?.name || "icons";
 
+      if (options.assetTypes?.includes("ts")) {
+        await generateFmgIconFont(outputDir, {
+          ...options,
+          assetTypes: ["ts"],
+          fontTypes: [],
+        });
+      }
+
       paths.push(`css/${name}.css`);
 
       for (const type of options.fontTypes) {
