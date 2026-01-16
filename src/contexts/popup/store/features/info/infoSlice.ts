@@ -4,10 +4,12 @@ import type { RootState } from "@/contexts/popup/store";
 
 export interface InfoState {
   data: Record<string, any>;
+  loading: boolean;
 }
 
 const initialState: InfoState = {
   data: {},
+  loading: true,
 };
 
 export const getInfoAsync = createAsyncThunk<Record<string, any>, void>(
@@ -26,8 +28,16 @@ export const infoSlice = createSlice({
   initialState,
   reducers: {},
   extraReducers: (builder) => {
+    builder.addCase(getInfoAsync.pending, (state) => {
+      state.loading = true;
+    });
     builder.addCase(getInfoAsync.fulfilled, (state, action) => {
       state.data = action.payload;
+      state.loading = false;
+    });
+    builder.addCase(getInfoAsync.rejected, (state) => {
+      state.data = {};
+      state.loading = false;
     });
   },
 });
@@ -35,5 +45,6 @@ export const infoSlice = createSlice({
 export const {} = infoSlice.actions;
 
 export const selectInfo = (state: RootState) => state.info.data;
+export const selectInfoLoading = (state: RootState) => state.info.loading;
 
 export default infoSlice.reducer;

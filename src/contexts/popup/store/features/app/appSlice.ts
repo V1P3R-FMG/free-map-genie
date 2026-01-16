@@ -12,6 +12,7 @@ export interface AppState {
   author: string;
   homepage: string;
   connected: boolean;
+  loading: boolean;
 }
 
 const initialState: AppState = {
@@ -26,6 +27,7 @@ const initialState: AppState = {
   author: import.meta.env.PKG_AUTHOR,
   homepage: import.meta.env.PKG_HOMEPAGE,
   connected: false,
+  loading: true,
 };
 
 export const fetchLatestVersionAsync = createAsyncThunk<string>(
@@ -60,6 +62,13 @@ export const updateConnectedStatusAsync = createAsyncThunk(
   }
 );
 
+export const injectIconFontAsync = createAsyncThunk(
+  "app/injectIconFont",
+  async (_) => {
+    await injectStyle("/assets/fmg-icons.css");
+  }
+);
+
 export const appSlice = createSlice({
   name: "app",
   initialState,
@@ -75,6 +84,12 @@ export const appSlice = createSlice({
     builder.addCase(updateConnectedStatusAsync.rejected, (state, action) => {
       state.connected = false;
     });
+    builder.addCase(injectIconFontAsync.fulfilled, (state) => {
+      state.loading = false;
+    });
+    builder.addCase(injectIconFontAsync.rejected, (state) => {
+      state.loading = false;
+    });
   },
 });
 
@@ -89,5 +104,6 @@ export const selectAppNeedsUpdate = (state: RootState) => state.app.needsUpdate;
 export const selectAppAuthor = (state: RootState) => state.app.author;
 export const selectAppHomepage = (state: RootState) => state.app.homepage;
 export const selectAppConnected = (state: RootState) => state.app.connected;
+export const selectAppLoading = (state: RootState) => state.app.loading;
 
 export default appSlice.reducer;

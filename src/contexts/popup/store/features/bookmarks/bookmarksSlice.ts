@@ -8,11 +8,13 @@ export { BookmarkInfo };
 export interface BookmarksState {
   list: BookmarkInfo[];
   title: Record<string, number>;
+  loading: boolean;
 }
 
 const initialState: BookmarksState = {
   list: [],
   title: {},
+  loading: true,
 };
 
 export const addBookmarkAsync = createAsyncThunk<BookmarkInfo, void>(
@@ -72,8 +74,15 @@ export const bookmarksSlice = createSlice({
         (bookmark) => bookmark.url !== action.meta.arg
       );
     });
+    builder.addCase(loadBookmarksAsync.pending, (state) => {
+      state.loading = true;
+    });
     builder.addCase(loadBookmarksAsync.fulfilled, (state, action) => {
       state.list = action.payload;
+      state.loading = false;
+    });
+    builder.addCase(loadBookmarksAsync.rejected, (state) => {
+      state.loading = false;
     });
   },
 });
@@ -83,5 +92,7 @@ export const { removeBookmarkTitle, setBookmarkTitle } = bookmarksSlice.actions;
 export const selectBookmarks = (state: RootState) => state.bookmarks.list;
 export const selectBookmarkTitle = (state: RootState) =>
   Object.keys(state.bookmarks.title)[0] || "";
+export const selectBookmarksLoading = (state: RootState) =>
+  state.bookmarks.loading;
 
 export default bookmarksSlice.reducer;

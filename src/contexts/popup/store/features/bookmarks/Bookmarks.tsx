@@ -2,6 +2,7 @@ import { useAppSelector, useAppDispatch } from "@/contexts/popup/hooks";
 import {
   selectBookmarks,
   selectBookmarkTitle,
+  selectBookmarksLoading,
   loadBookmarksAsync,
   removeBookmarkAsync,
 } from "./bookmarksSlice";
@@ -24,11 +25,13 @@ import { BookmarkTrash } from "./BookmarkTrash";
 import style from "./Bookmarks.module.scss";
 
 import type { BookmarkInfo } from "./bookmarksSlice";
+import { Loading } from "@/components/Loading";
 
 export const Bookmarks = ({}: Bookmarks.Props) => {
   const dispatch = useAppDispatch();
   const bookmarks = useAppSelector(selectBookmarks);
   const bookmarkTitle = useAppSelector(selectBookmarkTitle);
+  const loading = useAppSelector(selectBookmarksLoading);
 
   const [showTrash, setShowTrash] = React.useState(false);
   const [activeBookmarkUrl, setActiveBookmarkUrl] = React.useState<
@@ -76,31 +79,37 @@ export const Bookmarks = ({}: Bookmarks.Props) => {
   };
 
   return (
-    <DndContext
-      onDragEnd={onDragEnd}
-      onDragStart={onDragStart}
-      sensors={sensors}
-    >
-      <div className={style.bookmarks}>
-        <div ref={ref} className={style.bookmarksScrollbox}>
-          <div className={style.bookmarksContent}>
-            {bookmarks.map((bookmark) => (
-              <DraggableBookmark key={bookmark.url} bookmark={bookmark} />
-            ))}
-            <BookmarkAddButton />
+    <Loading loading={loading}>
+      <DndContext
+        onDragEnd={onDragEnd}
+        onDragStart={onDragStart}
+        sensors={sensors}
+      >
+        <div className={style.bookmarks}>
+          <div ref={ref} className={style.bookmarksScrollbox}>
+            <div className={style.bookmarksContent}>
+              {bookmarks.map((bookmark) => (
+                <DraggableBookmark key={bookmark.url} bookmark={bookmark} />
+              ))}
+              <BookmarkAddButton />
+            </div>
+          </div>
+          <div>
+            <div className={style.bookmarksLink}>
+              <span>
+                {activeBookmark ? activeBookmark.title : bookmarkTitle}
+              </span>
+            </div>
+            <BookmarkTrash show={showTrash} />
           </div>
         </div>
-        <div>
-          <div className={style.bookmarksLink}>
-            <span>{activeBookmark ? activeBookmark.title : bookmarkTitle}</span>
-          </div>
-          <BookmarkTrash show={showTrash} />
-        </div>
-      </div>
-      <DragOverlay>
-        {activeBookmark ? <Bookmark bookmark={activeBookmark} overlay /> : null}
-      </DragOverlay>
-    </DndContext>
+        <DragOverlay>
+          {activeBookmark ? (
+            <Bookmark bookmark={activeBookmark} overlay />
+          ) : null}
+        </DragOverlay>
+      </DndContext>
+    </Loading>
   );
 };
 
