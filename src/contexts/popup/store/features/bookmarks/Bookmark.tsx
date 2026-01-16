@@ -1,9 +1,5 @@
 import { useAppDispatch } from "@/contexts/popup/hooks";
-import {
-  removeBookmarkAsync,
-  setBookmarkTitle,
-  removeBookmarkTitle,
-} from "./bookmarksSlice";
+import { setBookmarkTitle, removeBookmarkTitle } from "./bookmarksSlice";
 
 import { Image } from "@/components/Image";
 
@@ -11,7 +7,7 @@ import style from "./Bookmarks.module.scss";
 
 import type { BookmarkInfo } from "./bookmarksSlice";
 
-export const Bookmark = ({ bookmark }: Bookmark.Props) => {
+export const Bookmark = ({ bookmark, overlay }: Bookmark.Props) => {
   const dispatch = useAppDispatch();
 
   const { title, preview, icon, url } = bookmark;
@@ -28,43 +24,25 @@ export const Bookmark = ({ bookmark }: Bookmark.Props) => {
     }
   };
 
-  const onRemove = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    dispatch(removeBookmarkAsync(url));
-  };
-
   const onMouseOver = () => {
+    if (overlay) return;
+
     dispatch(setBookmarkTitle(title));
   };
 
   const onMouseOut = () => {
+    if (overlay) return;
+
     setTimeout(() => {
       dispatch(removeBookmarkTitle(title));
     }, 100);
   };
 
-  // Prevent default context menu on bookmark items
-  React.useEffect(() => {
-    const f = (e: PointerEvent) => {
-      if (e.target instanceof HTMLElement) {
-        if (e.target.closest(`.${style.bookmarkContainer}`)) {
-          e.preventDefault();
-        }
-      }
-    };
-
-    document.addEventListener("contextmenu", f);
-
-    return () => document.removeEventListener("contextmenu", f);
-  });
-
   return (
-    <a
+    <div
       className={style.bookmarkContainer}
       onClick={onClick}
       onAuxClick={onClick}
-      href={url}
       onMouseOver={onMouseOver}
       onMouseOut={onMouseOut}
     >
@@ -76,12 +54,13 @@ export const Bookmark = ({ bookmark }: Bookmark.Props) => {
       {icon && (
         <Image src={icon} alt="Bookmark icon" className={style.bookmarkIcon} />
       )}
-    </a>
+    </div>
   );
 };
 
 export namespace Bookmark {
   export interface Props {
     bookmark: BookmarkInfo;
+    overlay?: boolean;
   }
 }

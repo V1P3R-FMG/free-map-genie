@@ -1,20 +1,49 @@
 .bookmark-container {
   display: grid;
-  width: 100%;
   height: 100%;
-  grid-template-columns: 5fr 4fr;
-  grid-template-rows: 5fr 4fr;
-  border-radius: 8px;
-  overflow: hidden;
-  align-items: center;
-  justify-items: center;
+  width: 100%;
+
   background-color: var(--item);
   border: 1px solid var(--border);
+  border-radius: 8px;
 
-  &:hover {
-    border-color: var(--active);
-    cursor: pointer;
+  grid-template-columns: 5fr 4fr;
+  grid-template-rows: 5fr 4fr;
+  align-items: center;
+  justify-items: center;
+
+  padding: 0;
+  overflow: hidden;
+
+  &:has(.bookmark-add-icon) {
+    &:hover {
+      cursor: pointer;
+      border-color: var(--active);
+    }
   }
+}
+
+.draggable-bookmark {
+  &.dragging {
+    opacity: 0.5;
+
+    .bookmark-container {
+      border-color: var(--active);
+    }
+  }
+
+  &:not(.dragging) {
+    .bookmark-container:hover {
+      border-color: var(--active);
+      cursor: pointer;
+    }
+  }
+}
+
+.bookmark-preview,
+.bookmark-icon {
+  -webkit-user-drag: none;
+  user-select: none;
 }
 
 .bookmark-preview {
@@ -53,6 +82,9 @@
 .bookmarks-link {
   color: var(--color);
   background-color: var(--background-darker);
+  border: 1px solid var(--border);
+
+  border-radius: 0.25rem;
 
   text-align: left;
   font-size: 0.8rem;
@@ -61,7 +93,11 @@
   margin-bottom: 0;
   padding: 0.2rem;
 
-  min-height: 1.6rem;
+  min-height: calc(1rem + 4px);
+
+  box-sizing: content-box;
+
+  overflow-x: hidden;
 }
 
 .bookmarks-scrollbox {
@@ -69,6 +105,8 @@
 
   display: block;
   max-height: calc(var(--row-count) * (4.1rem + 0.5rem) - 0.5rem);
+
+  scroll-behavior: auto;
 
   &::-webkit-scrollbar {
     width: 0.5rem;
@@ -88,7 +126,8 @@
   }
 
   margin-left: 0.5rem;
-  overflow-y: auto;
+  overflow-x: hidden;
+  overflow-y: scroll;
 }
 
 .bookmarks-content {
@@ -101,4 +140,35 @@
   margin-right: 0.5rem;
 
   gap: 0.5rem;
+}
+
+.bookmark-trash-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  padding: 1.2rem;
+  pointer-events: none;
+
+  .bookmark-trash {
+    transform: translateY(-4.5rem);
+    pointer-events: none;
+
+    border-radius: 4rem;
+    padding: 1rem;
+    background-color: #b82727b6;
+    transition: transform 0.2s ease-in;
+
+    &.show {
+      transform: none;
+      pointer-events: all;
+      transition: transform 0.2s ease-out;
+    }
+
+    &.over {
+      background-color: #cf2626e1;
+    }
+  }
 }
