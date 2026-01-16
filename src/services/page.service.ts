@@ -1,8 +1,6 @@
 import { createService, type ProxyInstance } from "@/common/messaging";
 import { getPageType } from "@/common/mapgenie";
 
-import mapgenieService from "./mapgenie.service";
-
 import type { Bookmark, ImageUrl } from "@/common/bookmark";
 
 type PartialBookmark = {
@@ -34,30 +32,44 @@ const validateBookmark: (
   }
 };
 
+const getPageInfoFromHead = (): PartialBookmark => {
+  const urlMeta = document.head.querySelector<HTMLMetaElement>(
+    "meta[property='og:url']"
+  );
+
+  const iconLink = document.head.querySelector<HTMLLinkElement>(
+    "link[rel='apple-touch-icon']"
+  );
+
+  const titleMeta = document.head.querySelector<HTMLMetaElement>(
+    "meta[property='og:title']"
+  );
+
+  const imageMeta = document.head.querySelector<HTMLMetaElement>(
+    "meta[property='og:image']"
+  );
+
+  return {
+    url: urlMeta?.content || null,
+    title: titleMeta?.content || null,
+    preview: imageMeta?.content || null,
+    icon: iconLink?.href || null,
+  };
+};
+
+const getPreviewForMap = (preview: ImageUrl | null): ImageUrl | null => {
+  const map = window.mapData!.map;
+  const game = window.game!;
+  const url = `https://cdn.mapgenie.io/images/games/${game.slug}/maps/${map.slug}.jpg`;
+
+  const fallback = typeof preview === "string" ? preview : preview?.fallback;
+
+  return fallback ? { url, fallback } : null;
+};
+
 export class PageService {
-  private readonly mapgenie = mapgenieService.use();
-
   public async createBookmark(): Promise<Bookmark> {
-    const urlMeta = document.head.querySelector<HTMLMetaElement>(
-      "meta[property='og:url']"
-    );
-
-    const iconLink = document.head.querySelector<HTMLLinkElement>(
-      "link[rel='apple-touch-icon']"
-    );
-
-    const titleMeta = document.head.querySelector<HTMLMetaElement>(
-      "meta[property='og:title']"
-    );
-
-    const imageMeta = document.head.querySelector<HTMLMetaElement>(
-      "meta[property='og:image']"
-    );
-
-    let url = urlMeta?.content || null;
-    let title = titleMeta?.content || null;
-    let preview: ImageUrl | null = imageMeta?.content || null;
-    let icon: ImageUrl | null = iconLink?.href || null;
+    let { url, title, preview, icon } = getPageInfoFromHead();
 
     const params = new URLSearchParams(window.location.search);
     const fmgMapId = params.get("fmgMapId");
@@ -66,6 +78,7 @@ export class PageService {
 
     // Fetch map data if mapId is available
     if (mapId) {
+      // Validate map ID matches
       const map = window.mapData!.map;
       if (mapId != map.id) {
         throw new Error("Map ID mismatch");
@@ -73,13 +86,7 @@ export class PageService {
 
       const game = window.game!;
 
-      const image = `https://cdn.mapgenie.io/images/games/${game.slug}/maps/${map.slug}.jpg`;
-
-      preview = preview && {
-        url: image,
-        fallback: preview,
-      };
-
+      preview = getPreviewForMap(preview);
       title = game.title + " | " + map.title;
     }
 
