@@ -71,16 +71,16 @@ export class PageService {
         throw new Error("Map ID mismatch");
       }
 
-      const game = window.game!.slug;
+      const game = window.game!;
 
-      const image = `https://cdn.mapgenie.io/images/games/${game}/maps/${map.slug}.jpg`;
+      const image = `https://cdn.mapgenie.io/images/games/${game.slug}/maps/${map.slug}.jpg`;
 
       preview = preview && {
         url: image,
         fallback: preview,
       };
 
-      title = map.title;
+      title = game.title + " | " + map.title;
     }
 
     // Append fmgMapId to URL if present
