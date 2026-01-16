@@ -62,4 +62,8 @@ export class GameHomePage extends Page {
   public async start() {
     await this.unlockProMaps();
   }
+
+  public async info(): Promise<Record<string, any>> {
+    return {};
+  }
 }

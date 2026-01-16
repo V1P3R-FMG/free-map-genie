@@ -1,9 +1,10 @@
 import { TabsContainer, TabView } from "@/components/Tabs";
 
 import "./App.css";
-import { Bookmarks } from "./store/features/bookmarks/Bookmarks";
 import { Header } from "./store/features/app/Header";
 import { Footer } from "./store/features/app/Footer";
+import { Bookmarks } from "./store/features/bookmarks/Bookmarks";
+import { Info } from "./store/features/info/Info";
 
 function App() {
   React.useEffect(() => {
@@ -17,8 +18,8 @@ function App() {
         <TabView name="bookmarks" icon="bookmark">
           <Bookmarks />
         </TabView>
-        <TabView name="info" icon="info">
-          <h1>Info</h1>
+        <TabView name="info" icon="document">
+          <Info />
         </TabView>
       </TabsContainer>
       <Footer />

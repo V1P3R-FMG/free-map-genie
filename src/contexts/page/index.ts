@@ -41,9 +41,15 @@ export default defineUnlistedScript(async () => {
   MapgenieAdBlocker.remove();
   MapgenieAdBlocker.removePrivacyPopup();
 
-  await page.start();
+  let failed: boolean = false;
+  try {
+    await page.start();
+  } catch (err) {
+    logger.debug("Page script failed to start.", err);
+    failed = true;
+  }
 
-  pageService.provide();
+  pageService.provide({ failed, page });
 
   logger.log("Page script initialized.");
 });

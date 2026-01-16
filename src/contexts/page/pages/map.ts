@@ -191,4 +191,20 @@ export class MapPage extends Page {
     await this.client.installInterceptor();
     await this.client.storageRequestPersist();
   }
+
+  public async info() {
+    const userId = window.user?.id ?? "not logged in";
+    const game = window.game?.title ?? null;
+    const gameId = window.game?.id ?? null;
+    const map = window.mapData?.map.title ?? null;
+    const mapId = this.fmgMapId ?? window.mapData?.map.id ?? null;
+
+    return {
+      userId,
+      game,
+      gameId,
+      map,
+      mapId,
+    };
+  }
 }

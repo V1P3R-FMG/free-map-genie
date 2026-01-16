@@ -255,4 +255,25 @@ export class GuidePage extends Page {
     await this.client.installInterceptor();
     await this.client.storageRequestPersist();
   }
+
+  public async info(): Promise<Record<string, any>> {
+    const userId = await this.getUserId();
+
+    if (this.isTarkovQuest17Page) {
+      return {
+        userId: userId ?? "not logged in",
+        game: "Tarkov",
+        gameId: 20,
+      };
+    } else {
+      const mapWindow = await this.getMapWindow();
+      const gameId = mapWindow?.game?.id ?? null;
+      const game = mapWindow?.game?.title ?? null;
+      return {
+        userId: userId ?? null,
+        game,
+        gameId: gameId,
+      };
+    }
+  }
 }

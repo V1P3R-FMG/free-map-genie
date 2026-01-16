@@ -2,6 +2,7 @@ import { createService, type ProxyInstance } from "@/common/messaging";
 import { getPageType } from "@/common/mapgenie";
 
 import type { Bookmark, ImageUrl } from "@/common/bookmark";
+import type { Page } from "@/contexts/page/pages/page";
 
 type PartialBookmark = {
   title: string | null;
@@ -67,8 +68,25 @@ const getPreviewForMap = (preview: ImageUrl | null): ImageUrl | null => {
   return fallback ? { url, fallback } : null;
 };
 
+export interface PageState {
+  failed: boolean;
+  page: Page;
+}
+
 export class PageService {
+  private readonly failed: boolean;
+  private readonly page: Page;
+
+  constructor({ failed, page }: PageState) {
+    this.failed = failed;
+    this.page = page;
+  }
+
   public async createBookmark(): Promise<Bookmark> {
+    if (this.failed) {
+      throw new Error("Page script failed to initialize");
+    }
+
     let { url, title, preview, icon } = getPageInfoFromHead();
 
     const params = new URLSearchParams(window.location.search);
@@ -104,6 +122,21 @@ export class PageService {
       ...bookmark,
       pageType: pageType,
       createdAt: Date.now(),
+    };
+  }
+
+  public async getInfo(): Promise<Record<string, any>> {
+    if (this.failed) {
+      return {
+        state: "crashed",
+      };
+    }
+
+    const info = await this.page.info();
+    return {
+      pageType: await getPageType(),
+      state: "running",
+      ...info,
     };
   }
 

@@ -1,0 +1,21 @@
+.info {
+  display: grid;
+  grid-template-columns: auto;
+  gap: 5px;
+}
+
+.entry {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  background-color: var(--item);
+  border-radius: 0.4rem;
+
+  strong {
+    border-right: 1px solid var(--border);
+  }
+
+  strong,
+  span {
+    padding: 0.4rem;
+  }
+}
