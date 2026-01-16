@@ -36,18 +36,14 @@ export default defineUnlistedScript(async () => {
   const params = new URLSearchParams(window.location.search);
   if (params.has("fmgBackend")) return;
 
-  pageService.provide();
-
   logger.log("Initializing page script for", pageType);
 
   MapgenieAdBlocker.remove();
   MapgenieAdBlocker.removePrivacyPopup();
 
-  if (await page.canStart()) {
-    await page.start();
-  } else {
-    await page.restore();
-  }
+  await page.start();
+
+  pageService.provide();
 
   logger.log("Page script initialized.");
 });

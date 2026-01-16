@@ -7,7 +7,6 @@ import mapgenieService from "@/services/mapgenie.service";
 
 export class Client {
   private readonly et: EventTarget = new EventTarget();
-  private readonly key: Key;
 
   private static readonly backend = backendService.use();
   private static readonly mapgenie = mapgenieService.use();
@@ -16,25 +15,53 @@ export class Client {
     return Client.backend;
   }
 
-  private get mapgenie() {
+  public get mapgenie() {
     return Client.mapgenie;
   }
 
   private interceptor?: AxiosInterceptor;
+  private _key?: Key;
 
-  public constructor(key: Key) {
-    this.key = key;
+  public get isLoggedIn(): boolean {
+    return !!this._key;
   }
 
-  public static forMap() {
-    return new Client(Key.fromWindow());
+  public get key(): Key {
+    if (!this._key) {
+      throw new Error("Client is not logged in");
+    }
+    return this._key;
   }
 
-  public static forGame(gameId: number) {
-    return new Client(Key.fromWindowGame(gameId));
+  public loginFromMap() {
+    this._key = Key.fromWindow();
   }
 
-  public static async forUrl(url: string) {
+  public loginFromGame(gameId: number) {
+    this._key = Key.fromWindowGame(gameId);
+  }
+
+  public async loginFromGuide() {
+    try {
+      // Try to get the game ID from axios headers
+      const axios = await waitForProperty(window, "axios");
+      const gameId = axios!.defaults.headers.common["X-Game-ID"];
+
+      if (gameId) {
+        this.loginFromGame(Number(gameId));
+        return;
+      }
+    } catch {
+      logger.warn(
+        "Could not get game ID from axios headers will fallback to URL-based client, notify the fmg authors to improve this"
+      );
+
+      // Fallback to URL-based client
+      this.loginFromUrl(window.location.href);
+    }
+  }
+
+  public async loginFromUrl(url: string) {
     const games = await this.mapgenie.fetchGames();
 
     const { hostname, pathname } = new URL(url);
@@ -48,7 +75,8 @@ export class Client {
 
     if (filteredGames.length === 1) {
       const { id } = filteredGames[0];
-      return this.forGame(id);
+      this.loginFromGame(id);
+      return;
     }
 
     const matchedGame = filteredGames.find((g) => g.slug === slug);
@@ -56,7 +84,7 @@ export class Client {
       throw new Error("No game found for URL");
     }
 
-    return this.forGame(matchedGame.id);
+    this.loginFromGame(matchedGame.id);
   }
 
   public async installInterceptor() {
@@ -104,22 +132,6 @@ export class Client {
     return this.backend.migrate(domain, this.key);
   }
 
-  public async fetchGames() {
-    return this.mapgenie.fetchGames();
-  }
-
-  public async fetchGame(gameId: number | string) {
-    return this.mapgenie.fetchGame(gameId);
-  }
-
-  public async fetchMap(mapId: number | string) {
-    return this.mapgenie.fetchMap(mapId);
-  }
-
-  public async fetchHeatmaps(mapId: number | string) {
-    return this.mapgenie.fetchHeatmaps(mapId);
-  }
-
   private async getDemoPresets(ordering: number[]) {
     let presets = window.mapData?.presets;
 
@@ -155,6 +167,7 @@ export class Client {
 
   private registerHandlers() {
     if (!this.interceptor) return;
+    if (!this.isLoggedIn) return;
 
     this.interceptor.put<{ id: string }>(
       "/api/v1/user/locations/:id",

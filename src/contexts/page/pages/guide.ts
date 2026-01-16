@@ -1,6 +1,5 @@
 import { Page } from "./page";
 import { Client } from "@/common/client";
-import { createAsyncProxy, type AsyncProxy } from "@/common/asyncProxy";
 import { activateBlockedMapgenieScript } from "@/common/mapgenie";
 import { waitForProperty } from "@/common/object";
 import { waitForElement } from "@/common/dom";
@@ -11,12 +10,7 @@ export class GuidePage extends Page {
   private readonly isTarkovQuest17Page =
     window.location.pathname === "/tarkov/guides/quests-17";
 
-  private _client?: AsyncProxy<Client>;
-  private _userId?: number;
-
-  private get client() {
-    return (this._client ??= createAsyncProxy(() => this.createClient()));
-  }
+  private client = new Client();
 
   private isExtendedState(state: any): state is MG.Guide.ExtendedState {
     return (
@@ -71,25 +65,6 @@ export class GuidePage extends Page {
     return state!;
   }
 
-  private async createClient() {
-    if (this.isTarkovQuest17Page) {
-      return Client.forGame(20);
-    }
-
-    try {
-      // Try to get the game ID from axios headers
-      const axios = await waitForProperty(window, "axios");
-      const gameId = axios!.defaults.headers.common["X-Game-ID"];
-
-      if (gameId) {
-        return Client.forGame(Number(gameId));
-      }
-    } catch {}
-
-    // Fallback to URL-based client
-    return Client.forUrl(window.location.href);
-  }
-
   private async getMapWindow() {
     const mapElement = await waitForElement<HTMLIFrameElement>(
       document,
@@ -100,8 +75,8 @@ export class GuidePage extends Page {
     return mapWindow;
   }
 
-  private async setupUser() {
-    const userId = await this.getUserId();
+  private async setupUser(userId?: number) {
+    if (userId === undefined) return;
 
     // Client requires a user to object to function properly
     // So we create a dummy user
@@ -120,10 +95,6 @@ export class GuidePage extends Page {
   }
 
   private async getUserId() {
-    if (this._userId !== undefined) {
-      return this._userId;
-    }
-
     if (this.isTarkovQuest17Page) {
       await waitForProperty(window, "config");
       return window.user?.id;
@@ -258,41 +229,30 @@ export class GuidePage extends Page {
   }
 
   public async start() {
-    await this.setupUser();
+    const userId = await this.getUserId();
 
-    await this.client.storageRequestPersist();
+    await this.setupUser(userId);
+
+    if (userId === undefined) {
+      if (this.isTarkovQuest17Page) {
+        await activateBlockedMapgenieScript("TarkovQuestToolWidget");
+      }
+      return;
+    }
+
+    await this.client.loginFromGuide();
 
     await this.loadUserData();
     await this.fixCheckboxes();
     this.updateCounts();
 
-    // Setup event listeners from the map window
+    // Activate blocked Mapgenie scripts
+    if (this.isTarkovQuest17Page) {
+      await activateBlockedMapgenieScript("TarkovQuestToolWidget");
+    }
+
     await this.setupEventListeners();
-
-    // Activate blocked Mapgenie scripts
-    if (this.isTarkovQuest17Page) {
-      await activateBlockedMapgenieScript("TarkovQuestToolWidget");
-    }
-
     await this.client.installInterceptor();
-  }
-
-  public async canStart() {
-    const userId = await this.getUserId();
-
-    // We can only start if user is logged in
-    if (userId === undefined) {
-      logger.warn("User not logged in, FMG will not work");
-
-      return false;
-    }
-    return true;
-  }
-
-  public async restore() {
-    // Activate blocked Mapgenie scripts
-    if (this.isTarkovQuest17Page) {
-      await activateBlockedMapgenieScript("TarkovQuestToolWidget");
-    }
+    await this.client.storageRequestPersist();
   }
 }

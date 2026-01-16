@@ -62,12 +62,4 @@ export class GameHomePage extends Page {
   public async start() {
     await this.unlockProMaps();
   }
-
-  public canStart() {
-    return true;
-  }
-
-  public restore() {
-    // No-op
-  }
 }

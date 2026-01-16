@@ -5,7 +5,8 @@ import { mapDataUtils } from "@/common/mapgenie";
 import { waitForProperty } from "@/common/object";
 
 export class MapPage extends Page {
-  private _client?: Client;
+  private client = new Client();
+
   private _mapId?: number;
 
   private async loadUserData() {
@@ -33,7 +34,7 @@ export class MapPage extends Page {
     window.mapData!.presets = data.presets;
   }
 
-  private async unlockMapSelector() {
+  private unlockMapSelector() {
     const links = $(".map-link")
       .toArray()
       .map((link) => {
@@ -105,7 +106,7 @@ export class MapPage extends Page {
   }
 
   private async loadMapDataForMapId(mapId: number) {
-    const game = await this.client.fetchGame(window.game!.id);
+    const game = await this.client.mapgenie.fetchGame(window.game!.id);
     const map = game.maps.find((m) => m.id === mapId);
 
     if (!map) {
@@ -137,18 +138,18 @@ export class MapPage extends Page {
     const hasHeatmaps = window.mapData!.heatmapGroups.length > 0;
     if (!hasHeatmaps) return;
 
-    const heatmaps = await this.client.fetchHeatmaps(window.mapData!.map.id);
+    const heatmaps = await this.client.mapgenie.fetchHeatmaps(
+      window.mapData!.map.id
+    );
     mapDataUtils.loadHeatmaps(heatmaps);
   }
 
-  private get client() {
-    return (this._client ??= Client.forMap());
-  }
+  private setupUser() {
+    if (window.user) {
+      window.user!.hasPro = true;
 
-  private async setupUser() {
-    window.user!.hasPro = true;
-
-    window.mapData!.maxMarkedLocations = Infinity;
+      window.mapData!.maxMarkedLocations = Infinity;
+    }
   }
 
   private setupEventListeners() {
@@ -163,33 +164,30 @@ export class MapPage extends Page {
   }
 
   public async start() {
+    await waitForProperty(window, "mapData");
+
     this.setupUser();
     this.unlockMapSelector();
-    this.setupEventListeners();
 
-    await this.client.storageRequestPersist();
-
+    // Load map data and heatmaps for pro maps and maps with heatmaps
     await this.loadMapData();
     await this.loadHeatmaps();
+
+    if (!window.user) {
+      await activateBlockedMapgenieScript("map");
+      return;
+    }
+
+    // Login client from map data
+    this.client.loginFromMap();
+
+    // Load user data
     await this.loadUserData();
 
     await activateBlockedMapgenieScript("map");
+
+    this.setupEventListeners();
     await this.client.installInterceptor();
-  }
-
-  public async canStart() {
-    await waitForProperty(window, "mapData");
-
-    // We can only start if user is logged in
-    if (!window.user) {
-      logger.warn("User not logged in, FMG will not work");
-
-      return false;
-    }
-    return true;
-  }
-
-  public async restore() {
-    await activateBlockedMapgenieScript("map");
+    await this.client.storageRequestPersist();
   }
 }
