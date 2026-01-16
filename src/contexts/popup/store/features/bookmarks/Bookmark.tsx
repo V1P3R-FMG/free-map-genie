@@ -5,6 +5,8 @@ import {
   removeBookmarkTitle,
 } from "./bookmarksSlice";
 
+import { Image } from "@/components/Image";
+
 import style from "./Bookmarks.module.scss";
 
 import type { BookmarkInfo } from "./bookmarksSlice";
@@ -66,14 +68,13 @@ export const Bookmark = ({ bookmark }: Bookmark.Props) => {
       onMouseOver={onMouseOver}
       onMouseOut={onMouseOut}
     >
-      <img
+      <Image
         className={style.bookmarkPreview}
         src={preview}
-        alt={title}
-        // title={title}
+        alt="Bookmark preview"
       />
       {icon && (
-        <img className={style.bookmarkIcon} src={icon} alt="Bookmark icon" />
+        <Image src={icon} alt="Bookmark icon" className={style.bookmarkIcon} />
       )}
     </a>
   );

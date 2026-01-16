@@ -3,13 +3,13 @@ import { getPageType } from "@/common/mapgenie";
 
 import mapgenieService from "./mapgenie.service";
 
-import type { Bookmark } from "@/common/bookmark";
+import type { Bookmark, ImageUrl } from "@/common/bookmark";
 
 type PartialBookmark = {
   title: string | null;
   url: string | null;
-  preview: string | null;
-  icon?: string | null;
+  preview: ImageUrl | null;
+  icon?: ImageUrl | null;
 };
 
 const validateBookmark: (
@@ -55,9 +55,9 @@ export class PageService {
     );
 
     let url = urlMeta?.content || null;
-    let preview = imageMeta?.content || null;
     let title = titleMeta?.content || null;
-    let icon = iconLink?.href || null;
+    let preview: ImageUrl | null = imageMeta?.content || null;
+    let icon: ImageUrl | null = iconLink?.href || null;
 
     const params = new URLSearchParams(window.location.search);
     const fmgMapId = params.get("fmgMapId");
@@ -66,8 +66,20 @@ export class PageService {
 
     // Fetch map data if mapId is available
     if (mapId) {
-      const map = await this.mapgenie.fetchMap(mapId);
-      preview = map.image;
+      const map = window.mapData!.map;
+      if (mapId != map.id) {
+        throw new Error("Map ID mismatch");
+      }
+
+      const game = window.game!.slug;
+
+      const image = `https://cdn.mapgenie.io/images/games/${game}/maps/${map.slug}.jpg`;
+
+      preview = preview && {
+        url: image,
+        fallback: preview,
+      };
+
       title = map.title;
     }
 
