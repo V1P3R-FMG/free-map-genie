@@ -12,7 +12,7 @@ export default class DedupeAdapter extends Adapter {
 
   private readonly ttl: number;
 
-  public constructor(adapter: Adapter, ttl = 1000) {
+  public constructor(adapter: Adapter, ttl = 250) {
     super();
 
     this.adapter = adapter;
