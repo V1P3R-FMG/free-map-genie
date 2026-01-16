@@ -79,12 +79,18 @@ export default class BackgroundAdapter extends Adapter {
     // Send to all global ports
     this.ports[""]?.forEach((port) => {
       port.postMessage(message);
+
+      // Consume runtime.lastError to prevent uncaught exceptions
+      const _ = browser.runtime.lastError;
     });
 
     // Send to specific tab ports
     if (key) {
       this.ports[key]?.forEach((port) => {
         port.postMessage(message);
+
+        // Consume runtime.lastError to prevent uncaught exceptions
+        const _ = browser.runtime.lastError;
       });
     }
   }
