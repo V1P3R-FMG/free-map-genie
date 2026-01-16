@@ -10,7 +10,13 @@ import path from "node:path";
 import fs from "node:fs";
 
 interface FantasticonOptions
-  extends Omit<RunnerOptions, "fontTypes" | "assetTypes" | "outputDir"> {
+  extends Omit<
+    RunnerOptions,
+    "fontTypes" | "assetTypes" | "outputDir" | "fontsUrl" | "pathOptions"
+  > {
+  pathOptions?: {
+    ts: string;
+  };
   fontTypes?: Lowercase<keyof typeof FontAssetType>[];
   assetTypes?: Lowercase<keyof typeof OtherAssetType>[];
 }
@@ -27,20 +33,17 @@ const generateFmgIconFont = async (
 ) => {
   return generateFonts(
     {
+      ...options,
       outputDir,
+      pathOptions: {
+        ts: options.pathOptions?.ts,
+      },
       fontTypes: fontTypes as FontAssetType[],
       assetTypes: assetTypes as OtherAssetType[],
-      ...options,
+      fontsUrl: "/assets",
     },
     false
   );
-};
-
-const getRelativePath = (outputDir: string, file: string) => {
-  if (file.endsWith(".css")) {
-    return path.join("css", path.relative(outputDir, file));
-  }
-  return path.join("fonts", path.relative(outputDir, file));
 };
 
 export default defineWxtModule({
@@ -59,13 +62,18 @@ export default defineWxtModule({
 
     wxt.hook("build:publicAssets", async (_wxt, assets) => {
       try {
-        const results = await generateFmgIconFont(outputDir, options);
+        const results = await generateFmgIconFont(outputDir, {
+          ...options,
+        });
 
         for (const { writePath } of results.writeResults) {
           if (writePath.endsWith(".ts")) continue;
 
           assets.push({
-            relativeDest: getRelativePath(outputDir, writePath),
+            relativeDest: path.join(
+              "assets",
+              path.relative(outputDir, writePath)
+            ),
             absoluteSrc: path.resolve(writePath),
           });
         }

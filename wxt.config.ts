@@ -41,7 +41,6 @@ export default defineConfig({
     pathOptions: {
       ts: "src/common/icons.ts",
     },
-    fontsUrl: "/fonts",
     prefix: "fmg-icon",
     normalize: true,
     inputDir: "icons",
@@ -51,7 +50,7 @@ export default defineConfig({
     web_accessible_resources: [
       {
         matches: ["<all_urls>"],
-        resources: ["page.js", "tablesort.js", "fonts/*", "css/*"],
+        resources: ["page.js", "tablesort.js", "assets/*"],
       },
     ],
     permissions:

@@ -7,7 +7,7 @@ import { Footer } from "./store/features/app/Footer";
 
 function App() {
   React.useEffect(() => {
-    injectStyle("/css/fmg-icons.css");
+    injectStyle("/assets/fmg-icons.css");
   }, []);
 
   return (
