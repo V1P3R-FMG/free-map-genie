@@ -1,6 +1,9 @@
 import PortAdapter from "../adapters/port";
 import DedupeAdapter from "../core/adapters/dedupe";
+import { setGlobalAdapter } from "../core/adapter";
 
-globalThis.__ADAPTER__ = new DedupeAdapter(new PortAdapter());
+const adapter = new DedupeAdapter(new PortAdapter());
 
-export default globalThis.__ADAPTER__;
+setGlobalAdapter(adapter);
+
+export default adapter;

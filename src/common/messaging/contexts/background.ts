@@ -1,6 +1,9 @@
 import BackgroundAdapter from "../adapters/background";
 import DedupeAdapter from "../core/adapters/dedupe";
+import { setGlobalAdapter } from "../core/adapter";
 
-globalThis.__ADAPTER__ = new DedupeAdapter(new BackgroundAdapter());
+const adapter = new DedupeAdapter(new BackgroundAdapter());
 
-export default globalThis.__ADAPTER__;
+setGlobalAdapter(adapter);
+
+export default adapter;

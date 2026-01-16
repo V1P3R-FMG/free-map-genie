@@ -1,6 +1,9 @@
 import ExtensionAdapter from "../adapters/contentScript";
 import DedupeAdapter from "../core/adapters/dedupe";
+import { setGlobalAdapter } from "../core/adapter";
 
-globalThis.__ADAPTER__ = new DedupeAdapter(new ExtensionAdapter());
+const adapter = new DedupeAdapter(new ExtensionAdapter());
 
-export default globalThis.__ADAPTER__;
+setGlobalAdapter(adapter);
+
+export default adapter;
