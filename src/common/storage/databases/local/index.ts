@@ -22,16 +22,23 @@ export class LocalDatabase implements Database {
     this.v2 = new V2(this.driver);
   }
 
+  private getHost(url: string): string {
+    try {
+      return new URL(url).host;
+    } catch {
+      return new URL("https://" + url).host;
+    }
+  }
+
   private getDriverForDomain(domain: string): Driver {
-    const url = URL.canParse(domain)
-      ? new URL(domain)
-      : new URL("https://" + domain);
-    if (url.host === location.host) {
+    const host = this.getHost(domain);
+
+    if (host === location.host) {
       // For same-domain, use local driver
       return new LocalStorageDriver();
     } else {
       // For cross-domain, use remote driver
-      return new RemoteLocalStorageDriver(url.host);
+      return new RemoteLocalStorageDriver(host);
     }
   }
 

@@ -65,12 +65,18 @@ export class StorageService {
   }
 }
 
-const createProxyForDomain = (domain: string) => {
-  const url = URL.canParse(domain)
-    ? new URL(domain)
-    : new URL("https://" + domain);
+const getHost = (domain: string): string => {
+  try {
+    return new URL(domain).host;
+  } catch {
+    return new URL("https://" + domain).host;
+  }
+};
 
-  const namespace = `StorageService::[${url.host}]`;
+const createProxyForDomain = (domain: string) => {
+  const host = getHost(domain);
+
+  const namespace = `StorageService::[${host}]`;
 
   return createService({
     context: StorageService,

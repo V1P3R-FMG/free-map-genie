@@ -55,7 +55,8 @@ export class MapPage extends Page {
     }
 
     const $firstFreeLink = links.find(
-      ({ $link, isPro }) => !isPro && URL.canParse($link.attr("href") || "")
+      ({ $link, isPro }) =>
+        !isPro && $link.attr("href") && $link.attr("href") !== "#"
     )?.$link;
     if (!$firstFreeLink) {
       // How did we get on a map page with no free maps?

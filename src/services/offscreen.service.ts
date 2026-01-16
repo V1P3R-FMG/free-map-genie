@@ -24,30 +24,32 @@ export class OffscreenService {
     return [...this._iframes.keys()];
   }
 
+  private normalizeUrl(url: string): string {
+    try {
+      return new URL(url).toString();
+    } catch {
+      return new URL(`https://${url}`).toString();
+    }
+  }
+
   public async addIframe(url: string) {
-    const normalizedUrl = URL.canParse(url)
-      ? new URL(url)
-      : new URL(`https://${url}`);
-    const normalizedUrlStr = normalizedUrl.toString();
+    const normalizedUrl = this.normalizeUrl(url);
 
-    if (this._iframes.has(normalizedUrlStr)) return;
+    if (this._iframes.has(normalizedUrl)) return;
 
-    const iframe = await this.createIframe(normalizedUrlStr);
-    this._iframes.set(normalizedUrlStr, iframe);
+    const iframe = await this.createIframe(normalizedUrl);
+    this._iframes.set(normalizedUrl, iframe);
   }
 
   public removeIframe(url: string) {
-    const normalizedUrl = URL.canParse(url)
-      ? new URL(url)
-      : new URL(`https://${url}`);
-    const normalizedUrlStr = normalizedUrl.toString();
+    const normalizedUrl = this.normalizeUrl(url);
 
-    const iframe = this._iframes.get(normalizedUrlStr);
+    const iframe = this._iframes.get(normalizedUrl);
 
     if (!iframe) return;
 
     iframe.remove();
-    this._iframes.delete(normalizedUrlStr);
+    this._iframes.delete(normalizedUrl);
   }
 }
 
