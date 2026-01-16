@@ -59,6 +59,10 @@ const getPageInfoFromHead = (): PartialBookmark => {
 };
 
 const getPreviewForMap = (preview: ImageUrl | null): ImageUrl | null => {
+  if (window.mapData?.maps.length! <= 1) {
+    return preview;
+  }
+
   const map = window.mapData!.map;
   const game = window.game!;
   const url = `https://cdn.mapgenie.io/images/games/${game.slug}/maps/${map.slug}.jpg`;
@@ -105,7 +109,12 @@ export class PageService {
       const game = window.game!;
 
       preview = getPreviewForMap(preview);
-      title = game.title + " | " + map.title;
+
+      if (game.title !== map.title) {
+        title = game.title + " | " + map.title;
+      } else {
+        title = game.title;
+      }
     }
 
     // Append fmgMapId to URL if present
