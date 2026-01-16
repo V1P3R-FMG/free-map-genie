@@ -5,33 +5,39 @@ interface ImageWithFallback {
 
 export type ImageUrl = string | ImageWithFallback;
 
-const getUrl = (url: ImageUrl) => {
-  if (typeof url === "string") {
-    return url;
-  } else {
-    return url.url;
-  }
-};
+export const Image = ({
+  src,
+  alt,
+  title,
+  className,
+  hideOnFail,
+}: Image.Props) => {
+  const [success, setSuccess] = React.useState(true);
+  const [url, setUrl] = React.useState(typeof src === "string" ? src : src.url);
 
-export const Image = ({ src, alt, title, className }: Image.Props) => {
-  const [url, setUrl] = React.useState<string>(getUrl(src));
+  if (!success && hideOnFail) {
+    return null;
+  }
 
   const onError = () => {
-    if (typeof src === "string") return;
+    if (typeof src === "string") {
+      setSuccess(false);
+      return;
+    }
 
-    if (url === src.url) {
+    if (url !== src.fallback) {
       setUrl(src.fallback);
-    } else if (url === src.fallback) {
-      setUrl(src.fallback);
+    } else {
+      setSuccess(false);
     }
   };
 
   return (
     <img
+      className={className}
       src={url}
       alt={alt}
       title={title}
-      className={className}
       onError={onError}
     />
   );
@@ -43,5 +49,6 @@ export namespace Image {
     alt?: string;
     title?: string;
     className?: string;
+    hideOnFail?: boolean;
   }
 }

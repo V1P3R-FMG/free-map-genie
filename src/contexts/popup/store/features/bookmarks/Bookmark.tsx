@@ -46,14 +46,8 @@ export const Bookmark = ({ bookmark, overlay }: Bookmark.Props) => {
       onMouseOver={onMouseOver}
       onMouseOut={onMouseOut}
     >
-      <Image
-        className={style.bookmarkPreview}
-        src={preview}
-        alt="Bookmark preview"
-      />
-      {icon && (
-        <Image src={icon} alt="Bookmark icon" className={style.bookmarkIcon} />
-      )}
+      <Image className={style.bookmarkPreview} src={preview} />
+      {icon && <Image src={icon} className={style.bookmarkIcon} hideOnFail />}
     </div>
   );
 };
