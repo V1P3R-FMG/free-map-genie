@@ -32,11 +32,6 @@ export default class DedupeAdapter extends Adapter {
   private handleMessage(message: any) {
     if (!isValidMessage(message)) return;
 
-    if (message.type === "ping") {
-      this.forwardMessage(message);
-      return;
-    }
-
     const hash = this.messageHash(message);
     if (this.recentMessageIds.has(hash)) {
       return;
