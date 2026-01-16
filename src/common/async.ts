@@ -25,14 +25,11 @@ export const waitUntil = (...args: Parameters<typeof _waitUntil>) => {
   const optionsObject =
     typeof options === "number" ? { timeout: options } : options ? options : {};
 
-  return _waitUntil(
-    predicate,
-    {
-      timeout: 60000,
-      ...optionsObject,
-    },
-    timeBetween
-  );
+  return _waitUntil(predicate, {
+    timeout: 60000,
+    intervalBetweenAttempts: timeBetween ?? 50,
+    ...optionsObject,
+  });
 };
 
 export default { some, waitUntil };
