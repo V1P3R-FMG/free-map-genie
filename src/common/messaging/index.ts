@@ -13,13 +13,13 @@ export type { Options as MemoizeOptions } from "p-memoize";
 export const createService = <T extends Context>(options: ProxyOptions<T>) => {
   const proxy = createProxy(options);
 
-  const adapter = getGlobalAdapter();
-
   const use = () => {
+    const adapter = getGlobalAdapter();
     return proxy.use(adapter);
   };
 
   const provide = (...args: ConstructorParameters<T>) => {
+    const adapter = getGlobalAdapter();
     return proxy.provide(adapter, ...args);
   };
 
