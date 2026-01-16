@@ -8,7 +8,7 @@ export const Tab = (props: Tab.Props) => {
       className={clsx(style.tab, { [style.active]: props.selected })}
       onClick={() => props.onClick?.(props.name)}
     >
-      <FontIcon icon={props.icon} size="1rem" />
+      <FontIcon icon={props.icon} size="1.2rem" />
     </div>
   );
 };
