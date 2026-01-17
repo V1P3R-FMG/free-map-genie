@@ -145,8 +145,15 @@ export class MapPage extends Page {
     mapDataUtils.loadHeatmaps(heatmaps);
   }
 
-  private setupUser() {
+  private async setupUser() {
     if (window.user) {
+      await this.client.addUserProfile(window.user.id);
+
+      const activeProfileId = await this.client.getActiveProfileId();
+
+      window.user.realId = window.user.id;
+      window.user.id = activeProfileId ?? window.user.id;
+
       window.user!.hasPro = true;
 
       window.mapData!.maxMarkedLocations = Infinity;
@@ -167,7 +174,7 @@ export class MapPage extends Page {
   public async start() {
     await waitForProperty(window, "mapData");
 
-    this.setupUser();
+    await this.setupUser();
     this.unlockMapSelector();
 
     // Load map data and heatmaps for pro maps and maps with heatmaps

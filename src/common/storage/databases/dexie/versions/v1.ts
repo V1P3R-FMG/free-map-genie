@@ -1,12 +1,8 @@
 import type { Bookmark } from "@/common/bookmark";
+import type { Profile } from "@/common/profile";
 import type { Table } from "dexie";
 
-import type {
-  IdIndex,
-  GameUserIndex,
-  MapUserIndex,
-  UserNoteIndex,
-} from "../indexes";
+import type { IdIndex, MapUserIndex, UserNoteIndex } from "../indexes";
 
 export type MetaTableV1 = Table<
   {
@@ -64,3 +60,15 @@ export type NotesTableV1 = Table<
 >;
 
 export type BookmarksTableV1 = Table<Bookmark, string>;
+
+export type ProfileV1 = {
+  name: string;
+  id: number;
+  active: number;
+};
+
+export type AsProfile<T extends ProfileV1 | undefined> = T extends ProfileV1
+  ? Profile
+  : undefined;
+
+export type ProfilesTableV1 = Table<ProfileV1, number>;

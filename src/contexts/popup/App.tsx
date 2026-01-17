@@ -12,6 +12,7 @@ import { Header } from "./store/features/app/Header";
 import { Footer } from "./store/features/app/Footer";
 import { Bookmarks } from "./store/features/bookmarks/Bookmarks";
 import { Info } from "./store/features/info/Info";
+import { Profiles } from "./store/features/profiles/Profiles";
 
 function App() {
   const dispatch = useAppDispatch();
@@ -31,6 +32,9 @@ function App() {
           </TabView>
           <TabView name="info" icon="document">
             <Info />
+          </TabView>
+          <TabView name="profiles" icon="user">
+            <Profiles />
           </TabView>
         </TabsContainer>
         <Footer />

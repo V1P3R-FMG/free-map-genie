@@ -108,4 +108,28 @@ export class Storage {
   public deleteBookmark(url: string) {
     return this.dexie.deleteBookmark(url);
   }
+
+  public getProfiles() {
+    return this.dexie.getProfiles();
+  }
+
+  public addUserProfile(id: number) {
+    return this.dexie.addUserProfile(id);
+  }
+
+  public addGuestProfile() {
+    return this.dexie.addGuestProfile();
+  }
+
+  public deleteGuestProfile() {
+    return this.dexie.deleteGuestProfile();
+  }
+
+  public getActiveProfileId() {
+    return this.dexie.getActiveProfileId();
+  }
+
+  public activateProfile(id: number) {
+    return this.dexie.setActiveProfile(id);
+  }
 }

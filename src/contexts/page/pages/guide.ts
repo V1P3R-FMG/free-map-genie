@@ -78,10 +78,14 @@ export class GuidePage extends Page {
   private async setupUser(userId?: number) {
     if (userId === undefined) return;
 
+    await this.client.addUserProfile(userId);
+    const activeProfileId = await this.client.getActiveProfileId();
+
     // Client requires a user to object to function properly
     // So we create a dummy user
     window.user = {
-      id: userId!,
+      id: activeProfileId ?? userId,
+      realId: userId,
       hasPro: false,
       locations: {},
       trackedCategoryIds: [],

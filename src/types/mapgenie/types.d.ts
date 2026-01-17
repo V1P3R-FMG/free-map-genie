@@ -45,6 +45,7 @@ declare namespace MG {
 
   declare interface User {
     id: Int;
+    realId?: Int;
     role: UserRole;
     hasPro: boolean;
     locations: RecordSetById;

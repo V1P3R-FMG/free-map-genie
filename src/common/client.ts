@@ -151,6 +151,14 @@ export class Client {
     return presets;
   }
 
+  public addUserProfile(id: number) {
+    return this.backend.addUserProfile(id);
+  }
+
+  public getActiveProfileId() {
+    return this.backend.getActiveProfileId();
+  }
+
   public on<K extends keyof Client.EventMap>(
     event: K,
     listener: (e: CustomEvent<Client.EventMap[K]>) => void

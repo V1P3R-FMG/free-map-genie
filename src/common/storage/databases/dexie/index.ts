@@ -9,6 +9,9 @@ import type { Database } from "../database";
 import type { Stores } from "./stores";
 import type { IdIndex } from "./indexes";
 import type { UserData } from "../../format";
+import type { Profile } from "@/common/profile";
+import type { ProfileV1, AsProfile } from "./versions/v1";
+import { profile } from "@/contexts/popup/store/features/profiles/Profiles.module.scss";
 
 // fmg@v3
 export class DexieDatabase implements Database {
@@ -24,6 +27,7 @@ export class DexieDatabase implements Database {
       presetsOrdering: "id, order, [game_id+user_id]",
       notes: "[id+user_id], [map_id+user_id], [game_id+user_id]",
       bookmarks: "url, title, createdAt",
+      profiles: "id, name, active",
     });
   }
 
@@ -359,5 +363,113 @@ export class DexieDatabase implements Database {
 
   public deleteBookmark(url: string) {
     return this.db.bookmarks.where("url").equals(url).delete();
+  }
+
+  private returnProfile<P extends ProfileV1 | undefined>(profile: P) {
+    if (!profile) {
+      return undefined as AsProfile<P>;
+    }
+
+    const { id, name } = profile;
+    const active = Boolean(profile.active);
+
+    return { id, name, active } as AsProfile<P>;
+  }
+
+  public async getProfiles() {
+    return this.db.profiles
+      .toArray()
+      .then((profiles) => profiles.map(this.returnProfile))
+      .then((profiles) => profiles.sort((a, b) => b.id - a.id));
+  }
+
+  public async getProfile(id: number) {
+    const profile = await this.db.profiles.get(id);
+    return this.returnProfile(profile);
+  }
+
+  public async setActiveProfile(id: number) {
+    return this.db.transaction("rw", this.db.profiles, async () => {
+      await this.db.profiles.where("active").equals(1).modify({ active: 0 });
+      await this.db.profiles.update(id, { active: 1 });
+    });
+  }
+
+  public async getActiveProfile(): Promise<Profile | undefined> {
+    const profile = await this.db.profiles.where("active").equals(1).first();
+    return this.returnProfile(profile);
+  }
+
+  public async getActiveProfileId() {
+    const profile = await this.db.profiles.where("active").equals(1).first();
+    return profile?.id;
+  }
+
+  public async addUserProfile(id: number) {
+    // We only allow one user profile at a time
+    // So we remove any existing user profiles
+    await this.db.profiles.where("id").above(0).delete();
+
+    const active = await this.getActiveProfile();
+
+    const profile = {
+      id,
+      name: `User ${id}`,
+      active: !active ? 1 : 0,
+    };
+
+    await this.db.profiles.add(profile);
+
+    return this.returnProfile(profile);
+  }
+
+  private async getNextGuestProfileId() {
+    const guests = await this.db.profiles.where("id").below(0).sortBy("id");
+
+    const { id } = guests[0] || {};
+
+    if (id === undefined) {
+      return -1;
+    }
+
+    return id - 1;
+  }
+
+  public async addGuestProfile() {
+    const user = await this.db.profiles.where("id").aboveOrEqual(0).first();
+    if (!user) return;
+
+    const id = await this.getNextGuestProfileId();
+
+    const profile = {
+      id,
+      name: `Guest ${id * -1}`,
+      active: 0,
+    };
+
+    await this.db.profiles.add(profile);
+
+    return this.returnProfile(profile);
+  }
+
+  public async deleteGuestProfile() {
+    return this.db.transaction("rw", this.db.profiles, async () => {
+      const nextId = await this.getNextGuestProfileId();
+      const id = nextId + 1;
+
+      if (id >= 0) return;
+
+      const profile = await this.getProfile(id);
+      await this.db.profiles.where("id").equals(id).delete();
+
+      if (profile?.active) {
+        const user = await this.db.profiles.where("id").aboveOrEqual(0).first();
+        if (user) {
+          await this.setActiveProfile(user.id);
+        }
+      }
+
+      return this.getProfiles();
+    });
   }
 }

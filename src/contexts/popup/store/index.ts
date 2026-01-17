@@ -4,6 +4,7 @@ import appReducer from "./features/app/appSlice";
 import bookmakrsReducer from "./features/bookmarks/bookmarksSlice";
 import servicesReducer from "./features/services/servicesSlice";
 import infoReducer from "./features/info/infoSlice";
+import profilesReducer from "./features/profiles/profilesSlice";
 
 export const store = configureStore({
   reducer: {
@@ -11,6 +12,7 @@ export const store = configureStore({
     app: appReducer,
     services: servicesReducer,
     info: infoReducer,
+    profiles: profilesReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

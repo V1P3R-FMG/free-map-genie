@@ -5,6 +5,7 @@ import type {
   PresetsTableV1,
   PresetsOrderingTableV1,
   BookmarksTableV1,
+  ProfilesTableV1,
 } from "./versions/v1";
 
 export type Stores = {
@@ -14,4 +15,5 @@ export type Stores = {
   presets: PresetsTableV1;
   presetsOrdering: PresetsOrderingTableV1;
   bookmarks: BookmarksTableV1;
+  profiles: ProfilesTableV1;
 };

@@ -1,0 +1,56 @@
+.profiles {
+  height: 100%;
+  display: grid;
+  max-height: 15.5rem;
+  overflow-y: scroll;
+
+  .profiles-list {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+
+    .profile {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      gap: 10px;
+
+      width: 100%;
+      background-color: var(--item);
+      padding: 0.34rem;
+      font-size: 1rem;
+      border-radius: 0.5rem;
+      border: 1px solid var(--border);
+      user-select: none;
+
+      &.active {
+        border-color: var(--active);
+      }
+
+      .profile-avatar {
+        padding: 0.2rem;
+        border-radius: 1rem;
+        object-fit: cover;
+        background-color: var(--background-darker);
+      }
+    }
+
+    #add-profile-button,
+    #delete-profile-button {
+      height: 2.4rem;
+      width: 2.4rem;
+      background-color: var(--item);
+      border: none;
+      border-radius: 1.2rem;
+      font-size: 1rem;
+      margin: 0 0.25rem;
+      cursor: pointer;
+    }
+  }
+
+  .profiles-footer {
+    display: flex;
+    justify-content: flex-end;
+  }
+}

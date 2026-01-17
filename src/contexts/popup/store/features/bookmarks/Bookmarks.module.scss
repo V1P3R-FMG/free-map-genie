@@ -108,23 +108,6 @@
 
   scroll-behavior: auto;
 
-  &::-webkit-scrollbar {
-    width: 0.5rem;
-  }
-
-  &::-webkit-scrollbar-thumb {
-    background-color: color-mix(in srgb, var(--border), transparent 50%);
-    border-radius: 4px;
-
-    &:hover {
-      background-color: var(--border);
-    }
-  }
-
-  &::-webkit-scrollbar-track {
-    background-color: var(--background);
-  }
-
   margin-left: 0.5rem;
   overflow-x: hidden;
   overflow-y: scroll;

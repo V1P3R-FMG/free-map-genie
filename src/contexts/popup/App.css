@@ -1,9 +1,6 @@
 #root {
   text-align: center;
   background-color: var(--background);
-}
 
-body {
-  margin: 0;
   width: 400px;
 }
