@@ -406,21 +406,23 @@ export class DexieDatabase implements Database {
   }
 
   public async addUserProfile(id: number) {
-    // We only allow one user profile at a time
-    // So we remove any existing user profiles
-    await this.db.profiles.where("id").above(0).delete();
+    return this.db.transaction("rw", this.db.profiles, async () => {
+      // We only allow one user profile at a time
+      // So we remove any existing user profiles
+      await this.db.profiles.where("id").above(0).delete();
 
-    const active = await this.getActiveProfile();
+      const active = await this.getActiveProfile();
 
-    const profile = {
-      id,
-      name: `User ${id}`,
-      active: !active ? 1 : 0,
-    };
+      const profile = {
+        id,
+        name: `User ${id}`,
+        active: !active ? 1 : 0,
+      };
 
-    await this.db.profiles.add(profile);
+      await this.db.profiles.add(profile);
 
-    return this.returnProfile(profile);
+      return this.returnProfile(profile);
+    });
   }
 
   private async getNextGuestProfileId() {
