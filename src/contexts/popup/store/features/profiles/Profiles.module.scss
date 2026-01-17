@@ -23,9 +23,14 @@
       border-radius: 0.5rem;
       border: 1px solid var(--border);
       user-select: none;
+      cursor: pointer;
 
       &.active {
         border-color: var(--active);
+      }
+
+      &:hover {
+        background-color: var(--item-hover);
       }
 
       .profile-avatar {
@@ -46,6 +51,10 @@
       font-size: 1rem;
       margin: 0 0.25rem;
       cursor: pointer;
+
+      &:hover {
+        background-color: var(--item-hover);
+      }
     }
   }
 
