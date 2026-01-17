@@ -13,8 +13,6 @@ export const Bookmark = ({ bookmark, overlay }: Bookmark.Props) => {
   const { title, preview, icon, url } = bookmark;
 
   const onClick = async (e: React.MouseEvent) => {
-    e.preventDefault();
-
     if (e.button === 1 || (e.button === 0 && e.ctrlKey)) {
       await browser.tabs.create({ url });
       window.close();
@@ -46,8 +44,19 @@ export const Bookmark = ({ bookmark, overlay }: Bookmark.Props) => {
       onMouseOver={onMouseOver}
       onMouseOut={onMouseOut}
     >
-      <Image className={style.bookmarkPreview} src={preview} />
-      {icon && <Image src={icon} className={style.bookmarkIcon} hideOnFail />}
+      <Image
+        className={style.bookmarkPreview}
+        src={preview}
+        draggable={false}
+      />
+      {icon && (
+        <Image
+          src={icon}
+          className={style.bookmarkIcon}
+          hideOnFail
+          draggable={false}
+        />
+      )}
     </div>
   );
 };

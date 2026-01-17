@@ -11,6 +11,7 @@ export const Image = ({
   title,
   className,
   hideOnFail,
+  draggable,
 }: Image.Props) => {
   const [success, setSuccess] = React.useState(true);
   const [url, setUrl] = React.useState(typeof src === "string" ? src : src.url);
@@ -39,6 +40,7 @@ export const Image = ({
       alt={alt}
       title={title}
       onError={onError}
+      draggable={draggable}
     />
   );
 };
@@ -50,5 +52,6 @@ export namespace Image {
     title?: string;
     className?: string;
     hideOnFail?: boolean;
+    draggable?: boolean;
   }
 }
