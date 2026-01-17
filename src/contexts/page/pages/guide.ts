@@ -132,7 +132,7 @@ export class GuidePage extends Page {
     }
   }
 
-  private async fixState(checkbox: HTMLInputElement) {
+  private fixState(checkbox: HTMLInputElement) {
     const $this = $(checkbox);
     const locationId = $this.data("location-id");
     const mapId = $this.data("map-id");
@@ -159,7 +159,7 @@ export class GuidePage extends Page {
     }
   }
 
-  private async fixCheckboxes() {
+  private fixCheckboxes() {
     // Make sure the guide script checkboxes are unchecked
     $<HTMLInputElement>(".check").each((_, checkbox) => {
       this.fixCheckbox(checkbox);
@@ -247,7 +247,8 @@ export class GuidePage extends Page {
     await this.client.loginFromGuide();
 
     await this.loadUserData();
-    await this.fixCheckboxes();
+
+    this.fixCheckboxes();
     this.updateCounts();
 
     // Activate blocked Mapgenie scripts
