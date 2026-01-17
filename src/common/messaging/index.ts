@@ -1,7 +1,7 @@
 import { createProxy } from "./core/proxy";
 
 import { getGlobalAdapter } from "./core/adapter";
-import type { Context, ProxyOptions } from "./core/proxy.types";
+import type { Context, ProxiedObject, ProxyOptions } from "./core/proxy.types";
 
 export type { Adapter } from "./core/adapter";
 export type * from "./core/proxy.types";
@@ -25,3 +25,9 @@ export const createService = <T extends Context>(options: ProxyOptions<T>) => {
 
   return { use, provide };
 };
+
+export namespace createService {
+  export type User<T extends Context> = ProxiedObject<InstanceType<T>>;
+
+  export type Provider<T extends Context> = InstanceType<T>;
+}

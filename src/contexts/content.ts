@@ -1,12 +1,12 @@
 import "@/common/messaging/contexts/contentScript";
 
-import testService from "@/services/test.service";
+import { contentLoggerService } from "@/services/logger.service";
 
 export default defineContentScript({
   matches: ["<all_urls>"],
   allFrames: true,
   async main() {
-    const test = testService.use();
+    contentLoggerService.provide();
 
     await injectScript("/page.js");
   },

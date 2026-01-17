@@ -1,6 +1,6 @@
 import { ConsoleLogTemplate } from "./template";
 
-import type { CssStyleEntryValue, CssStyleMap } from "./template";
+import type { CssStyleMap } from "./template";
 
 type PickMatching<T, V> = {
   [K in keyof T as T[K] extends V ? K : never]: T[K];
@@ -14,10 +14,23 @@ export type ConsoleMethodName = keyof ConsoleMethods;
 
 export type LogMethodName = "info" | "warn" | "error" | "debug";
 
+interface RemoteLogger {
+  log(prefix: string, ...args: any): Promise<void>;
+  warn(prefix: string, ...args: any): Promise<void>;
+  error(prefix: string, ...args: any): Promise<void>;
+  debug(prefix: string, ...args: any): Promise<void>;
+}
+
 /**
  * Logger class with a bit more style to it.
  */
 export class Logger {
+  public readonly name: string;
+
+  private readonly prefix?: string;
+
+  private service: RemoteLogger | null = null;
+
   private muted: boolean;
 
   protected readonly css: CssStyleMap = Object.seal({
@@ -50,41 +63,26 @@ export class Logger {
   protected readonly errorTemplate: ConsoleLogTemplate;
   protected readonly debugTemplate: ConsoleLogTemplate;
 
-  public constructor(
-    name?: string,
-    prefix?: string,
-    prefixCss?: CssStyleEntryValue
-  ) {
+  public constructor(name?: string, prefix?: string) {
+    this.name = name ?? "Logger";
     this.muted = false;
+    this.prefix = prefix ?? this.getEntryName();
 
-    this.infoTemplate = this.createTemplate("info", name, prefix, prefixCss);
-    this.warnTemplate = this.createTemplate("warn", name, prefix, prefixCss);
-    this.errorTemplate = this.createTemplate("error", name, prefix, prefixCss);
-    this.debugTemplate = this.createTemplate("debug", name, prefix, prefixCss);
+    this.infoTemplate = this.createTemplate("info");
+    this.warnTemplate = this.createTemplate("warn");
+    this.errorTemplate = this.createTemplate("error");
+    this.debugTemplate = this.createTemplate("debug");
   }
 
-  protected createTemplate(
-    logName: LogMethodName,
-    name?: string,
-    prefix?: string,
-    prefixCss?: CssStyleEntryValue
-  ): ConsoleLogTemplate {
+  protected createTemplate(logName: LogMethodName): ConsoleLogTemplate {
     const template = new ConsoleLogTemplate(this.css.common, this.css.message);
 
     template.addTag(Logger.getTimestamp, this.css.timestamp);
+    template.addTag(this.name, this.css[logName]);
 
-    if (name) {
-      template.addTag(name, this.css[logName]);
-    } else {
-      template.addTag(logName, this.css[logName]);
+    if (this.prefix) {
+      template.addTag(`${this.prefix}`, this.css.entryname);
     }
-
-    const entryname = this.getEntryName();
-    if (entryname) {
-      template.addTag(`${entryname}`, this.css.entryname);
-    }
-
-    if (prefix) template.addTag(prefix, prefixCss);
 
     return template;
   }
@@ -148,15 +146,27 @@ export class Logger {
     return console.log;
   }
   get log() {
+    if (this.service) {
+      return this.service.log.bind(this.service, this.prefix ?? "");
+    }
     return this.createLogCallback("info", "log");
   }
   get warn() {
+    if (this.service) {
+      return this.service.warn.bind(this.service, this.prefix ?? "");
+    }
     return this.createLogCallback("warn", "warn");
   }
   get error() {
+    if (this.service) {
+      return this.service.error.bind(this.service, this.prefix ?? "");
+    }
     return this.createLogCallback("error", "error");
   }
   get debug() {
+    if (this.service) {
+      return this.service.debug.bind(this.service, this.prefix ?? "");
+    }
     return this.createLogCallback("debug", "debug");
   }
   get groupCollapsed() {
@@ -186,6 +196,10 @@ export class Logger {
       const stack = new Error().stack;
       return stack?.substring(stack.indexOf("\n"));
     };
+  }
+
+  public setRemoteService(service: RemoteLogger) {
+    this.service = service;
   }
 }
 
