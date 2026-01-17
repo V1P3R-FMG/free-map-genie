@@ -73,7 +73,7 @@ const createUser = <T extends Context>(
       },
       apply: applyMemoize(async (_target: any, _thisArg: any, args: any[]) => {
         if (options.heartbeatCheck) {
-          await messenger.heartbeatCheck();
+          await messenger.heartbeatCheck(path);
         }
         return messenger.invoke(path, args);
       }, memoizeOptions),

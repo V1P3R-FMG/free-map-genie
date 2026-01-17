@@ -4,8 +4,8 @@ import type { Adapter, OffMessage } from "../adapter";
 import type { MessengerOptions } from "./base";
 
 export class ProviderUnavailableError extends Error {
-  public constructor(error: string) {
-    super(`Provider unavailable: ${error}`);
+  public constructor(path: string[], error: string) {
+    super(`Provider path ${path.join(".")} unavailable: ${error}`);
   }
 }
 
@@ -73,14 +73,14 @@ export class UserMessenger extends BaseMessenger {
     }
   }
 
-  public async heartbeatCheck(data?: any) {
+  public async heartbeatCheck(path: string[]) {
     let intervalCleanup: () => void;
     let timeoutCleanup: () => void;
     const offMessages = new Set<OffMessage>();
 
     const heartbeatInterval = new Promise<void>((resolve, reject) => {
       const cb = async () => {
-        const offMessage = await this.ping(resolve, reject, data);
+        const offMessage = await this.ping(resolve, reject);
 
         if (offMessage) {
           offMessages.add(offMessage);
@@ -100,6 +100,7 @@ export class UserMessenger extends BaseMessenger {
         reject.bind(
           null,
           new ProviderUnavailableError(
+            path,
             `heartbeat check timeout ${this.options.heartbeatTimeout}ms.`
           )
         ),
