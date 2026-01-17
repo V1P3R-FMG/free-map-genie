@@ -1019,6 +1019,13 @@
   dependencies:
     is-potential-custom-element-name "^1.0.1"
 
+"@webext-core/isolated-element@^1.1.3":
+  version "1.1.3"
+  resolved "https://registry.yarnpkg.com/@webext-core/isolated-element/-/isolated-element-1.1.3.tgz#6f60bf045d31bb4d352669fdc9d0fcc95efca1ca"
+  integrity sha512-rbtnReIGdiVQb2UhK3MiECU6JqsiIo2K/luWvOdOw57Ot770Iw4KLCEPXUQMITIH5V5er2jfVK8hSWXaEOQGNQ==
+  dependencies:
+    is-potential-custom-element-name "^1.0.1"
+
 "@webext-core/match-patterns@^1.0.3":
   version "1.0.3"
   resolved "https://registry.npmjs.org/@webext-core/match-patterns/-/match-patterns-1.0.3.tgz"

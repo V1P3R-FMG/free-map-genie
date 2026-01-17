@@ -15,6 +15,21 @@ export class BrowserUtils {
     const tab = await this.getActiveTab();
     return tab?.id;
   }
+
+  public static getURL(path: string) {
+    if ("runtime" in browser) {
+      return browser.runtime.getURL(path);
+    }
+
+    const script = document.currentScript as HTMLScriptElement;
+    const src = script.src;
+
+    const url = new URL(src);
+    url.search = "";
+    url.pathname = path;
+
+    return url.toString();
+  }
 }
 
 export const injectStyle = async (path: PublicPathLike) => {

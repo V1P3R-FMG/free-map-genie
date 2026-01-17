@@ -6,6 +6,8 @@ import {
   type PageType,
 } from "@/common/mapgenie";
 
+import { mountLoadingOverlay } from "./ui/LoadingOverlay";
+
 import pageService from "@/services/page.service";
 
 import { HomePage } from "./pages/home";
@@ -41,6 +43,8 @@ export default defineUnlistedScript(async () => {
   MapgenieAdBlocker.remove();
   MapgenieAdBlocker.removePrivacyPopup();
 
+  const unmountLoadingOverlay = await mountLoadingOverlay();
+
   let failed: boolean = false;
   try {
     await page.start();
@@ -49,6 +53,8 @@ export default defineUnlistedScript(async () => {
   } catch (err) {
     logger.error("Page script failed to start.", err);
     failed = true;
+  } finally {
+    unmountLoadingOverlay();
   }
 
   pageService.provide({ failed, page });

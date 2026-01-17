@@ -10,6 +10,7 @@ interface Window {
   game?: MG.Game;
   mapData?: MG.MapData;
   config?: MG.Config;
+  isMini?: boolean;
 
   mapUrl?: string;
   baseUrl?: string;
