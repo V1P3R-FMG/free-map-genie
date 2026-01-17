@@ -53,8 +53,8 @@ export default defineConfig({
     host_permissions: ["*://mapgenie.io/*", "*://cdn.mapgenie.io/*"],
     web_accessible_resources: [
       {
-        matches: ["<all_urls>"],
-        resources: ["page.js", "tablesort.js", "assets/*"],
+        matches: ["<mapgenie_domains>"],
+        resources: ["page.js", "content-scripts/*.css", "assets/*"],
       },
     ],
     permissions:

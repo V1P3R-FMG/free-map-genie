@@ -39,7 +39,7 @@ const fetchDomains = async (wxt: Wxt) => {
 };
 
 const replaceAllUrls = (arr: string[], domains: string[]) => {
-  const idx = arr.findIndex((url) => url === "<all_urls>") ?? -1;
+  const idx = arr.findIndex((url) => url === "<mapgenie_domains>") ?? -1;
   if (idx === -1) return;
   arr.splice(idx, 1);
   arr.push(...domains.map((d) => `*://${d}/*`));
@@ -53,8 +53,6 @@ export default defineWxtModule({
     addViteConfig(wxt, () => ({ define }));
 
     wxt.hook("entrypoints:resolved", async (wxt, entrypoints) => {
-      if (wxt.config.mode === "development") return;
-
       domains ??= await fetchDomains(wxt);
 
       for (const ep of entrypoints) {
@@ -65,8 +63,6 @@ export default defineWxtModule({
     });
 
     wxt.hook("build:manifestGenerated", async (wxt, manifest) => {
-      if (wxt.config.mode === "development") return;
-
       domains ??= await fetchDomains(wxt);
 
       for (const resource of manifest.web_accessible_resources) {
