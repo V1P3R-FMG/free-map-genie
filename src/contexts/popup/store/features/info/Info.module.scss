@@ -5,10 +5,12 @@
 }
 
 .entry {
+  font-size: 0.8rem;
+
   display: grid;
   grid-template-columns: 1fr 1fr;
   background-color: var(--item);
-  border-radius: 0.4rem;
+  border-radius: 6px;
 
   strong {
     border-right: 1px solid var(--border);
@@ -16,6 +18,6 @@
 
   strong,
   span {
-    padding: 0.42rem;
+    padding: 5px;
   }
 }

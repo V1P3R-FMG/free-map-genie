@@ -84,7 +84,7 @@
   background-color: var(--background-darker);
   border: 1px solid var(--border);
 
-  border-radius: 0.25rem;
+  border-radius: 6px;
 
   text-align: left;
   font-size: 0.8rem;
@@ -104,7 +104,7 @@
   --row-count: 3;
 
   display: block;
-  max-height: calc(var(--row-count) * (4.1rem + 0.5rem) - 0.5rem);
+  height: 212px;
 
   scroll-behavior: auto;
 
@@ -116,9 +116,9 @@
 .bookmarks-content {
   width: calc(100% - var(--content-margin) * 2);
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: repeat(5, 65px);
   grid-auto-rows: minmax(4.1rem, auto);
-  grid-template-rows: repeat(var(--row-count), minmax(4.1rem, auto));
+  grid-template-rows: repeat(var(--row-count), 65px);
 
   margin-right: 0.5rem;
 

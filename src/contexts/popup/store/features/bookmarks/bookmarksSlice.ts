@@ -44,7 +44,7 @@ export const loadBookmarksAsync = createAsyncThunk<BookmarkInfo[], void>(
 
     const bookmarks = await state.services.backend.getBookmarks();
 
-    return bookmarks;
+    return [...bookmarks, ...bookmarks, ...bookmarks];
   }
 );
 

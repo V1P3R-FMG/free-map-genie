@@ -1,6 +1,6 @@
 .connection {
   display: flex;
-  gap: 0.2rem;
+  gap: 5px;
   align-items: center;
   justify-content: center;
 
@@ -12,6 +12,5 @@
 
   i {
     cursor: pointer;
-    transform: translateY(0.1rem);
   }
 }
