@@ -1,4 +1,4 @@
-import initOffscreen from "../offscreen.content/init";
+import initOffscreen from "../offscreen/init";
 
 import type { PublicPath, Browser } from "wxt/browser";
 
