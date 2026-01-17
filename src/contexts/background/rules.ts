@@ -2,7 +2,7 @@ const addRulesViaDeclarativeNetRequest = async () => {
   logger.debug("Using declarativeNetRequest to handle mapgenie.io requests");
 
   await browser.declarativeNetRequest.updateDynamicRules({
-    removeRuleIds: [1, 2, 3, 4],
+    removeRuleIds: [1, 2, 3],
     addRules: [
       // Remove X-Frame-Options headers to allow embedding in iframe
       // So we can use it in our offscreen/background document to host our backend
@@ -48,21 +48,6 @@ const addRulesViaDeclarativeNetRequest = async () => {
           resourceTypes: ["script"],
         },
       },
-      // Redirect tablesort to our own version
-      {
-        id: 4,
-        action: {
-          type: "redirect",
-          redirect: {
-            extensionPath: "/tablesort.js",
-          },
-        },
-        condition: {
-          requestDomains: ["cdn.mapgenie.io"],
-          urlFilter: "/js/vendor/tablesort@5.*.*.min.js",
-          resourceTypes: ["script"],
-        },
-      },
     ],
   });
 };
@@ -92,17 +77,6 @@ const addRulesViaWebRequest = () => {
         "*://cdn.mapgenie.io/js/map.js?id=*",
         "*://cdn.mapgenie.io/js/TarkovQuestToolWidget.js?id=*",
       ],
-      types: ["script"],
-    },
-    ["blocking"]
-  );
-
-  browser.webRequest.onBeforeRequest.addListener(
-    (e) => ({
-      redirectUrl: browser.runtime.getURL("/tablesort.js"),
-    }),
-    {
-      urls: ["*://cdn.mapgenie.io/js/vendor/tablesort@5.*.*.min.js"],
       types: ["script"],
     },
     ["blocking"]
