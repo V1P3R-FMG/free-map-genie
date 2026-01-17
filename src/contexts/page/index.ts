@@ -44,12 +44,12 @@ export default defineUnlistedScript(async () => {
   let failed: boolean = false;
   try {
     await page.start();
+
+    logger.log(`Page ${pageType} script initialized.`);
   } catch (err) {
-    logger.debug("Page script failed to start.", err);
+    logger.error("Page script failed to start.", err);
     failed = true;
   }
 
   pageService.provide({ failed, page });
-
-  logger.log("Page script initialized.");
 });
