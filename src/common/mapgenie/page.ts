@@ -1,4 +1,4 @@
-import { waitForBody } from "@/common/dom";
+import { waitForBody, waitForHead } from "@/common/dom";
 
 export type PageType =
   | "home"
@@ -14,8 +14,16 @@ const isHomePage = () => {
   );
 };
 
-const isMapgenieSite = () => {
+const hasMapgenieCndUrl = () => {
   return $(`[href*="cdn.mapgenie.io"]`).length > 0;
+};
+
+const hasMapgeniePrebid = () => {
+  return $(`[src$="mapgenie.prebid.js"]`).length > 0;
+};
+
+const isMapgenieSite = () => {
+  return hasMapgenieCndUrl() || hasMapgeniePrebid();
 };
 
 export const getPageType = async () => {
@@ -23,6 +31,7 @@ export const getPageType = async () => {
     return "home";
   }
 
+  await waitForHead();
   if (!isMapgenieSite()) {
     return "unknown";
   }
