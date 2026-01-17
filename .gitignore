@@ -8,11 +8,12 @@ pnpm-debug.log*
 lerna-debug.log*
 
 node_modules/
+.wxt/
 .output/
 .icons/
+.cache/
 stats.html
 stats-*.json
-.wxt/
 web-ext.config.ts
 src/common/icons.ts
 playwright/
