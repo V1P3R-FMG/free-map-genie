@@ -78,17 +78,22 @@ export const appSlice = createSlice({
       state.latest = action.payload;
       state.needsUpdate = compareVersions(state.latest, state.version) > 0;
     });
+    builder.addCase(fetchLatestVersionAsync.rejected, (state, action) => {
+      logger.error("Failed to fetch latest version", action.error);
+    });
     builder.addCase(updateConnectedStatusAsync.fulfilled, (state, action) => {
       state.connected = true;
     });
     builder.addCase(updateConnectedStatusAsync.rejected, (state, action) => {
       state.connected = false;
+      logger.error("Failed to update connected status", action.error);
     });
     builder.addCase(injectIconFontAsync.fulfilled, (state) => {
       state.loading = false;
     });
-    builder.addCase(injectIconFontAsync.rejected, (state) => {
+    builder.addCase(injectIconFontAsync.rejected, (state, action) => {
       state.loading = false;
+      logger.error("Failed to inject icon font", action.error);
     });
   },
 });

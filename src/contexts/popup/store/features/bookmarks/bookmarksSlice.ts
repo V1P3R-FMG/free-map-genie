@@ -69,10 +69,16 @@ export const bookmarksSlice = createSlice({
     builder.addCase(addBookmarkAsync.fulfilled, (state, action) => {
       state.list.push(action.payload);
     });
+    builder.addCase(addBookmarkAsync.rejected, (state, action) => {
+      logger.error("Failed to add bookmark", action.error);
+    });
     builder.addCase(removeBookmarkAsync.fulfilled, (state, action) => {
       state.list = state.list.filter(
         (bookmark) => bookmark.url !== action.meta.arg
       );
+    });
+    builder.addCase(removeBookmarkAsync.rejected, (state, action) => {
+      logger.error("Failed to remove bookmark", action.error);
     });
     builder.addCase(loadBookmarksAsync.pending, (state) => {
       state.loading = true;
@@ -81,8 +87,9 @@ export const bookmarksSlice = createSlice({
       state.list = action.payload;
       state.loading = false;
     });
-    builder.addCase(loadBookmarksAsync.rejected, (state) => {
+    builder.addCase(loadBookmarksAsync.rejected, (state, action) => {
       state.loading = false;
+      logger.error("Failed to load bookmarks", action.error);
     });
   },
 });

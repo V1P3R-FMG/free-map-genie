@@ -35,9 +35,10 @@ export const infoSlice = createSlice({
       state.data = action.payload;
       state.loading = false;
     });
-    builder.addCase(getInfoAsync.rejected, (state) => {
+    builder.addCase(getInfoAsync.rejected, (state, action) => {
       state.data = {};
       state.loading = false;
+      logger.error("Failed to get info", action.error);
     });
   },
 });
