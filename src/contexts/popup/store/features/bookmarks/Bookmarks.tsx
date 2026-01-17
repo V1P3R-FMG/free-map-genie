@@ -10,8 +10,7 @@ import {
 import {
   DndContext,
   DragOverlay,
-  MouseSensor,
-  TouchSensor,
+  PointerSensor,
   useSensor,
   useSensors,
   type DragEndEvent,
@@ -47,12 +46,7 @@ export const Bookmarks = ({}: Bookmarks.Props) => {
   const ref = React.useRef<HTMLDivElement>(null);
 
   const sensors = useSensors(
-    useSensor(MouseSensor, {
-      activationConstraint: {
-        distance: 10,
-      },
-    }),
-    useSensor(TouchSensor, {
+    useSensor(PointerSensor, {
       activationConstraint: {
         distance: 10,
       },

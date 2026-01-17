@@ -9,13 +9,10 @@ export const DraggableBookmark = ({ bookmark }: DraggableBookmark.Props) => {
   const { setNodeRef, attributes, listeners, isDragging } = useDraggable({
     id: bookmark.url,
     data: bookmark,
-    attributes: {
-      tabIndex: -1,
-    },
   });
 
   return (
-    <div
+    <button
       className={clsx(style.draggableBookmark, {
         [style.dragging]: isDragging,
       })}
@@ -24,7 +21,7 @@ export const DraggableBookmark = ({ bookmark }: DraggableBookmark.Props) => {
       {...listeners}
     >
       <Bookmark bookmark={bookmark} />
-    </div>
+    </button>
   );
 };
 

@@ -24,6 +24,10 @@
 }
 
 .draggable-bookmark {
+  padding: 0;
+  border: 0;
+  background-color: transparent;
+
   &.dragging {
     opacity: 0.5;
 
