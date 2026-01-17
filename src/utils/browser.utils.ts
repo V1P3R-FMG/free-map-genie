@@ -28,6 +28,15 @@ export class BrowserUtils {
     }
     return this.extension.getURL(path);
   }
+
+  public static async getCssUrl() {
+    if (browser && "runtime" in browser) {
+      return browser.runtime.getURL(
+        `/content-scripts/${import.meta.env.ENTRYPOINT}.css`
+      );
+    }
+    return this.getURL(`/assets/${import.meta.env.ENTRYPOINT}.css`);
+  }
 }
 
 export const injectStyle = async (path: PublicPathLike) => {

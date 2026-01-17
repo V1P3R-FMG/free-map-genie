@@ -9,7 +9,7 @@ export const mountLoadingOverlay = async (message?: string) => {
     props: { message: message ?? "FMG Initializing..." },
     anchor: "body",
     css: {
-      url: await BrowserUtils.getURL("/assets/page.css"),
+      url: await BrowserUtils.getCssUrl(),
     },
   });
 

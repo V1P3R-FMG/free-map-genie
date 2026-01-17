@@ -6,9 +6,8 @@ import {
   type PageType,
 } from "@/common/mapgenie";
 
-import { mountLoadingOverlay } from "./ui/LoadingOverlay";
-
 import pageService from "@/services/page.service";
+import extensionService from "@/services/extension.service";
 
 import { HomePage } from "./pages/home";
 import { GameHomePage } from "./pages/game-home";
@@ -31,19 +30,16 @@ const getPage = async (pageType: PageType) => {
 };
 
 export default defineUnlistedScript(async () => {
+  const extension = extensionService.use();
+
   const pageType = await getPageType();
   const page = await getPage(pageType);
   if (!page) return;
-
-  const params = new URLSearchParams(window.location.search);
-  if (params.has("fmgBackend")) return;
 
   logger.log("Initializing page script for", pageType);
 
   MapgenieAdBlocker.remove();
   MapgenieAdBlocker.removePrivacyPopup();
-
-  const unmountLoadingOverlay = await mountLoadingOverlay();
 
   let failed: boolean = false;
   try {
@@ -54,7 +50,7 @@ export default defineUnlistedScript(async () => {
     logger.error("Page script failed to start.", err);
     failed = true;
   } finally {
-    unmountLoadingOverlay();
+    await extension.unmountLoadingOverlay();
   }
 
   pageService.provide({ failed, page });
