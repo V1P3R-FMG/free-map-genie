@@ -19,8 +19,8 @@ class BackgroundService {
 
 const backgroundService = createService({
   context: BackgroundService,
-  heartbeatTimeout: 60000,
   namespace: "BackgroundService",
+  heartbeatTimeout: import.meta.env.SERVICE_TIMEOUT,
 });
 
 namespace backgroundService {

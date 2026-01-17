@@ -5,8 +5,8 @@ class BackendService extends Storage {}
 
 const backendService = createService({
   context: BackendService,
-  heartbeatTimeout: 60000,
   namespace: "BackendService",
+  heartbeatTimeout: import.meta.env.SERVICE_TIMEOUT,
 });
 
 namespace backendService {

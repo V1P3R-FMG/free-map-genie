@@ -1,4 +1,5 @@
 import { defineConfig } from "wxt";
+import "dotenv/config";
 
 import { author, version, homepage } from "./package.json";
 
@@ -33,6 +34,9 @@ export default defineConfig({
     "import.meta.env.PKG_VERSION": JSON.stringify(version),
     "import.meta.env.PKG_HOMEPAGE": JSON.stringify(homepage),
     "import.meta.env.PKG_AUTHOR": JSON.stringify(author),
+    "import.meta.env.SERVICE_TIMEOUT": JSON.stringify(
+      process.env.FMG_SERVICE_TIMEOUT ?? 60000
+    ),
   },
   fantasticon: {
     name: "fmg-icons",
@@ -57,8 +61,8 @@ export default defineConfig({
       browser === "chrome"
         ? ["declarativeNetRequest", "offscreen"]
         : manifestVersion === 2
-        ? ["webRequest", "webRequestBlocking"]
-        : ["declarativeNetRequest"],
+          ? ["webRequest", "webRequestBlocking"]
+          : ["declarativeNetRequest"],
     background_page: "background/page.html",
     browser_specific_settings:
       browser === "chrome"

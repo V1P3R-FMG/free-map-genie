@@ -81,7 +81,7 @@ const createProxyForDomain = (domain: string) => {
   return createService({
     context: StorageService,
     namespace,
-    heartbeatTimeout: 60000,
+    heartbeatTimeout: import.meta.env.SERVICE_TIMEOUT,
   });
 };
 

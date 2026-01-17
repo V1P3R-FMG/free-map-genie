@@ -73,8 +73,8 @@ class MapgenieService {
 
 const mapgenieService = createService({
   context: MapgenieService,
-  heartbeatTimeout: 60000,
   namespace: "MapgenieService",
+  heartbeatTimeout: import.meta.env.SERVICE_TIMEOUT,
 });
 
 namespace mapgenieService {

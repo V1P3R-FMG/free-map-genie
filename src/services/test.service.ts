@@ -25,7 +25,7 @@ export class TestService {
 const testService = createService({
   context: TestService,
   namespace: "TestService",
-  heartbeatTimeout: 60000,
+  heartbeatTimeout: import.meta.env.SERVICE_TIMEOUT,
 });
 
 export namespace testService {

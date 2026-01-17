@@ -55,8 +55,8 @@ export class OffscreenService {
 
 const offscreenService = createService({
   context: OffscreenService,
-  heartbeatTimeout: 60000,
   namespace: "OffscreenService",
+  heartbeatTimeout: import.meta.env.SERVICE_TIMEOUT,
 });
 
 namespace offscreenService {

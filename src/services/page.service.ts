@@ -157,7 +157,7 @@ export class PageService {
 const pageService = createService({
   context: PageService,
   namespace: "PageService",
-  heartbeatTimeout: 60000,
+  heartbeatTimeout: import.meta.env.SERVICE_TIMEOUT,
 });
 
 namespace pageService {
