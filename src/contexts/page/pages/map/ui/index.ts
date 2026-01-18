@@ -16,12 +16,7 @@ export class UI {
   }
 
   private update() {
-    if (!window.store) {
-      logger.warn("Store not defined yet, skipping ui update.");
-      return;
-    }
-
-    const state = window.store.getState();
+    const state = window.store!.getState();
 
     this.totalProgress.updateFromState(state);
   }
