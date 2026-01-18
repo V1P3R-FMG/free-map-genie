@@ -1,7 +1,7 @@
 import type { FmgIconsId } from "../FontIcon";
 
 export const TabView = (props: TabView.Props) => {
-  return <div>{props.children}</div>;
+  return <>{props.children}</>;
 };
 
 export namespace TabView {
