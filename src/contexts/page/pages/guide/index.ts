@@ -33,11 +33,12 @@ export class GuidePage extends Page {
     state.foundLocations = data.locations;
   }
 
+  private async getMapElement() {
+    return waitForElement<HTMLIFrameElement>(document, "#sticky-map iframe");
+  }
+
   private async getMapWindow() {
-    const mapElement = await waitForElement<HTMLIFrameElement>(
-      document,
-      "#sticky-map iframe"
-    );
+    const mapElement = await this.getMapElement();
     const mapWindow = await waitForProperty(mapElement, "contentWindow");
     await waitForProperty(mapWindow!, "mapData");
     return mapWindow;
@@ -130,11 +131,20 @@ export class GuidePage extends Page {
       return;
     }
 
-    const mapWindow = await this.getMapWindow();
-    mapWindow?.addEventListener("locationMarked", (e) => {
-      const { locationId, found } = e.detail;
+    const setupLocationMarkedListener = async () => {
+      const mapWindow = await this.getMapWindow();
+      mapWindow?.addEventListener("locationMarked", (e) => {
+        const { locationId, found } = e.detail;
 
-      this.state.markLocationFound(locationId, found);
+        this.state.markLocationFound(locationId, found);
+      });
+    };
+
+    await setupLocationMarkedListener();
+
+    const mapElement = await this.getMapElement();
+    mapElement.addEventListener("load", async () => {
+      await setupLocationMarkedListener();
     });
   }
 
