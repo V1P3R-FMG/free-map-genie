@@ -72,6 +72,11 @@ export const fixMapLinks = async (mapgenie: mapgenieService.Instance) => {
 
   if (!$proSidebarLinks.length) return;
 
+  const parmas = new URLSearchParams(window.location.search);
+  if (parmas.has("fmgMapId")) {
+    $("a.map-link.selected").toggleClass("selected", false);
+  }
+
   // Get game for this map
   const game = await mapgenie.fetchGame(window.game!.id);
 
