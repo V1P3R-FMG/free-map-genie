@@ -3,6 +3,7 @@ import { waitForBody } from "@/common/dom";
 export { default as MapgenieAdBlocker } from "./ads";
 
 export * from "./page";
+export * from "./links";
 export * as mapDataUtils from "./data";
 
 /**

@@ -1,13 +1,32 @@
 import { Page } from "./page";
+
 import { Client } from "@/common/client";
 import { activateBlockedMapgenieScript } from "@/common/mapgenie";
 import { mapDataUtils } from "@/common/mapgenie";
 import { waitForProperty } from "@/common/object";
 
+import { fixMapLinks } from "@/common/mapgenie";
+
 export class MapPage extends Page {
   private client = new Client();
 
-  private _mapId?: number;
+  private async setupUser() {
+    if (!window.user) return;
+
+    // Add real user to the backend profiles list
+    await this.client.addUserProfile(window.user.id);
+
+    // Get the active user from the backend
+    const activeProfileId = await this.client.getActiveProfileId();
+
+    // Update the user
+    window.user.realId = window.user.id;
+    window.user.id = activeProfileId ?? window.user.id;
+
+    window.user!.hasPro = true;
+
+    window.mapData!.maxMarkedLocations = Infinity;
+  }
 
   private async loadUserData() {
     await this.client.migrate();
@@ -34,76 +53,23 @@ export class MapPage extends Page {
     window.mapData!.presets = data.presets;
   }
 
-  private unlockMapSelector() {
-    const links = $(".map-link")
-      .toArray()
-      .map((link) => {
-        const $link = $(link);
-        const isPro = $link.attr("href")?.endsWith("/upgrade") ?? false;
-        return { $link, isPro };
-      });
-
-    if (links.length === 0) {
-      logger.warn("No map links found to unlock map selector");
-      return;
-    }
-
-    const proCount = links.filter(({ isPro }) => isPro).length;
-    if (proCount === 0) {
-      // No pro maps, nothing to unlock
-      return;
-    }
-
-    const $firstFreeLink = links.find(
-      ({ $link, isPro }) =>
-        !isPro && $link.attr("href") && $link.attr("href") !== "#"
-    )?.$link;
-    if (!$firstFreeLink) {
-      // How did we get on a map page with no free maps?
-      logger.warn("No free map link found to unlock map selector");
-      return;
-    }
-
-    const { origin, pathname } = new URL($firstFreeLink.attr("href")!);
-
-    links.forEach(({ $link, isPro }) => {
-      const name = $link
-        .text()
-        .replace(/\[(WIP|PRO)\]/, "")
-        .trim();
-
-      const map = window.mapData?.maps.find((m) => m.title.trim() === name);
-
-      if (!map) {
-        logger.warn(`Could not find map data for ${name}`);
-        return;
-      }
-
-      if (this.fmgMapId !== undefined) {
-        $link.toggleClass("selected", map.id === this.fmgMapId);
-      }
-
-      if (!isPro) return;
-
-      $link.attr("href", `${origin}${pathname}?fmgMapId=${map.id}`);
-      $link.attr("style", "");
-
-      $link.removeAttr("target");
-      $link.removeAttr("data-toggle");
-      $link.removeAttr("title");
-      $link.removeAttr("data-original-title");
-    });
+  private async unlockMapLinks() {
+    await fixMapLinks(this.client.mapgenie);
   }
 
-  private get fmgMapId() {
-    if (this._mapId === undefined) {
-      const urlParams = new URLSearchParams(window.location.search);
-      const mapIdParmam = urlParams.get("fmgMapId") ?? undefined;
-      if (mapIdParmam) {
-        this._mapId = Number(mapIdParmam);
-      }
+  private getFmgMapId() {
+    const urlParams = new URLSearchParams(window.location.search);
+    const mapIdParmam = urlParams.get("fmgMapId") ?? undefined;
+    return mapIdParmam && Number(mapIdParmam);
+  }
+
+  private hasProCategoryLocations() {
+    const proCategoryLocationCounts = window.mapData!.proCategoryLocationCounts;
+    for (const key in proCategoryLocationCounts) {
+      const count = proCategoryLocationCounts[key];
+      if (count > 0) return true;
     }
-    return this._mapId;
+    return false;
   }
 
   private async loadMapDataForMapId(mapId: number) {
@@ -111,9 +77,7 @@ export class MapPage extends Page {
     const map = game.maps.find((m) => m.id === mapId);
 
     if (!map) {
-      logger.warn(
-        `Map with ID ${this.fmgMapId} not found in game ${game.title}`
-      );
+      logger.warn(`Map with ID ${mapId} not found in game ${game.title}`);
       return;
     }
 
@@ -121,17 +85,15 @@ export class MapPage extends Page {
   }
 
   private async loadMapData() {
-    if (this.fmgMapId) {
-      await this.loadMapDataForMapId(this.fmgMapId);
-    } else {
-      for (const count of Object.values(
-        window.mapData!.proCategoryLocationCounts
-      )) {
-        if (count > 0) {
-          await this.loadMapDataForMapId(window.mapData!.map.id);
-          break;
-        }
-      }
+    const fmgMapId = this.getFmgMapId();
+
+    if (fmgMapId) {
+      await this.loadMapDataForMapId(fmgMapId);
+      return;
+    }
+
+    if (this.hasProCategoryLocations()) {
+      await this.loadMapDataForMapId(window.mapData!.map.id);
     }
   }
 
@@ -142,22 +104,8 @@ export class MapPage extends Page {
     const heatmaps = await this.client.mapgenie.fetchHeatmaps(
       window.mapData!.map.id
     );
+
     mapDataUtils.loadHeatmaps(heatmaps);
-  }
-
-  private async setupUser() {
-    if (window.user) {
-      await this.client.addUserProfile(window.user.id);
-
-      const activeProfileId = await this.client.getActiveProfileId();
-
-      window.user.realId = window.user.id;
-      window.user.id = activeProfileId ?? window.user.id;
-
-      window.user!.hasPro = true;
-
-      window.mapData!.maxMarkedLocations = Infinity;
-    }
   }
 
   private setupEventListeners() {
@@ -175,16 +123,21 @@ export class MapPage extends Page {
     await waitForProperty(window, "mapData");
 
     await this.setupUser();
-    this.unlockMapSelector();
 
     // Load map data and heatmaps for pro maps and maps with heatmaps
     await this.loadMapData();
     await this.loadHeatmaps();
 
+    // Unlock pro map links
+    await this.unlockMapLinks();
+
     if (!window.user) {
       await activateBlockedMapgenieScript("map");
       return;
     }
+
+    // Request persistend storage
+    await this.client.storageRequestPersist();
 
     // Login client from map data
     this.client.loginFromMap();
@@ -196,7 +149,6 @@ export class MapPage extends Page {
 
     this.setupEventListeners();
     await this.client.installInterceptor();
-    await this.client.storageRequestPersist();
   }
 
   public async info() {
@@ -204,7 +156,7 @@ export class MapPage extends Page {
     const game = window.game?.title ?? null;
     const gameId = window.game?.id ?? null;
     const map = window.mapData?.map.title ?? null;
-    const mapId = this.fmgMapId ?? window.mapData?.map.id ?? null;
+    const mapId = window.mapData?.map.id ?? null;
 
     return {
       userId,

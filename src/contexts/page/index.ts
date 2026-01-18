@@ -14,7 +14,7 @@ import { GameHomePage } from "./pages/game-home";
 import { MapPage } from "./pages/map";
 import { GuidePage } from "./pages/guide";
 
-const getPage = async (pageType: PageType) => {
+const getPageScript = async (pageType: PageType) => {
   switch (pageType) {
     case "home":
       return new HomePage();
@@ -33,22 +33,24 @@ export default defineUnlistedScript(async () => {
   const extension = extensionService.use();
 
   const pageType = await getPageType();
-  const page = await getPage(pageType);
-  if (!page) return;
+  const pageScript = await getPageScript(pageType);
 
-  logger.log("Initializing page script for", pageType);
+  if (!pageScript) return;
+
+  logger.log(`Initializing page ${pageType} script.`);
 
   MapgenieAdBlocker.remove();
   MapgenieAdBlocker.removePrivacyPopup();
 
   let failed: boolean = false;
   try {
-    await page.start();
+    await pageScript.start();
 
     logger.log(`Page ${pageType} script initialized.`);
   } catch (err) {
-    logger.error("Page script failed to start.", err);
     failed = true;
+
+    logger.error(`Page ${pageType} script failed to initialize.`, err);
   } finally {
     await extension.unmountLoadingOverlay();
   }
