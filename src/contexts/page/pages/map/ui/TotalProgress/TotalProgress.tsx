@@ -33,6 +33,13 @@ export class TotalProgress extends IntegratedComponent<TotalProgress.Props> {
     );
   }
 
+  public shouldUpdate(nextProps: TotalProgress.Props) {
+    return (
+      this.props.total !== nextProps.total ||
+      this.props.found !== nextProps.found
+    );
+  }
+
   public mount() {
     super.mount(".category-progress", "before");
   }

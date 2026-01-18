@@ -41,12 +41,21 @@ export class MountableComponent<P extends {}> {
     return null;
   }
 
-  protected mergeProps(prev: P, next: Partial<P>) {
-    return { ...prev, ...next };
+  protected shouldUpdate(nextProps: P) {
+    return true;
+  }
+
+  protected mergeProps(props: Partial<P>) {
+    return { ...this.props, ...props };
   }
 
   public update(props: Partial<P>) {
-    Object.assign(this.props, props);
+    const nextProps = this.mergeProps(props);
+    if (!this.shouldUpdate(nextProps)) {
+      return;
+    }
+
+    Object.assign(this.props, nextProps);
     this.root?.render(this.render());
   }
 }
