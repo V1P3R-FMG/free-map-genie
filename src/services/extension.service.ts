@@ -18,7 +18,7 @@ class ExtensionService {
   }
 
   public mountLoadingOverlay() {
-    return this.loadingOverlay.mount(document.body);
+    return this.loadingOverlay.mount();
   }
 
   public unmountLoadingOverlay() {

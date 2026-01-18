@@ -1,11 +1,12 @@
 import ReactDOM from "react-dom/client";
+import { resolveParent, type Parent } from "./mount";
 
 export type Component<P extends {}> =
   | React.FunctionComponent<P>
   | React.ComponentClass<P>;
 
 export class MountableComponent<P extends {}> {
-  private readonly props: P;
+  protected readonly props: P;
 
   private root?: ReactDOM.Root;
 
@@ -13,16 +14,30 @@ export class MountableComponent<P extends {}> {
     this.props = props;
   }
 
-  public mount(container: ReactDOM.Container) {
+  public mount(parent?: Parent) {
+    if (this.root) {
+      throw new Error("Component allready mounted.");
+    }
+
+    const container = resolveParent(parent);
+
+    if (!container) {
+      logger.warn("Failed to mount component, parent element not found.", {
+        parent,
+        component: this,
+      });
+      return;
+    }
+
     this.root = ReactDOM.createRoot(container);
-    this.root.render(this.render(this.props));
+    this.root.render(this.render());
   }
 
   public unmount() {
     this.root?.unmount();
   }
 
-  protected render(props: P): React.ReactNode {
+  protected render(): React.ReactNode {
     return null;
   }
 
@@ -32,6 +47,6 @@ export class MountableComponent<P extends {}> {
 
   public update(props: Partial<P>) {
     Object.assign(this.props, props);
-    this.root?.render(this.render(this.props));
+    this.root?.render(this.render());
   }
 }

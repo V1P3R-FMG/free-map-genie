@@ -1,14 +1,9 @@
 import { IsolatedComponent } from "@/common/ui";
 import { Spinner } from "@/components/Spinner";
 
-import { useScrollLock } from "./hooks";
+import { ScrollLock } from "./ScrolLock";
 
 import style from "./LoadingOverlay.module.scss";
-
-const ScrollLock = () => {
-  useScrollLock();
-  return null as React.ReactNode;
-};
 
 export namespace LoadingOverlay {
   export interface Props {
@@ -36,7 +31,9 @@ export class LoadingOverlay extends IsolatedComponent<LoadingOverlay.Props> {
     return false;
   }
 
-  public render({ message }: LoadingOverlay.Props) {
+  public render() {
+    const { message } = this.props;
+
     if (this.isMini()) {
       return null;
     }

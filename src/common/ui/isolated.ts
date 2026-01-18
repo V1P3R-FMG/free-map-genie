@@ -1,6 +1,7 @@
 import { createIsolatedElement } from "@webext-core/isolated-element";
 
 import { MountableComponent } from "./react";
+import { mount, type Parent, type MountPlace } from "./mount";
 
 export type Css =
   | {
@@ -18,7 +19,7 @@ export class IsolatedComponent<P extends {}> extends MountableComponent<P> {
     return undefined;
   }
 
-  public async mount(parent: Element) {
+  public async mount(parent?: Parent, place?: MountPlace) {
     const css = await this.css();
 
     const { isolatedElement, parentElement } = await createIsolatedElement({
@@ -29,7 +30,7 @@ export class IsolatedComponent<P extends {}> extends MountableComponent<P> {
 
     this.parentElement = parentElement;
 
-    parent.append(parentElement);
+    mount(parent, parentElement, place);
 
     super.mount(isolatedElement);
   }

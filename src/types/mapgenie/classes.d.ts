@@ -1,16 +1,4 @@
 declare namespace MG {
-  declare type MapFeatureSource = "locations-data" | "circle-locations-data";
-
-  declare class MapboxglMap {
-    //TODO
-    public setFeatureState(
-      feature: { source: MapFeatureSource; id: number | string },
-      state: Record<string, any>
-    ): void;
-
-    public getSource(sourceId: MapFeatureSource): MapboxGl.Source;
-  }
-
   declare class FoundLocationService {
     public onMarkLocation(locationId: Int, marked: boolean): void;
   }

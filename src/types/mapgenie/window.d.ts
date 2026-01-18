@@ -23,7 +23,7 @@ interface Window {
 
   store?: MG.Store;
   mapManager?: MG.MapManager;
-  map?: MG.MapboxglMap;
+  map?: MG.MapboxGL.Map;
 
   // guide
   isPro?: boolean;

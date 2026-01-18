@@ -1,4 +1,5 @@
-import { Page } from "./page";
+import { Page } from "../page";
+import { UI } from "./ui";
 
 import { Client } from "@/common/client";
 import { activateBlockedMapgenieScript } from "@/common/mapgenie";
@@ -9,6 +10,7 @@ import { fixMapLinks } from "@/common/mapgenie";
 
 export class MapPage extends Page {
   private client = new Client();
+  private ui = new UI();
 
   private async setupUser() {
     if (!window.user) return;
@@ -157,6 +159,7 @@ export class MapPage extends Page {
 
     this.setupEventListeners();
     await this.client.installInterceptor();
+    await this.ui.mount();
   }
 
   public async info() {

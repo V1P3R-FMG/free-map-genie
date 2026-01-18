@@ -1,4 +1,4 @@
-export const useScrollLock = () => {
+export const ScrollLock = (): React.ReactNode => {
   React.useEffect(() => {
     const { overflow, paddingRight } = document.body.style;
 
@@ -18,4 +18,6 @@ export const useScrollLock = () => {
       document.body.style.paddingRight = paddingRight;
     };
   }, []);
+
+  return null;
 };
