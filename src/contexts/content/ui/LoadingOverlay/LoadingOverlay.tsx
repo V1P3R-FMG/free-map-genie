@@ -23,8 +23,21 @@ export class LoadingOverlay extends IsolatedComponent<LoadingOverlay.Props> {
     };
   }
 
-  public render({ message }: LoadingOverlay.Props) {
+  private isMini() {
     if (window.isMini) {
+      return true;
+    }
+
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("mini")) {
+      return true;
+    }
+
+    return false;
+  }
+
+  public render({ message }: LoadingOverlay.Props) {
+    if (this.isMini()) {
       return null;
     }
 
