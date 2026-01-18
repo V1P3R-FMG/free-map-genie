@@ -1,11 +1,11 @@
 import style from "./Spinner.module.scss";
 
-export const Spinner = ({ color, size }: Spinner.Props) => {
+export const Spinner = ({ className, color, size }: Spinner.Props) => {
   return (
     <svg
-      className={style.spinner}
-      width={size ?? "1rem"}
-      height={size ?? "1rem"}
+      className={clsx(style.spinner, className)}
+      width={size}
+      height={size}
       fill={color ?? "currentColor"}
       viewBox="0 0 24 24"
       xmlns="http://www.w3.org/2000/svg"
@@ -24,6 +24,7 @@ export const Spinner = ({ color, size }: Spinner.Props) => {
 
 export namespace Spinner {
   export interface Props {
+    className?: string;
     color?: string;
     size?: string | number;
   }

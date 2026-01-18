@@ -15,7 +15,7 @@
   background-color: #00000098;
 
   h1 {
-    font-size: 5rem;
+    font-size: 3rem;
   }
 }
 
@@ -23,4 +23,20 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+
+  .spinner {
+    width: 3rem;
+    height: 3rem;
+  }
+}
+
+@media (min-width: 768px) {
+  .loading h1 {
+    font-size: 5rem;
+  }
+
+  .loading-content .spinner {
+    width: 5rem;
+    height: 5rem;
+  }
 }

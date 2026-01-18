@@ -36,7 +36,7 @@ export class LoadingOverlay extends IsolatedComponent<LoadingOverlay.Props> {
         <div className={style.loading} style={{ top: `${top}px` }}>
           <div className={style.loadingContent}>
             <h1>{message}</h1>
-            <Spinner size="5rem" />
+            <Spinner className={style.spinner} />
           </div>
         </div>
       </>

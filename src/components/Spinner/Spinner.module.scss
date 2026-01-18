@@ -1,6 +1,9 @@
 .spinner #wheel {
   animation: 1s linear infinite rotate;
   transform-origin: center;
+
+  width: 1rem;
+  height: 1rem;
 }
 
 @keyframes rotate {
