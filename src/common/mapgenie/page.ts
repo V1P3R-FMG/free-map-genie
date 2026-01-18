@@ -1,4 +1,4 @@
-import { waitForBody, waitForHead } from "@/common/dom";
+import { waitForBody } from "@/common/dom";
 
 export type PageType =
   | "home"
@@ -27,16 +27,17 @@ const isMapgenieSite = () => {
 };
 
 export const getPageType = async () => {
+  await waitForBody();
+
   if (isHomePage()) {
     return "home";
   }
 
-  await waitForHead();
   if (!isMapgenieSite()) {
     return "unknown";
   }
 
-  const $body = $(await waitForBody());
+  const $body = $(document.body);
 
   if ($body.hasClass("map")) {
     return "map";
