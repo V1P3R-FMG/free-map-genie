@@ -55,5 +55,5 @@ export default defineUnlistedScript(async () => {
     await extension.unmountLoadingOverlay();
   }
 
-  pageService.provide({ failed, page });
+  pageService.provide({ failed, page: pageScript });
 });
