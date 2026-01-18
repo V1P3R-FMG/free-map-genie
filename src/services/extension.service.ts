@@ -1,4 +1,5 @@
 import { createService } from "@/common/messaging";
+import { LoadingOverlay } from "@/contexts/content/ui/LoadingOverlay";
 import { PublicPath } from "wxt/browser";
 
 export interface ExtensionServiceOptions {
@@ -6,11 +7,9 @@ export interface ExtensionServiceOptions {
 }
 
 class ExtensionService {
-  private readonly _unmountLoadingOverlay: () => void;
-
-  constructor({ unmountLoadingOverlay }: ExtensionServiceOptions) {
-    this._unmountLoadingOverlay = unmountLoadingOverlay;
-  }
+  private readonly loadingOverlay = new LoadingOverlay({
+    message: "FMG Initializing...",
+  });
 
   public async getURL(path: PublicPath): Promise<string>;
   public async getURL(path: string): Promise<string>;
@@ -18,8 +17,12 @@ class ExtensionService {
     return browser.runtime.getURL(path);
   }
 
+  public mountLoadingOverlay() {
+    return this.loadingOverlay.mount(document.body);
+  }
+
   public unmountLoadingOverlay() {
-    this._unmountLoadingOverlay();
+    return this.loadingOverlay.unmount();
   }
 }
 
@@ -29,7 +32,7 @@ const extensionService = createService({
   heartbeatTimeout: import.meta.env.SERVICE_TIMEOUT,
 });
 
-export namespace extensionService {
+namespace extensionService {
   export type Instance = createService.User<typeof ExtensionService>;
 }
 

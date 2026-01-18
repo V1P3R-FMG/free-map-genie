@@ -1,13 +1,9 @@
-import * as async from "@/common/async";
-
 import extensionService from "@/services/extension.service";
 
-import type { Browser, PublicPath } from "wxt/browser";
-
-type PublicPathLike = PublicPath | (string & {});
+import type { Browser, PublicPathLike } from "wxt/browser";
 
 export class BrowserUtils {
-  private static readonly extension = extensionService.use();
+  private static extension: extensionService.Instance;
 
   public static async getActiveTab(): Promise<Browser.tabs.Tab | undefined> {
     const [tab] = await browser.tabs.query({
@@ -26,6 +22,7 @@ export class BrowserUtils {
     if (browser && "runtime" in browser) {
       return browser.runtime.getURL(path);
     }
+    this.extension ??= extensionService.use();
     return this.extension.getURL(path);
   }
 

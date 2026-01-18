@@ -5,8 +5,6 @@ import { getPageType } from "@/common/mapgenie";
 import extensionService from "@/services/extension.service";
 import { contentLoggerService } from "@/services/logger.service";
 
-import { mountLoadingOverlay } from "./ui/LoadingOverlay";
-
 export default defineContentScript({
   matches: ["<mapgenie_domains>"],
   allFrames: true,
@@ -18,10 +16,10 @@ export default defineContentScript({
     const page = await getPageType();
     if (page === "unknown") return;
 
-    const unmountLoadingOverlay = await mountLoadingOverlay();
-
-    extensionService.provide({ unmountLoadingOverlay });
+    const extension = extensionService.provide();
     contentLoggerService.provide();
+
+    await extension.mountLoadingOverlay();
 
     await injectScript("/page.js");
   },
