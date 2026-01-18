@@ -73,7 +73,7 @@ export const Bookmarks = ({}: Bookmarks.Props) => {
   };
 
   return (
-    <Loading loading={loading}>
+    <Loading loading={loading} spinnerSize={"2rem"}>
       <DndContext
         onDragEnd={onDragEnd}
         onDragStart={onDragStart}

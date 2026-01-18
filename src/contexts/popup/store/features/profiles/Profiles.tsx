@@ -22,7 +22,7 @@ export const Profiles = ({}: Profiles.Props) => {
   }, []);
 
   return (
-    <Loading loading={loading}>
+    <Loading loading={loading} spinnerSize={"2rem"}>
       <div className={style.profiles}>
         <div className={style.profilesList}>
           {profiles.length === 0 && <p>User not logged in.</p>}

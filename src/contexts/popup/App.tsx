@@ -24,7 +24,7 @@ function App() {
 
   return (
     <div className="container" data-theme="dark">
-      <Loading loading={loading}>
+      <Loading loading={loading} spinnerSize={"2rem"}>
         <Header />
         <TabsContainer>
           <TabView name="bookmarks" icon="bookmark">

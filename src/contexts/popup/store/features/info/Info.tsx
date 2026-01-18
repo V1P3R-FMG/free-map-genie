@@ -16,7 +16,7 @@ export const Info = ({}: Info.Props) => {
   }, []);
 
   return (
-    <Loading loading={loading}>
+    <Loading loading={loading} spinnerSize={"2rem"}>
       <div className={style.info}>
         {Object.entries(info).map(([key, value]) => (
           <Entry key={key} name={key} value={value} />
