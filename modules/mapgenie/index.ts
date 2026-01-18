@@ -31,7 +31,11 @@ const fetchDomains = async (wxt: Wxt) => {
   const data = await res.json();
   const games = data as MG.Api.Game[];
 
-  const domains = Array.from(new Set<string>(games.map((game) => game.domain)));
+  const domains = Array.from(
+    new Set<string>(
+      games.map((game) => new URL(game.config.url)).map((url) => url.host)
+    )
+  );
 
   await cache.set("domains", domains);
 
