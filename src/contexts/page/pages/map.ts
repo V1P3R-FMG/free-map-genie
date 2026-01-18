@@ -128,6 +128,14 @@ export class MapPage extends Page {
     await this.loadMapData();
     await this.loadHeatmaps();
 
+    // Overwrite some game config options
+    if (window.config) {
+      window.config.proOnlyMedia = false;
+      window.config.checklistEnabled = true;
+      window.config.presetsEnabled = true;
+      window.config.iconSizeToggleEnabled = true;
+    }
+
     // Unlock pro map links
     await this.unlockMapLinks();
 
