@@ -18,6 +18,7 @@ export const FontIcon = (props: FontIcon.Props) => {
         onAuxClick={props.auxClick}
         onMouseOver={props.onMouseOver}
         onMouseOut={props.onMouseOut}
+        title={props.title}
       />
     </div>
   );
@@ -29,6 +30,7 @@ export namespace FontIcon {
 
     className?: string;
     size?: string;
+    title?: string;
 
     onClick?: React.MouseEventHandler;
     auxClick?: React.MouseEventHandler;

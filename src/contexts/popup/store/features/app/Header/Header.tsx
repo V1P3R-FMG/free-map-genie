@@ -29,6 +29,7 @@ export const Header = () => {
           size="1.2rem"
           icon="reload"
           onClick={reload}
+          title="reload the extension"
         />
         <FontIcon
           className={style.btn}
@@ -36,6 +37,7 @@ export const Header = () => {
           icon="g"
           onClick={openLogoLink}
           auxClick={openLogoLink}
+          title="open mapgenio.io"
         />
       </div>
       <div className={style.center}>
@@ -51,6 +53,7 @@ export const Header = () => {
           size="1.2rem"
           icon="cross"
           onClick={close}
+          title="close popup"
         />
       </div>
     </div>
