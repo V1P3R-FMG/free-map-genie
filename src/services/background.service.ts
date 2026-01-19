@@ -1,3 +1,4 @@
+import { ExtensionSettings } from "@/common/extension/settings";
 import { createService, type ProxiedObject } from "@/common/messaging";
 
 class BackgroundService {
@@ -14,6 +15,14 @@ class BackgroundService {
     if (tab?.id !== undefined) {
       await browser.tabs.reload(tab.id);
     }
+  }
+
+  public async setExtensionEnabled(enabled: boolean) {
+    await ExtensionSettings.enabled.setValue(enabled);
+  }
+
+  public async getExtensionEnabled() {
+    return ExtensionSettings.enabled.getValue();
   }
 }
 

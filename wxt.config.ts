@@ -59,10 +59,10 @@ export default defineConfig({
     ],
     permissions:
       browser === "chrome"
-        ? ["declarativeNetRequest", "offscreen"]
+        ? ["declarativeNetRequest", "offscreen", "storage"]
         : manifestVersion === 2
-          ? ["webRequest", "webRequestBlocking"]
-          : ["declarativeNetRequest"],
+          ? ["webRequest", "webRequestBlocking", "storage"]
+          : ["declarativeNetRequest", "storage"],
     background_page: "background/page.html",
     browser_specific_settings:
       browser === "chrome"

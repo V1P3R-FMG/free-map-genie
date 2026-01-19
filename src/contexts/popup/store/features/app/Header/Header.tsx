@@ -1,8 +1,22 @@
+import { useAppSelector, useAppDispatch } from "@/contexts/popup/hooks";
+import {
+  selectAppEnabled,
+  fetchIsAppEnabledAsync,
+  setIsAppEnabledAsync,
+} from "../appSlice";
+
 import { FontIcon } from "@/components/FontIcon";
 
 import style from "./Header.module.scss";
 
 export const Header = () => {
+  const dispatch = useAppDispatch();
+  const enabled = useAppSelector(selectAppEnabled);
+
+  React.useEffect(() => {
+    dispatch(fetchIsAppEnabledAsync());
+  });
+
   const reload = () => {
     browser.runtime.reload();
   };
@@ -21,9 +35,20 @@ export const Header = () => {
     window.close();
   };
 
+  const toggle = () => {
+    dispatch(setIsAppEnabledAsync(!enabled));
+  };
+
   return (
     <div className={style.header}>
       <div className={style.left}>
+        <FontIcon
+          className={clsx(style.power, { [style.on]: enabled })}
+          size="1.2rem"
+          icon="power"
+          onClick={toggle}
+          title="turn the extension on/off"
+        />
         <FontIcon
           className={style.btn}
           size="1.2rem"

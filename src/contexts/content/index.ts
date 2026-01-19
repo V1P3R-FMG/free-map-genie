@@ -1,5 +1,6 @@
 import "@/common/messaging/contexts/contentScript";
 
+import { ExtensionSettings } from "@/common/extension/settings";
 import { getPageType } from "@/common/mapgenie";
 
 import extensionService from "@/services/extension.service";
@@ -20,6 +21,13 @@ export default defineContentScript({
     contentLoggerService.provide();
 
     await extension.mountLoadingOverlay();
+
+    const enabled = await ExtensionSettings.enabled.getValue();
+    if (!enabled) {
+      logger.log("Extension disabled.");
+      extension.unmountLoadingOverlay();
+      return;
+    }
 
     await injectScript("/page.js");
   },

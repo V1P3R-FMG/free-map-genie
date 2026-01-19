@@ -30,9 +30,23 @@
     justify-self: center;
   }
 
-  .btn:hover {
-    color: var(--active);
+  .btn {
     cursor: pointer;
+
+    &:hover {
+      color: var(--active);
+    }
+  }
+
+  .power {
+    color: var(--red);
+    filter: drop-shadow(0 0 5px var(--red));
+    cursor: pointer;
+
+    &.on {
+      color: var(--green);
+      filter: drop-shadow(0 0 5px var(--green));
+    }
   }
 
   .title {

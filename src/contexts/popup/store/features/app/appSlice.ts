@@ -13,6 +13,7 @@ export interface AppState {
   homepage: string;
   connected: boolean;
   loading: boolean;
+  enabled: boolean;
 }
 
 const initialState: AppState = {
@@ -28,7 +29,26 @@ const initialState: AppState = {
   homepage: import.meta.env.PKG_HOMEPAGE,
   connected: false,
   loading: true,
+  enabled: true,
 };
+
+export const fetchIsAppEnabledAsync = createAsyncThunk<boolean>(
+  "app/fetchIsAppEnabled",
+  async (_, { getState }) => {
+    const state = getState() as RootState;
+
+    return state.services.background.getExtensionEnabled();
+  }
+);
+
+export const setIsAppEnabledAsync = createAsyncThunk<void, boolean>(
+  "app/setIsAppEnabled",
+  async (enabled, { getState }) => {
+    const state = getState() as RootState;
+
+    return state.services.background.setExtensionEnabled(enabled);
+  }
+);
 
 export const fetchLatestVersionAsync = createAsyncThunk<string>(
   "app/fetchLatestVersion",
@@ -74,6 +94,18 @@ export const appSlice = createSlice({
   initialState,
   reducers: {},
   extraReducers: (builder) => {
+    builder.addCase(fetchIsAppEnabledAsync.fulfilled, (state, action) => {
+      state.enabled = action.payload;
+    });
+    builder.addCase(fetchIsAppEnabledAsync.rejected, (state, action) => {
+      logger.error("Failed to get is extension enabled status", action.error);
+    });
+    builder.addCase(setIsAppEnabledAsync.fulfilled, (state, action) => {
+      state.enabled = !state.enabled;
+    });
+    builder.addCase(setIsAppEnabledAsync.rejected, (state, action) => {
+      logger.error("Failed to set is extension enabled status", action.error);
+    });
     builder.addCase(fetchLatestVersionAsync.fulfilled, (state, action) => {
       state.latest = action.payload;
       state.needsUpdate = compareVersions(state.latest, state.version) > 0;
@@ -100,6 +132,7 @@ export const appSlice = createSlice({
 
 export const {} = appSlice.actions;
 
+export const selectAppEnabled = (state: RootState) => state.app.enabled;
 export const selectAppVersion = (state: RootState) => state.app.version;
 export const selectAppLatestVersion = (state: RootState) => state.app.latest;
 export const selectAppDisplayVersion = (state: RootState) =>
