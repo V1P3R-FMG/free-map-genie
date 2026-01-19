@@ -5,13 +5,19 @@ export type Component<P extends {}> =
   | React.FunctionComponent<P>
   | React.ComponentClass<P>;
 
+type ComponentParameters<P extends {}> = keyof P extends never
+  ? Parameters<(props?: P) => void>
+  : Parameters<(props: P) => void>;
+
 export class MountableComponent<P extends {}> {
   protected readonly props: P;
 
   private root?: ReactDOM.Root;
 
-  public constructor(props: P) {
-    this.props = props;
+  public constructor(...args: ComponentParameters<P>) {
+    const [props] = args;
+
+    this.props = props ?? ({} as P);
   }
 
   public mount(parent?: Parent) {
