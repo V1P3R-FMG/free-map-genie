@@ -7,6 +7,7 @@ import { mapDataUtils } from "@/common/mapgenie";
 import { waitForProperty } from "@/common/object";
 
 import { fixMapLinks } from "@/common/mapgenie";
+import { LazyGetter } from "lazy-get-decorator";
 
 export class MapPage extends Page {
   private client = new Client();
@@ -59,10 +60,11 @@ export class MapPage extends Page {
     await fixMapLinks(this.client.mapgenie);
   }
 
-  private getFmgMapId() {
+  @LazyGetter()
+  private get fmgMapId() {
     const urlParams = new URLSearchParams(window.location.search);
     const mapIdParmam = urlParams.get("fmgMapId") ?? undefined;
-    return mapIdParmam && Number(mapIdParmam);
+    return mapIdParmam ? Number(mapIdParmam) : null;
   }
 
   private hasProCategoryLocations() {
@@ -87,10 +89,8 @@ export class MapPage extends Page {
   }
 
   private async loadMapData() {
-    const fmgMapId = this.getFmgMapId();
-
-    if (fmgMapId) {
-      await this.loadMapDataForMapId(fmgMapId);
+    if (this.fmgMapId !== null) {
+      await this.loadMapDataForMapId(this.fmgMapId);
       return;
     }
 
@@ -160,6 +160,18 @@ export class MapPage extends Page {
     this.setupEventListeners();
     await this.client.installInterceptor();
     await this.ui.mount();
+
+    // Restore fmgMapId param on pro maps
+    if (this.fmgMapId !== null) {
+      const params = new URLSearchParams();
+      params.set("fmgMapId", this.fmgMapId.toString());
+
+      window.history.replaceState(
+        {},
+        document.title,
+        `${window.location.pathname}?${params}`
+      );
+    }
   }
 
   public async info() {
