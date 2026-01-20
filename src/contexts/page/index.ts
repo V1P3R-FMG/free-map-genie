@@ -14,6 +14,14 @@ import { GameHomePage } from "./pages/game-home";
 import { MapPage } from "./pages/map";
 import { GuidePage } from "./pages/guide";
 
+const FMG = Symbol.for("FMG");
+
+declare global {
+  interface Window {
+    [FMG]?: boolean;
+  }
+}
+
 const getPageScript = async (pageType: PageType) => {
   switch (pageType) {
     case "home":
@@ -29,6 +37,14 @@ const getPageScript = async (pageType: PageType) => {
   }
 };
 
+const checkReload = () => {
+  if (FMG in window) {
+    window.location.reload();
+  } else {
+    window[FMG] = true;
+  }
+};
+
 export default defineUnlistedScript(async () => {
   const extension = extensionService.use();
 
@@ -36,6 +52,9 @@ export default defineUnlistedScript(async () => {
   const pageScript = await getPageScript(pageType);
 
   if (!pageScript) return;
+
+  // Reload if script was already injected
+  checkReload();
 
   logger.log(`Initializing page ${pageType} script.`);
 
