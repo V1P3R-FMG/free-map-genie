@@ -13,8 +13,14 @@ export class TotalProgress extends IntegratedComponent<TotalProgress.Props> {
 
     return (
       <>
-        <div className="progress-item-wrapper" style={{ marginRight: "10px" }}>
-          <div className="progress-item">
+        <div
+          className="progress-item-wrapper"
+          style={{
+            marginRight: "10px",
+            background: "transparent",
+          }}
+        >
+          <div className="progress-item" style={{ cursor: "default" }}>
             <span className="title">{percent.toFixed(2) + "%"}</span>
             <span className="counter">
               {found} / {total}
