@@ -1,0 +1,23 @@
+[data-theme="light"] {
+  --color: #333333;
+  --color-light: #b0b0b0;
+  --active: #e17171;
+
+  --background: #f5f5f5;
+  --background-darker: #eeeeee;
+
+  --border: #d0d0d0;
+
+  --item: #ffffff;
+  --item-border: #e0e0e0;
+  --item-hover: #e2e1e1;
+
+  --item-red-color: #fdfdfd;
+  --item-red: #c95959;
+  --item-red-border: rgb(145, 37, 37);
+  --item-red-hover: #a82828;
+
+  --red: #e74c3c;
+  --green: #27ae60;
+  --yellow: #f39c12;
+}

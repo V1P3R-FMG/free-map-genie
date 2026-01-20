@@ -21,11 +21,12 @@ import { DraggableBookmark } from "./DraggableBookmark";
 import { BookmarkAddButton } from "./BookmarkAddButton";
 import { BookmarkTrash } from "./BookmarkTrash";
 
+import { Loading } from "@/components/Loading";
+import { ScrollContainer } from "@/components/ScrollContainer/ScrollContainer";
+
 import style from "./Bookmarks.module.scss";
 
 import type { BookmarkInfo } from "./bookmarksSlice";
-import { Loading } from "@/components/Loading";
-import { ScrollLock } from "@/components/ScrollLock";
 
 export const Bookmarks = ({}: Bookmarks.Props) => {
   const dispatch = useAppDispatch();
@@ -78,24 +79,24 @@ export const Bookmarks = ({}: Bookmarks.Props) => {
         onDragStart={onDragStart}
         sensors={sensors}
       >
-        <ScrollLock lockTarget="#scrollbox" locked={showTrash} />
         <div className={style.bookmarks}>
-          <div id="scrollbox" className={style.bookmarksScrollbox}>
+          <ScrollContainer
+            className={style.bookmarksScrollbox}
+            locked={showTrash}
+          >
             <div className={style.bookmarksContent}>
               {bookmarks.map((bookmark) => (
                 <DraggableBookmark key={bookmark.url} bookmark={bookmark} />
               ))}
               <BookmarkAddButton />
             </div>
+          </ScrollContainer>
+        </div>
+        <div>
+          <div className={style.bookmarksLink}>
+            <span>{activeBookmark ? activeBookmark.title : bookmarkTitle}</span>
           </div>
-          <div>
-            <div className={style.bookmarksLink}>
-              <span>
-                {activeBookmark ? activeBookmark.title : bookmarkTitle}
-              </span>
-            </div>
-            <BookmarkTrash show={showTrash} />
-          </div>
+          <BookmarkTrash show={showTrash} />
         </div>
         <DragOverlay>
           {activeBookmark ? (

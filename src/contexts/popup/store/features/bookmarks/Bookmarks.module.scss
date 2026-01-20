@@ -12,6 +12,8 @@
   align-items: center;
   justify-items: center;
 
+  box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.192);
+
   padding: 0;
   overflow: hidden;
 
@@ -110,7 +112,10 @@
 
 .bookmarks-scrollbox {
   display: block;
-  height: calc(var(--row-count) * (var(--size) + var(--gap)) - var(--gap));
+  height: calc(
+    var(--row-count) * (var(--size) + var(--gap)) - var(--gap) + 2px
+  );
+  padding-bottom: 2px;
 
   scroll-behavior: auto;
 
