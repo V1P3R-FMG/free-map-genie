@@ -67,7 +67,8 @@ export class MapPage extends Page {
     return mapIdParmam ? Number(mapIdParmam) : null;
   }
 
-  private hasProCategoryLocations() {
+  @LazyGetter()
+  private get hasProCategoryLocations() {
     const proCategoryLocationCounts = window.mapData!.proCategoryLocationCounts;
     for (const key in proCategoryLocationCounts) {
       const count = proCategoryLocationCounts[key];
@@ -94,7 +95,7 @@ export class MapPage extends Page {
       return;
     }
 
-    if (this.hasProCategoryLocations()) {
+    if (this.hasProCategoryLocations) {
       await this.loadMapDataForMapId(window.mapData!.map.id);
     }
   }
