@@ -35,7 +35,8 @@
     "p-memoize": "^8.0.0",
     "react": "^19.2.3",
     "react-dom": "^19.2.3",
-    "react-redux": "^9.2.0"
+    "react-redux": "^9.2.0",
+    "usehooks-ts": "^3.1.1"
   },
   "devDependencies": {
     "@ghostery/adblocker-playwright": "^2.13.3",

@@ -1,7 +1,6 @@
 import { IsolatedComponent } from "@/common/ui";
 import { Spinner } from "@/components/Spinner";
-
-import { ScrollLock } from "./ScrolLock";
+import { ScrollLock } from "@/components/ScrollLock";
 
 import style from "./LoadingOverlay.module.scss";
 
@@ -42,7 +41,7 @@ export class LoadingOverlay extends IsolatedComponent<LoadingOverlay.Props> {
 
     return (
       <>
-        <ScrollLock />
+        <ScrollLock locked={true} />
         <div className={style.loading} style={{ top: `${top}px` }}>
           <div className={style.loadingContent}>
             <h1>{message}</h1>

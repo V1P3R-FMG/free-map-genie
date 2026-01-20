@@ -81,6 +81,10 @@
 
 .bookmarks {
   display: block;
+
+  --size: 68px;
+  --row-count: 4;
+  --gap: 5px;
 }
 
 .bookmarks-link {
@@ -105,10 +109,8 @@
 }
 
 .bookmarks-scrollbox {
-  --row-count: 3;
-
   display: block;
-  height: 212px;
+  height: calc(var(--row-count) * (var(--size) + var(--gap)) - var(--gap));
 
   scroll-behavior: auto;
 
@@ -120,13 +122,12 @@
 .bookmarks-content {
   width: calc(100% - var(--content-margin) * 2);
   display: grid;
-  grid-template-columns: repeat(5, 65px);
-  grid-auto-rows: minmax(4.1rem, auto);
-  grid-template-rows: repeat(var(--row-count), 65px);
+  grid-template-columns: repeat(5, var(--size));
+  grid-auto-rows: var(--size);
 
   margin-right: 0.5rem;
 
-  gap: 0.5rem;
+  gap: var(--gap);
 }
 
 .bookmark-trash-container {

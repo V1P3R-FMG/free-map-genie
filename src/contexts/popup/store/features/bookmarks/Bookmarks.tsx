@@ -25,6 +25,7 @@ import style from "./Bookmarks.module.scss";
 
 import type { BookmarkInfo } from "./bookmarksSlice";
 import { Loading } from "@/components/Loading";
+import { ScrollLock } from "@/components/ScrollLock";
 
 export const Bookmarks = ({}: Bookmarks.Props) => {
   const dispatch = useAppDispatch();
@@ -42,8 +43,6 @@ export const Bookmarks = ({}: Bookmarks.Props) => {
       ? bookmarks.find((b) => b.url === activeBookmarkUrl) || null
       : null;
   }, [activeBookmarkUrl, bookmarks.length]);
-
-  const ref = React.useRef<HTMLDivElement>(null);
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -79,8 +78,9 @@ export const Bookmarks = ({}: Bookmarks.Props) => {
         onDragStart={onDragStart}
         sensors={sensors}
       >
+        <ScrollLock lockTarget="#scrollbox" locked={showTrash} />
         <div className={style.bookmarks}>
-          <div ref={ref} className={style.bookmarksScrollbox}>
+          <div id="scrollbox" className={style.bookmarksScrollbox}>
             <div className={style.bookmarksContent}>
               {bookmarks.map((bookmark) => (
                 <DraggableBookmark key={bookmark.url} bookmark={bookmark} />
