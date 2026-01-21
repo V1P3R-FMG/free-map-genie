@@ -12,7 +12,6 @@ export const ScrollLock = ({
   });
 
   React.useEffect(() => {
-    logger.debug({ lockTarget, locked });
     if (locked) lock();
     else unlock();
   }, [locked, lockTarget]);
