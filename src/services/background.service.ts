@@ -1,10 +1,10 @@
 import { ExtensionSettings } from "@/common/extension/settings";
 import { createService, type ProxiedObject } from "@/common/messaging";
 
-import offscreenService from "./offscreen.service";
+import { WindowManager } from "@/common/windowManager";
 
 class BackgroundService {
-  private readonly offscreen = offscreenService.use();
+  private readonly windowManager = new WindowManager();
 
   public async getActiveTab(): Promise<Browser.tabs.Tab | undefined> {
     const tabs = await browser.tabs.query({
@@ -21,16 +21,24 @@ class BackgroundService {
     }
   }
 
-  public async reloadBackend(): Promise<void> {
-    await this.offscreen.reloadIframe("https://mapgenie.io/?fmgBackend");
-  }
-
   public async setExtensionEnabled(enabled: boolean) {
     await ExtensionSettings.enabled.setValue(enabled);
   }
 
   public async getExtensionEnabled() {
     return ExtensionSettings.enabled.getValue();
+  }
+
+  public async openDataManager() {
+    await this.windowManager.open(browser.runtime.getURL("dataManager.html"), {
+      focused: true,
+      width: 1000,
+      height: 800,
+    });
+  }
+
+  public async closeDataManager() {
+    await this.windowManager.close(browser.runtime.getURL("dataManager.html"));
   }
 }
 

@@ -4,12 +4,12 @@ import { nanoid } from "nanoid";
 import async from "@/common/async";
 
 import type { Bookmark } from "@/common/bookmark";
+import type { Profile } from "@/common/profile";
 import type { Key } from "../../key";
 import type { Database } from "../database";
 import type { Stores } from "./stores";
 import type { IdIndex } from "./indexes";
 import type { UserData } from "../../format";
-import type { Profile } from "@/common/profile";
 import type { ProfileV1, AsProfile } from "./versions/v1";
 
 // fmg@v3
@@ -147,6 +147,10 @@ export class DexieDatabase implements Database {
         }))
       );
     });
+  }
+
+  public clearLocations(locationIds: number[]) {
+    return this.db.locations.bulkDelete(locationIds);
   }
 
   public putLocation(key: Key, locationId: number) {

@@ -4,6 +4,7 @@ import { waitForProperty } from "@/common/object";
 
 import backendService from "@/services/backend.service";
 import mapgenieService from "@/services/mapgenie.service";
+import clientService from "@/services/client.service";
 
 export class Client {
   private readonly et: EventTarget = new EventTarget();
@@ -27,10 +28,12 @@ export class Client {
 
   public loginFromMap() {
     this._key = Key.fromWindow();
+    clientService.provide(this);
   }
 
   public loginFromGame(gameId: number) {
     this._key = Key.fromWindowGame(gameId);
+    clientService.provide(this);
   }
 
   public async loginFromGuide() {
@@ -143,12 +146,27 @@ export class Client {
     return presets;
   }
 
-  public addUserProfile(id: number) {
-    return this.backend.addUserProfile(id);
-  }
-
   public getActiveProfileId() {
     return this.backend.getActiveProfileId();
+  }
+
+  public async importFromMapgenieAccount() {
+    if (!this.isLoggedIn) {
+      throw new Error("Client is not logged in");
+    }
+    await this.backend.importFromMapgenieAccount(this.key);
+  }
+
+  public async clearGame() {
+    if (!this.isLoggedIn) {
+      throw new Error("Client is not logged in");
+    }
+    await this.backend.removeData(this.key);
+  }
+
+  public async clearMap() {
+    const locations = window.mapData!.locations.map((loc) => loc.id);
+    await this.backend.clearLocations(locations);
   }
 
   public on<K extends keyof Client.EventMap>(

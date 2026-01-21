@@ -1,4 +1,4 @@
-import { Storage } from "@/common/storage";
+import { Key, Storage } from "@/common/storage";
 import { createService, type ProxiedObject } from "@/common/messaging";
 import { getAuthToken, setAuthToken } from "@/common/mapgenie";
 
@@ -32,6 +32,32 @@ class BackendService extends Storage {
     if (!user || !idMatches || !nameMatches) {
       await this.addUserProfile(userData.id, userData.username);
     }
+  }
+
+  public async importFromMapgenieAccount(key: Key) {
+    if (!this.isLoggedIn()) {
+      throw new Error("User is not logged in");
+    }
+
+    const user = await this.mapgenie.fetchUser(key.gameId);
+    logger.debug("Importing user data from MapGenie account", {
+      user,
+      key,
+    });
+
+    const locations = Object.fromEntries(
+      user.locations.map((locId) => [locId, true])
+    );
+    const trackedCategoryIds = user.tracked_category_ids;
+    const notes = user.notes;
+
+    await this.setData(key, {
+      locations,
+      trackedCategoryIds,
+      notes,
+      presetOrdering: [],
+      presets: [],
+    });
   }
 
   public isLoggedIn() {

@@ -152,6 +152,10 @@ export class PageService {
   public async ping() {
     return "pong";
   }
+
+  public async getPageType() {
+    return getPageType();
+  }
 }
 
 const pageService = createService({

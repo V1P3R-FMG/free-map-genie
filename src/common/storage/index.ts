@@ -2,6 +2,7 @@ import { Key } from "./key";
 import { DexieDatabase, LocalDatabase } from "./databases";
 
 import type { Bookmark } from "@/common/bookmark";
+import type { UserData } from "./format";
 
 export type { UserData } from "./format";
 export { Key } from "./key";
@@ -33,12 +34,24 @@ export class Storage {
     return this.dexie.getData(key);
   }
 
+  public async setData(key: Key, data: UserData) {
+    return this.dexie.setData(key, data);
+  }
+
+  public async removeData(key: Key) {
+    return this.dexie.removeData(key);
+  }
+
   public async markLocationFound(key: Key, locationId: number, found: boolean) {
     if (found) {
       await this.dexie.putLocation(key, locationId);
     } else {
       await this.dexie.deleteLocation(locationId);
     }
+  }
+
+  public async clearLocations(locationIds: number[]) {
+    return this.dexie.clearLocations(locationIds);
   }
 
   public async trackCategory(key: Key, categoryId: number, track: boolean) {

@@ -5,6 +5,7 @@ import bookmakrsReducer from "./features/bookmarks/bookmarksSlice";
 import servicesReducer from "./features/services/servicesSlice";
 import infoReducer from "./features/info/infoSlice";
 import profilesReducer from "./features/profiles/profilesSlice";
+import dataReducer from "./features/data/dataSlice";
 
 export const store = configureStore({
   reducer: {
@@ -13,6 +14,7 @@ export const store = configureStore({
     services: servicesReducer,
     info: infoReducer,
     profiles: profilesReducer,
+    data: dataReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
