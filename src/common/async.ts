@@ -1,4 +1,9 @@
 import _waitUntil from "async-wait-until";
+import type {
+  Predicate,
+  PredicateReturnValue,
+  Options as WaitUntilOptions,
+} from "async-wait-until";
 
 export const some = async (promises: Promise<boolean>[]): Promise<boolean> => {
   return new Promise<boolean>(async (resolve, reject) => {
@@ -19,17 +24,12 @@ export const some = async (promises: Promise<boolean>[]): Promise<boolean> => {
   });
 };
 
-export const waitUntil = (...args: Parameters<typeof _waitUntil>) => {
-  const [predicate, options, timeBetween] = args;
-
-  const optionsObject =
-    typeof options === "number" ? { timeout: options } : options ? options : {};
-
-  return _waitUntil(predicate, {
-    timeout: 60000,
-    intervalBetweenAttempts: timeBetween ?? 50,
-    ...optionsObject,
-  });
+export const waitUntil = <T extends PredicateReturnValue>(
+  predicate: Predicate<T>,
+  options: number | WaitUntilOptions = 60000,
+  intervalBetweenAttempts: number = 50
+) => {
+  return _waitUntil(predicate, options, intervalBetweenAttempts);
 };
 
 export default { some, waitUntil };

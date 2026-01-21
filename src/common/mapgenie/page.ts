@@ -6,6 +6,7 @@ export type PageType =
   | "map"
   | "guide"
   | "tarkov-quests-17"
+  | "login"
   | "unknown";
 
 const isHomePage = () => {
@@ -35,6 +36,10 @@ export const getPageType = async () => {
 
   if (!isMapgenieSite()) {
     return "unknown";
+  }
+
+  if (window.location.pathname.endsWith("/login")) {
+    return "login";
   }
 
   const $body = $(document.body);

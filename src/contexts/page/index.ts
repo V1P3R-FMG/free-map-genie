@@ -13,6 +13,7 @@ import { HomePage } from "./pages/home";
 import { GameHomePage } from "./pages/game-home";
 import { MapPage } from "./pages/map";
 import { GuidePage } from "./pages/guide";
+import { LoginPage } from "./pages/login";
 
 const FMG = Symbol.for("FMG");
 
@@ -32,6 +33,8 @@ const getPageScript = async (pageType: PageType) => {
       return new MapPage();
     case "guide":
       return new GuidePage();
+    case "login":
+      return new LoginPage();
     default:
       return null;
   }
