@@ -1,23 +1,16 @@
 import { Key } from "@/common/storage";
 import { AxiosInterceptor } from "@/common/axios";
-import { waitForProperty } from "./object";
+import { waitForProperty } from "@/common/object";
 
 import backendService from "@/services/backend.service";
 import mapgenieService from "@/services/mapgenie.service";
+import backgroundService from "@/services/background.service";
 
 export class Client {
   private readonly et: EventTarget = new EventTarget();
 
-  private static readonly backend = backendService.use();
-  private static readonly mapgenie = mapgenieService.use();
-
-  private get backend() {
-    return Client.backend;
-  }
-
-  public get mapgenie() {
-    return Client.mapgenie;
-  }
+  private readonly backend = backendService.use();
+  public readonly mapgenie = mapgenieService.use();
 
   private interceptor?: AxiosInterceptor;
   private _key?: Key;
