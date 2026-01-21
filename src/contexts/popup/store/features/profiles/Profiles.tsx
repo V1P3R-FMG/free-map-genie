@@ -9,8 +9,10 @@ import {
 } from "./profilesSlice";
 
 import style from "./Profiles.module.scss";
+
 import { Loading } from "@/components/Loading";
 import { FontIcon } from "@/components/FontIcon";
+import { ScrollContainer } from "@/components/ScrollContainer/ScrollContainer";
 
 export const Profiles = ({}: Profiles.Props) => {
   const dispatch = useAppDispatch();
@@ -23,30 +25,28 @@ export const Profiles = ({}: Profiles.Props) => {
 
   return (
     <Loading loading={loading} spinnerSize={"2rem"}>
-      <div className={style.profiles}>
-        <div className={style.profilesList}>
-          {profiles.length === 0 && <p>User not logged in.</p>}
-          {profiles.map((profile) => (
-            <Profile key={profile.id} profile={profile} />
-          ))}
-          {profiles.length > 0 && (
-            <div>
-              <button
-                id={style.addProfileButton}
-                onClick={() => dispatch(addGuestProfileAsync())}
-              >
-                <FontIcon icon="plus" />
-              </button>
-              <button
-                id={style.deleteProfileButton}
-                onClick={() => dispatch(deleteGuestProfileAsync())}
-              >
-                <FontIcon icon="minus" />
-              </button>
-            </div>
-          )}
-        </div>
-      </div>
+      <ScrollContainer className={style.profiles}>
+        {profiles.length === 0 && <p>User not logged in.</p>}
+        {profiles.map((profile) => (
+          <Profile key={profile.id} profile={profile} />
+        ))}
+        {profiles.length > 0 && (
+          <div>
+            <button
+              id={style.addProfileButton}
+              onClick={() => dispatch(addGuestProfileAsync())}
+            >
+              <FontIcon icon="plus" />
+            </button>
+            <button
+              id={style.deleteProfileButton}
+              onClick={() => dispatch(deleteGuestProfileAsync())}
+            >
+              <FontIcon icon="minus" />
+            </button>
+          </div>
+        )}
+      </ScrollContainer>
     </Loading>
   );
 };

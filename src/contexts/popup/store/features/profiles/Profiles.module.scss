@@ -1,66 +1,57 @@
 .profiles {
-  height: 100%;
-  display: grid;
-  max-height: 15.5rem;
-  overflow-y: scroll;
+  width: 100%;
+  max-height: 325px;
 
-  .profiles-list {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+
+  .profile {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     align-items: center;
-    gap: 5px;
+    gap: 10px;
 
-    .profile {
-      display: flex;
-      flex-direction: row;
-      align-items: center;
-      gap: 10px;
+    width: 100%;
+    background-color: var(--item);
+    padding: 0.3rem;
+    font-size: 1rem;
+    border-radius: 0.5rem;
+    border: 1px solid var(--border);
+    user-select: none;
+    cursor: pointer;
 
-      width: 100%;
-      background-color: var(--item);
-      padding: 0.34rem;
-      font-size: 1rem;
-      border-radius: 0.5rem;
-      border: 1px solid var(--border);
-      user-select: none;
-      cursor: pointer;
-
-      &.active {
-        border-color: var(--active);
-      }
-
-      &:hover {
-        background-color: var(--item-hover);
-      }
-
-      .profile-avatar {
-        padding: 0.2rem;
-        border-radius: 1rem;
-        object-fit: cover;
-        background-color: var(--background-darker);
-      }
+    &.active {
+      border-color: var(--active);
     }
 
-    #add-profile-button,
-    #delete-profile-button {
-      height: 2.4rem;
-      width: 2.4rem;
-      color: var(--color);
-      background-color: var(--item);
-      border: none;
-      border-radius: 1.2rem;
-      font-size: 1rem;
-      margin: 0 0.25rem;
-      cursor: pointer;
+    &:hover {
+      background-color: var(--item-hover);
+    }
 
-      &:hover {
-        background-color: var(--item-hover);
-      }
+    .profile-avatar {
+      padding: 0.2rem;
+      border-radius: 1rem;
+      object-fit: cover;
+      background-color: var(--background-darker);
     }
   }
 
-  .profiles-footer {
-    display: flex;
-    justify-content: flex-end;
+  #add-profile-button,
+  #delete-profile-button {
+    height: 2.4rem;
+    width: 2.4rem;
+    color: var(--color);
+    background-color: var(--item);
+    border: none;
+    border-radius: 1.2rem;
+    font-size: 1rem;
+    margin: 0 0.25rem;
+    cursor: pointer;
+
+    &:hover {
+      background-color: var(--item-hover);
+    }
   }
 }
