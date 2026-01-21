@@ -4,7 +4,6 @@ import { waitForProperty } from "@/common/object";
 
 import backendService from "@/services/backend.service";
 import mapgenieService from "@/services/mapgenie.service";
-import backgroundService from "@/services/background.service";
 
 export class Client {
   private readonly et: EventTarget = new EventTarget();
