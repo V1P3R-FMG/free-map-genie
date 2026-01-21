@@ -25,6 +25,7 @@ class MapgenieService {
   public async fetchUser(gameId: number | string) {
     const auth = await this.backend.getAuthToken();
     const { data } = await this.axios.get<MG.Api.UserFull>("/user/full", {
+      cache: false,
       baseURL: "https://mapgenie.io/api/v1", // Force mapgenie API base URL
       headers: {
         ["Authorization"]: `Bearer ${auth}`,
