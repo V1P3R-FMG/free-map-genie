@@ -3,11 +3,15 @@ import { setupCache } from "axios-cache-interceptor";
 
 import { createService, Memoize, type ProxiedObject } from "@/common/messaging";
 
+import backendService from "./backend.service";
+
 declare global {
   var $headers: Record<string, string>;
 }
 
 class MapgenieService {
+  private readonly backend = backendService.use();
+
   private readonly axios = setupCache(
     axios.create({
       baseURL: import.meta.env.MAPGENIE_API_URL,
@@ -17,6 +21,19 @@ class MapgenieService {
       interpretHeader: false,
     }
   );
+
+  public async fetchUser(gameId: number | string) {
+    const auth = await this.backend.getAuthToken();
+    const { data } = await this.axios.get<MG.Api.UserFull>("/user/full", {
+      baseURL: "https://mapgenie.io/api/v1", // Force mapgenie API base URL
+      headers: {
+        ["Authorization"]: `Bearer ${auth}`,
+        ["X-Game-ID"]: String(gameId),
+      },
+    });
+
+    return data;
+  }
 
   @Memoize()
   public async fetchGames() {

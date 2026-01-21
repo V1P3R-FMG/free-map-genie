@@ -120,4 +120,18 @@ declare namespace MG.Api {
   declare type PresetPostData = Omit<Preset, "id" | "order"> & {
     ordering: number[];
   };
+
+  declare interface UserFull {
+    api_token: string;
+    email: string;
+    has_ign_plus: boolean;
+    id: number;
+    is_member: boolean;
+    is_pro: boolean;
+    locations: number[];
+    notes: Note[];
+    presets: Preset[];
+    tracked_category_ids: number[];
+    username: string;
+  }
 }

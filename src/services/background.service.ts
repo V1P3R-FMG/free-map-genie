@@ -1,7 +1,11 @@
 import { ExtensionSettings } from "@/common/extension/settings";
 import { createService, type ProxiedObject } from "@/common/messaging";
 
+import offscreenService from "./offscreen.service";
+
 class BackgroundService {
+  private readonly offscreen = offscreenService.use();
+
   public async getActiveTab(): Promise<Browser.tabs.Tab | undefined> {
     const tabs = await browser.tabs.query({
       active: true,
@@ -15,6 +19,10 @@ class BackgroundService {
     if (tab?.id !== undefined) {
       await browser.tabs.reload(tab.id);
     }
+  }
+
+  public async reloadBackend(): Promise<void> {
+    await this.offscreen.reloadIframe("https://mapgenie.io/?fmgBackend");
   }
 
   public async setExtensionEnabled(enabled: boolean) {

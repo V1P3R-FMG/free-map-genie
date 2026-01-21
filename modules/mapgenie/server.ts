@@ -27,6 +27,18 @@ const mapgenieApi = setupCache(
   }
 );
 
+const stringify = (data: any) => {
+  if (data instanceof Error) {
+    return JSON.stringify({
+      message: data.message,
+      name: data.name,
+      stack: data.stack,
+    });
+  } else {
+    return JSON.stringify(data);
+  }
+};
+
 export default function setupServer(
   wxt: Wxt,
   port: number = 8080,
@@ -67,10 +79,10 @@ export default function setupServer(
         PREFIX,
         chalk.blue(req.method),
         req.originalUrl,
-        chalk.redBright(data ?? String(error))
+        chalk.redBright(stringify(data ?? error))
       );
 
-      res.status(500).send(data ?? new String(error));
+      res.status(500).send(data ?? stringify(error));
     }
   });
 

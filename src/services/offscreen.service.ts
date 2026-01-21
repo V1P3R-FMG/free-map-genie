@@ -32,6 +32,20 @@ export class OffscreenService {
     }
   }
 
+  public async reloadIframe(url: string) {
+    const normalizedUrl = this.normalizeUrl(url);
+
+    const iframe = this._iframes.get(normalizedUrl);
+
+    if (!iframe) return;
+
+    return new Promise<void>((resolve) => {
+      iframe.on("load", () => resolve());
+      iframe.removeAttr("src");
+      iframe.attr("src", normalizedUrl);
+    });
+  }
+
   public async addIframe(url: string) {
     const normalizedUrl = this.normalizeUrl(url);
 
