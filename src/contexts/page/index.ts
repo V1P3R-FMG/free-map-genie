@@ -3,11 +3,13 @@ import "@/common/messaging/contexts/window";
 import {
   MapgenieAdBlocker,
   getPageType,
+  getAuthToken,
   type PageType,
 } from "@/common/mapgenie";
 
 import pageService from "@/services/page.service";
 import extensionService from "@/services/extension.service";
+import backendService from "@/services/backend.service";
 
 import { HomePage } from "./pages/home";
 import { GameHomePage } from "./pages/game-home";
@@ -50,11 +52,17 @@ const checkReload = () => {
 
 export default defineUnlistedScript(async () => {
   const extension = extensionService.use();
+  const backend = backendService.use();
 
   const pageType = await getPageType();
   const pageScript = await getPageScript(pageType);
 
   if (!pageScript) return;
+
+  // Set auth token in backend service
+  const auth = getAuthToken();
+  await backend.setAuthToken(auth);
+  await backend.updateUser();
 
   // Reload if script was already injected
   checkReload();

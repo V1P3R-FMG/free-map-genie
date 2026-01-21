@@ -27,3 +27,22 @@ export const activateBlockedMapgenieScript = async (name: string) => {
 
   $(`<script/>`, { src }).appendTo("body");
 };
+
+export const getAuthToken = () => {
+  return (
+    document.querySelector<HTMLMetaElement>('meta[name="auth-token"]')
+      ?.content || null
+  );
+};
+
+export const setAuthToken = (token: string | null) => {
+  let authToken = document.querySelector<HTMLMetaElement>(
+    'meta[name="auth-token"]'
+  );
+  if (!authToken) {
+    authToken = document.createElement("meta");
+    authToken.name = "auth-token";
+    document.head.appendChild(authToken);
+  }
+  authToken.content = token || "";
+};

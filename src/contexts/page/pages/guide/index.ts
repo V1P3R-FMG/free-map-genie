@@ -47,9 +47,6 @@ export class GuidePage extends Page {
   private async setupUser(userId?: number) {
     if (userId === undefined) return;
 
-    // Add real user to the backend profiles list
-    await this.client.addUserProfile(userId);
-
     // Get the active user from the backend
     const activeProfileId = await this.client.getActiveProfileId();
 

@@ -16,9 +16,6 @@ export class MapPage extends Page {
   private async setupUser() {
     if (!window.user) return;
 
-    // Add real user to the backend profiles list
-    await this.client.addUserProfile(window.user.id);
-
     // Get the active user from the backend
     const activeProfileId = await this.client.getActiveProfileId();
 

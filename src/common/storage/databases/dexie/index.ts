@@ -11,7 +11,6 @@ import type { IdIndex } from "./indexes";
 import type { UserData } from "../../format";
 import type { Profile } from "@/common/profile";
 import type { ProfileV1, AsProfile } from "./versions/v1";
-import { profile } from "@/contexts/popup/store/features/profiles/Profiles.module.scss";
 
 // fmg@v3
 export class DexieDatabase implements Database {
@@ -377,6 +376,9 @@ export class DexieDatabase implements Database {
   }
 
   public async getProfiles() {
+    const user = await this.db.profiles.where("id").aboveOrEqual(0).first();
+    if (!user) return [];
+
     return this.db.profiles
       .toArray()
       .then((profiles) => profiles.map(this.returnProfile))
@@ -405,17 +407,17 @@ export class DexieDatabase implements Database {
     return profile?.id;
   }
 
-  public async addUserProfile(id: number) {
+  public async addUserProfile(id: number, name?: string) {
     return this.db.transaction("rw", this.db.profiles, async () => {
       // We only allow one user profile at a time
       // So we remove any existing user profiles
-      await this.db.profiles.where("id").above(0).delete();
+      await this.db.profiles.where("id").aboveOrEqual(0).delete();
 
       const active = await this.getActiveProfile();
 
       const profile = {
         id,
-        name: `User ${id}`,
+        name: name ?? `User ${id}`,
         active: !active ? 1 : 0,
       };
 
@@ -423,6 +425,15 @@ export class DexieDatabase implements Database {
 
       return this.returnProfile(profile);
     });
+  }
+
+  public async getUserProfile() {
+    const profile = await this.db.profiles.where("id").aboveOrEqual(0).first();
+    return this.returnProfile(profile);
+  }
+
+  public async deleteProfile(id: number) {
+    return this.db.profiles.where("id").equals(id).delete();
   }
 
   private async getNextGuestProfileId() {

@@ -113,8 +113,16 @@ export class Storage {
     return this.dexie.getProfiles();
   }
 
-  public addUserProfile(id: number) {
-    return this.dexie.addUserProfile(id);
+  public removeProfile(id: number) {
+    return this.dexie.deleteProfile(id);
+  }
+
+  public addUserProfile(id: number, name?: string) {
+    return this.dexie.addUserProfile(id, name);
+  }
+
+  public getUserProfile() {
+    return this.dexie.getUserProfile();
   }
 
   public addGuestProfile() {

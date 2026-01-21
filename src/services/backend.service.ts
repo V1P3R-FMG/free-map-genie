@@ -1,16 +1,41 @@
 import { Storage } from "@/common/storage";
 import { createService, type ProxiedObject } from "@/common/messaging";
+import { getAuthToken, setAuthToken } from "@/common/mapgenie";
+
+import mapgenieService from "./mapgenie.service";
 
 class BackendService extends Storage {
-  public async getAuthToken(): Promise<string | null> {
-    const authToken = document.head.querySelector<HTMLMetaElement>(
-      'meta[name="auth-token"]'
-    );
-    return authToken?.content || null;
+  private readonly mapgenie = mapgenieService.use();
+
+  public getAuthToken() {
+    return getAuthToken();
   }
 
-  public async isLoggedIn(): Promise<boolean> {
-    const authToken = await this.getAuthToken();
+  public setAuthToken(token: string | null) {
+    setAuthToken(token);
+  }
+
+  public async updateUser() {
+    const user = await this.getUserProfile();
+
+    if (!this.isLoggedIn()) {
+      if (user) {
+        await this.removeProfile(user.id);
+      }
+      return;
+    }
+
+    const userData = await this.mapgenie.fetchUser(1);
+    const idMatches = user?.id === userData.id;
+    const nameMatches = user?.name === userData.username;
+
+    if (!user || !idMatches || !nameMatches) {
+      await this.addUserProfile(userData.id, userData.username);
+    }
+  }
+
+  public isLoggedIn() {
+    const authToken = this.getAuthToken();
     return !!authToken;
   }
 }
