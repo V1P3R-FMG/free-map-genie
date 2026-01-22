@@ -2,7 +2,6 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 
 import type { Bookmark as BookmarkInfo } from "@/common/bookmark";
 import type { RootState } from "@/contexts/popup/store";
-import { nanoid } from "nanoid";
 
 export { BookmarkInfo };
 
@@ -45,9 +44,7 @@ export const loadBookmarksAsync = createAsyncThunk<BookmarkInfo[], void>(
 
     const bookmarks = await state.services.backend.getBookmarks();
 
-    return Array.from({ length: 20 })
-      .map(() => bookmarks.map((b) => ({ ...b, url: nanoid() })))
-      .flat();
+    return bookmarks;
   }
 );
 
