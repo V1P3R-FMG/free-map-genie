@@ -9,11 +9,10 @@ import {
 import path from "node:path";
 import fs from "node:fs";
 
-interface FantasticonOptions
-  extends Omit<
-    RunnerOptions,
-    "fontTypes" | "assetTypes" | "outputDir" | "fontsUrl" | "pathOptions"
-  > {
+interface FantasticonOptions extends Omit<
+  RunnerOptions,
+  "fontTypes" | "assetTypes" | "outputDir" | "fontsUrl" | "pathOptions"
+> {
   pathOptions?: {
     ts: string;
   };
@@ -96,10 +95,10 @@ export default defineWxtModule({
         });
       }
 
-      paths.push(`css/${name}.css`);
+      paths.push(`assets/${name}.css`);
 
       for (const type of options.fontTypes) {
-        paths.push(`fonts/${name}.${type}`);
+        paths.push(`assets/${name}.${type}`);
       }
     });
   },

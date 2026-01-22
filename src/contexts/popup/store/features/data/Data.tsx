@@ -10,25 +10,14 @@ import {
   isLoggedIn,
   getPageType,
 } from "./dataSlice";
-import { FontIcon } from "@/components/FontIcon";
-import { Loading } from "@/components/Loading";
 
 import style from "./Data.module.scss";
-import { Confirm } from "@/components";
-
-interface ModalState {
-  message: string;
-  onAccept: () => void;
-  onCancel: () => void;
-}
 
 export const Data = ({}: Data.Props) => {
   const dispatch = useAppDispatch();
   const busy = useAppSelector(isBusy);
   const loggedIn = useAppSelector(isLoggedIn);
   const pageType = useAppSelector(getPageType);
-
-  const [modalState, setModalState] = React.useState<ModalState | null>(null);
 
   const isMap = pageType === "map";
   const isGuide = pageType === "guide";
@@ -37,85 +26,74 @@ export const Data = ({}: Data.Props) => {
   const clearMapEnabled = loggedIn && isMap;
   const clearGameEnabled = loggedIn && (isGuide || isMap);
 
-  const onImportFromAccountClick = React.useCallback(() => {
-    setModalState({
-      message:
-        "Import data from your Mapgenie account? This will overwrite your current game data.",
-      onAccept: () => {
-        setModalState(null);
-        dispatch(importFromMapgenieAccountAsync());
-      },
-      onCancel: () => setModalState(null),
-    });
-  }, []);
+  const {
+    state: importFromAccountConfirmState,
+    open: openImportFromAccountConfirm,
+  } = useConfirm(
+    (accepted) => accepted && dispatch(importFromMapgenieAccountAsync())
+  );
 
-  const onClearMapClick = React.useCallback(() => {
-    setModalState({
-      message:
-        "Clear all locations for the current map? This action cannot be undone.",
-      onAccept: () => {
-        setModalState(null);
-        dispatch(clearMapDataAsync());
-      },
-      onCancel: () => setModalState(null),
-    });
-  }, []);
+  const { state: clearMapConfirmState, open: openClearMapConfirm } = useConfirm(
+    (accepted) => accepted && dispatch(clearMapDataAsync())
+  );
 
-  const onClearGameClick = React.useCallback(() => {
-    setModalState({
-      message:
-        "Clear all data for the current game? This action cannot be undone.",
-      onAccept: () => {
-        setModalState(null);
-        dispatch(clearGameDataAsync());
-      },
-      onCancel: () => setModalState(null),
-    });
-  }, []);
+  const { state: clearGameConfirmState, open: openClearGameConfirm } =
+    useConfirm((accepted) => accepted && dispatch(clearGameDataAsync()));
 
   React.useEffect(() => {
     dispatch(fetchLoggedInStatusAsync());
     dispatch(fetchPageTypeAsync());
   }, []);
 
-  const onOpenDataManager = React.useCallback(() => {
+  const onOpenDataManager = () => {
     dispatch(openDataManagerAsync());
-  }, [dispatch]);
+  };
 
   return (
     <Loading loading={busy} overlay spinnerSize="2rem">
-      <Confirm visible={modalState !== null} {...modalState} />
+      <Confirm
+        message="Import data from your Mapgenie account? This will overwrite your current game data."
+        {...importFromAccountConfirmState}
+      />
+      <Confirm
+        message="Clear all locations for the current map? This action cannot be undone."
+        {...clearMapConfirmState}
+      />
+      <Confirm
+        message="Clear all data for the current game? This action cannot be undone."
+        {...clearGameConfirmState}
+      />
       <div className={style.data}>
-        <button className={style.btn} onClick={onOpenDataManager}>
+        <Button className={style.btn} onClick={onOpenDataManager}>
           <FontIcon icon="open-new-tab" className={style.icon} />
           <span>Open data manager</span>
-        </button>
-        <button
+        </Button>
+        <Button
           className={style.btn}
           disabled={!importFromAccountEnabled}
-          onClick={onImportFromAccountClick}
+          onClick={openImportFromAccountConfirm}
         >
           <FontIcon icon="person-import" className={style.icon} />
           <span>Import from Mapgenie account</span>
-        </button>
-        <button
+        </Button>
+        <Button
           className={style.btn}
           id={style.clearGame}
           disabled={!clearGameEnabled}
-          onClick={onClearGameClick}
+          onClick={openClearGameConfirm}
         >
           <FontIcon icon="trash" className={style.icon} />
           <span>Clear current game</span>
-        </button>
-        <button
+        </Button>
+        <Button
           className={style.btn}
           id={style.clearMap}
           disabled={!clearMapEnabled}
-          onClick={onClearMapClick}
+          onClick={openClearMapConfirm}
         >
           <FontIcon icon="trash" className={style.icon} />
           <span>Clear current map</span>
-        </button>
+        </Button>
       </div>
     </Loading>
   );

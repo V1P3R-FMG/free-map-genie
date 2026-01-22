@@ -1,0 +1,22 @@
+.checkbox {
+  position: relative;
+  border: 1px solid var(--border);
+  background: var(--background-darker);
+  margin: 7px;
+  width: 16px;
+  height: 16px;
+  border-radius: 3px;
+
+  .input {
+    position: absolute;
+    width: 0;
+    height: 0;
+  }
+
+  .icon {
+    color: var(--color);
+    display: block;
+    font-size: 0.75rem;
+    transform: translateY(-1px);
+  }
+}

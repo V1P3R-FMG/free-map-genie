@@ -1,0 +1,38 @@
+.btn {
+  color: var(--color);
+  background: var(--item);
+  border: 1px solid var(--border);
+  width: 100%;
+  border-radius: 8px;
+  border: none;
+  padding: 1rem;
+  cursor: pointer;
+
+  &:hover {
+    background: var(--item-hover);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+  }
+
+  &[data-type="cancel"] {
+    color: var(--item-red-color);
+    background: var(--item-red);
+    border: 1px solid var(--item-red-border);
+
+    &:hover {
+      background: var(--item-red-hover);
+    }
+  }
+
+  &[data-type="confirm"] {
+    color: var(--item-green-color);
+    background: var(--item-green);
+    border: 1px solid var(--item-green-border);
+
+    &:hover {
+      background: var(--item-green-hover);
+    }
+  }
+}

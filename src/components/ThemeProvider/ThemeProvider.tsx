@@ -1,6 +1,8 @@
 import "./themes/dark.css";
 import "./themes/light.css";
 
+import "./ThemeProvider.css";
+
 export const ThemeProvider = (props: ThemeProvider.Props) => {
   return (
     // Fallback to dark theme if selected theme is not available
