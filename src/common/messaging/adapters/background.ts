@@ -21,6 +21,12 @@ export default class BackgroundAdapter extends Adapter {
   public constructor() {
     super();
 
+    setupOneWayBridge({
+      name: "background",
+      from: this,
+      to: this,
+    });
+
     browser.runtime.onConnect.addListener(this.onConnect);
   }
 
@@ -48,12 +54,6 @@ export default class BackgroundAdapter extends Adapter {
       message.tab ??= tab;
 
       this.callbacks.forEach((cb) => cb(message));
-    });
-
-    setupOneWayBridge({
-      name: "background",
-      from: this,
-      to: this,
     });
 
     port.onDisconnect.addListener(() => {
