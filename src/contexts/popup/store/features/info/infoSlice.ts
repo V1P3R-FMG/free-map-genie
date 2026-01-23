@@ -1,6 +1,5 @@
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-
-import type { RootState } from "@/contexts/popup/store";
+import { createSlice } from "@reduxjs/toolkit";
+import { createAppAsyncThunk } from "../../typed";
 
 export interface InfoState {
   data: Record<string, any>;
@@ -12,14 +11,10 @@ const initialState: InfoState = {
   loading: true,
 };
 
-export const getInfoAsync = createAsyncThunk<Record<string, any>, void>(
+export const getInfoAsync = createAppAsyncThunk<Record<string, any>, void>(
   "info/getInfo",
-  async (_, { getState }) => {
-    const state = getState() as RootState;
-
-    const info = await state.services.page.getInfo();
-
-    return info;
+  async (_, { extra: { services } }) => {
+    return services.page.getInfo();
   }
 );
 
@@ -28,24 +23,28 @@ export const infoSlice = createSlice({
   initialState,
   reducers: {},
   extraReducers: (builder) => {
-    builder.addCase(getInfoAsync.pending, (state) => {
-      state.loading = true;
-    });
-    builder.addCase(getInfoAsync.fulfilled, (state, action) => {
-      state.data = action.payload;
-      state.loading = false;
-    });
-    builder.addCase(getInfoAsync.rejected, (state, action) => {
-      state.data = {};
-      state.loading = false;
-      logger.error("Failed to get info", action.error);
-    });
+    builder
+      .addCase(getInfoAsync.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(getInfoAsync.fulfilled, (state, action) => {
+        state.data = action.payload;
+        state.loading = false;
+      })
+      .addCase(getInfoAsync.rejected, (state, action) => {
+        state.data = {};
+        state.loading = false;
+        logger.error("Failed to get info", action.error);
+      });
+  },
+  selectors: {
+    selectInfo: (state) => state.data,
+    selectInfoLoading: (state) => state.loading,
   },
 });
 
 export const {} = infoSlice.actions;
 
-export const selectInfo = (state: RootState) => state.info.data;
-export const selectInfoLoading = (state: RootState) => state.info.loading;
+export const { selectInfo, selectInfoLoading } = infoSlice.selectors;
 
 export default infoSlice.reducer;

@@ -1,7 +1,6 @@
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import { createSlice } from "@reduxjs/toolkit";
 import { compareVersions, displayVersion } from "@/common/version";
-
-import type { RootState } from "@/contexts/popup/store";
+import { createAppAsyncThunk } from "../../typed";
 
 export interface AppState {
   version: string;
@@ -32,29 +31,24 @@ const initialState: AppState = {
   enabled: true,
 };
 
-export const fetchIsAppEnabledAsync = createAsyncThunk<boolean>(
+export const fetchIsAppEnabledAsync = createAppAsyncThunk<boolean>(
   "app/fetchIsAppEnabled",
-  async (_, { getState }) => {
-    const state = getState() as RootState;
-
-    return state.services.background.getExtensionEnabled();
+  async (_, { extra: { services } }) => {
+    return services.background.getExtensionEnabled();
   }
 );
 
-export const setIsAppEnabledAsync = createAsyncThunk<void, boolean>(
+export const setIsAppEnabledAsync = createAppAsyncThunk<void, boolean>(
   "app/setIsAppEnabled",
-  async (enabled, { getState }) => {
-    const state = getState() as RootState;
-
-    return state.services.background.setExtensionEnabled(enabled);
+  async (enabled, { extra: { services } }) => {
+    return services.background.setExtensionEnabled(enabled);
   }
 );
 
-export const fetchLatestVersionAsync = createAsyncThunk<string>(
+export const fetchLatestVersionAsync = createAppAsyncThunk<string>(
   "app/fetchLatestVersion",
   async (_, { getState }) => {
-    const state = getState() as RootState;
-    const homepage = state.app.homepage;
+    const homepage = selectAppHomepage(getState());
 
     const url = new URL("https://raw.githubusercontent.com");
     url.pathname = new URL(homepage).pathname + "/main/package.json";
@@ -66,23 +60,21 @@ export const fetchLatestVersionAsync = createAsyncThunk<string>(
   }
 );
 
-export const reloadActiveTabAsync = createAsyncThunk<void>(
+export const reloadActiveTabAsync = createAppAsyncThunk<void>(
   "app/reloadActiveTab",
-  async (_, { getState }) => {
-    const state = getState() as RootState;
-    await state.services.background.reloadActiveTab();
+  async (_, { extra: { services } }) => {
+    await services.background.reloadActiveTab();
   }
 );
 
-export const updateConnectedStatusAsync = createAsyncThunk(
+export const updateConnectedStatusAsync = createAppAsyncThunk(
   "app/fetchConnectedStatus",
-  async (_, { getState }) => {
-    const state = getState() as RootState;
-    await state.services.page.ping();
+  async (_, { extra: { services } }) => {
+    await services.page.ping();
   }
 );
 
-export const injectIconFontAsync = createAsyncThunk(
+export const injectIconFontAsync = createAppAsyncThunk(
   "app/injectIconFont",
   async (_) => {
     await injectStyle("/assets/fmg-icons.css");
@@ -94,54 +86,68 @@ export const appSlice = createSlice({
   initialState,
   reducers: {},
   extraReducers: (builder) => {
-    builder.addCase(fetchIsAppEnabledAsync.fulfilled, (state, action) => {
-      state.enabled = action.payload;
-    });
-    builder.addCase(fetchIsAppEnabledAsync.rejected, (state, action) => {
-      logger.error("Failed to get is extension enabled status", action.error);
-    });
-    builder.addCase(setIsAppEnabledAsync.fulfilled, (state, action) => {
-      state.enabled = !state.enabled;
-    });
-    builder.addCase(setIsAppEnabledAsync.rejected, (state, action) => {
-      logger.error("Failed to set is extension enabled status", action.error);
-    });
-    builder.addCase(fetchLatestVersionAsync.fulfilled, (state, action) => {
-      state.latest = action.payload;
-      state.needsUpdate = compareVersions(state.latest, state.version) > 0;
-    });
-    builder.addCase(fetchLatestVersionAsync.rejected, (state, action) => {
-      logger.error("Failed to fetch latest version", action.error);
-    });
-    builder.addCase(updateConnectedStatusAsync.fulfilled, (state, action) => {
-      state.connected = true;
-    });
-    builder.addCase(updateConnectedStatusAsync.rejected, (state, action) => {
-      state.connected = false;
-      logger.error("Failed to update connected status", action.error);
-    });
-    builder.addCase(injectIconFontAsync.fulfilled, (state) => {
-      state.loading = false;
-    });
-    builder.addCase(injectIconFontAsync.rejected, (state, action) => {
-      state.loading = false;
-      logger.error("Failed to inject icon font", action.error);
-    });
+    builder
+      .addCase(fetchIsAppEnabledAsync.fulfilled, (state, action) => {
+        state.enabled = action.payload;
+      })
+      .addCase(fetchIsAppEnabledAsync.rejected, (state, action) => {
+        logger.error("Failed to get is extension enabled status", action.error);
+      })
+      .addCase(setIsAppEnabledAsync.fulfilled, (state, action) => {
+        state.enabled = !state.enabled;
+      })
+      .addCase(setIsAppEnabledAsync.rejected, (state, action) => {
+        logger.error("Failed to set is extension enabled status", action.error);
+      })
+      .addCase(fetchLatestVersionAsync.fulfilled, (state, action) => {
+        state.latest = action.payload;
+        state.needsUpdate = compareVersions(state.latest, state.version) > 0;
+      })
+      .addCase(fetchLatestVersionAsync.rejected, (state, action) => {
+        logger.error("Failed to fetch latest version", action.error);
+      })
+      .addCase(updateConnectedStatusAsync.fulfilled, (state, action) => {
+        state.connected = true;
+      })
+      .addCase(updateConnectedStatusAsync.rejected, (state, action) => {
+        state.connected = false;
+        logger.error("Failed to update connected status", action.error);
+      })
+      .addCase(injectIconFontAsync.fulfilled, (state) => {
+        state.loading = false;
+      })
+      .addCase(injectIconFontAsync.rejected, (state, action) => {
+        state.loading = false;
+        logger.error("Failed to inject icon font", action.error);
+      });
+  },
+  selectors: {
+    selectAppEnabled: (state) => state.enabled,
+    selectAppVersion: (state) => state.version,
+    selectAppLatestVersion: (state) => state.latest,
+    selectAppDisplayVersion: (state) => state.displayVersion,
+    selectAppIsDevBuild: (state) => state.isDevBuild,
+    selectAppNeedsUpdate: (state) => state.needsUpdate,
+    selectAppAuthor: (state) => state.author,
+    selectAppHomepage: (state) => state.homepage,
+    selectAppConnected: (state) => state.connected,
+    selectAppLoading: (state) => state.loading,
   },
 });
 
 export const {} = appSlice.actions;
 
-export const selectAppEnabled = (state: RootState) => state.app.enabled;
-export const selectAppVersion = (state: RootState) => state.app.version;
-export const selectAppLatestVersion = (state: RootState) => state.app.latest;
-export const selectAppDisplayVersion = (state: RootState) =>
-  state.app.displayVersion;
-export const selectAppIsDevBuild = (state: RootState) => state.app.isDevBuild;
-export const selectAppNeedsUpdate = (state: RootState) => state.app.needsUpdate;
-export const selectAppAuthor = (state: RootState) => state.app.author;
-export const selectAppHomepage = (state: RootState) => state.app.homepage;
-export const selectAppConnected = (state: RootState) => state.app.connected;
-export const selectAppLoading = (state: RootState) => state.app.loading;
+export const {
+  selectAppEnabled,
+  selectAppVersion,
+  selectAppLatestVersion,
+  selectAppDisplayVersion,
+  selectAppIsDevBuild,
+  selectAppNeedsUpdate,
+  selectAppAuthor,
+  selectAppHomepage,
+  selectAppConnected,
+  selectAppLoading,
+} = appSlice.selectors;
 
 export default appSlice.reducer;

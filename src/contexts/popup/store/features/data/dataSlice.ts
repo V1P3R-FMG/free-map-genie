@@ -1,68 +1,62 @@
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import { createSlice } from "@reduxjs/toolkit";
+import { createAppAsyncThunk } from "../../typed";
 
-import type { RootState } from "@/contexts/popup/store";
 import type { PageType } from "@/common/mapgenie";
 
-export interface InfoState {
+export interface DataState {
   busy: boolean;
   loggedIn: boolean;
   pageType: PageType;
 }
 
-const initialState: InfoState = {
+const initialState: DataState = {
   busy: false,
   loggedIn: false,
   pageType: "unknown",
 };
 
-export const fetchLoggedInStatusAsync = createAsyncThunk<boolean, void>(
+export const fetchLoggedInStatusAsync = createAppAsyncThunk<boolean, void>(
   "data/fetchLoggedInStatus",
-  async (_, { getState }) => {
-    const state = getState() as RootState;
-    return state.services.backend.isLoggedIn();
+  async (_, { extra: { services } }) => {
+    return services.backend.isLoggedIn();
   }
 );
 
-export const fetchPageTypeAsync = createAsyncThunk<PageType, void>(
+export const fetchPageTypeAsync = createAppAsyncThunk<PageType, void>(
   "data/fetchPageType",
-  async (_, { getState }) => {
-    const state = getState() as RootState;
-    return state.services.page.getPageType();
+  async (_, { extra: { services } }) => {
+    return services.page.getPageType();
   }
 );
 
-export const openDataManagerAsync = createAsyncThunk<void, void>(
+export const openDataManagerAsync = createAppAsyncThunk<void, void>(
   "data/openDataManager",
-  async (_, { getState }) => {
-    const state = getState() as RootState;
-    await state.services.background.openDataManager();
+  async (_, { extra: { services } }) => {
+    await services.background.openDataManager();
   }
 );
 
-export const importFromMapgenieAccountAsync = createAsyncThunk<void, void>(
+export const importFromMapgenieAccountAsync = createAppAsyncThunk<void, void>(
   "data/importFromMapgenieAccount",
-  async (_, { getState }) => {
-    const state = getState() as RootState;
-    await state.services.client.importFromMapgenieAccount();
-    await state.services.background.reloadActiveTab();
+  async (_, { extra: { services } }) => {
+    await services.client.importFromMapgenieAccount();
+    await services.background.reloadActiveTab();
   }
 );
 
-export const clearMapDataAsync = createAsyncThunk<void, void>(
+export const clearMapDataAsync = createAppAsyncThunk<void, void>(
   "data/clearMapData",
-  async (_, { getState }) => {
-    const state = getState() as RootState;
-    await state.services.client.clearMap();
-    await state.services.background.reloadActiveTab();
+  async (_, { extra: { services } }) => {
+    await services.client.clearMap();
+    await services.background.reloadActiveTab();
   }
 );
 
-export const clearGameDataAsync = createAsyncThunk<void, void>(
+export const clearGameDataAsync = createAppAsyncThunk<void, void>(
   "data/clearGameData",
-  async (_, { getState }) => {
-    const state = getState() as RootState;
-    await state.services.client.clearGame();
-    await state.services.background.reloadActiveTab();
+  async (_, { extra: { services } }) => {
+    await services.client.clearGame();
+    await services.background.reloadActiveTab();
   }
 );
 
@@ -115,12 +109,15 @@ export const infoSlice = createSlice({
         logger.error("Failed to clear game data");
       });
   },
+  selectors: {
+    isBusy: (state) => state.busy,
+    isLoggedIn: (state) => state.loggedIn,
+    getPageType: (state) => state.pageType,
+  },
 });
 
 export const {} = infoSlice.actions;
 
-export const isBusy = (state: RootState) => state.data.busy;
-export const isLoggedIn = (state: RootState) => state.data.loggedIn;
-export const getPageType = (state: RootState) => state.data.pageType;
+export const { isBusy, isLoggedIn, getPageType } = infoSlice.selectors;
 
 export default infoSlice.reducer;

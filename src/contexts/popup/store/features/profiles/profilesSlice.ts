@@ -1,7 +1,6 @@
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { getInfoAsync } from "../info/infoSlice";
+import { createSlice } from "@reduxjs/toolkit";
+import { createAppAsyncThunk } from "../../typed";
 
-import type { RootState } from "@/contexts/popup/store";
 import type { Profile as ProfileInfo } from "@/common/profile";
 
 export type { ProfileInfo };
@@ -16,39 +15,32 @@ const initialState: ProfilesState = {
   loading: true,
 };
 
-export const getProfilesAsync = createAsyncThunk<ProfileInfo[], void>(
+export const getProfilesAsync = createAppAsyncThunk<ProfileInfo[], void>(
   "profiles/getProfiles",
-  async (_, { getState }) => {
-    const state = getState() as RootState;
-    const profiles = await state.services.backend.getProfiles();
-    return profiles;
+  async (_, { extra: { services } }) => {
+    return services.backend.getProfiles();
   }
 );
 
-export const addGuestProfileAsync = createAsyncThunk<
+export const addGuestProfileAsync = createAppAsyncThunk<
   ProfileInfo | undefined,
   void
->("profiles/addGuestProfile", async (_, { getState }) => {
-  const state = getState() as RootState;
-  const newProfile = await state.services.backend.addGuestProfile();
-  return newProfile;
+>("profiles/addGuestProfile", async (_, { extra: { services } }) => {
+  return services.backend.addGuestProfile();
 });
 
-export const deleteGuestProfileAsync = createAsyncThunk<
+export const deleteGuestProfileAsync = createAppAsyncThunk<
   ProfileInfo[] | undefined,
   void
->("profiles/deleteGuestProfile", async (_, { getState }) => {
-  const state = getState() as RootState;
-  const profiles = await state.services.backend.deleteGuestProfile();
-  return profiles;
+>("profiles/deleteGuestProfile", async (_, { extra: { services } }) => {
+  return services.backend.deleteGuestProfile();
 });
 
-export const activateProfileAsync = createAsyncThunk<number, number>(
+export const activateProfileAsync = createAppAsyncThunk<number, number>(
   "profiles/activateProfile",
-  async (profileId, { getState }) => {
-    const state = getState() as RootState;
-    await state.services.backend.activateProfile(profileId);
-    await state.services.background.reloadActiveTab();
+  async (profileId, { extra: { services } }) => {
+    await services.backend.activateProfile(profileId);
+    await services.background.reloadActiveTab();
     return profileId;
   }
 );
@@ -58,51 +50,55 @@ export const profilesSlice = createSlice({
   initialState,
   reducers: {},
   extraReducers: (builder) => {
-    builder.addCase(getProfilesAsync.pending, (state) => {
-      state.loading = true;
-    });
-    builder.addCase(getProfilesAsync.fulfilled, (state, action) => {
-      state.list = action.payload;
-      state.loading = false;
-    });
-    builder.addCase(getProfilesAsync.rejected, (state) => {
-      state.list = [];
-      state.loading = false;
-    });
-    builder.addCase(addGuestProfileAsync.fulfilled, (state, action) => {
-      if (action.payload === undefined) {
-        return;
-      }
-      state.list.push(action.payload);
-    });
-    builder.addCase(addGuestProfileAsync.rejected, (state, action) => {
-      logger.error("Failed to add profile:", action.error);
-    });
-    builder.addCase(deleteGuestProfileAsync.fulfilled, (state, action) => {
-      if (action.payload === undefined) {
-        return;
-      }
-      state.list = action.payload;
-    });
-    builder.addCase(deleteGuestProfileAsync.rejected, (state, action) => {
-      logger.error("Failed to delete profile:", action.error);
-    });
-    builder.addCase(activateProfileAsync.fulfilled, (state, action) => {
-      state.list = state.list.map((profile) => ({
-        ...profile,
-        active: profile.id === action.payload,
-      }));
-    });
-    builder.addCase(activateProfileAsync.rejected, (state, action) => {
-      logger.error("Failed to activate profile:", action.error);
-    });
+    builder
+      .addCase(getProfilesAsync.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(getProfilesAsync.fulfilled, (state, action) => {
+        state.list = action.payload;
+        state.loading = false;
+      })
+      .addCase(getProfilesAsync.rejected, (state) => {
+        state.list = [];
+        state.loading = false;
+      })
+      .addCase(addGuestProfileAsync.fulfilled, (state, action) => {
+        if (action.payload === undefined) {
+          return;
+        }
+        state.list.push(action.payload);
+      })
+      .addCase(addGuestProfileAsync.rejected, (state, action) => {
+        logger.error("Failed to add profile:", action.error);
+      })
+      .addCase(deleteGuestProfileAsync.fulfilled, (state, action) => {
+        if (action.payload === undefined) {
+          return;
+        }
+        state.list = action.payload;
+      })
+      .addCase(deleteGuestProfileAsync.rejected, (state, action) => {
+        logger.error("Failed to delete profile:", action.error);
+      })
+      .addCase(activateProfileAsync.fulfilled, (state, action) => {
+        state.list = state.list.map((profile) => ({
+          ...profile,
+          active: profile.id === action.payload,
+        }));
+      })
+      .addCase(activateProfileAsync.rejected, (state, action) => {
+        logger.error("Failed to activate profile:", action.error);
+      });
+  },
+  selectors: {
+    selectProfiles: (state) => state.list,
+    selectProfilesLoading: (state) => state.loading,
   },
 });
 
 export const {} = profilesSlice.actions;
 
-export const selectProfiles = (state: RootState) => state.profiles.list;
-export const selectProfilesLoading = (state: RootState) =>
-  state.profiles.loading;
+export const { selectProfiles, selectProfilesLoading } =
+  profilesSlice.selectors;
 
 export default profilesSlice.reducer;

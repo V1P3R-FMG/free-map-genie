@@ -1,7 +1,7 @@
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import { createSlice } from "@reduxjs/toolkit";
+import { createAppAsyncThunk } from "../../typed";
 
 import type { Bookmark as BookmarkInfo } from "@/common/bookmark";
-import type { RootState } from "@/contexts/popup/store";
 
 export { BookmarkInfo };
 
@@ -17,34 +17,27 @@ const initialState: BookmarksState = {
   loading: true,
 };
 
-export const addBookmarkAsync = createAsyncThunk<BookmarkInfo, void>(
+export const addBookmarkAsync = createAppAsyncThunk<BookmarkInfo, void>(
   "bookmarks/addBookmark",
-  async (_, { getState }) => {
-    const state = getState() as RootState;
-
-    const bookmark = await state.services.page.createBookmark();
-    await state.services.backend.addBookmark(bookmark);
+  async (_, { extra: { services } }) => {
+    const bookmark = await services.page.createBookmark();
+    await services.backend.addBookmark(bookmark);
 
     return bookmark;
   }
 );
 
-export const removeBookmarkAsync = createAsyncThunk<void, string>(
+export const removeBookmarkAsync = createAppAsyncThunk<void, string>(
   "bookmarks/removeBookmark",
-  async (url, { getState }) => {
-    const state = getState() as RootState;
-    await state.services.backend.deleteBookmark(url);
+  async (url, { extra: { services } }) => {
+    await services.backend.deleteBookmark(url);
   }
 );
 
-export const loadBookmarksAsync = createAsyncThunk<BookmarkInfo[], void>(
+export const loadBookmarksAsync = createAppAsyncThunk<BookmarkInfo[], void>(
   "bookmarks/loadBookmarks",
-  async (_, { getState }) => {
-    const state = getState() as RootState;
-
-    const bookmarks = await state.services.backend.getBookmarks();
-
-    return bookmarks;
+  async (_, { extra: { services } }) => {
+    return services.backend.getBookmarks();
   }
 );
 
@@ -66,40 +59,43 @@ export const bookmarksSlice = createSlice({
     },
   },
   extraReducers: (builder) => {
-    builder.addCase(addBookmarkAsync.fulfilled, (state, action) => {
-      state.list.push(action.payload);
-    });
-    builder.addCase(addBookmarkAsync.rejected, (state, action) => {
-      logger.error("Failed to add bookmark", action.error);
-    });
-    builder.addCase(removeBookmarkAsync.fulfilled, (state, action) => {
-      state.list = state.list.filter(
-        (bookmark) => bookmark.url !== action.meta.arg
-      );
-    });
-    builder.addCase(removeBookmarkAsync.rejected, (state, action) => {
-      logger.error("Failed to remove bookmark", action.error);
-    });
-    builder.addCase(loadBookmarksAsync.pending, (state) => {
-      state.loading = true;
-    });
-    builder.addCase(loadBookmarksAsync.fulfilled, (state, action) => {
-      state.list = action.payload;
-      state.loading = false;
-    });
-    builder.addCase(loadBookmarksAsync.rejected, (state, action) => {
-      state.loading = false;
-      logger.error("Failed to load bookmarks", action.error);
-    });
+    builder
+      .addCase(addBookmarkAsync.fulfilled, (state, action) => {
+        state.list.push(action.payload);
+      })
+      .addCase(addBookmarkAsync.rejected, (state, action) => {
+        logger.error("Failed to add bookmark", action.error);
+      })
+      .addCase(removeBookmarkAsync.fulfilled, (state, action) => {
+        state.list = state.list.filter(
+          (bookmark) => bookmark.url !== action.meta.arg
+        );
+      })
+      .addCase(removeBookmarkAsync.rejected, (state, action) => {
+        logger.error("Failed to remove bookmark", action.error);
+      })
+      .addCase(loadBookmarksAsync.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(loadBookmarksAsync.fulfilled, (state, action) => {
+        state.list = action.payload;
+        state.loading = false;
+      })
+      .addCase(loadBookmarksAsync.rejected, (state, action) => {
+        state.loading = false;
+        logger.error("Failed to load bookmarks", action.error);
+      });
+  },
+  selectors: {
+    selectBookmarks: (state) => state.list,
+    selectBookmarkTitle: (state) => Object.keys(state.title)[0] || "",
+    selectBookmarksLoading: (state) => state.loading,
   },
 });
 
 export const { removeBookmarkTitle, setBookmarkTitle } = bookmarksSlice.actions;
 
-export const selectBookmarks = (state: RootState) => state.bookmarks.list;
-export const selectBookmarkTitle = (state: RootState) =>
-  Object.keys(state.bookmarks.title)[0] || "";
-export const selectBookmarksLoading = (state: RootState) =>
-  state.bookmarks.loading;
+export const { selectBookmarks, selectBookmarkTitle, selectBookmarksLoading } =
+  bookmarksSlice.selectors;
 
 export default bookmarksSlice.reducer;
