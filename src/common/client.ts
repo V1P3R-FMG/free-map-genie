@@ -165,8 +165,19 @@ export class Client {
   }
 
   public async clearMap() {
+    if (!this.isLoggedIn) {
+      throw new Error("Client is not logged in");
+    }
     const locations = window.mapData!.locations.map((loc) => loc.id);
     await this.backend.clearLocations(locations);
+  }
+
+  public async dumpGame() {
+    if (!this.isLoggedIn) {
+      throw new Error("Client is not logged in");
+    }
+    const games = await this.backend.dumpGame(this.key);
+    return { userId: this.key.userId, games };
   }
 
   public on<K extends keyof Client.EventMap>(

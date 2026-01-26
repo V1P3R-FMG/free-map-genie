@@ -1,21 +1,9 @@
 import { Version } from "./version";
 import { V2MigratorHelper } from "./helpers/v2MigratorHelper";
 
+import type { LocalV2Data } from "./v2.schema";
 import type { Driver } from "../drivers/driver";
 import type { Key } from "../../../key";
-
-export interface LocalV2MapData {
-  locationIds?: number[];
-  categoryIds?: number[];
-  visibleCategoriesIds?: number[];
-  notes?: MG.Note[];
-  presets?: MG.Preset[];
-  presetOrder?: number[];
-}
-
-export interface LocalV2Data {
-  [mapId: string]: LocalV2MapData;
-}
 
 export class V2 implements Version<LocalV2Data> {
   public constructor(private readonly driver: Driver) {}

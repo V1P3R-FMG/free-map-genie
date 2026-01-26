@@ -49,11 +49,7 @@
   .btn {
     width: 100%;
     display: flex;
-    align-items: center;
-    justify-content: start;
     gap: 10px;
-    color: var(--color);
-    border: 1px solid var(--item-border);
 
     .icon {
       font-size: 1rem;
@@ -62,17 +58,6 @@
     &[disabled] {
       opacity: 0.5;
       pointer-events: none;
-    }
-  }
-
-  #clear-game,
-  #clear-map {
-    background-color: var(--item-red);
-    border: 1px solid var(--item-red-border);
-    color: var(--item-red-color);
-
-    &:hover {
-      background-color: var(--item-red-hover);
     }
   }
 }

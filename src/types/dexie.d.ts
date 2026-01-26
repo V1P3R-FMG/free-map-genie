@@ -1,3 +1,5 @@
+import { Table } from "dexie";
+
 module "dexie" {
   export * from "dexie";
 
@@ -16,6 +18,9 @@ module "dexie" {
       scope: (trans: TXWithTables<this>) => PromiseLike<U> | U
     ): PromiseExtended<U>;
   }
+
+  export type TableEntity<T extends Table> =
+    T extends Table<infer E, any, any> ? E : never;
 
   export default Dexie;
 }

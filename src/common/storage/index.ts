@@ -34,6 +34,18 @@ export class Storage {
     return this.dexie.getData(key);
   }
 
+  public async dumpUser(userId: number) {
+    return this.dexie.dumpUser(userId);
+  }
+
+  public async dumpGame(key: Key) {
+    return this.dexie.dumpGame(key);
+  }
+
+  public async import(userId: number, games: Record<Id, UserData>) {
+    return this.dexie.import(userId, games);
+  }
+
   public async setData(key: Key, data: UserData) {
     return this.dexie.setData(key, data);
   }

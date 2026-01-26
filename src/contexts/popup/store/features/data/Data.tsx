@@ -6,10 +6,13 @@ import {
   importFromMapgenieAccountAsync,
   clearMapDataAsync,
   clearGameDataAsync,
+  exportUserDataAsync,
+  exportGameDataAsync,
   isBusy,
   isLoggedIn,
   getPageType,
 } from "./dataSlice";
+import { DataAction } from "./DataAction";
 
 import style from "./Data.module.scss";
 
@@ -23,22 +26,10 @@ export const Data = ({}: Data.Props) => {
   const isGuide = pageType === "guide";
 
   const importFromAccountEnabled = loggedIn && (isGuide || isMap);
+  const exportUserEnabled = loggedIn;
+  const exportGameEnabled = loggedIn && (isGuide || isMap);
   const clearMapEnabled = loggedIn && isMap;
   const clearGameEnabled = loggedIn && (isGuide || isMap);
-
-  const {
-    state: importFromAccountConfirmState,
-    open: openImportFromAccountConfirm,
-  } = useConfirm(
-    (accepted) => accepted && dispatch(importFromMapgenieAccountAsync())
-  );
-
-  const { state: clearMapConfirmState, open: openClearMapConfirm } = useConfirm(
-    (accepted) => accepted && dispatch(clearMapDataAsync())
-  );
-
-  const { state: clearGameConfirmState, open: openClearGameConfirm } =
-    useConfirm((accepted) => accepted && dispatch(clearGameDataAsync()));
 
   React.useEffect(() => {
     dispatch(fetchLoggedInStatusAsync());
@@ -51,49 +42,52 @@ export const Data = ({}: Data.Props) => {
 
   return (
     <Loading loading={busy} overlay spinnerSize="2rem">
-      <Confirm
-        message="Import data from your Mapgenie account? This will overwrite your current game data."
-        {...importFromAccountConfirmState}
-      />
-      <Confirm
-        message="Clear all locations for the current map? This action cannot be undone."
-        {...clearMapConfirmState}
-      />
-      <Confirm
-        message="Clear all data for the current game? This action cannot be undone."
-        {...clearGameConfirmState}
-      />
       <div className={style.data}>
-        <Button className={style.btn} onClick={onOpenDataManager}>
+        <Button
+          className={style.btn}
+          onClick={onOpenDataManager}
+          disabled={!loggedIn}
+        >
           <FontIcon icon="open-new-tab" className={style.icon} />
           <span>Open data manager</span>
         </Button>
-        <Button
-          className={style.btn}
+        <DataAction
+          message="Import data from your Mapgenie account? This will overwrite your current game data."
+          text="Import from Mapgenie account"
+          icon="person-import"
+          action={importFromMapgenieAccountAsync}
           disabled={!importFromAccountEnabled}
-          onClick={openImportFromAccountConfirm}
-        >
-          <FontIcon icon="person-import" className={style.icon} />
-          <span>Import from Mapgenie account</span>
-        </Button>
-        <Button
-          className={style.btn}
-          id={style.clearGame}
-          disabled={!clearGameEnabled}
-          onClick={openClearGameConfirm}
-        >
-          <FontIcon icon="trash" className={style.icon} />
-          <span>Clear current game</span>
-        </Button>
-        <Button
-          className={style.btn}
-          id={style.clearMap}
+        />
+        <DataAction
+          message="Export all games for the current user?"
+          text="Export all games"
+          icon="download"
+          action={exportUserDataAsync}
+          disabled={!exportUserEnabled}
+        />
+        <DataAction
+          message="Export data for the current game?"
+          text="Export current game"
+          icon="download"
+          action={exportGameDataAsync}
+          disabled={!exportGameEnabled}
+        />
+        <DataAction
+          message="Clear all locations for the current map? This action cannot be undone."
+          text="Clear current map"
+          type="cancel"
+          icon="trash"
+          action={clearMapDataAsync}
           disabled={!clearMapEnabled}
-          onClick={openClearMapConfirm}
-        >
-          <FontIcon icon="trash" className={style.icon} />
-          <span>Clear current map</span>
-        </Button>
+        />
+        <DataAction
+          message="Clear all data for the current game? This action cannot be undone."
+          text="Clear current game"
+          type="cancel"
+          icon="trash"
+          action={clearGameDataAsync}
+          disabled={!clearGameEnabled}
+        />
       </div>
     </Loading>
   );

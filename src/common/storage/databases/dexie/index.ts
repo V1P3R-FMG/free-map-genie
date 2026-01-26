@@ -1,4 +1,9 @@
-import Dexie, { type Table, type CollectionForTable, Collection } from "dexie";
+import Dexie, {
+  type Table,
+  type CollectionForTable,
+  type Collection,
+  type TableEntity,
+} from "dexie";
 import { nanoid } from "nanoid";
 
 import async from "@/common/async";
@@ -10,7 +15,15 @@ import type { Database } from "../database";
 import type { Stores } from "./stores";
 import type { IdIndex } from "./indexes";
 import type { UserData } from "../../format";
-import type { ProfileV1, AsProfile } from "./versions/v1";
+import type {
+  ProfileV1,
+  AsProfile,
+  LocationsTableV1,
+  TrackedCategoriesTableV1,
+  PresetsTableV1,
+  PresetsOrderingTableV1,
+  NotesTableV1,
+} from "./versions/v1";
 
 // fmg@v3
 export class DexieDatabase implements Database {
@@ -20,11 +33,11 @@ export class DexieDatabase implements Database {
     this.db = new Dexie("fmg:database") as Dexie & Stores;
 
     this.db.version(1).stores({
-      locations: "id, [game_id+user_id]",
-      trackedCategories: "id, [game_id+user_id]",
-      presets: "++id, [game_id+user_id]",
-      presetsOrdering: "id, order, [game_id+user_id]",
-      notes: "[id+user_id], [map_id+user_id], [game_id+user_id]",
+      locations: "id, [game_id+user_id], user_id",
+      trackedCategories: "id, [game_id+user_id], user_id",
+      presets: "++id, [game_id+user_id], user_id",
+      presetsOrdering: "id, order, [game_id+user_id], user_id",
+      notes: "[id+user_id], [map_id+user_id], [game_id+user_id], user_id",
       bookmarks: "url, title, createdAt",
       profiles: "id, name, active",
     });
@@ -92,7 +105,7 @@ export class DexieDatabase implements Database {
       this.db.presetsOrdering,
       this.db.notes,
       async () => {
-        await Promise.allSettled([
+        await Promise.all([
           this.locations(key).delete(),
           this.trackedCategories(key).delete(),
           this.presets(key).delete(),
@@ -211,6 +224,7 @@ export class DexieDatabase implements Database {
         ...note,
         game_id: key.gameId,
         user_id: key.userId,
+        created_at: new Date().toISOString(),
         id,
       })
       .then(([_userId, id]) => ({
@@ -488,5 +502,137 @@ export class DexieDatabase implements Database {
 
       return this.getProfiles();
     });
+  }
+
+  private asPreset(preset: TableEntity<PresetsTableV1>) {
+    return {
+      id: preset.id!,
+      title: preset.title,
+      order: preset.order,
+      categories: [],
+    } as MG.Preset;
+  }
+
+  private asNote(note: TableEntity<NotesTableV1>) {
+    return {
+      id: note.id,
+      title: note.title,
+      description: note.description,
+      color: note.color,
+      latitude: note.latitude,
+      longitude: note.longitude,
+      category: note.category,
+      user_id: note.user_id,
+      map_id: note.map_id,
+    } as MG.Note;
+  }
+
+  private async getAllForUser(userId: number): Promise<{
+    locations: TableEntity<LocationsTableV1>[];
+    trackedCategories: TableEntity<TrackedCategoriesTableV1>[];
+    presets: TableEntity<PresetsTableV1>[];
+    presetsOrdering: TableEntity<PresetsOrderingTableV1>[];
+    notes: TableEntity<NotesTableV1>[];
+  }> {
+    return this.db.transaction(
+      "r",
+      this.db.locations,
+      this.db.trackedCategories,
+      this.db.presets,
+      this.db.presetsOrdering,
+      this.db.notes,
+      async () => {
+        const [locations, trackedCategories, presets, presetsOrdering, notes] =
+          await Promise.all([
+            this.db.locations.where("user_id").equals(userId).toArray(),
+            this.db.trackedCategories.where("user_id").equals(userId).toArray(),
+            this.db.presets.where("user_id").equals(userId).toArray(),
+            this.db.presetsOrdering.where("user_id").equals(userId).toArray(),
+            this.db.notes.where("user_id").equals(userId).toArray(),
+          ]);
+
+        return {
+          locations,
+          trackedCategories,
+          presets,
+          presetsOrdering,
+          notes,
+        };
+      }
+    );
+  }
+
+  public async import(userId: number, games: Record<Id, UserData>) {
+    return this.db.transaction(
+      "rw",
+      this.db.locations,
+      this.db.trackedCategories,
+      this.db.presets,
+      this.db.presetsOrdering,
+      this.db.notes,
+      async () => {
+        for (const [gameId, data] of Object.entries(games)) {
+          const key = {
+            gameId: Number(gameId),
+            userId,
+          };
+          await this.setData(key, data);
+        }
+      }
+    );
+  }
+
+  public async dumpUser(userId: number) {
+    const { locations, trackedCategories, presets, presetsOrdering, notes } =
+      await this.getAllForUser(userId);
+
+    const games: Record<Id, UserData> = {};
+
+    const getOrCreateGame = (gameId: Id) => {
+      if (!games[gameId]) {
+        games[gameId] = {
+          locations: {},
+          trackedCategoryIds: [],
+          presets: [],
+          presetOrdering: [],
+          notes: [],
+        };
+      }
+      return games[gameId];
+    };
+
+    for (const location of locations) {
+      const game = getOrCreateGame(location.game_id);
+      game.locations[location.id] = true;
+    }
+
+    for (const category of trackedCategories) {
+      const game = getOrCreateGame(category.game_id);
+      game.trackedCategoryIds.push(category.id);
+    }
+
+    for (const preset of presets) {
+      const game = getOrCreateGame(preset.game_id);
+      game.presets.push(this.asPreset(preset));
+    }
+
+    for (const ordering of presetsOrdering) {
+      const game = getOrCreateGame(ordering.game_id);
+      game.presetOrdering.push(ordering.id);
+    }
+
+    for (const note of notes) {
+      const game = getOrCreateGame(note.game_id);
+      game.notes.push(this.asNote(note));
+    }
+
+    return games;
+  }
+
+  public async dumpGame(key: Key) {
+    const data = await this.getData(key);
+    return {
+      [key.gameId]: data,
+    };
   }
 }

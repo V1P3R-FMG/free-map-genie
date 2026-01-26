@@ -8,9 +8,6 @@ declare namespace MG {
 
   declare type MimeType = `${string}/${string}`;
 
-  declare type IsoDateString =
-    `${number}-${number}-${number}T${number}:${number}:${number}.${number}Z`;
-
   declare type Int = number;
   declare type Float = number;
   declare type Color = string;
@@ -218,7 +215,7 @@ declare namespace MG {
     description: string;
     color: Nullable<Color>;
     category: Nullable<number>;
-    created_at: IsoDateString;
+    created_at: string;
     latitude: Float;
     longitude: Float;
     map_id: Int;

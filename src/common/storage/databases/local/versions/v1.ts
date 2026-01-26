@@ -1,29 +1,9 @@
 import { Version } from "./version";
 import { V1MigratorHelper } from "./helpers/v1MigratorHelper";
 
+import type { LocalV1Data } from "./v1.schema";
 import type { Driver } from "../drivers/driver";
 import type { Key } from "../../../key";
-
-export interface LocalV1GameData {
-  locations?: Record<string, boolean>;
-}
-
-export interface LocalV1MapData {
-  categories?: Record<string, boolean>;
-  presets?: Record<string, MG.Preset>;
-  presets_order?: number[];
-  visible_categories?: Record<string, boolean>;
-}
-
-export interface LocalV1MapSettings {
-  remember_categories?: boolean;
-}
-
-export interface LocalV1Data {
-  sharedData?: LocalV1GameData;
-  mapData?: Record<string, LocalV1MapData>;
-  settings?: Record<string, LocalV1MapSettings>;
-}
 
 export class V1 implements Version<LocalV1Data> {
   public constructor(private readonly driver: Driver) {}

@@ -1,4 +1,4 @@
-import type { LocalV1Data } from "../v1";
+import type { LocalV1Data } from "../v1.schema";
 import type { UserData } from "@/common/storage/format";
 
 export class V1MigratorHelper {
@@ -17,7 +17,7 @@ export class V1MigratorHelper {
     return Array.from(categories);
   }
 
-  public async migrate(legacyData: LocalV1Data): Promise<UserData> {
+  public migrate(legacyData: LocalV1Data): UserData {
     const locations = this.migrateLocations(legacyData);
     const trackedCategoryIds = this.migrateCategories(legacyData);
 

@@ -36,7 +36,8 @@
     "react": "^19.2.3",
     "react-dom": "^19.2.3",
     "react-redux": "^9.2.0",
-    "usehooks-ts": "^3.1.1"
+    "usehooks-ts": "^3.1.1",
+    "zod": "^4.3.5"
   },
   "devDependencies": {
     "@ghostery/adblocker-playwright": "^2.13.3",

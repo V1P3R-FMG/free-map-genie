@@ -1,7 +1,10 @@
 import { createSlice } from "@reduxjs/toolkit";
+import { SaveHelper } from "@/common/storage/saves";
 import { createAppAsyncThunk } from "../../typed";
 
 import type { PageType } from "@/common/mapgenie";
+
+const saveHelper = new SaveHelper();
 
 export interface DataState {
   busy: boolean;
@@ -57,6 +60,24 @@ export const clearGameDataAsync = createAppAsyncThunk<void, void>(
   async (_, { extra: { services } }) => {
     await services.client.clearGame();
     await services.background.reloadActiveTab();
+  }
+);
+
+export const exportUserDataAsync = createAppAsyncThunk<void, void>(
+  "data/exportUserData",
+  async (_, { extra: { services } }) => {
+    const { userId, games } = await services.backend.dumpCurrentUser();
+    const file = saveHelper.write(userId, games);
+    saveHelper.download(file);
+  }
+);
+
+export const exportGameDataAsync = createAppAsyncThunk<void, void>(
+  "data/exportGameData",
+  async (_, { extra: { services } }) => {
+    const { userId, games } = await services.client.dumpGame();
+    const file = saveHelper.write(userId, games);
+    saveHelper.download(file);
   }
 );
 

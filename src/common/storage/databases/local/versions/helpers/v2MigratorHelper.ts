@@ -1,4 +1,4 @@
-import type { LocalV2Data } from "../v2";
+import type { LocalV2Data } from "../v2.schema";
 import type { UserData } from "@/common/storage/format";
 
 export class V2MigratorHelper {
@@ -25,13 +25,18 @@ export class V2MigratorHelper {
 
     for (const mapId in legacyData) {
       const mapData = legacyData[mapId];
-      mapData.notes?.forEach((note) => notes.push(note));
+      mapData.notes?.forEach((note) =>
+        notes.push({
+          created_at: new Date().toISOString(),
+          ...note,
+        })
+      );
     }
 
     return notes;
   }
 
-  public async migrate(legacyData: LocalV2Data): Promise<UserData> {
+  public migrate(legacyData: LocalV2Data): UserData {
     const locations = this.migrateLocations(legacyData);
     const trackedCategoryIds = this.migrateCategories(legacyData);
     const notes = this.migrateNotes(legacyData);

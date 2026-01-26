@@ -1,4 +1,4 @@
-import { Key, Storage } from "@/common/storage";
+import { Key, Storage, UserData } from "@/common/storage";
 import { createService, type ProxiedObject } from "@/common/messaging";
 import { getAuthToken, setAuthToken } from "@/common/mapgenie";
 
@@ -40,10 +40,6 @@ class BackendService extends Storage {
     }
 
     const user = await this.mapgenie.fetchUser(key.gameId);
-    logger.debug("Importing user data from MapGenie account", {
-      user,
-      key,
-    });
 
     const locations = Object.fromEntries(
       user.locations.map((locId) => [locId, true])
@@ -58,6 +54,34 @@ class BackendService extends Storage {
       presetOrdering: [],
       presets: [],
     });
+  }
+
+  public async dumpCurrentUser() {
+    if (!this.isLoggedIn()) {
+      throw new Error("User is not logged in");
+    }
+
+    const userId = await this.getActiveProfileId();
+    if (userId === undefined) {
+      throw new Error("No active user profile found");
+    }
+
+    const games = await this.dumpUser(userId);
+
+    return { userId, games };
+  }
+
+  public async importForCurrentUser(games: Record<number, UserData>) {
+    if (!this.isLoggedIn()) {
+      throw new Error("User is not logged in");
+    }
+
+    const userId = await this.getActiveProfileId();
+    if (userId === undefined) {
+      throw new Error("No active user profile found");
+    }
+
+    return this.import(userId, games);
   }
 
   public isLoggedIn() {
