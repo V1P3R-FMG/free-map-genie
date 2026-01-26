@@ -49,14 +49,21 @@ export const fetchLatestVersionAsync = createAppAsyncThunk<string>(
   "app/fetchLatestVersion",
   async (_, { getState }) => {
     const homepage = selectAppHomepage(getState());
+    const { pathname } = new URL(homepage);
 
-    const url = new URL("https://raw.githubusercontent.com");
-    url.pathname = new URL(homepage).pathname + "/main/package.json";
+    const url = new URL("https://api.github.com");
+    url.pathname = "/repos" + pathname + "/releases/latest";
 
     const res = await fetch(url.toString());
-    const json = await res.json();
+    const json: {
+      tag_name: string;
+    } = await res.json();
 
-    return json.version as string;
+    logger.debug(
+      json.tag_name.replace(/^v/, "").replace(/-[\w]+(\.\d+)?$/, "")
+    );
+
+    return json.tag_name.replace(/^v/, "").replace(/-[\w]+(\.\d+)?$/, "");
   }
 );
 
