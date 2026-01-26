@@ -1,0 +1,15 @@
+.version-badge {
+  position: absolute;
+  padding: 0 0.3rem;
+  text-align: center;
+  border-radius: 4px;
+  right: 5px;
+  bottom: 5px;
+  color: #e6e6e6;
+  background: #a5a5a5;
+
+  .warn {
+    color: var(--red);
+    padding: 0.2rem 0;
+  }
+}

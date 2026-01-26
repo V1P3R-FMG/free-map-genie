@@ -1,0 +1,57 @@
+.game-item {
+  position: relative;
+
+  &:has(input:checked) {
+    .game-card {
+      opacity: 1;
+    }
+  }
+
+  .game-card {
+    opacity: 0.5;
+    background: var(--item);
+    display: grid;
+    width: 200px;
+    border-radius: 8px;
+    border: 1px solid var(--background-darker);
+    box-shadow: 1px 1px 10px rgba(0, 0, 0, 0.253);
+    overflow: hidden;
+
+    .preview {
+      width: 100%;
+      height: 180px;
+      object-fit: cover;
+      background-color: black;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.37);
+    }
+
+    .details {
+      padding: 0.5rem;
+
+      .title {
+        font-weight: bold;
+        margin-bottom: 0.25rem;
+        border-bottom: 1px solid var(--border);
+        padding-bottom: 0.25rem;
+      }
+
+      .info {
+        display: grid;
+        width: 100%;
+        grid-template-columns: 1fr 1fr;
+        flex-wrap: wrap;
+        gap: 0.25rem;
+      }
+    }
+  }
+
+  .checkbox {
+    position: absolute;
+    top: 5px;
+    left: 5px;
+    margin: 0;
+    width: 20px;
+    height: 20px;
+    border-color: var(--background-darker);
+  }
+}

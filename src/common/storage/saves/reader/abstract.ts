@@ -15,7 +15,7 @@ export type Group = {
 export type Save = {
   version: number | null;
   userId: number | null;
-  games: Record<number, UserData>;
+  games: Record<Id, UserData>;
   filenames: string[];
 };
 

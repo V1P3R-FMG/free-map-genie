@@ -1,0 +1,51 @@
+.save-Entry {
+  position: relative;
+  background: var(--item);
+  border: 1px solid var(--item);
+  border-bottom: 1px solid var(--background-darker);
+  padding: 0.5rem 1rem 0.5rem 0;
+  cursor: pointer;
+
+  &:hover {
+    background: var(--item-hover);
+  }
+
+  &.selected {
+    border: 1px solid var(--active);
+  }
+
+  .info {
+    display: grid;
+    grid-template-columns: auto 1fr;
+
+    .icon {
+      position: relative;
+      height: max-content;
+      padding: 0.75rem;
+    }
+
+    span {
+      overflow: hidden;
+      word-break: keep-all;
+      white-space: pre-wrap;
+      user-select: none;
+      padding: 5px;
+    }
+  }
+
+  .remove {
+    position: absolute;
+    right: 5px;
+    top: 5px;
+
+    .iconBtn {
+      cursor: pointer;
+    }
+
+    &:hover {
+      .iconBtn {
+        color: var(--red);
+      }
+    }
+  }
+}

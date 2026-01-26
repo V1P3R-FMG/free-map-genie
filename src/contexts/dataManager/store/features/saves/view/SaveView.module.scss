@@ -1,0 +1,19 @@
+.save-view {
+  display: flex;
+  flex-direction: row;
+  gap: 0.5rem;
+  margin: 0.5rem;
+
+  .errors {
+    flex: 1;
+
+    .error {
+      margin-bottom: 0.5rem;
+      color: var(--error);
+      padding: 1rem;
+      background: var(--item-red);
+      border: 1px solid var(--item-red-border);
+      border-radius: 5px;
+    }
+  }
+}

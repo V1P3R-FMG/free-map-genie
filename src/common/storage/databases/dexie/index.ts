@@ -551,11 +551,16 @@ export class DexieDatabase implements Database {
             this.db.notes.where("user_id").equals(userId).toArray(),
           ]);
 
+        logger.debug(
+          presetsOrdering,
+          presetsOrdering.sort((a, b) => a.order - b.order)
+        );
+
         return {
           locations,
           trackedCategories,
           presets,
-          presetsOrdering,
+          presetsOrdering: presetsOrdering.sort((a, b) => a.order - b.order),
           notes,
         };
       }
