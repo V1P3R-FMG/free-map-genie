@@ -23,7 +23,7 @@ export const Button = ({
   );
 };
 
-namespace Button {
+export namespace Button {
   export interface Props extends React.PropsWithChildren {
     ref?: React.Ref<HTMLButtonElement>;
     id?: string;
