@@ -23,7 +23,7 @@ export const Checkbox = ({
         ref={ref}
         checked={checked}
         onChange={onChange}
-        readOnly={!onChange}
+        readOnly={checked !== undefined && !onChange}
       />
       {checked ? (
         <FontIcon className={style.icon} icon="check" />
