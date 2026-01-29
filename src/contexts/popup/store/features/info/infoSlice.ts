@@ -1,5 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { createAppAsyncThunk } from "../../typed";
+import { toastr } from "react-redux-toastr";
 
 export interface InfoState {
   data: Record<string, any>;
@@ -14,7 +15,13 @@ const initialState: InfoState = {
 export const getInfoAsync = createAppAsyncThunk<Record<string, any>, void>(
   "info/getInfo",
   async (_, { extra: { services } }) => {
-    return services.page.getInfo();
+    try {
+      return services.page.getInfo();
+    } catch (e) {
+      toastr.error("Error", "Failed to get info");
+      logger.error("Failed to get info", e);
+      return {};
+    }
   }
 );
 
@@ -30,11 +37,6 @@ export const infoSlice = createSlice({
       .addCase(getInfoAsync.fulfilled, (state, action) => {
         state.data = action.payload;
         state.loading = false;
-      })
-      .addCase(getInfoAsync.rejected, (state, action) => {
-        state.data = {};
-        state.loading = false;
-        logger.error("Failed to get info", action.error);
       });
   },
   selectors: {

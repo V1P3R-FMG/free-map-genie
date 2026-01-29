@@ -1,5 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { createAppAsyncThunk } from "../../typed";
+import { toastr } from "react-redux-toastr";
 
 import type { Profile as ProfileInfo } from "@/common/profile";
 
@@ -18,7 +19,13 @@ const initialState: ProfilesState = {
 export const getProfilesAsync = createAppAsyncThunk<ProfileInfo[], void>(
   "profiles/getProfiles",
   async (_, { extra: { services } }) => {
-    return services.backend.getProfiles();
+    try {
+      return await services.backend.getProfiles();
+    } catch (e) {
+      toastr.error("Error", "Failed to get profiles");
+      logger.error("Failed to get profiles", e);
+      return [];
+    }
   }
 );
 
@@ -26,22 +33,40 @@ export const addGuestProfileAsync = createAppAsyncThunk<
   ProfileInfo | undefined,
   void
 >("profiles/addGuestProfile", async (_, { extra: { services } }) => {
-  return services.backend.addGuestProfile();
+  try {
+    return await services.backend.addGuestProfile();
+  } catch (e) {
+    toastr.error("Error", "Failed to add guest profile");
+    logger.error("Failed to add guest profile", e);
+    return undefined;
+  }
 });
 
 export const deleteGuestProfileAsync = createAppAsyncThunk<
   ProfileInfo[] | undefined,
   void
 >("profiles/deleteGuestProfile", async (_, { extra: { services } }) => {
-  return services.backend.deleteGuestProfile();
+  try {
+    return await services.backend.deleteGuestProfile();
+  } catch (e) {
+    toastr.error("Error", "Failed to delete guest profile");
+    logger.error("Failed to delete guest profile", e);
+    return undefined;
+  }
 });
 
 export const activateProfileAsync = createAppAsyncThunk<number, number>(
   "profiles/activateProfile",
   async (profileId, { extra: { services } }) => {
-    await services.backend.setActiveProfile(profileId);
-    await services.background.reloadActiveTab();
-    return profileId;
+    try {
+      await services.backend.setActiveProfile(profileId);
+      await services.background.reloadActiveTab();
+      return profileId;
+    } catch (e) {
+      toastr.error("Error", "Failed to activate profile");
+      logger.error("Failed to activate profile", e);
+      return profileId;
+    }
   }
 );
 
@@ -58,18 +83,11 @@ export const profilesSlice = createSlice({
         state.list = action.payload;
         state.loading = false;
       })
-      .addCase(getProfilesAsync.rejected, (state) => {
-        state.list = [];
-        state.loading = false;
-      })
       .addCase(addGuestProfileAsync.fulfilled, (state, action) => {
         if (action.payload === undefined) {
           return;
         }
         state.list.push(action.payload);
-      })
-      .addCase(addGuestProfileAsync.rejected, (state, action) => {
-        logger.error("Failed to add profile:", action.error);
       })
       .addCase(deleteGuestProfileAsync.fulfilled, (state, action) => {
         if (action.payload === undefined) {
@@ -77,17 +95,11 @@ export const profilesSlice = createSlice({
         }
         state.list = action.payload;
       })
-      .addCase(deleteGuestProfileAsync.rejected, (state, action) => {
-        logger.error("Failed to delete profile:", action.error);
-      })
       .addCase(activateProfileAsync.fulfilled, (state, action) => {
         state.list = state.list.map((profile) => ({
           ...profile,
           active: profile.id === action.payload,
         }));
-      })
-      .addCase(activateProfileAsync.rejected, (state, action) => {
-        logger.error("Failed to activate profile:", action.error);
       });
   },
   selectors: {

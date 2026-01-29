@@ -1,6 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { compareVersions, displayVersion } from "@/common/version";
 import { createAppAsyncThunk } from "../../typed";
+import { toastr } from "react-redux-toastr";
 
 export interface AppState {
   version: string;
@@ -34,57 +35,89 @@ const initialState: AppState = {
 export const fetchIsAppEnabledAsync = createAppAsyncThunk<boolean>(
   "app/fetchIsAppEnabled",
   async (_, { extra: { services } }) => {
-    return services.background.getExtensionEnabled();
+    try {
+      return services.background.getExtensionEnabled();
+    } catch (e) {
+      toastr.error("Error", "Failed to get extension enabled status");
+      logger.error("Failed to get is extension enabled status", e);
+      return false;
+    }
   }
 );
 
 export const setIsAppEnabledAsync = createAppAsyncThunk<void, boolean>(
   "app/setIsAppEnabled",
   async (enabled, { extra: { services } }) => {
-    return services.background.setExtensionEnabled(enabled);
+    try {
+      await services.background.setExtensionEnabled(enabled);
+    } catch (e) {
+      toastr.error("Error", "Failed to set extension enabled status");
+      logger.error("Failed to set is extension enabled status", e);
+    }
   }
 );
 
 export const fetchLatestVersionAsync = createAppAsyncThunk<string>(
   "app/fetchLatestVersion",
   async (_, { getState }) => {
-    const homepage = selectAppHomepage(getState());
-    const { pathname } = new URL(homepage);
+    try {
+      const homepage = selectAppHomepage(getState());
+      const { pathname } = new URL(homepage);
 
-    const url = new URL("https://api.github.com");
-    url.pathname = "/repos" + pathname + "/releases/latest";
+      const url = new URL("https://api.github.com");
+      url.pathname = "/repos" + pathname + "/releases/latest";
 
-    const res = await fetch(url.toString());
-    const json: {
-      tag_name: string;
-    } = await res.json();
+      const res = await fetch(url.toString());
+      const json: {
+        tag_name: string;
+      } = await res.json();
 
-    logger.debug(
-      json.tag_name.replace(/^v/, "").replace(/-[\w]+(\.\d+)?$/, "")
-    );
+      logger.debug(
+        json.tag_name.replace(/^v/, "").replace(/-[\w]+(\.\d+)?$/, "")
+      );
 
-    return json.tag_name.replace(/^v/, "").replace(/-[\w]+(\.\d+)?$/, "");
+      return json.tag_name.replace(/^v/, "").replace(/-[\w]+(\.\d+)?$/, "");
+    } catch (e) {
+      toastr.error("Error", "Failed to fetch latest version");
+      logger.error("Failed to fetch latest version", e);
+      return selectAppVersion(getState());
+    }
   }
 );
 
 export const reloadActiveTabAsync = createAppAsyncThunk<void>(
   "app/reloadActiveTab",
   async (_, { extra: { services } }) => {
-    await services.background.reloadActiveTab();
+    try {
+      await services.background.reloadActiveTab();
+    } catch (e) {
+      toastr.error("Error", "Failed to reload active tab");
+      logger.error("Failed to reload active tab", e);
+    }
   }
 );
 
 export const updateConnectedStatusAsync = createAppAsyncThunk(
   "app/fetchConnectedStatus",
   async (_, { extra: { services } }) => {
-    await services.page.ping();
+    try {
+      await services.page.ping();
+    } catch (e) {
+      toastr.error("Error", "Failed to update connected status");
+      logger.error("Failed to update connected status", e);
+    }
   }
 );
 
 export const injectIconFontAsync = createAppAsyncThunk(
   "app/injectIconFont",
   async (_) => {
-    await injectStyle("/assets/fmg-icons.css");
+    try {
+      await injectStyle("/assets/fmg-icons.css");
+    } catch (e) {
+      toastr.error("Error", "Failed to inject icon font");
+      logger.error("Failed to inject icon font", e);
+    }
   }
 );
 
@@ -97,35 +130,21 @@ export const appSlice = createSlice({
       .addCase(fetchIsAppEnabledAsync.fulfilled, (state, action) => {
         state.enabled = action.payload;
       })
-      .addCase(fetchIsAppEnabledAsync.rejected, (state, action) => {
-        logger.error("Failed to get is extension enabled status", action.error);
-      })
       .addCase(setIsAppEnabledAsync.fulfilled, (state, action) => {
         state.enabled = !state.enabled;
-      })
-      .addCase(setIsAppEnabledAsync.rejected, (state, action) => {
-        logger.error("Failed to set is extension enabled status", action.error);
       })
       .addCase(fetchLatestVersionAsync.fulfilled, (state, action) => {
         state.latest = action.payload;
         state.needsUpdate = compareVersions(state.latest, state.version) > 0;
       })
-      .addCase(fetchLatestVersionAsync.rejected, (state, action) => {
-        logger.error("Failed to fetch latest version", action.error);
+      .addCase(updateConnectedStatusAsync.pending, (state, action) => {
+        state.connected = false;
       })
       .addCase(updateConnectedStatusAsync.fulfilled, (state, action) => {
         state.connected = true;
       })
-      .addCase(updateConnectedStatusAsync.rejected, (state, action) => {
-        state.connected = false;
-        logger.error("Failed to update connected status", action.error);
-      })
       .addCase(injectIconFontAsync.fulfilled, (state) => {
         state.loading = false;
-      })
-      .addCase(injectIconFontAsync.rejected, (state, action) => {
-        state.loading = false;
-        logger.error("Failed to inject icon font", action.error);
       });
   },
   selectors: {

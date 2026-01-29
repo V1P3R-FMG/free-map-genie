@@ -11,6 +11,8 @@ import infoReducer from "./features/info/infoSlice";
 import profilesReducer from "./features/profiles/profilesSlice";
 import dataReducer from "./features/data/dataSlice";
 
+import { reducer as toastrReducer } from "react-redux-toastr";
+
 export const store = configureStore({
   reducer: {
     bookmarks: bookmakrsReducer,
@@ -18,6 +20,7 @@ export const store = configureStore({
     info: infoReducer,
     profiles: profilesReducer,
     data: dataReducer,
+    toastr: toastrReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

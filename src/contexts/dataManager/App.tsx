@@ -11,7 +11,6 @@ import {
 import { SidePanel } from "./store/features/saves/sidepanel/SidePanel";
 import { SaveView } from "./store/features/saves/view/SaveView";
 
-import "react-redux-toastr/lib/css/react-redux-toastr.min.css";
 import style from "./App.module.scss";
 
 function App() {

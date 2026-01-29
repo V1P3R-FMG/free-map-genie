@@ -1,5 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { createAppAsyncThunk } from "../../typed";
+import { toastr } from "react-redux-toastr";
 
 import type { Bookmark as BookmarkInfo } from "@/common/bookmark";
 
@@ -20,24 +21,41 @@ const initialState: BookmarksState = {
 export const addBookmarkAsync = createAppAsyncThunk<BookmarkInfo, void>(
   "bookmarks/addBookmark",
   async (_, { extra: { services } }) => {
-    const bookmark = await services.page.createBookmark();
-    await services.backend.addBookmark(bookmark);
+    try {
+      const bookmark = await services.page.createBookmark();
+      await services.backend.addBookmark(bookmark);
 
-    return bookmark;
+      return bookmark;
+    } catch (e) {
+      toastr.error("Error", "Failed to add bookmark");
+      logger.error("Failed to add bookmark", e);
+      throw e;
+    }
   }
 );
 
 export const removeBookmarkAsync = createAppAsyncThunk<void, string>(
   "bookmarks/removeBookmark",
   async (url, { extra: { services } }) => {
-    await services.backend.deleteBookmark(url);
+    try {
+      await services.backend.deleteBookmark(url);
+    } catch (e) {
+      toastr.error("Error", "Failed to remove bookmark");
+      logger.error("Failed to remove bookmark", e);
+    }
   }
 );
 
 export const loadBookmarksAsync = createAppAsyncThunk<BookmarkInfo[], void>(
   "bookmarks/loadBookmarks",
   async (_, { extra: { services } }) => {
-    return services.backend.getBookmarks();
+    try {
+      return await services.backend.getBookmarks();
+    } catch (e) {
+      toastr.error("Error", "Failed to load bookmarks");
+      logger.error("Failed to load bookmarks", e);
+      return [];
+    }
   }
 );
 
@@ -63,16 +81,10 @@ export const bookmarksSlice = createSlice({
       .addCase(addBookmarkAsync.fulfilled, (state, action) => {
         state.list.push(action.payload);
       })
-      .addCase(addBookmarkAsync.rejected, (state, action) => {
-        logger.error("Failed to add bookmark", action.error);
-      })
       .addCase(removeBookmarkAsync.fulfilled, (state, action) => {
         state.list = state.list.filter(
           (bookmark) => bookmark.url !== action.meta.arg
         );
-      })
-      .addCase(removeBookmarkAsync.rejected, (state, action) => {
-        logger.error("Failed to remove bookmark", action.error);
       })
       .addCase(loadBookmarksAsync.pending, (state) => {
         state.loading = true;
@@ -80,10 +92,6 @@ export const bookmarksSlice = createSlice({
       .addCase(loadBookmarksAsync.fulfilled, (state, action) => {
         state.list = action.payload;
         state.loading = false;
-      })
-      .addCase(loadBookmarksAsync.rejected, (state, action) => {
-        state.loading = false;
-        logger.error("Failed to load bookmarks", action.error);
       });
   },
   selectors: {
