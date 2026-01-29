@@ -8,8 +8,8 @@ export class ClientService {
     await this.client.importFromMapgenieAccount();
   }
 
-  public async dumpGame() {
-    return this.client.dumpGame();
+  public async export() {
+    return this.client.export();
   }
 
   public async clearMap() {

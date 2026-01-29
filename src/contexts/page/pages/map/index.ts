@@ -17,12 +17,11 @@ export class MapPage extends Page {
     if (!window.user) return;
 
     // Get the active user from the backend
-    const activeProfileId = await this.client.getActiveProfileId();
+    const activeUserId = await this.client.getActiveUserId();
 
     // Update the user
     window.user.realId = window.user.id;
-    window.user.id = activeProfileId ?? window.user.id;
-
+    window.user.id = activeUserId ?? window.user.id;
     window.user!.hasPro = true;
 
     window.mapData!.maxMarkedLocations = Infinity;

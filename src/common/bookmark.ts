@@ -13,5 +13,5 @@ export interface Bookmark {
   preview: ImageUrl;
   icon?: ImageUrl;
   pageType: PageType;
-  createdAt: number;
+  createdAt: string;
 }

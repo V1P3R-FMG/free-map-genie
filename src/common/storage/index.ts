@@ -8,28 +8,6 @@ export type { UserData } from "./format";
 export { Key } from "./key";
 
 export class Storage {
-  private readonly domains = new Map<string, LocalDatabase>();
-  private readonly dexie = new DexieDatabase();
-
-  public async migrate(domain: string, key: Key) {
-    const local = this.getDomainDatabase(domain);
-
-    if (await local.hasData(key)) {
-      const data = await local.getData(key);
-      await this.dexie.setData(key, data);
-      await local.removeData(key);
-    }
-  }
-
-  private getDomainDatabase(domain: string) {
-    let database = this.domains.get(domain);
-    if (!database) {
-      database = new LocalDatabase(domain);
-      this.domains.set(domain, database);
-    }
-    return database;
-  }
-
   public async getData(key: Key) {
     return this.dexie.getData(key);
   }
@@ -42,9 +20,9 @@ export class Storage {
     return this.dexie.dumpGame(key);
   }
 
-  public async import(userId: number, games: Record<Id, UserData>) {
-    return this.dexie.import(userId, games);
-  }
+  // public async import(userId: number, games: Record<Id, UserData>) {
+  //   return this.dexie.import(userId, games);
+  // }
 
   public async setData(key: Key, data: UserData) {
     return this.dexie.setData(key, data);
@@ -96,30 +74,6 @@ export class Storage {
 
   public async reorderPresets(key: Key, order: number[]) {
     return this.dexie.reorderPresets(key, order);
-  }
-
-  public async storageRequestPersist() {
-    const permission = await navigator.permissions.query({
-      name: "persistent-storage",
-    });
-
-    if (permission.state === "granted") {
-      return navigator.storage.persist();
-    } else {
-      console.warn(
-        "Persistent storage permission not granted:",
-        permission.state
-      );
-      return false;
-    }
-  }
-
-  public storageEstimate() {
-    return navigator.storage.estimate();
-  }
-
-  public isStoragePersisted() {
-    return navigator.storage.persisted();
   }
 
   public getBookmarks() {

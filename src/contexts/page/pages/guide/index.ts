@@ -48,12 +48,12 @@ export class GuidePage extends Page {
     if (userId === undefined) return;
 
     // Get the active user from the backend
-    const activeProfileId = await this.client.getActiveProfileId();
+    const activeUserId = await this.client.getActiveUserId();
 
     // Client requires a user to object to function properly
     // So we create a dummy user
     window.user = {
-      id: activeProfileId ?? userId,
+      id: activeUserId ?? userId,
       realId: userId,
       hasPro: false,
       locations: {},

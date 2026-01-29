@@ -1,13 +1,3 @@
-declare namespace MG {
-  declare type PageType =
-    | "home"
-    | "map"
-    | "guide"
-    | "game-home"
-    | "login"
-    | "unknown";
-}
-
 // guides
 var state: MG.Guide.State | MG.Guide.ExtendedState | undefined;
 

@@ -66,7 +66,7 @@ export const clearGameDataAsync = createAppAsyncThunk<void, void>(
 export const exportUserDataAsync = createAppAsyncThunk<void, void>(
   "data/exportUserData",
   async (_, { extra: { services } }) => {
-    const { userId, games } = await services.backend.dumpCurrentUser();
+    const { userId, games } = await services.backend.exportActiveUser();
     const file = saveHelper.write(userId, games);
     saveHelper.download(file);
   }
@@ -75,7 +75,7 @@ export const exportUserDataAsync = createAppAsyncThunk<void, void>(
 export const exportGameDataAsync = createAppAsyncThunk<void, void>(
   "data/exportGameData",
   async (_, { extra: { services } }) => {
-    const { userId, games } = await services.client.dumpGame();
+    const { userId, games } = await services.client.export();
     const file = saveHelper.write(userId, games);
     saveHelper.download(file);
   }

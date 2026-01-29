@@ -62,7 +62,7 @@ export const importSelectedSave = createAppAsyncThunk(
         throw new Error("No save selected");
       }
       const games = selectSelectedGames(state);
-      await services.backend.importForCurrentUser(games);
+      await services.backend.import(games);
 
       toastr.success("Success", "Selected games imported successfully.");
     } catch (error) {

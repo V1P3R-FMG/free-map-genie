@@ -3,7 +3,7 @@ import z from "zod";
 export const Preset = z.object({
   id: z.number(),
   title: z.string(),
-  order: z.number(),
+  order: z.number().optional(),
   categories: z.array(z.number()),
 });
 

@@ -102,11 +102,16 @@ export class Client {
       presets: userPresets,
       presetOrdering,
     } = await this.backend.getData(this.key);
-    const demoPresets = await this.getDemoPresets(presetOrdering);
 
-    const presets = [...demoPresets, ...userPresets].sort(
-      (a, b) => a.order - b.order
-    );
+    const demoPresets = await this.getDemoPresets();
+    const presets = [...demoPresets, ...userPresets]
+      .map((preset) => {
+        const newPreset = { ...preset, order: 0 };
+        const order = presetOrdering.indexOf(preset.id);
+        newPreset.order = order !== -1 ? order : 0;
+        return newPreset;
+      })
+      .sort((a, b) => a.order - b.order);
 
     return {
       locations,
@@ -127,7 +132,7 @@ export class Client {
     return this.backend.migrate(domain, this.key);
   }
 
-  private async getDemoPresets(ordering: number[]) {
+  private async getDemoPresets() {
     let presets = window.mapData?.presets;
 
     // Fallback to fetching from API if not available in mapData
@@ -138,46 +143,36 @@ export class Client {
 
     //Invert IDs to avoid conflicts with local saved presets
     presets.forEach((preset) => {
-      const order = ordering.indexOf(-preset.id);
       preset.id = -preset.id;
-      preset.order = order !== -1 ? order : 0;
     });
 
     return presets;
   }
 
-  public getActiveProfileId() {
-    return this.backend.getActiveProfileId();
+  public async getActiveUserId() {
+    const user = await this.backend.getActiveProfile();
+    return user?.id;
   }
 
   public async importFromMapgenieAccount() {
-    if (!this.isLoggedIn) {
-      throw new Error("Client is not logged in");
-    }
     await this.backend.importFromMapgenieAccount(this.key);
   }
 
   public async clearGame() {
-    if (!this.isLoggedIn) {
-      throw new Error("Client is not logged in");
-    }
     await this.backend.removeData(this.key);
   }
 
   public async clearMap() {
-    if (!this.isLoggedIn) {
-      throw new Error("Client is not logged in");
-    }
     const locations = window.mapData!.locations.map((loc) => loc.id);
-    await this.backend.clearLocations(locations);
+    await this.backend.deleteLocations(locations);
   }
 
-  public async dumpGame() {
+  public async export() {
     if (!this.isLoggedIn) {
       throw new Error("Client is not logged in");
     }
-    const games = await this.backend.dumpGame(this.key);
-    return { userId: this.key.userId, games };
+    const games = await this.backend.export(this.key.userId, this.key.gameId);
+    return games;
   }
 
   public on<K extends keyof Client.EventMap>(
@@ -275,7 +270,7 @@ export class Client {
       "/api/v1/user/notes/:id",
       async (ctx) => {
         logger.debug("Intercepted note update request", ctx);
-        await this.backend.updateNote(this.key, ctx.params.id, ctx.postData);
+        await this.backend.updateNote(ctx.params.id, ctx.postData);
         ctx.block();
       }
     );
@@ -284,7 +279,7 @@ export class Client {
       "/api/v1/user/notes/:id",
       async (ctx) => {
         logger.debug("Intercepted note delete request", ctx);
-        await this.backend.deleteNote(this.key, ctx.params.id);
+        await this.backend.deleteNote(ctx.params.id);
         ctx.block();
       }
     );
@@ -293,7 +288,12 @@ export class Client {
       "/api/v1/user/presets",
       async (ctx) => {
         logger.debug("Intercepted preset create request", ctx);
-        const preset = await this.backend.addPreset(this.key, ctx.postData);
+        const { ordering, ...presetData } = ctx.postData;
+        const preset = await this.backend.addPreset(
+          this.key,
+          presetData,
+          ordering
+        );
         ctx.block(preset);
       }
     );
@@ -302,7 +302,7 @@ export class Client {
       "/api/v1/user/presets/:id",
       async (ctx) => {
         logger.debug("Intercepted preset delete request", ctx);
-        await this.backend.deletePreset(this.key, Number(ctx.params.id));
+        await this.backend.deletePreset(Number(ctx.params.id));
         ctx.block();
       }
     );

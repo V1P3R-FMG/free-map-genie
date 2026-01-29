@@ -39,7 +39,7 @@ export const deleteGuestProfileAsync = createAppAsyncThunk<
 export const activateProfileAsync = createAppAsyncThunk<number, number>(
   "profiles/activateProfile",
   async (profileId, { extra: { services } }) => {
-    await services.backend.activateProfile(profileId);
+    await services.backend.setActiveProfile(profileId);
     await services.background.reloadActiveTab();
     return profileId;
   }
