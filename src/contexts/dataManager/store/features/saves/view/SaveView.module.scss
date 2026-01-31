@@ -18,6 +18,12 @@
   }
 }
 
+@media (max-width: 900px) {
+  .save-view {
+    padding-top: 3rem;
+  }
+}
+
 @media (max-width: 1700px) {
   .save-view {
     grid-template-columns: repeat(6, minmax(0, 1fr));
