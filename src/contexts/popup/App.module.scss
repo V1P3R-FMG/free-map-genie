@@ -2,4 +2,12 @@
   color: var(--color);
   background-color: var(--background);
   pointer-events: all;
+
+  width: 400px;
+}
+
+:root[data-iframe="true"] {
+  .container {
+    width: 100%;
+  }
 }
