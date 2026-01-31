@@ -83,26 +83,11 @@
       transform: translateX(0);
       transition: transform 200ms ease;
       box-shadow: 12px 0 24px rgba(0, 0, 0, 0.35);
+      border-right: 1px solid var(--background-darker);
     }
 
     .side-panel-collapsed {
       transform: translateX(-110%);
-    }
-
-    .backdrop {
-      display: block;
-      position: absolute;
-      inset: 0;
-      background: rgba(0, 0, 0, 0.5);
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 200ms ease;
-      z-index: 2;
-    }
-
-    .backdrop-visible {
-      opacity: 1;
-      pointer-events: auto;
     }
 
     .side-panel-toggle {
