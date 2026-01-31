@@ -6,7 +6,7 @@ export class UI {
   private readonly totalProgress = new TotalProgress();
 
   public async mount() {
-    this.totalProgress.mount();
+    await this.totalProgress.mount();
 
     const store = await waitForProperty(window, "store");
 

@@ -46,8 +46,8 @@ export class TotalProgress extends IntegratedComponent<TotalProgress.Props> {
     );
   }
 
-  public mount() {
-    super.mount(".category-progress", "before");
+  public async mount() {
+    await super.mount(".category-progress", "before");
   }
 
   public updateFromState(state: MG.State) {

@@ -37,10 +37,12 @@ export class MountableComponent<P extends {}> {
 
     this.root = ReactDOM.createRoot(container);
     this.root.render(this.render());
+    this.onMounted();
   }
 
   public unmount() {
     this.root?.unmount();
+    this.onUnmounted();
   }
 
   protected render(): React.ReactNode {
@@ -51,17 +53,31 @@ export class MountableComponent<P extends {}> {
     return true;
   }
 
+  protected onMounted() {
+    // Override to add behavior on mount
+  }
+
+  protected onUnmounted() {
+    // Override to add behavior on unmount
+  }
+
+  protected onUpdate() {
+    // Override to add behavior on update
+  }
+
   protected mergeProps(props: Partial<P>) {
     return { ...this.props, ...props };
   }
 
   public update(props: Partial<P>) {
     const nextProps = this.mergeProps(props);
-    if (!this.shouldUpdate(nextProps)) {
-      return;
-    }
+    const shouldUpdate = this.shouldUpdate(nextProps);
 
     Object.assign(this.props, nextProps);
+
+    if (!shouldUpdate) return;
+
     this.root?.render(this.render());
+    this.onUpdate();
   }
 }
