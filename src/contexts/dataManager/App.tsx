@@ -17,6 +17,7 @@ function App() {
   const dispatch = useAppDispatch();
   const loading = useAppSelector(selectAppLoading);
   const save = useAppSelector(selectCurrentSave);
+  const [sidePanelOpen, setSidePanelOpen] = React.useState(true);
 
   React.useEffect(() => {
     dispatch(injectIconFontAsync());
@@ -36,9 +37,34 @@ function App() {
       <Loading loading={loading} spinnerSize="2rem" overlay>
         <div className={style.app}>
           <div className={style.panels}>
-            <div className={style.panel}>
+            <div
+              className={clsx(
+                style.panel,
+                style.sidePanelContainer,
+                !sidePanelOpen && style.sidePanelCollapsed
+              )}
+            >
               <SidePanel />
             </div>
+            <Button
+              className={clsx(
+                style.sidePanelToggle,
+                sidePanelOpen
+                  ? style.sidePanelToggleOpen
+                  : style.sidePanelToggleClosed
+              )}
+              type="normal"
+              onClick={() => setSidePanelOpen((open) => !open)}
+            >
+              <FontIcon icon={sidePanelOpen ? "caret-left" : "caret-right"} />
+            </Button>
+            <div
+              className={clsx(
+                style.backdrop,
+                sidePanelOpen && style.backdropVisible
+              )}
+              onClick={() => setSidePanelOpen(false)}
+            />
             <div className={clsx(style.panel, style.content)}>
               <div className={style.view}>
                 <SaveView />

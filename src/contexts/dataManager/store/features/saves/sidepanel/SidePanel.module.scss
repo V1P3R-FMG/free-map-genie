@@ -4,3 +4,11 @@
   width: 310px;
   height: 100%;
 }
+
+@media (max-width: 900px) {
+  .side-panel {
+    width: 100%;
+    height: auto;
+    min-height: 200px;
+  }
+}

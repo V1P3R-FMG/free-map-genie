@@ -11,7 +11,7 @@
     opacity: 0.5;
     background: var(--item);
     display: grid;
-    width: 200px;
+    width: 100%;
     border-radius: 8px;
     border: 1px solid var(--background-darker);
     box-shadow: 1px 1px 10px rgba(0, 0, 0, 0.253);
@@ -53,5 +53,13 @@
     width: 20px;
     height: 20px;
     border-color: var(--background-darker);
+  }
+}
+
+@media (max-width: 600px) {
+  .game-item {
+    .preview {
+      height: 140px;
+    }
   }
 }

@@ -7,11 +7,20 @@
     color: var(--color);
     gap: 5px;
     height: calc(100vh - 10px);
+    position: relative;
 
     .panel {
       background: var(--background);
       border-radius: 8px;
       overflow: hidden;
+    }
+
+    .side-panel-container {
+      flex: 0 0 auto;
+    }
+
+    .backdrop {
+      display: none;
     }
   }
 
@@ -41,6 +50,98 @@
       display: flex;
       gap: 10px;
       align-items: center;
+    }
+  }
+
+  .side-panel-toggle {
+    display: none;
+  }
+}
+
+@media (max-width: 900px) {
+  .app {
+    padding: 4px;
+
+    .panels {
+      flex-direction: column;
+      height: auto;
+      min-height: calc(100dvh - 8px);
+      gap: 0;
+
+      .panel {
+        border-radius: 6px;
+      }
+    }
+
+    .side-panel-container {
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 100%;
+      width: min(85vw, 360px);
+      z-index: 3;
+      transform: translateX(0);
+      transition: transform 200ms ease;
+      box-shadow: 12px 0 24px rgba(0, 0, 0, 0.35);
+    }
+
+    .side-panel-collapsed {
+      transform: translateX(-110%);
+    }
+
+    .backdrop {
+      display: block;
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.5);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 200ms ease;
+      z-index: 2;
+    }
+
+    .backdrop-visible {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .side-panel-toggle {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      position: absolute;
+      top: 12px;
+      z-index: 4;
+      width: 36px;
+      height: 36px;
+      border-radius: 18px;
+      padding: 0;
+    }
+
+    .side-panel-toggle-open {
+      left: calc(min(85vw, 360px) - 18px);
+    }
+
+    .side-panel-toggle-closed {
+      left: 8px;
+    }
+
+    .content {
+      position: relative;
+      z-index: 1;
+
+      .bottom-bar {
+        height: auto;
+        padding: 8px;
+        justify-content: space-between;
+        gap: 8px;
+      }
+
+      .icon-btn {
+        width: 100%;
+        justify-content: center;
+        flex: 1;
+      }
     }
   }
 }
