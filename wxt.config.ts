@@ -75,7 +75,7 @@ export default defineConfig({
         ? undefined
         : {
             gecko: {
-              id: "fmg@viper.net",
+              id: "viper-fmg@freemapgenie.com",
             },
           },
   }),
