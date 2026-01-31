@@ -105,6 +105,7 @@ export const updateConnectedStatusAsync = createAppAsyncThunk(
     } catch (e) {
       toastr.error("Error", "Failed to update connected status");
       logger.error("Failed to update connected status", e);
+      throw e;
     }
   }
 );
