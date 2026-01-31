@@ -25,6 +25,14 @@ function App() {
     dispatch(injectIconFontAsync());
   }, []);
 
+  React.useLayoutEffect(() => {
+    if (window.self === window.top) return;
+    window.parent.postMessage(
+      { type: "popup-mounted", height: document.body.clientHeight },
+      "*"
+    );
+  }, []);
+
   return (
     <ThemeProvider theme="dark">
       <Loading loading={loading} spinnerSize={"2rem"}>

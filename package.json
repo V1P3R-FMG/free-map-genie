@@ -14,6 +14,7 @@
     "build:all": "run-p build build:firefox",
     "zip": "wxt zip",
     "zip:firefox": "wxt zip -b firefox",
+    "zip:all": "run-p zip zip:firefox",
     "compile": "tsc --noEmit",
     "postinstall": "wxt prepare",
     "e2e": "playwright test"
@@ -27,6 +28,7 @@
     "axios-cache-interceptor": "^1.11.2",
     "clsx": "^2.1.1",
     "dexie": "^4.2.1",
+    "is-mobile": "^5.0.0",
     "jquery": "^3.7.1",
     "lazy-get-decorator": "^3.0.0",
     "memoize": "^10.2.0",

@@ -3,6 +3,7 @@ import {
   selectAppEnabled,
   fetchIsAppEnabledAsync,
   setIsAppEnabledAsync,
+  closeWindowAsync,
 } from "../appSlice";
 
 import { FontIcon } from "@/components/FontIcon";
@@ -32,7 +33,7 @@ export const Header = () => {
   };
 
   const close = () => {
-    window.close();
+    dispatch(closeWindowAsync());
   };
 
   const toggle = () => {

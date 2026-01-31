@@ -4,6 +4,7 @@ import type pageService from "@/services/page.service";
 import type backendService from "@/services/backend.service";
 import type backgroundService from "@/services/background.service";
 import type clientService from "@/services/client.service";
+import type extensionService from "@/services/extension.service";
 
 import type { RootState, AppDispatch } from ".";
 
@@ -18,6 +19,7 @@ export const createAppAsyncThunk = createAsyncThunk.withTypes<{
       backend: backendService.Instance;
       background: backgroundService.Instance;
       client: clientService.Instance;
+      extension: extensionService.Instance;
     };
   };
 }>();

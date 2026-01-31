@@ -1,6 +1,8 @@
 import { createService } from "@/common/messaging";
 import { LoadingOverlay } from "@/contexts/content/ui/LoadingOverlay";
-import { PublicPath } from "wxt/browser";
+import { Popup } from "@/contexts/content/ui/Popup";
+
+import type { PublicPath } from "wxt/browser";
 
 export interface ExtensionServiceOptions {
   unmountLoadingOverlay: () => void;
@@ -10,6 +12,8 @@ class ExtensionService {
   private readonly loadingOverlay = new LoadingOverlay({
     message: "FMG Initializing...",
   });
+
+  private readonly popup = new Popup({ open: false });
 
   public async getURL(path: PublicPath): Promise<string>;
   public async getURL(path: string): Promise<string>;
@@ -23,6 +27,22 @@ class ExtensionService {
 
   public unmountLoadingOverlay() {
     return this.loadingOverlay.unmount();
+  }
+
+  public async mountPopup() {
+    await this.popup.mount();
+  }
+
+  public unmountPopup() {
+    return this.popup.unmount();
+  }
+
+  public openPopup() {
+    return this.popup.update({ open: true });
+  }
+
+  public closePopup() {
+    return this.popup.update({ open: false });
   }
 }
 

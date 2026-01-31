@@ -24,6 +24,12 @@ if (import.meta.env.FIREFOX) {
   };
 }
 
+$(function () {
+  if (window.self != window.top) {
+    $(document.documentElement).attr("data-iframe", "true");
+  }
+});
+
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <Provider store={store}>
     <ReduxToastr

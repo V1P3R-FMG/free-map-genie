@@ -127,12 +127,30 @@
 .bookmarks-content {
   width: calc(100% - var(--content-margin) * 2);
   display: grid;
-  grid-template-columns: repeat(5, var(--size));
+  grid-template-columns: repeat(2, var(--size));
   grid-auto-rows: var(--size);
 
   margin-right: 0.5rem;
 
   gap: var(--gap);
+}
+
+@media screen and (min-width: 250px) {
+  .bookmarks-content {
+    grid-template-columns: repeat(3, var(--size));
+  }
+}
+
+@media screen and (min-width: 320px) {
+  .bookmarks-content {
+    grid-template-columns: repeat(4, var(--size));
+  }
+}
+
+@media screen and (min-width: 400px) {
+  .bookmarks-content {
+    grid-template-columns: repeat(5, var(--size));
+  }
 }
 
 .bookmark-trash-container {

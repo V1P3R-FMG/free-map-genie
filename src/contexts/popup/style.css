@@ -4,7 +4,7 @@
   font-weight: 400;
   font-size: 16px;
 
-  background-color: black;
+  background-color: transparent;
 
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -12,7 +12,15 @@
   -moz-osx-font-smoothing: grayscale;
   -webkit-text-size-adjust: 100%;
 
+  pointer-events: none;
+
   width: 400px;
+  max-width: 400px;
+  /* width: 400px; */
+}
+
+:root[data-iframe="true"] {
+  width: 100%;
 }
 
 * {

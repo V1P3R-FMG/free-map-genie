@@ -121,6 +121,17 @@ export const injectIconFontAsync = createAppAsyncThunk(
   }
 );
 
+export const closeWindowAsync = createAppAsyncThunk(
+  "app/closeWindow",
+  async (_, { extra: { services } }) => {
+    if (window.self !== window.top) {
+      await services.extension.closePopup();
+    } else {
+      window.close();
+    }
+  }
+);
+
 export const appSlice = createSlice({
   name: "app",
   initialState,

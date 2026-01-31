@@ -3,6 +3,8 @@ import "@/common/messaging/contexts/contentScript";
 import { ExtensionSettings } from "@/common/extension/settings";
 import { getPageType } from "@/common/mapgenie";
 
+import { Popup } from "./ui/Popup";
+
 import extensionService from "@/services/extension.service";
 import { contentLoggerService } from "@/services/logger.service";
 
@@ -20,14 +22,14 @@ export default defineContentScript({
     const extension = extensionService.provide();
     contentLoggerService.provide();
 
-    await extension.mountLoadingOverlay();
-
     const enabled = await ExtensionSettings.enabled.getValue();
     if (!enabled) {
       logger.log("Extension disabled.");
-      extension.unmountLoadingOverlay();
       return;
     }
+
+    await extension.mountLoadingOverlay();
+    await extension.mountPopup();
 
     await injectScript("/page.js");
   },

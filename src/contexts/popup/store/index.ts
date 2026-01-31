@@ -4,6 +4,7 @@ import pageService from "@/services/page.service";
 import backendService from "@/services/backend.service";
 import backgroundService from "@/services/background.service";
 import clientService from "@/services/client.service";
+import extensionService from "@/services/extension.service";
 
 import appReducer from "./features/app/appSlice";
 import bookmakrsReducer from "./features/bookmarks/bookmarksSlice";
@@ -31,6 +32,7 @@ export const store = configureStore({
             backend: backendService.use(),
             background: backgroundService.use(),
             client: clientService.use(),
+            extension: extensionService.use(),
           },
         },
       },

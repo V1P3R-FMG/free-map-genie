@@ -54,7 +54,13 @@ export default defineConfig({
     web_accessible_resources: [
       {
         matches: ["<mapgenie_domains>"],
-        resources: ["page.js", "content-scripts/*.css", "assets/*"],
+        resources: [
+          "page.js",
+          "popup.html",
+          "logo.svg",
+          "content-scripts/*.css",
+          "assets/*",
+        ],
       },
     ],
     permissions:
