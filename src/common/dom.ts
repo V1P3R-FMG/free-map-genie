@@ -34,12 +34,24 @@ export const waitForElement = <T extends HTMLElement>(
   });
 };
 
-export const waitForBody = () => {
-  return waitForElement<HTMLBodyElement>(document.documentElement, "body");
+export const waitForBody = (doc?: Document, timeout?: number) => {
+  return waitForElement<HTMLBodyElement>(
+    doc ?? document.documentElement,
+    "body",
+    {
+      timeout: timeout ?? 5000,
+    }
+  );
 };
 
-export const waitForHead = () => {
-  return waitForElement<HTMLHeadElement>(document.documentElement, "head");
+export const waitForHead = (doc?: Document, timeout?: number) => {
+  return waitForElement<HTMLHeadElement>(
+    doc ?? document.documentElement,
+    "head",
+    {
+      timeout: timeout ?? 5000,
+    }
+  );
 };
 
 export const waitForDocumentLoaded = () => {
