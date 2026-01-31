@@ -36,6 +36,13 @@ interface Window {
 
   // libraries
   axios?: import("axios").Axios;
+
+  // google maps
+  google?: {
+    maps?: {
+      Size: Function;
+    };
+  };
 }
 
 interface WindowEventMap {

@@ -118,6 +118,15 @@ export class MapPage extends Page {
     });
   }
 
+  public fixAltMapSdk() {
+    if (window.config?.altMapSdk) {
+      window.google = window.google || {};
+      window.google.maps = window.google.maps || {
+        Size: function () {},
+      };
+    }
+  }
+
   public async start() {
     await waitForProperty(window, "mapData");
 
@@ -151,6 +160,9 @@ export class MapPage extends Page {
 
     // Load user data
     await this.loadUserData();
+
+    // Fix alt map sdk if needed
+    this.fixAltMapSdk();
 
     await activateBlockedMapgenieScript("map");
 
