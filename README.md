@@ -5,6 +5,8 @@
 
 <p align="center">
     <strong>🚧 FMG V3 - Work in Progress 🚧</strong>
+    <br/>
+    <a href="https://github.com/V1P3R-FMG/free-map-genie/releases/tag/v3.0.0-beta">⬇️🧪 V3 Download</a>
 </p>
 
 ## About
