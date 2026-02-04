@@ -42,6 +42,10 @@ export class DexieDatabase implements Database {
     return this.repositories.profiles;
   }
 
+  public get transaction() {
+    return this.dexie.transaction.bind(this.dexie);
+  }
+
   public async open() {}
   public async close() {}
 

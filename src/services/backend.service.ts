@@ -138,13 +138,19 @@ class BackendService {
     preset: Omit<MG.Preset, "id" | "order">,
     ordering: number[]
   ) {
-    const order = ordering.length;
+    return this.database.transaction(
+      "rw",
+      this.database.presets.table,
+      this.database.presetsOrdering.table,
+      async () => {
+        const order = ordering.length;
+        const id = await this.database.presets.add(key, preset);
 
-    const id = await this.database.presets.add(key, preset);
+        await this.reorderPresets(key, [...ordering, id]);
 
-    await this.database.presetsOrdering.add(key, id, order);
-
-    return { ...preset, order, id };
+        return { ...preset, order, id };
+      }
+    );
   }
 
   public async deletePreset(presetId: number) {
