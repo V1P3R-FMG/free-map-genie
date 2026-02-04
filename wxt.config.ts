@@ -17,7 +17,7 @@ export default defineConfig({
       { name: "default", as: "$", from: "jquery" },
     ],
   },
-  vite: () => ({
+  vite: ({ mode }) => ({
     css: {
       modules: {
         localsConvention: "camelCase",
@@ -27,7 +27,7 @@ export default defineConfig({
       target: "es2020",
     },
     build: {
-      minify: "terser",
+      minify: mode === "production" ? "terser" : false,
     },
   }),
   define: {
