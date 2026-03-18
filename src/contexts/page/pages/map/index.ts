@@ -118,12 +118,25 @@ export class MapPage extends Page {
     });
   }
 
-  public fixAltMapSdk() {
+  private fixAltMapSdk() {
     if (window.config?.altMapSdk) {
       window.google = window.google || {};
       window.google.maps = window.google.maps || {
         Size: function () {},
       };
+    }
+  }
+
+  private restoreFmgMapId() {
+    if (this.fmgMapId !== null) {
+      const params = new URLSearchParams();
+      params.set("fmgMapId", this.fmgMapId.toString());
+
+      window.history.replaceState(
+        {},
+        document.title,
+        `${window.location.pathname}?${params}`
+      );
     }
   }
 
@@ -171,16 +184,7 @@ export class MapPage extends Page {
     await this.ui.mount();
 
     // Restore fmgMapId param on pro maps
-    if (this.fmgMapId !== null) {
-      const params = new URLSearchParams();
-      params.set("fmgMapId", this.fmgMapId.toString());
-
-      window.history.replaceState(
-        {},
-        document.title,
-        `${window.location.pathname}?${params}`
-      );
-    }
+    this.restoreFmgMapId();
   }
 
   public async info() {

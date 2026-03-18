@@ -55,6 +55,8 @@ declare namespace MG {
     public hideAllLocationMarkers(): void;
 
     public updateFoundLocationsStyle(): void;
+
+    public setFoundLocationsShown(shown: boolean): void;
   }
 
   declare type Alignment = "auto";

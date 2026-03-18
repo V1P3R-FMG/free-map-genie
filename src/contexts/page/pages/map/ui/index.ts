@@ -1,12 +1,17 @@
 import { waitForProperty } from "@/common/object";
 
 import { TotalProgress } from "./TotalProgress";
+import { Settings, getAllExtraMapgenieSettings } from "./Settings";
 
 export class UI {
   private readonly totalProgress = new TotalProgress();
+  private readonly settings = new Settings({
+    settings: getAllExtraMapgenieSettings(),
+  });
 
   public async mount() {
     await this.totalProgress.mount();
+    await this.settings.mount();
 
     const store = await waitForProperty(window, "store");
 
