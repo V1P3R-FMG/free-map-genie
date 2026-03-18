@@ -1,18 +1,8 @@
 import { IntegratedComponent } from "@/common/ui";
 import { Setting } from "./Setting";
-import { MapgenieSettings } from "./mapgenieSettings";
-
-export type SettingData = {
-  label: string;
-  enabled: boolean;
-  onChange?: (value: boolean) => void;
-};
-
-export type SettingDataFactory = (settings: MapgenieSettings) => SettingData;
+import { SettingsManager } from "./settingsManager";
 
 export class Settings extends IntegratedComponent<Setting.Props> {
-  private readonly mapgenieSettings = new MapgenieSettings();
-
   constructor(props: Setting.Props) {
     super(props);
   }
@@ -20,17 +10,13 @@ export class Settings extends IntegratedComponent<Setting.Props> {
   public render() {
     return (
       <>
-        {this.props.settings.map((setting) => {
-          const settingData =
-            typeof setting === "function"
-              ? setting(this.mapgenieSettings)
-              : setting;
+        {this.props.settingsManager.settings.map((setting) => {
           return (
             <Setting
-              key={settingData.label}
-              label={settingData.label}
-              enabled={settingData.enabled}
-              onChange={settingData.onChange}
+              key={setting.label}
+              label={setting.label}
+              enabled={setting.enabled}
+              onChange={setting.onChange}
             />
           );
         })}
@@ -45,6 +31,6 @@ export class Settings extends IntegratedComponent<Setting.Props> {
 
 namespace Setting {
   export interface Props {
-    settings: SettingData[] | SettingDataFactory[];
+    settingsManager: SettingsManager;
   }
 }

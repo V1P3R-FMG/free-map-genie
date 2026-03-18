@@ -1,56 +1,62 @@
-import { SettingDataFactory } from "../Settings";
+import { waitForProperty } from "@/common/object";
+import { SettingData } from "./settingData";
 
-export const rememberFoundLocationsShownSettingDataFactory: SettingDataFactory =
-  (settings) => {
-    logger.debug("Initializing Remember Found Locations Shown setting");
+export class RememberFoundLocationsShownSettingData extends SettingData {
+  public readonly label = "Remember Found Locations Shown";
 
-    const setting = settings.get<boolean>("remember_found_locations_shown");
-    let remembering = setting.value !== null;
+  private readonly setting = this.storage.get<boolean>(
+    "remember_found_locations_shown"
+  );
 
-    // Load initial value and apply it
-    const load = () => {
-      const storedValue = setting.value;
-      if (storedValue !== null) {
-        window.mapManager?.setFoundLocationsShown(storedValue);
-        $("#toggle-found").toggleClass("disabled", !storedValue);
-      }
-    };
-
-    // Wait for the map to load before applying the setting
-    if (!window.map) {
-      throw new Error("window.map is not available");
-    }
-
-    if (!window.map?.loaded()) {
-      window.map.on("load", load);
-    } else {
-      load();
-    }
-
-    // Listen for found location shown state changes and store them
-    if (!window.mapManager?.setFoundLocationsShown) {
-      throw new Error("mapManager.setFoundLocationsShown is not available");
-    }
-
-    const _setFoundLocationsShown = window.mapManager.setFoundLocationsShown;
-    window.mapManager.setFoundLocationsShown = (shown: boolean) => {
+  private interceptSetFoundLocationsShown() {
+    const _setFoundLocationsShown = window.mapManager!.setFoundLocationsShown;
+    window.mapManager!.setFoundLocationsShown = (shown: boolean) => {
       _setFoundLocationsShown.call(window.mapManager, shown);
 
-      if (remembering) {
-        setting.value = shown;
+      if (this.enabled) {
+        this.setting.value = shown;
       }
     };
+  }
 
-    return {
-      label: "Remember Found Locations Shown",
-      enabled: remembering,
-      onChange: (enabled) => {
-        remembering = enabled;
-        if (enabled) {
-          setting.value = window.mapManager?.showFoundLocations ?? false;
-        } else {
-          setting.value = null;
-        }
-      },
-    };
-  };
+  private loadInitialValue() {
+    const storedValue = this.setting.value;
+    if (storedValue !== null) {
+      window.mapManager?.setFoundLocationsShown(storedValue);
+      $("#toggle-found").toggleClass("disabled", !storedValue);
+    }
+  }
+
+  private waitForMapManager() {
+    return waitForProperty(window, "mapManager");
+  }
+
+  private async waitForMapLoad() {
+    if (!window.mapManager!.map.loaded()) {
+      return new Promise<void>((resolve) => {
+        window.mapManager!.map.on("load", () => resolve());
+      });
+    }
+  }
+
+  protected init() {
+    logger.debug("Initializing RememberFoundLocationsShownSettingData", this);
+    this.waitForMapManager().then(async () => {
+      this.interceptSetFoundLocationsShown();
+
+      await this.waitForMapLoad();
+      this.loadInitialValue();
+    });
+
+    return this.setting.value !== null;
+  }
+
+  public onChange(enabled: boolean) {
+    super.onChange(enabled);
+    if (enabled) {
+      this.setting.value = window.mapManager?.showFoundLocations ?? false;
+    } else {
+      this.setting.value = null;
+    }
+  }
+}

@@ -1,7 +1,9 @@
-import { rememberFoundLocationsShownSettingDataFactory } from "./rememberFoundLocationsShown";
+import { RememberFoundLocationsShownSettingData } from "./rememberFoundLocationsShown";
 
-export const getAllExtraMapgenieSettings = () => {
-  return [rememberFoundLocationsShownSettingDataFactory];
+export * from "./settingData";
+
+export const settingsData = {
+  RememberFoundLocationsShownSettingData,
 };
 
-export { rememberFoundLocationsShownSettingDataFactory };
+export const allSettingsData = Object.values(settingsData);

@@ -1,6 +1,6 @@
 export type ChangeListener<T> = (value: T | null) => void;
 
-export class MapgenieSetting<T> {
+export class SavedEntry<T> {
   private readonly key: string;
   private readonly listeners: Set<ChangeListener<T>> = new Set();
 
@@ -44,7 +44,7 @@ export class MapgenieSetting<T> {
     this.onChange(listener);
   }
 
-  public static emitChange<T>(setting: MapgenieSetting<T>, value: string) {
+  public static emitChange<T>(setting: SavedEntry<T>, value: string) {
     const parsedValue = setting.parse(value);
     setting.listeners.forEach((listener) => listener(parsedValue));
   }

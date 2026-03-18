@@ -13,7 +13,7 @@ declare namespace MG {
     public iconSize: number;
     public imageOverlays?: unknown;
     public isToolInterceptingClicks: boolean;
-    public map: Map;
+    public map: MapboxGL.Map;
     public mapTypeControl: Nullable<unknown>;
     public newLocationMarker: Nullable<unknown>;
     public newSuggestionClickListener: Nullable<unknown>;
