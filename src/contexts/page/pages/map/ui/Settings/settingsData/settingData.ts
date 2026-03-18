@@ -6,6 +6,7 @@ export abstract class SettingData {
   public constructor(protected readonly storage: LocalStorageManager) {}
 
   private _enabled: boolean | null = null;
+
   public get enabled() {
     if (this._enabled === null) {
       this._enabled = this.init();

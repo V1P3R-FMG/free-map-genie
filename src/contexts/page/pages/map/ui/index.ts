@@ -1,7 +1,7 @@
 import { waitForProperty } from "@/common/object";
 
 import { TotalProgress } from "./TotalProgress";
-import { Settings, SettingsManager, settingsData } from "./Settings";
+import { Settings, SettingsManager, allSettingsData } from "./Settings";
 
 export class UI {
   private readonly settingsManager = new SettingsManager();
@@ -12,9 +12,7 @@ export class UI {
   });
 
   constructor() {
-    this.settingsManager.register(
-      settingsData.RememberFoundLocationsShownSettingData
-    );
+    this.settingsManager.register(...allSettingsData);
   }
 
   public async mount() {

@@ -16,7 +16,7 @@ export class Settings extends IntegratedComponent<Setting.Props> {
               key={setting.label}
               label={setting.label}
               enabled={setting.enabled}
-              onChange={setting.onChange}
+              onChange={(enabled) => setting.onChange(enabled)}
             />
           );
         })}

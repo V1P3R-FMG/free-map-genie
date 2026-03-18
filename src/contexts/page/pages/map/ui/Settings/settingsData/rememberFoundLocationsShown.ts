@@ -40,7 +40,6 @@ export class RememberFoundLocationsShownSettingData extends SettingData {
   }
 
   protected init() {
-    logger.debug("Initializing RememberFoundLocationsShownSettingData", this);
     this.waitForMapManager().then(async () => {
       this.interceptSetFoundLocationsShown();
 

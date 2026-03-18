@@ -21,7 +21,6 @@ export class LocalStorageManager {
   }
 
   public get<T>(...keys: KeyPart[]): SavedEntry<T> {
-    logger.debug("Getting setting with keys:", keys);
     const key = this.createKey(keys);
     if (!this.saves.has(key)) {
       this.saves.set(key, new SavedEntry<T>(key));
