@@ -169,7 +169,7 @@ declare namespace MG.Actions {
     }
 
     declare interface SearchResults {
-      searchResults: unknown[];
+      searchResults: MG.SearchStateSearchResult;
     }
 
     declare interface LocationHighlighted {
@@ -268,4 +268,12 @@ declare namespace MG.Actions {
     ["MG:SEARCH:SET_SEARCH_RESULTS"]: Meta.SearchResults;
     ["MG:SEARCH:SET_LOCATION_HIGHLIGHTED"]: Meta.LocationHighlighted;
   }
+
+  declare type StateActionsMap = {
+    [K in keyof UserStateActionsMap]: UserStateActionsMap[K];
+  } & {
+    [K in keyof MapStateActionsMap]: MapStateActionsMap[K];
+  } & {
+    [K in keyof SearchStateActionsMap]: SearchStateActionsMap[K];
+  };
 }

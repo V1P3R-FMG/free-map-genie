@@ -14,7 +14,7 @@ declare namespace MG {
     isEditingRoute: boolean;
     isSavingRoute: boolean;
     locations: Location[];
-    locationByCategory: RecordById<Location>;
+    locationsByCategory: Location[];
     locationById: RecordById<Location>;
     multiTagFilters: Record<unknown, unknown>;
     newLocation: Nullable<Location>;
