@@ -59,19 +59,16 @@ export default class PortAdapter extends Adapter {
       // Supress possible errors from lastError
       const _ = browser.runtime.lastError;
     } catch (e) {
-      if (e instanceof Error) {
-        if (
-          e.message.includes("Attempting to use a disconnected port object")
-        ) {
-          logger.warn(
-            "Port was disconnected, reconnecting and retrying message"
-          );
+      if (
+        e instanceof Error &&
+        e.message.includes("Attempting to use a disconnected port object")
+      ) {
+        logger.warn("Port was disconnected, reconnecting and retrying message");
 
-          // Reconnect and retry
-          this.connect();
-          this.port?.postMessage(message);
-          return;
-        }
+        // Reconnect and retry
+        this.connect();
+        this.port?.postMessage(message);
+        return;
       }
 
       // rethrow if it's a different error
