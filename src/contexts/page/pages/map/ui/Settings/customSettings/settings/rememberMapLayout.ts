@@ -49,10 +49,7 @@ export class RememberMapTypeSettingData extends CustomSetting {
   public async init() {
     const gameId = await this.waitForGameId();
 
-    this.setting = this.StorageEntry.get<string>(
-      ["game", gameId],
-      "remember_map_type"
-    );
+    this.setting = this.StorageEntry.get<string>(["game", gameId], "map_type");
 
     await this.waitForMapManager();
     this.interceptMapTypeChanges();

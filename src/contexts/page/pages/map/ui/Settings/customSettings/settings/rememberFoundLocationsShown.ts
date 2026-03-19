@@ -33,7 +33,7 @@ export class RememberFoundLocationsShownSettingData extends CustomSetting {
 
     this.setting = this.StorageEntry.get<boolean>(
       ["game", gameId],
-      "remember_found_locations_shown"
+      "found_locations_shown"
     );
 
     await this.waitForMapManager();
