@@ -1,6 +1,6 @@
 import { CustomSetting, type StorageEntry } from "../customSetting";
 
-export class RememberFoundLocationsShownSettingData extends CustomSetting {
+export class RememberFoundLocationsShownSetting extends CustomSetting {
   public readonly label = "Remember Found Locations Shown";
 
   private setting!: StorageEntry<boolean>;

@@ -1,6 +1,6 @@
 import { CustomSetting, type StorageEntry } from "../customSetting";
 
-export class RememberMapTypeSettingData extends CustomSetting {
+export class RememberMapTypeSetting extends CustomSetting {
   public readonly label = "Remember Map Type";
 
   private setting!: StorageEntry<string>;

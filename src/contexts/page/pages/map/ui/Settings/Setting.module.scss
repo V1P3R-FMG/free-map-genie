@@ -9,7 +9,7 @@
 
   &.skeleton {
     // width: 300px;
-    background: color-mix(in srgb, var(--accent-color), transparent 95%);
+    // background: var(--popup-button-highlight-color);
     position: relative;
     overflow: hidden;
 
@@ -29,7 +29,7 @@
       background: linear-gradient(
         90deg,
         transparent,
-        color-mix(in srgb, var(--text-color), transparent 60%),
+        color-mix(in srgb, var(--accent-color), transparent 60%),
         transparent
       );
       animation: shine 1.4s infinite;

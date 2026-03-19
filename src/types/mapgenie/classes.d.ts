@@ -66,6 +66,7 @@ declare namespace MG {
     public updateFoundLocationsStyle(): void;
 
     public setFoundLocationsShown(shown: boolean): void;
+    public setImageOverlaysVisible(visible: boolean): void;
   }
 
   declare type Alignment = "auto";
