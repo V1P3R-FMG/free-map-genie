@@ -1,19 +1,11 @@
 import { waitForProperty } from "@/common/object";
 
 import { TotalProgress } from "./TotalProgress";
-import { Settings, SettingsManager, allSettingsData } from "./Settings";
+import { Settings } from "./Settings";
 
 export class UI {
-  private readonly settingsManager = new SettingsManager();
-
   private readonly totalProgress = new TotalProgress();
-  private readonly settings = new Settings({
-    settingsManager: this.settingsManager,
-  });
-
-  constructor() {
-    this.settingsManager.register(...allSettingsData);
-  }
+  private readonly settings = new Settings();
 
   public async mount() {
     await this.totalProgress.mount();

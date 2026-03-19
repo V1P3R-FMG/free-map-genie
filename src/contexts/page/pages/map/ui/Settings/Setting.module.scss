@@ -1,0 +1,45 @@
+.setting {
+  display: grid;
+
+  .spinner,
+  .custom-checkbox {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  &.skeleton {
+    // width: 300px;
+    background: color-mix(in srgb, var(--accent-color), transparent 95%);
+    position: relative;
+    overflow: hidden;
+
+    .custom-checkbox {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    /* Shine layer */
+    &::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: -50%;
+      height: 100%;
+      width: 50%;
+      background: linear-gradient(
+        90deg,
+        transparent,
+        color-mix(in srgb, var(--text-color), transparent 60%),
+        transparent
+      );
+      animation: shine 1.4s infinite;
+    }
+  }
+}
+
+/* Animation */
+@keyframes shine {
+  100% {
+    left: 100%;
+  }
+}

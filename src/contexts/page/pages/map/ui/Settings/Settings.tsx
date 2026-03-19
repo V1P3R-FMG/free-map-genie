@@ -1,24 +1,21 @@
 import { IntegratedComponent } from "@/common/ui";
 import { Setting } from "./Setting";
-import { SettingsManager } from "./settingsManager";
+import { CustomSettings } from "./customSettings";
 
 export class Settings extends IntegratedComponent<Setting.Props> {
-  constructor(props: Setting.Props) {
-    super(props);
+  public readonly settings = new CustomSettings();
+
+  public async css() {
+    return {
+      url: await BrowserUtils.getCssUrl(),
+    };
   }
 
   public render() {
     return (
       <>
-        {this.props.settingsManager.settings.map((setting) => {
-          return (
-            <Setting
-              key={setting.label}
-              label={setting.label}
-              enabled={setting.enabled}
-              onChange={(enabled) => setting.onChange(enabled)}
-            />
-          );
+        {this.settings.all.map((setting) => {
+          return <Setting key={setting.label} setting={setting} />;
         })}
       </>
     );
@@ -30,7 +27,5 @@ export class Settings extends IntegratedComponent<Setting.Props> {
 }
 
 namespace Setting {
-  export interface Props {
-    settingsManager: SettingsManager;
-  }
+  export interface Props {}
 }
