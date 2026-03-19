@@ -3,6 +3,15 @@ declare namespace MG {
     public onMarkLocation(locationId: Int, marked: boolean): void;
   }
 
+  declare interface MapType extends MG.TileSet {}
+
+  declare interface MapTypeControl {
+    container: HTMLDivElement;
+    map: MapboxGL.Map;
+    mapTypes: MapType[];
+    onMapTypeSelected: (mapType: string) => void;
+  }
+
   declare class MapManager {
     public routeToolControl: Nullable<unknown>;
     public foundLocationService: FoundLocationService;
@@ -14,7 +23,7 @@ declare namespace MG {
     public imageOverlays?: unknown;
     public isToolInterceptingClicks: boolean;
     public map: MapboxGL.Map;
-    public mapTypeControl: Nullable<unknown>;
+    public mapTypeControl: Nullable<MapTypeControl>;
     public newLocationMarker: Nullable<unknown>;
     public newSuggestionClickListener: Nullable<unknown>;
     public notesById: RecordByStrId<Note>;

@@ -9,6 +9,10 @@ export class RememberMapTypeSettingData extends CustomSetting {
     return this.setting.value !== null;
   }
 
+  public get applicable(): boolean {
+    return window.mapManager?.mapTypeControl !== null;
+  }
+
   private interceptMapTypeChanges() {
     $("#map-type-control div").on("click", (event) => {
       const title = $(event.currentTarget).attr("title");

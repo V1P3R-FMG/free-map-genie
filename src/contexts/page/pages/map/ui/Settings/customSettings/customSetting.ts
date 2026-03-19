@@ -23,7 +23,7 @@ export abstract class CustomSetting {
   public constructor() {
     Promise.resolve()
       .then(() => this.init())
-      .then(() => this.load())
+      .then(() => this.applicable && this.load())
       .then(() => {
         this._loaded = true;
         this.loadedCallbacks.forEach((callback) => callback());
@@ -32,6 +32,10 @@ export abstract class CustomSetting {
       .catch((error) => {
         console.error("Error initializing setting:", error);
       });
+  }
+
+  public get applicable(): boolean {
+    return true;
   }
 
   public loaded(): boolean {

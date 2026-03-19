@@ -15,7 +15,11 @@ export class Settings extends IntegratedComponent<Setting.Props> {
     return (
       <>
         {this.settings.all.map((setting) => {
-          return <Setting key={setting.label} setting={setting} />;
+          return (
+            setting.applicable && (
+              <Setting key={setting.label} setting={setting} />
+            )
+          );
         })}
       </>
     );
