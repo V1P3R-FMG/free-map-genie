@@ -69,7 +69,7 @@ export default defineUnlistedScript(async () => {
 
   logger.log(`Initializing page ${pageType} script.`);
 
-  MapgenieAdBlocker.remove();
+  MapgenieAdBlocker.start();
   MapgenieAdBlocker.removePrivacyPopup();
 
   let failed: boolean = false;

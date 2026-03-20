@@ -114,7 +114,7 @@ export default class MapgenieAdBlocker {
     this.handle = null;
   }
 
-  public static remove() {
+  public static start() {
     if (this.handle != null) return;
     this.handle = window.setInterval(
       () => this.tick(),
