@@ -29,6 +29,15 @@ export default defineConfig({
     build: {
       minify: mode === "production" ? "terser" : false,
     },
+    define:
+      mode === "production"
+        ? {}
+        : {
+            "import.meta.env.MG_EMAIL": JSON.stringify(process.env.MG_EMAIL),
+            "import.meta.env.MG_PASSWORD": JSON.stringify(
+              process.env.MG_PASSWORD
+            ),
+          },
   }),
   define: {
     "import.meta.env.PKG_VERSION": JSON.stringify(version),

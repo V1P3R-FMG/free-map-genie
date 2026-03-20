@@ -140,6 +140,20 @@ export class MapPage extends Page {
     }
   }
 
+  private async login() {
+    await waitForProperty(window, "mapManager");
+
+    const $loginLink = $(`#user-panel a[href$="/login"]`);
+    if ($loginLink.length > 0) {
+      const href = $loginLink[0].getAttribute("href");
+      if (href) {
+        window.location.href = href;
+      }
+    } else {
+      logger.warn("Login link not found.");
+    }
+  }
+
   public async start() {
     await waitForProperty(window, "mapData");
 
@@ -162,6 +176,12 @@ export class MapPage extends Page {
 
     if (!window.user) {
       await activateBlockedMapgenieScript("map");
+
+      // In development mode, auto-login and load map data to speed up testing
+      if (import.meta.env.DEV) {
+        await this.login();
+      }
+
       return;
     }
 
