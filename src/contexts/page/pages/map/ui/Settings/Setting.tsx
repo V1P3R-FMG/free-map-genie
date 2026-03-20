@@ -11,7 +11,7 @@ export const Setting = (props: Setting.Props) => {
       setEnabled(props.setting.enabled);
       setLoading(false);
     });
-  });
+  }, [props.setting]);
 
   const onClick = () => {
     setEnabled((prev) => {
@@ -20,6 +20,10 @@ export const Setting = (props: Setting.Props) => {
       return newValue;
     });
   };
+
+  if (!props.setting.applicable) {
+    return null;
+  }
 
   return (
     <div

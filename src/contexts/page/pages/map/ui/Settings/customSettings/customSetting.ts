@@ -38,7 +38,7 @@ export abstract class CustomSetting {
     return true;
   }
 
-  public loaded(): boolean {
+  public get loaded(): boolean {
     return this._loaded;
   }
 
@@ -70,6 +70,18 @@ export abstract class CustomSetting {
         window.mapManager!.map.on("load", () => resolve());
       });
     }
+  }
+
+  protected async waitForStore() {
+    return waitForProperty(window, "store");
+  }
+
+  protected get store() {
+    return window.store!;
+  }
+
+  protected getState() {
+    return this.store.getState();
   }
 
   protected async waitForGameId() {
