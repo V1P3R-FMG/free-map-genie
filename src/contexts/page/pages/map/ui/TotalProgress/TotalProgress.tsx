@@ -1,5 +1,6 @@
 import { IntegratedComponent } from "@/common/ui/integrated";
 import { MapInfo } from "../../mapInfo";
+import { OnStateUpdate } from "./onStateUpdateHook";
 
 export class TotalProgress extends IntegratedComponent<TotalProgress.Props> {
   constructor(props?: TotalProgress.Props) {
@@ -13,6 +14,7 @@ export class TotalProgress extends IntegratedComponent<TotalProgress.Props> {
 
     return (
       <>
+        <OnStateUpdate onUpdate={(state) => this.updateFromState(state)} />
         <div
           className="progress-item-wrapper"
           style={{
