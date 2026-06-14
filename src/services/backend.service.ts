@@ -122,7 +122,8 @@ class BackendService {
   public async addNote(key: Key, note: Omit<MG.Note, "id" | "created_at">) {
     const created_at = new Date().toISOString();
     const id = await this.database.notes.add(key, { ...note, created_at });
-    return { ...note, created_at, id };
+    const user_id = key.userId;
+    return { ...note, user_id, created_at, id };
   }
 
   public async updateNote(id: string, updates: Partial<MG.Note>) {
