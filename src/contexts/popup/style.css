@@ -27,3 +27,8 @@
   box-sizing: border-box;
   margin: 0;
 }
+
+body {
+  background-color: var(--background);
+  color: var(--color);
+}

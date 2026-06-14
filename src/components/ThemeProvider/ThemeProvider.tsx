@@ -4,12 +4,17 @@ import "./themes/light.css";
 import "./ThemeProvider.css";
 
 export const ThemeProvider = (props: ThemeProvider.Props) => {
-  return (
-    // Fallback to dark theme if selected theme is not available
-    <div data-theme="dark">
-      <div data-theme={props.theme}>{props.children}</div>
-    </div>
-  );
+
+
+  React.useEffect(() => {
+    document.body.setAttribute("data-theme", props.theme ?? "dark");
+
+    return () => {
+      document.body.removeAttribute("data-theme");
+    };
+  }, [props.theme]);
+
+  return <>{props.children}</>
 };
 
 namespace ThemeProvider {
