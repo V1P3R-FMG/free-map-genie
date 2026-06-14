@@ -1,5 +1,5 @@
-import { TotalProgress } from "./TotalProgress";
-import { Settings } from "./Settings";
+import { TotalProgress } from "./components/TotalProgress";
+import { Settings } from "./components/Settings";
 
 export class UI {
   private readonly totalProgress = new TotalProgress();

@@ -1,16 +1,17 @@
 import { waitForProperty } from "@/common/object";
 
 export const useOnStateUpdateHook = (onUpdate: (state: MG.State) => void) => {
+  const update = () => {
+    const state = window.store!.getState();
+    onUpdate(state);
+  };
+
   React.useEffect(() => {
     waitForProperty(window, "store").then((store) => {
-      store!.subscribe(() => {
-        const state = window.store!.getState();
-        onUpdate(state);
-      });
+      store!.subscribe(update);
 
       // Call onUpdate immediately with the current state
-      const state = store!.getState();
-      onUpdate(state);
+      update();
     });
   }, [onUpdate]);
 };

@@ -1,6 +1,6 @@
 import { IntegratedComponent } from "@/common/ui/integrated";
-import { MapInfo } from "../../mapInfo";
-import { OnStateUpdate } from "./onStateUpdateHook";
+import { MapInfo } from "@/common/mapgenie/mapInfo";
+import { OnStateUpdate } from "../../hooks/onStateUpdateHook";
 
 export class TotalProgress extends IntegratedComponent<TotalProgress.Props> {
   constructor(props?: TotalProgress.Props) {
