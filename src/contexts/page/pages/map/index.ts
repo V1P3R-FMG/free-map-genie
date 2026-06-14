@@ -86,6 +86,8 @@ export class MapPage extends Page {
   }
 
   private async loadMapData() {
+    if (!window.mapData) return;
+
     if (this.fmgMapId !== null) {
       await this.loadMapDataForMapId(this.fmgMapId);
       return;
@@ -97,7 +99,9 @@ export class MapPage extends Page {
   }
 
   private async loadHeatmaps() {
-    const hasHeatmaps = window.mapData!.heatmapGroups.length > 0;
+    if (!window.mapData?.heatmapGroups) return;
+
+    const hasHeatmaps = window.mapData.heatmapGroups.length > 0;
     if (!hasHeatmaps) return;
 
     const heatmaps = await this.client.mapgenie.fetchHeatmaps(
