@@ -42,7 +42,9 @@ const fetchDomains = async (wxt: Wxt) => {
   return domains;
 };
 
-const replaceAllUrls = (arr: string[], domains: string[]) => {
+const replaceAllUrls = (arr: string[] | null | undefined, domains: string[]) => {
+  if (!arr) return;
+
   const idx = arr.findIndex((url) => url === "<mapgenie_domains>") ?? -1;
   if (idx === -1) return;
   arr.splice(idx, 1);
@@ -67,6 +69,8 @@ export default defineWxtModule({
     });
 
     wxt.hook("build:manifestGenerated", async (wxt, manifest) => {
+      if (!manifest.web_accessible_resources) return;
+
       domains ??= await fetchDomains(wxt);
 
       for (const resource of manifest.web_accessible_resources) {
