@@ -115,6 +115,56 @@ export class FMG_Map {
     }
 
     /**
+     * Lock FMG's injected data so Map Genie's map.js can't undo it.
+     *
+     * On boot (after we re-activate it) map.js fetches the user's server data
+     * from GET /api/v1/user/map-data/{mapId} and re-applies it, clobbering every
+     * value we set just before re-injecting it:
+     *     window.user.hasPro             = s.hasPro              // -> false (re-locks the cap)
+     *     window.user.locations          = s.locations          // -> wipes found locations
+     *     window.user.trackedCategoryIds = s.trackedCategoryIds // -> wipes tracked categories
+     *     window.mapData.notes           = s.notes              // -> wipes notes
+     *     window.mapData.presets         = s.presets            // -> wipes presets
+     *     window.mapData.maxMarkedLocations = s.maxMarkedLocations  // -> 100
+     *
+     * Defining them as getters with a no-op setter makes map.js's assignments
+     * no-ops, so FMG's imported/saved data survives. canMarkLocation() reads
+     * window.user.hasPro live, so locking it to true also removes the free-user
+     * location limit. map.js never reassigns window.user / window.mapData
+     * wholesale (only mutates their properties), so the lock holds.
+     */
+    private lockProUnlock(): void {
+        const user = this.window.user;
+        if (user) {
+            this.lockValue(user, "hasPro", true);
+            this.lockValue(user, "locations", user.locations);
+            this.lockValue(user, "trackedCategoryIds", user.trackedCategoryIds);
+        }
+
+        const mapData = this.window.mapData;
+        if (mapData) {
+            this.lockValue(mapData, "maxMarkedLocations", Infinity);
+            this.lockValue(mapData, "notes", mapData.notes);
+            this.lockValue(mapData, "presets", mapData.presets);
+        }
+    }
+
+    /**
+     * Define `obj[key]` as a getter returning `value` with a no-op setter, so a
+     * later assignment (map.js's boot-time re-sync from the server) is silently
+     * ignored. Other properties stay mutable and `value` can still be mutated
+     * in place.
+     */
+    private lockValue(obj: object, key: PropertyKey, value: unknown): void {
+        Object.defineProperty(obj, key, {
+            configurable: true,
+            enumerable: true,
+            get: () => value,
+            set: () => {}
+        });
+    }
+
+    /**
      * Enable map editor.
      * At the momment nothing usfull can be done with as far as i know.
      */
@@ -289,7 +339,15 @@ export class FMG_Map {
             } as any;
         }
 
-        await this.loadMapData();
+        // Best-effort: loading pro map data must never abort setup() before
+        // loadMapScript() re-injects the blocked map.js, or the map won't load
+        // at all. If the Map Genie data API fails (e.g. missing/expired
+        // X-Api-Secret), fall back to the page's original map data.
+        try {
+            await this.loadMapData();
+        } catch (err) {
+            logger.error("Failed to load pro map data, loading map anyway.", err);
+        }
         this.setupConfig(settings);
 
         await FMG_StorageDataMigrator.migrateLegacyData(this.window);
@@ -304,6 +362,11 @@ export class FMG_Map {
         // Install storage filter, before we load the blocked map script
         const storageFilter = FMG_StorageFilter.install(this.window);
         setupStorageFilter(storageFilter, this.mapManager);
+
+        // Lock the pro data right before map.js boots, so its boot-time re-sync
+        // (GET /api/v1/user/map-data/{mapId}) can't clobber it and re-enable the
+        // free-user location limit or wipe the loaded/imported data.
+        this.lockProUnlock();
 
         // After we fixed google maps and enabled pro features,
         // we can load the blocked map script
