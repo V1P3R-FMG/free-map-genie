@@ -119,6 +119,14 @@ class BackendService {
     await this.database.categories.setTracked(key, categoryId, track);
   }
 
+  public async getCategoryFilters(key: Key) {
+    return this.database.categoryFilters.get(key);
+  }
+
+  public async setCategoryFilters(key: Key, filters: Record<number, boolean>) {
+    await this.database.categoryFilters.set(key, filters);
+  }
+
   public async addNote(key: Key, note: Omit<MG.Note, "id" | "created_at">) {
     const created_at = new Date().toISOString();
     const id = await this.database.notes.add(key, { ...note, created_at });

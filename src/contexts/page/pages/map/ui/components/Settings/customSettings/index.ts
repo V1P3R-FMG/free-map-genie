@@ -2,6 +2,7 @@ import { RememberFoundLocationsShownSetting } from "./settings/rememberFoundLoca
 import { RememberMapTypeSetting } from "./settings/rememberMapLayout";
 import { RememberToggleInteriorsOverlaySetting } from "./settings/rememberToggleInteriorsOverlay";
 import { RememberTagFiltersSetting } from "./settings/rememberTagFilters";
+import { RememberCategoryFiltersSetting } from "./settings/rememberCategoryFilters";
 
 import type { CustomSetting } from "./customSetting";
 
@@ -14,6 +15,8 @@ export class CustomSettings {
   public readonly rememberToggleInteriorsOverlay =
     new RememberToggleInteriorsOverlaySetting();
   public readonly rememberTagFilters = new RememberTagFiltersSetting();
+  public readonly rememberCategoryFilters =
+    new RememberCategoryFiltersSetting();
 
   public get all(): CustomSetting[] {
     return Object.values(this);
