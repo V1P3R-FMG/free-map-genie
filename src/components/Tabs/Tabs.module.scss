@@ -1,0 +1,50 @@
+.tab {
+  color: var(--color);
+  background-color: var(--item);
+  border: 1px solid var(--item);
+  border-radius: 5px;
+  padding: 0.5rem;
+
+  &.active {
+    color: var(--active);
+  }
+
+  &:hover {
+    border-color: var(--active);
+  }
+}
+
+.tabs-container {
+  display: grid;
+  grid-template-rows: 3rem auto;
+  overflow: hidden;
+}
+
+.tab-bar {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 5px;
+  margin: 0 0.5rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.tab-views {
+  display: grid;
+  overflow-y: auto;
+  max-height: 100%;
+  margin: 0.5rem;
+}
+
+.tab-view-container {
+  opacity: 0;
+  pointer-events: none;
+
+  grid-column: 1;
+  grid-row: 1;
+
+  &.active {
+    opacity: 1;
+    pointer-events: all;
+  }
+}

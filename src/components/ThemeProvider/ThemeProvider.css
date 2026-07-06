@@ -1,0 +1,4 @@
+div[data-theme] {
+  color: var(--color);
+  background: var(--background);
+}

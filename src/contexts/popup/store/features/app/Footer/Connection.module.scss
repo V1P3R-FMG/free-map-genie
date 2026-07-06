@@ -1,0 +1,16 @@
+.connection {
+  display: flex;
+  gap: 5px;
+  align-items: center;
+  justify-content: center;
+
+  color: var(--red);
+
+  &.connected {
+    color: var(--green);
+  }
+
+  i {
+    cursor: pointer;
+  }
+}

@@ -1,0 +1,18 @@
+.confirm-panel {
+  position: relative;
+  padding: 0.5rem;
+  padding-top: 1rem;
+  width: 300px;
+  user-select: none;
+
+  .btn-group {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    margin-top: 1rem;
+
+    .btn {
+      display: block;
+    }
+  }
+}

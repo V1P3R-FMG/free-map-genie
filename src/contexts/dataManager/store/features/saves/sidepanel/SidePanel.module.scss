@@ -1,0 +1,13 @@
+.side-panel {
+  display: flex;
+  flex-direction: column;
+  width: 310px;
+  height: 100%;
+}
+
+@media (max-width: 900px) {
+  .side-panel {
+    width: 100%;
+    min-height: 200px;
+  }
+}

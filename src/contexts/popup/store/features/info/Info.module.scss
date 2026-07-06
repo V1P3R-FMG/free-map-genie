@@ -1,0 +1,23 @@
+.info {
+  display: grid;
+  grid-template-columns: auto;
+  gap: 5px;
+}
+
+.entry {
+  font-size: 0.8rem;
+
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  background-color: var(--item);
+  border-radius: 6px;
+
+  strong {
+    border-right: 1px solid var(--border);
+  }
+
+  strong,
+  span {
+    padding: 5px;
+  }
+}

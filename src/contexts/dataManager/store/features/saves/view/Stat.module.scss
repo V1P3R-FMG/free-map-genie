@@ -1,0 +1,8 @@
+.stat {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  padding: 5px;
+  gap: 10px;
+  font-size: 1rem;
+  user-select: none;
+}

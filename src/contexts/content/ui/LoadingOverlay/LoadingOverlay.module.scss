@@ -1,0 +1,42 @@
+* {
+  margin: 0;
+}
+
+.loading {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 99999999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #00000098;
+
+  h1 {
+    font-size: 3rem;
+  }
+}
+
+.loading-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  .spinner {
+    width: 3rem;
+    height: 3rem;
+  }
+}
+
+@media (min-width: 768px) {
+  .loading h1 {
+    font-size: 5rem;
+  }
+
+  .loading-content .spinner {
+    width: 5rem;
+    height: 5rem;
+  }
+}
