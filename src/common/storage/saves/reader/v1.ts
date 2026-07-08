@@ -4,7 +4,7 @@ import {
   LocalV1DataSchema,
   type LocalV1Data,
 } from "../../databases/local/versions/v1.schema";
-import { V1MigratorHelper } from "../../databases/local/versions/helpers/v1MigratorHelper";
+import { V1MigratorHelper } from "../../databases/local/versions/helpers/v1migratorhelper";
 
 const V1SaveLayoutSchema = z.object({
   version: z.string(),

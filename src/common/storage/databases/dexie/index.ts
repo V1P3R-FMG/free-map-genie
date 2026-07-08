@@ -2,7 +2,7 @@ import Dexie from "dexie";
 import async from "@/common/async";
 
 import { Repositories } from "./repositories";
-import { ExportHelper } from "./exportHelper";
+import { ExportHelper } from "./exporthelper";
 
 import type { Database } from "../database";
 import type { Key } from "../../key";

@@ -3,7 +3,7 @@ import { Dexie } from "dexie";
 import { LocationsRepositoryV1 } from "./locations";
 import { CategoriesRepositoryV1 } from "./categories";
 import { PresetsRepositoryV1 } from "./presets";
-import { PresetsOrderingRepositoryV1 } from "./presetsOrdering";
+import { PresetsOrderingRepositoryV1 } from "./presetsordering";
 import { NotesRepositoryV1 } from "./notes";
 import { BookmarksRepositoryV1 } from "./bookmarks";
 import { ProfilesRepositoryV1 } from "./profiles";
@@ -21,7 +21,7 @@ export {
 export type { LocationModelV1 } from "./locations";
 export type { CategoryModelV1 } from "./categories";
 export type { PresetModelV1 } from "./presets";
-export type { PresetOrderModelV1 } from "./presetsOrdering";
+export type { PresetOrderModelV1 } from "./presetsordering";
 export type { NoteModelV1 } from "./notes";
 export type { BookmarkModelV1 } from "./bookmarks";
 export type { ProfileModelV1 } from "./profiles";

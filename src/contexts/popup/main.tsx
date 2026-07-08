@@ -2,7 +2,7 @@ import "@/common/messaging/contexts/popup";
 
 import React from "react";
 import ReactDOM from "react-dom/client";
-import App from "./App";
+import App from "./app";
 import { store } from "./store";
 import { Provider } from "react-redux";
 import ReduxToastr from "react-redux-toastr";

@@ -3,7 +3,7 @@ import "@/common/messaging/contexts/contentScript";
 import { ExtensionSettings } from "@/common/extension/settings";
 import { getPageType } from "@/common/mapgenie";
 
-import { Popup } from "./ui/Popup";
+import { Popup } from "./ui/popup";
 
 import extensionService from "@/services/extension.service";
 import { contentLoggerService } from "@/services/logger.service";

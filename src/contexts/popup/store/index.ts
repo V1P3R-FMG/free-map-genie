@@ -6,11 +6,11 @@ import backgroundService from "@/services/background.service";
 import clientService from "@/services/client.service";
 import extensionService from "@/services/extension.service";
 
-import appReducer from "./features/app/appSlice";
-import bookmakrsReducer from "./features/bookmarks/bookmarksSlice";
-import infoReducer from "./features/info/infoSlice";
-import profilesReducer from "./features/profiles/profilesSlice";
-import dataReducer from "./features/data/dataSlice";
+import appReducer from "./features/app/appslice";
+import bookmakrsReducer from "./features/bookmarks/bookmarksslice";
+import infoReducer from "./features/info/infoslice";
+import profilesReducer from "./features/profiles/profilesslice";
+import dataReducer from "./features/data/dataslice";
 
 import { reducer as toastrReducer } from "react-redux-toastr";
 

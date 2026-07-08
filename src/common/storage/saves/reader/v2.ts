@@ -4,7 +4,7 @@ import {
   LocalV2MapDataSchema,
   type LocalV2Data,
 } from "../../databases/local/versions/v2.schema";
-import { V2MigratorHelper } from "../../databases/local/versions/helpers/v2MigratorHelper";
+import { V2MigratorHelper } from "../../databases/local/versions/helpers/v2migratorhelper";
 
 const V2SaveLayoutSchema = z.object({
   version: z.number(),

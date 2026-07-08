@@ -1,4 +1,4 @@
-import ExtensionAdapter from "../adapters/contentScript";
+import ExtensionAdapter from "../adapters/contentscript";
 import DedupeAdapter from "../core/adapters/dedupe";
 import { setGlobalAdapter } from "../core/adapter";
 

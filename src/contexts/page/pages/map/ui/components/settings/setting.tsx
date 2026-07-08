@@ -1,0 +1,67 @@
+import { CustomSetting } from "./customsettings";
+
+import style from "./setting.module.scss";
+
+export const Setting = (props: Setting.Props) => {
+  const [loading, setLoading] = React.useState(true);
+  const [enabled, setEnabled] = useState(false);
+
+  React.useEffect(() => {
+    props.setting.onLoaded(() => {
+      setEnabled(props.setting.enabled);
+      setLoading(false);
+    });
+  }, [props.setting]);
+
+  const onClick = () => {
+    setEnabled((prev) => {
+      const newValue = !prev;
+      props.setting.onChange(newValue);
+      return newValue;
+    });
+  };
+
+  if (!props.setting.applicable) {
+    return null;
+  }
+
+  return (
+    <div
+      className={clsx(
+        "checkbox-wrapper",
+        style.setting,
+        loading && style.skeleton
+      )}
+      onClick={onClick}
+    >
+      {loading && (
+        <Loading
+          className={style.spinner}
+          loading={true}
+          spinnerSize={"1rem"}
+        />
+      )}
+      <div
+        className={clsx(
+          "custom-checkbox",
+          "settings-checkbox",
+          style.customCheckbox
+        )}
+      >
+        <input
+          type="checkbox"
+          className="custom-control-input"
+          checked={enabled}
+          readOnly
+        />
+        <label className="custom-control-label">{props.setting.label}</label>
+      </div>
+    </div>
+  );
+};
+
+namespace Setting {
+  export interface Props {
+    setting: CustomSetting;
+  }
+}

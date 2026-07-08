@@ -1,5 +1,5 @@
 import { Version } from "./version";
-import { V1MigratorHelper } from "./helpers/v1MigratorHelper";
+import { V1MigratorHelper } from "./helpers/v1migratorhelper";
 
 import type { LocalV1Data } from "./v1.schema";
 import type { Driver } from "../drivers/driver";

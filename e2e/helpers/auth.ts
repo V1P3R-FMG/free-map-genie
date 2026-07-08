@@ -1,6 +1,6 @@
 import dotenv from "dotenv";
 
-import { globalCache } from "./globalCache";
+import { globalCache } from "./globalcache";
 import { LoginPage } from "../pages/login";
 
 import type { Browser } from "@playwright/test";
