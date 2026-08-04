@@ -11,20 +11,29 @@ export type PageType =
 
 const isHomePage = () => {
   return (
-    window.location.host === "mapgenie.io" && window.location.pathname === "/"
+    ["mapgenie.io", "www.mapgenie.io"].includes(window.location.host) &&
+    window.location.pathname === "/"
   );
 };
 
-const hasMapgenieCndUrl = () => {
-  return $(`[href*="cdn.mapgenie.io"]`).length > 0;
+const hasMapgenieCdnUrl = () => {
+  return $(`[href*="cdn.mapgenie.io"],[src*="cdn.mapgenie.io"]`).length > 0;
 };
 
 const hasMapgeniePrebid = () => {
   return $(`[src$="mapgenie.prebid.js"]`).length > 0;
 };
 
+const hasMapgenieMeta = () => {
+  return (
+    $(`meta[name="base-url"][content*="mapgenie"]`).length > 0 ||
+    $(`meta[property="og:url"][content*="mapgenie"]`).length > 0 ||
+    $(`link[rel="canonical"][href*="mapgenie"]`).length > 0
+  );
+};
+
 const isMapgenieSite = () => {
-  return hasMapgenieCndUrl() || hasMapgeniePrebid();
+  return hasMapgenieCdnUrl() || hasMapgeniePrebid() || hasMapgenieMeta();
 };
 
 export const getPageType = async () => {

@@ -50,30 +50,46 @@ const checkReload = () => {
   }
 };
 
+const initializeBackendUserState = async (
+  backend: backendService.Instance
+) => {
+  try {
+    // Set auth token in backend service
+    const auth = getAuthToken();
+    await backend.setAuthToken(auth);
+    await backend.updateUser();
+  } catch (err) {
+    logger.debug(
+      "Could not refresh MapGenie account profile; continuing with local FMG data.",
+      err
+    );
+  }
+};
+
 export default defineUnlistedScript(async () => {
   const extension = extensionService.use();
-  const backend = backendService.use();
-
-  const pageType = await getPageType();
-  const pageScript = await getPageScript(pageType);
-
-  if (!pageScript) return;
-
-  // Set auth token in backend service
-  const auth = getAuthToken();
-  await backend.setAuthToken(auth);
-  await backend.updateUser();
-
-  // Reload if script was already injected
-  checkReload();
-
-  logger.log(`Initializing page ${pageType} script.`);
-
-  MapgenieAdBlocker.start();
-  MapgenieAdBlocker.removePrivacyPopup();
-
   let failed: boolean = false;
+  let pageType: PageType = "unknown";
+  let pageScript: Awaited<ReturnType<typeof getPageScript>> = null;
+
   try {
+    const backend = backendService.use();
+
+    pageType = await getPageType();
+    pageScript = await getPageScript(pageType);
+
+    if (!pageScript) return;
+
+    void initializeBackendUserState(backend);
+
+    // Reload if script was already injected
+    checkReload();
+
+    logger.log(`Initializing page ${pageType} script.`);
+
+    MapgenieAdBlocker.start();
+    MapgenieAdBlocker.removePrivacyPopup();
+
     await pageScript.start();
 
     logger.log(`Page ${pageType} script initialized.`);
@@ -85,5 +101,7 @@ export default defineUnlistedScript(async () => {
     await extension.unmountLoadingOverlay();
   }
 
-  pageService.provide({ failed, page: pageScript });
+  if (pageScript) {
+    pageService.provide({ failed, page: pageScript });
+  }
 });

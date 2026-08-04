@@ -6,6 +6,7 @@ import { getPageType } from "@/common/mapgenie";
 import { Popup } from "./ui/Popup";
 
 import extensionService from "@/services/extension.service";
+import backendService from "@/services/backend.service";
 import { contentLoggerService } from "@/services/logger.service";
 
 export default defineContentScript({
@@ -15,12 +16,18 @@ export default defineContentScript({
   async main() {
     const params = new URLSearchParams(window.location.search);
     if (params.has("fmgBackend")) return;
+    if (params.has("fmgStorage")) return;
 
     const page = await getPageType();
     if (page === "unknown") return;
 
     const extension = extensionService.provide();
     contentLoggerService.provide();
+
+    if (import.meta.env.FIREFOX && window.top === window) {
+      backendService.provide();
+      logger.log("Backend service provided from page content script.");
+    }
 
     const enabled = await ExtensionSettings.enabled.getValue();
     if (!enabled) {

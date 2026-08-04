@@ -1,15 +1,30 @@
 import type mapgenieService from "@/services/mapgenie.service";
 
+type GameWithMaps = MG.Api.Game | MG.Api.GameFull;
+type MapInfo = MG.Api.Map | MG.Api.MapFullForGame | MG.Map;
+
 const getLinkMapName = ($link: JQuery<HTMLAnchorElement>) => {
   return $link
     .text()
-    .replace(/\[(WIP|PRO)\]/, "")
+    .replace(/\s*\[(WIP|PRO)\]\s*/gi, " ")
+    .replace(/\s+/g, " ")
     .trim();
+};
+
+const isLockedMapLink = (link: HTMLAnchorElement) => {
+  const href = link.getAttribute("href")?.trim();
+  if (!href || href === "#") return true;
+
+  try {
+    return new URL(link.href).pathname.endsWith("/upgrade");
+  } catch {
+    return link.href.endsWith("/upgrade");
+  }
 };
 
 const getProLinks = ($links: JQuery<HTMLAnchorElement>) => {
   return $links.filter(function () {
-    return this.href.endsWith("/upgrade");
+    return isLockedMapLink(this);
   });
 };
 
@@ -26,13 +41,32 @@ const getProHeaderLinks = (
   });
 };
 
-const createMapByTitle = (game: MG.Api.GameFull) => {
-  return Object.fromEntries(game.maps.map((m) => [m.title.trim(), m]));
+const createMapByTitle = (maps: MapInfo[]) => {
+  return Object.fromEntries(maps.map((m) => [m.title.trim(), m]));
+};
+
+const getFreeLinkUrl = (
+  $links: JQuery<HTMLAnchorElement>,
+  game: GameWithMaps
+) => {
+  const freeLink = $links.toArray().find((link) => !isLockedMapLink(link));
+  if (freeLink) {
+    return new URL(freeLink.href);
+  }
+
+  const freeMap = game.maps.find((map) => !map.premium && map.available);
+  const fallbackMap = freeMap ?? game.maps.find((map) => !map.premium);
+
+  if (!fallbackMap) {
+    return null;
+  }
+
+  return new URL(`${game.config.url}/maps/${fallbackMap.slug}`);
 };
 
 const fixLink = (
   link: HTMLAnchorElement,
-  mapByTitle: Record<string, MG.Api.MapFull>,
+  mapByTitle: Record<string, MapInfo>,
   freeUrl: URL
 ) => {
   const $link = $(link);
@@ -77,19 +111,21 @@ export const fixMapLinks = async (mapgenie: mapgenieService.Instance) => {
     $("a.map-link.selected").toggleClass("selected", false);
   }
 
-  // Get game for this map
-  const game = await mapgenie.fetchGame(window.game!.id);
+  const currentMapId = window.mapData?.map.id;
+  const game = currentMapId
+    ? (await mapgenie.fetchMap(currentMapId)).game
+    : await mapgenie.fetchGameInfo(window.game!.id);
 
-  // Get first free map we find
-  const freeMap = game.maps.find((map) => !map.premium);
-
-  if (!freeMap) {
+  const freeMapUrl = getFreeLinkUrl($sidebarLinks, game);
+  if (!freeMapUrl) {
     logger.warn("No free map found, can not unlock map selector panel.");
     return;
   }
 
-  const freeMapUrl = new URL(freeMap.url);
-  const mapByTitle = createMapByTitle(game);
+  const mapByTitle = createMapByTitle([
+    ...game.maps,
+    ...(window.mapData?.maps ?? []),
+  ]);
 
   $proSidebarLinks.each((_, link) => fixLink(link, mapByTitle, freeMapUrl));
   $proHeaderLinks.each((_, link) => fixLink(link, mapByTitle, freeMapUrl));
@@ -106,16 +142,13 @@ export const fixGameHomeLinks = async (mapgenie: mapgenieService.Instance) => {
   const [_, slug] = location.pathname.split("/");
   const game = await mapgenie.fetchGameBySlug(slug);
 
-  // Get first free map we find
-  const freeMap = game.maps.find((map) => !map.premium);
-
-  if (!freeMap) {
+  const freeMapUrl = getFreeLinkUrl($mapLinks, game);
+  if (!freeMapUrl) {
     logger.warn("No free map found, can not pro links in game home page.");
     return;
   }
 
-  const freeMapUrl = new URL(freeMap.url);
-  const mapByTitle = createMapByTitle(game);
+  const mapByTitle = createMapByTitle(game.maps);
 
   $proMapLinks.each((_, link) => fixLink(link, mapByTitle, freeMapUrl));
 };
