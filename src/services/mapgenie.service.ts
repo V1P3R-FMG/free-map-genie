@@ -43,6 +43,16 @@ class MapgenieService {
   }
 
   @Memoize()
+  public async fetchGameInfo(gameId: number | string) {
+    const games = await this.fetchGames();
+    const game = games.find((g) => String(g.id) === String(gameId));
+    if (!game) {
+      throw new Error(`Game with id "${gameId}" not found`);
+    }
+    return game;
+  }
+
+  @Memoize()
   public async fetchGame(gameId: number | string) {
     const { data } = await this.axios.get<MG.Api.GameFull>(
       `/games/${gameId}/full`

@@ -6,6 +6,7 @@ import { WebRequestManager } from "./webRequest";
 
 export class Rules {
   private readonly manager: RulesManager = this.createManager();
+  private readonly blockedScriptRuleIds = [2, 3];
 
   constructor() {
     this.setupRules();
@@ -61,7 +62,7 @@ export class Rules {
       action: { type: "block" },
       condition: {
         requestDomains: ["cdn.mapgenie.io"],
-        urlFilter: "/js/map.js?id=*",
+        regexFilter: "^https://cdn\\.mapgenie\\.io/js/map\\.js\\?id=",
         resourceTypes: ["script"],
       },
     });
@@ -73,14 +74,16 @@ export class Rules {
       action: { type: "block" },
       condition: {
         requestDomains: ["cdn.mapgenie.io"],
-        urlFilter: "/js/TarkovQuestToolWidget.js?id=*",
+        regexFilter:
+          "^https://cdn\\.mapgenie\\.io/js/TarkovQuestToolWidget\\.js\\?id=",
         resourceTypes: ["script"],
       },
     });
   }
 
   public async enable() {
-    await this.manager.enable([1, 2, 3]);
+    await this.manager.disable([2, 3]);
+    await this.manager.enable([1, ...this.blockedScriptRuleIds]);
   }
 
   public disable() {

@@ -6,6 +6,14 @@ export * from "./page";
 export * from "./links";
 export * as mapDataUtils from "./data";
 
+const getReadyScriptUrl = (src: string) => {
+  const url = new URL(src, window.location.href);
+  if (!url.searchParams.has("ready")) {
+    url.search = url.search ? `?ready&${url.search.slice(1)}` : "?ready";
+  }
+  return url.toString();
+};
+
 /**
  * This function reloads a blocked mapgenie script.
  * The background script blocks certain mapgenie scripts from loading.
@@ -15,17 +23,31 @@ export * as mapDataUtils from "./data";
 export const activateBlockedMapgenieScript = async (name: string) => {
   await waitForBody();
 
-  const $ogScript = $(
+  const ogScript = document.querySelector<HTMLScriptElement>(
     `script[src^="https://cdn.mapgenie.io/js/${name}.js?id="]`
   );
 
-  if ($ogScript.length === 0) {
+  if (!ogScript) {
     return false;
   }
 
-  const src = $ogScript.attr("src")!.replace("id=", "ready&id=");
+  const src = getReadyScriptUrl(ogScript.src);
 
-  $(`<script/>`, { src }).appendTo("body");
+  await new Promise<void>((resolve, reject) => {
+    const script = document.createElement("script");
+    script.src = src;
+    script.async = false;
+    script.addEventListener("load", () => resolve(), { once: true });
+    script.addEventListener(
+      "error",
+      () => reject(new Error(`Failed to load MapGenie script: ${src}`)),
+      { once: true }
+    );
+
+    document.body.appendChild(script);
+  });
+
+  return true;
 };
 
 export const getAuthToken = () => {
