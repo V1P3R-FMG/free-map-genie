@@ -22,6 +22,10 @@ export class DexieDatabase implements Database {
     return this.repositories.categories;
   }
 
+  public get categoryFilters() {
+    return this.repositories.categoryFilters;
+  }
+
   public get presets() {
     return this.repositories.presets;
   }
