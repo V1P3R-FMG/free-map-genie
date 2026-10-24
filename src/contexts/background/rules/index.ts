@@ -61,7 +61,7 @@ export class Rules {
       action: { type: "block" },
       condition: {
         requestDomains: ["cdn.mapgenie.io"],
-        urlFilter: "/js/map.js?id=*",
+        regexFilter: "^https://cdn[.]mapgenie[.]io/js/map([.][a-zA-Z0-9_-]+)?[.]js([?]id=|$)",
         resourceTypes: ["script"],
       },
     });

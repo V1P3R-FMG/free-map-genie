@@ -15,17 +15,26 @@ export * as mapDataUtils from "./data";
 export const activateBlockedMapgenieScript = async (name: string) => {
   await waitForBody();
 
-  const $ogScript = $(
-    `script[src^="https://cdn.mapgenie.io/js/${name}.js?id="]`
-  );
+  const escapedName = name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const scriptPath = new RegExp(`^/js/${escapedName}(?:\\.[a-zA-Z0-9_-]+)?\\.js$`);
+  const scripts = [...document.querySelectorAll<HTMLScriptElement>("script[src]")];
+  const matches = scripts.filter((script) => {
+    const url = new URL(script.src);
+    return url.origin === "https://cdn.mapgenie.io" && scriptPath.test(url.pathname);
+  });
 
-  if ($ogScript.length === 0) {
-    return false;
-  }
+  // An already activated copy must not be inserted/executed a second time.
+  if (matches.some((script) => new URL(script.src).searchParams.has("ready"))) return false;
+  const original = matches[0];
+  if (!original) return false;
 
-  const src = $ogScript.attr("src")!.replace("id=", "ready&id=");
-
-  $(`<script/>`, { src }).appendTo("body");
+  const url = new URL(original.src);
+  // Keep ready first: the blocking rules only match the original URL forms.
+  url.search = `?ready${url.search ? `&${url.search.slice(1)}` : ""}`;
+  const script = document.createElement("script");
+  script.src = url.toString();
+  document.body.appendChild(script);
+  return true;
 };
 
 export const getAuthToken = () => {
