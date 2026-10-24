@@ -45,7 +45,11 @@ export default class BackgroundAdapter extends Adapter {
   }
 
   private handlePort(port: Browser.runtime.Port) {
-    const tab = port.sender?.tab;
+    // The Vivaldi backend tab replaces the global offscreen context. Its
+    // iframe ports must remain global, not be routed only to that hidden tab.
+    const isBackendTab = import.meta.env.VIVALDI_COMPAT &&
+      port.sender?.tab?.url === browser.runtime.getURL("/offscreen.html");
+    const tab = isBackendTab ? undefined : port.sender?.tab;
     const key = this.getKeyForTab(tab);
 
     port.onMessage.addListener(async (message) => {

@@ -40,6 +40,7 @@ export default defineConfig({
           },
   }),
   define: {
+    "import.meta.env.VIVALDI_COMPAT": JSON.stringify(process.env.FMG_VIVALDI_COMPAT === "1"),
     "import.meta.env.PKG_VERSION": JSON.stringify(version),
     "import.meta.env.PKG_HOMEPAGE": JSON.stringify(homepage),
     "import.meta.env.PKG_AUTHOR": JSON.stringify(author),
@@ -59,6 +60,8 @@ export default defineConfig({
     inputDir: "icons",
   },
   manifest: ({ browser, manifestVersion }) => ({
+    name: process.env.FMG_VIVALDI_COMPAT === "1" ? "Free Map Genie — Vivaldi compatibility" : undefined,
+    version_name: process.env.FMG_VIVALDI_COMPAT === "1" ? "3.0.0-vivaldi-local" : undefined,
     host_permissions: ["*://mapgenie.io/*", "*://cdn.mapgenie.io/*"],
     web_accessible_resources: [
       {
@@ -74,7 +77,9 @@ export default defineConfig({
     ],
     permissions:
       browser === "chrome"
-        ? ["declarativeNetRequest", "offscreen", "storage"]
+        ? (process.env.FMG_VIVALDI_COMPAT === "1"
+          ? ["declarativeNetRequest", "storage", "tabs"]
+          : ["declarativeNetRequest", "offscreen", "storage"])
         : manifestVersion === 2
           ? ["webRequest", "webRequestBlocking", "storage"]
           : ["declarativeNetRequest", "storage"],
